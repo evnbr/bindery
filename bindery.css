@@ -1,0 +1,296 @@
+/*
+
+
+B I N D E R Y . C S S
+
+Evan Brooks 2014
+Accompanies bindery.js
+
+*/
+
+
+
+/* ----------------------------------
+
+CSS Region flow (used by the polyfill)
+
+----------------------------------*/
+
+
+._book .content-source {
+    flow-into: content-flow contents;
+}
+
+._book .content-region {
+    flow-from: content-flow;
+    region-fragment: break;
+}
+
+[data-remove-before-print] {
+	display: none !important;
+}
+
+/* ----------------------------------
+
+Faked print styles
+
+----------------------------------*/
+
+
+._book ._page-break {
+	display: block;
+	/*outline: 1px solid red;*/
+	break-after: region;
+	/* margin-bottom: 6in; */
+	opacity: 0.1;
+}
+
+/* ----------------------------------
+
+UI for bookmaker
+
+----------------------------------*/
+
+._book._notsplityet {
+	color: black !important;
+}
+
+._book._notsplityet h4 {
+	color: black;
+}
+
+._book._notsplityet ._wont-print h4 {
+	color: #aaa;
+}
+
+._book._notsplityet ._wont-print h4:hover {
+	opacity: 0.8;
+}
+
+._book._notsplityet .toc-pg {
+	left: 0;
+	right: auto;
+	padding: 5px;
+}
+
+._book._notsplityet .toc-item {
+	padding-left: 2.5em;
+	margin-bottom: 0.2em;
+}
+
+._book._notsplityet body {
+	/*background: gray;*/
+}
+
+._book._notsplityet .title-page,
+._book._notsplityet .toc-heading {
+	display: none;
+}
+
+._book._notsplityet .toc h4 {
+	font-size: 20px !important;
+}
+
+._book._notsplityet .toc-author {
+	color: inherit !important;
+}
+
+._book._notsplityet .content-source {
+	max-width: 800px;
+	margin: auto;
+	padding: 0.3in 0.4in;
+}
+
+/* ----------------------------------
+
+For previewing the print
+
+----------------------------------*/
+
+
+._cropmarks .page-outer:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: -20px;
+	left: -20px;
+	width: 100%;
+	height: 100%;
+	-webkit-border-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowMjAwMjQwRUNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDowMjAwMjQwRkNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkJFRjE1REVCQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkJFRjE1REVDQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+OTmWYwAAA3VJREFUeNrs2MGKgzAUhtH+pXt9/6esT3An3RWEQWidScw5EFpchZvwgaaqbswnyevn/fDT610Yaa+c624EgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgA/+ZhBFNb7ZWRpKpMYcaDT3bPer0LI+0Vr4QAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFgAAv0tbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFgAAH0lbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWwN97GMHUlrf/m73Su1SVKcx48Mnrp0a4CyPtFa+EAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABV/UjwADn4TtZkBC9rAAAAABJRU5ErkJggg==) 131 fill stretch round;
+	border-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowMjAwMjQwRUNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDowMjAwMjQwRkNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkJFRjE1REVCQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkJFRjE1REVDQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+OTmWYwAAA3VJREFUeNrs2MGKgzAUhtH+pXt9/6esT3An3RWEQWidScw5EFpchZvwgaaqbswnyevn/fDT610Yaa+c624EgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgA/+ZhBFNb7ZWRpKpMYcaDT3bPer0LI+0Vr4QAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFgAAv0tbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFgAAH0lbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWwN97GMHUlrf/m73Su1SVKcx48Mnrp0a4CyPtFa+EAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABV/UjwADn4TtZkBC9rAAAAABJRU5ErkJggg==) 131 fill stretch round;
+	border-image-slice: 131;
+	border-image-repeat: stretch round;
+	border-width: 20px;
+	box-sizing: content-box;
+}
+
+
+.print-nav {
+	display: none; 
+	font: 15px/1.4 'Messenger Text', sans-serif;
+}
+
+._book._notsplityet .page-outer {
+	display: none;
+}
+
+
+@media screen {
+	._book body {
+		max-width: 11in;
+		background: white;
+	}
+
+	._book body._regions-loaded {
+		margin-top: 0;
+		background: #eee;
+	}
+
+	._book-pages {
+		visibility: hidden;
+	}
+
+	._regions-loaded ._book-pages {
+		visibility: visible;
+	}
+
+
+	.page-outer {
+		background: white;
+		display: inline-block;
+	    margin: 30px 10px;
+	    box-shadow: 0px 2px 3px rgba(0,0,0,0.1);
+	    /*outline: 1px solid black;*/
+	    overflow: hidden;
+	}
+
+	._guides .page-outer {
+		overflow: visible;
+	}
+
+	/* bleed line */
+	._guides .page-inner {
+		outline: 1px solid cyan;
+	}
+
+
+	/* page break line */
+	._guides ._book ._page-break:after {
+		content: "Force a page break!";
+		position: absolute;
+		color: red;
+	}
+
+	.page-outer[data-page='1'] {
+		display: block;
+		margin: 1rem auto;
+	}
+
+	.print-nav {
+		position: fixed;
+		top: 0;
+		right: 0;
+		left: 0;
+		display: block;
+		z-index: 999;
+		padding: 15px;
+	}
+
+	.toggle-btn {
+		padding: 0.4em 1em;
+		margin: -7px 0;
+		-webkit-appearance: none;
+		border: none;
+		background: blue;
+		color: white;
+		cursor: pointer;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		float: right;
+		-webkit-transition: opacity 0.7s;
+	}
+
+	.toggle-btn:hover {
+		background: black;
+	}
+
+	.toggle-btn[disabled] {
+		opacity: 0.2;
+	}
+
+	#bindStatus {
+		float: right;
+		margin-right: 2em;
+	}
+
+	#postProcessControls {
+		display: none;
+		float: right;
+	}
+
+	._regions-loaded #postProcessControls {
+		display: block;
+	}
+
+	#postProcessControls input {
+		margin-right: 1ch;
+	}
+
+	#postProcessControls label {
+		margin-right: 1em;
+	}
+
+
+	#progbar {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		width: 100%;
+		height: 5px;
+		-webkit-appearance: none;
+		appearence: none;
+		border: 0;
+		z-index: -1;
+		opacity: 1;
+		background: transparent;
+		-webkit-transition: opacity 0.8s;
+	}
+
+	._regions-loaded #progbar {
+		background: blue;
+		opacity: 0;
+	}
+
+	#progbar[value]::-webkit-progress-bar {
+  		background-color: transparent;
+  	}
+
+  	#progbar[value]::-webkit-progress-value {
+  		background: blue;
+  	}
+
+}
+
+/* ----------------------------------
+
+Actual print styles
+
+----------------------------------*/
+
+@media print {
+	body, html {
+		margin: 1px;
+		padding: 0;
+	}
+
+	.page-outer {
+		/* BECAUSE CHROME !?!?! */
+		-webkit-transform: scale(0.944);
+	}
+
+	/* Hacky and temporary, assume that crop marks means large paper*/
+	._cropmarks .page-outer {
+		margin-top: 1in;
+	}
+}
