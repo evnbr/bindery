@@ -40,10 +40,6 @@ class Book {
     this.target.appendChild(page.element);
     return page;
   }
-  nextFlowBox() {
-    let pg = this.addPage();
-    return pg.flowBox;
-  }
 }
 
 class Page {
@@ -84,8 +80,12 @@ class Binder {
   currentEl() {
     return this.context[this.context.length-1];
   }
+  nextFlowBox() {
+    let pg = this.book.addPage();
+    return pg.flowBox;
+  }
   bind(doneBinding) {
-    let DELAY = 200; // ms
+    let DELAY = 10; // ms
 
     let hasOverflowed = (t) => {
       let elementBottom = t.getBoundingClientRect().bottom;
@@ -98,7 +98,7 @@ class Binder {
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
     let cloneContextToNextFlowBox = () => {
-      currentFlowBox = this.book.nextFlowBox();
+      currentFlowBox = this.nextFlowBox();
       for (var i = this.context.length - 1; i >= 0; i--) {
         let clone = this.context[i].cloneNode(false);
         clone.innerHTML = '';
@@ -135,40 +135,38 @@ class Binder {
 
       let textNode = origTextNode;
       let origText = textNode.nodeValue;
-      // let breakPositionsToTry = getAllSpaces(origText);
-      // let breakPosIndex = 0;
 
       let posShift = 1;
-      let addWordCount = 0;
 
-      let addWord = (pos) => {
+      let pos = 0;
+      let lastPos = pos;
+
+      let addWord = (rawPos) => {
+
+        lastPos = pos;
+        pos = parseInt(rawPos);
+        let dist = Math.abs(lastPos - pos);
+
+        console.log(`Pos: ${pos} Dist: ${dist}`);
+
         if (pos > origText.length - 1) {
           delayedDone()
           return;
         }
-        if (origText.charAt(pos) !== " " && pos < origText.length-1) {
-          // console.log(`adjusted to ${pos+1}`);
-          posShift += 1;
-          addWord(pos + 1);
-          return;
-        }
-        addWordCount++;
         textNode.nodeValue = origText.substr(0, pos);
-        if (hasOverflowed(this.currentEl())) {
+
+        if (dist < 1) { // Is done
           // Go back to before we overflowed
-          pos = pos - posShift;
-          // console.log(`reset pos to ${pos} by subtracting ${posShift}, could have set it to ${breakPositionsToTry[breakPosIndex+1]}`)
+
+          while(origText.charAt(pos) !== " " && pos > -1) pos--;
 
           textNode.nodeValue = origText.substr(0, pos);
           if (pos > 0) {
             origText = origText.substr(pos);
             pos = 0;
-            // breakPositionsToTry = getAllSpaces(origText);
-            // breakPosIndex = 0;
           }
 
           // Start on new page
-          // console.log(`We naively tried ${addWordCount} of ${breakPositionsToTry.length} text break points`);
           cloneContextToNextFlowBox();
           textNode = document.createTextNode(origText);
           this.currentEl().appendChild(textNode);
@@ -179,15 +177,17 @@ class Binder {
             return;
           }
         }
-        setTimeout(() => {
-          // breakPosIndex++;
-          // console.log(`trying ${pos+2}, could have tried ${breakPositionsToTry[breakPosIndex]}`)
-          // addWord(breakPositionsToTry[breakPosIndex])
 
-          posShift = 2; // skip past the space
-          addWord(pos + 2);
-
-        }, DELAY);
+        if (hasOverflowed(this.currentEl())) { // Go back
+          setTimeout(() => {
+            addWord(pos - dist/2);
+          }, DELAY);
+        }
+        else {
+          setTimeout(() => {
+            addWord(pos + dist/2);
+          }, DELAY);
+        }
       }
 
       // we added it all in one go
@@ -196,7 +196,7 @@ class Binder {
       }
       // iterate word-by-word
       else {
-        addWord(0);
+        addWord(origText.length/2);
       }
     }
 
@@ -284,7 +284,7 @@ class Binder {
       addNextChild();
     }
 
-    let currentFlowBox = this.book.nextFlowBox();
+    let currentFlowBox = this.nextFlowBox();
     addElementNode(this.source, () => {
       console.log("wow we're done!");
       doneBinding(this.book);
