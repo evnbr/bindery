@@ -1,0 +1,57 @@
+[bindery-page] {
+  outline: 1px solid red;
+  width: 400px;
+  height: 600px;
+  position: relative;
+  overflow: hidden;
+  flex: none;
+  margin: auto;
+}
+
+[bindery-print-wrapper] {
+  page-break-after: always;
+  display: flex;
+  margin: 10px;
+  /*display: inline-block;*/
+  width: 800px;
+  margin: auto;
+}
+
+[bindery-flowbox] {
+  outline: 1px solid cyan;
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  right: 40px;
+  bottom: 40px;
+}
+
+[bindery-flowbox].bleed {
+  outline: 1px solid cyan;
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+}
+
+[bindery-num] {
+  outline: 1px solid cyan;
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  text-align: center;
+  bottom: 20px;
+}
+
+[bindery-continuation] {
+  text-indent: 0 !important;
+}
+
+.scanner {
+  background: magenta;
+  height: 1em;
+  width: 4px;
+  display: inline-block;
+  vertical-align: middle;
+}
