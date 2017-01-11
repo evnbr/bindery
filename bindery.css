@@ -47,11 +47,3 @@
 [bindery-continuation] {
   text-indent: 0 !important;
 }
-
-.scanner {
-  background: magenta;
-  height: 1em;
-  width: 4px;
-  display: inline-block;
-  vertical-align: middle;
-}

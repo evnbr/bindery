@@ -80,11 +80,12 @@ class Binder {
     })
 
     this.context = [];
-
+  }
+  currentEl() {
+    return this.context[this.context.length-1];
   }
   bind(doneBinding) {
     let DELAY = 200; // ms
-    let textScanner =  el("div", "scanner");
 
     let hasOverflowed = (t) => {
       let elementBottom = t.getBoundingClientRect().bottom;
@@ -130,8 +131,7 @@ class Binder {
         setTimeout(doneCallback, DELAY);
       }
 
-      last(this.context).appendChild(origTextNode);
-      last(this.context).insertBefore(textScanner, origTextNode.nextSibling);
+      this.currentEl().appendChild(origTextNode);
 
       let textNode = origTextNode;
       let origText = textNode.nodeValue;
@@ -154,7 +154,7 @@ class Binder {
         }
         addWordCount++;
         textNode.nodeValue = origText.substr(0, pos);
-        if (hasOverflowed(last(this.context))) {
+        if (hasOverflowed(this.currentEl())) {
           // Go back to before we overflowed
           pos = pos - posShift;
           // console.log(`reset pos to ${pos} by subtracting ${posShift}, could have set it to ${breakPositionsToTry[breakPosIndex+1]}`)
@@ -171,11 +171,10 @@ class Binder {
           // console.log(`We naively tried ${addWordCount} of ${breakPositionsToTry.length} text break points`);
           cloneContextToNextFlowBox();
           textNode = document.createTextNode(origText);
-          last(this.context).appendChild(textNode);
-          last(this.context).insertBefore(textScanner, textNode.nextSibling);
+          this.currentEl().appendChild(textNode);
 
           // If the remainder fits there, we're done
-          if (!hasOverflowed(last(this.context))) {
+          if (!hasOverflowed(this.currentEl())) {
             delayedDone()
             return;
           }
@@ -192,7 +191,7 @@ class Binder {
       }
 
       // we added it all in one go
-      if (!hasOverflowed(textScanner)) {
+      if (!hasOverflowed(this.currentEl())) {
         delayedDone();
       }
       // iterate word-by-word
@@ -208,7 +207,7 @@ class Binder {
 
       // Add this node to the current page or context
       if (this.context.length == 0) currentFlowBox.appendChild(this.source);
-      else last(this.context).appendChild(node);
+      else this.currentEl().appendChild(node);
       this.context.push(node);
 
       // This can be added instantly without searching for the overflow point
