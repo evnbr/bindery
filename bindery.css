@@ -1,8 +1,11 @@
 @media screen {
   [bindery-page] {
-    outline: 1px solid red;
+    outline: 1px solid rgba(0,0,0,0.3);
+    background: white;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
   }
   [bindery-print-wrapper] {
+    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/
   }
   [bindery-flowbox] {
     outline: 1px solid cyan;
@@ -16,11 +19,15 @@
   [bindery-num] {
     outline: 1px solid cyan;
   }
+  .export, .measureArea {
+    background: #eee;
+    padding: 20px;
+  }
 }
 
 @media print {
   [bindery-print-wrapper] {
-    border: 1px solid black;
+    border: 1px dashed black;
     margin: 8px;
   }
 }
@@ -32,7 +39,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  opacity: 0.2;
 }
 
 .measureArea p {
@@ -45,7 +51,7 @@
   display: flex;
   margin: 10px;
   width: 800px;
-  margin: auto;
+  margin: 8px auto;
 }
 
 [bindery-page] {
@@ -70,6 +76,7 @@
   margin: 40px;
   margin-top: 10px;
   flex: 0 1 auto;
+  font-size: 0.66em;
 }
 
 .bleed [bindery-flowbox] {
