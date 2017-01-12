@@ -32,6 +32,7 @@
   left: 0;
   right: 0;
   bottom: 0;
+  opacity: 0.2;
 }
 
 .measureArea p {
@@ -71,7 +72,7 @@
   flex: 0 1 auto;
 }
 
-[bindery-flowbox].bleed {
+.bleed [bindery-flowbox] {
   margin: 0;
   outline: 1px solid cyan;
   position: absolute;

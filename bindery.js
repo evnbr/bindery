@@ -85,35 +85,34 @@ class Binder {
   currentEl() {
     return this.context[this.context.length-1];
   }
-  nextFlowBox() {
+  nextPage() {
     let pg = new Page(this.template);
     this.measureArea.appendChild(pg.element);
     this.book.addPage(pg);
     return pg;
   }
   bind(doneBinding) {
-    let DELAY = 50; // ms
+    let DELAY = 10; // ms
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();
     }
 
     let hasOverflowed = () => {
-      let elementBottom = currentPage.flowContent.getBoundingClientRect().bottom;
-      let pageY = currentPage.flowBox.getBoundingClientRect().top;
-      let pageH = currentPage.flowBox.getBoundingClientRect().height;
-      elementBottom = elementBottom - pageY;
-      return elementBottom > pageH;
+      let contentH = currentPage.flowContent.getBoundingClientRect().height;
+      let boxH = currentPage.flowBox.getBoundingClientRect().height;
+      return contentH >= boxH;
     }
 
     let finishPage = () => {
+      // console.log(`Finished page with `)
       this.measureArea.removeChild(currentPage.element);
     }
 
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
-    let cloneContextToNextFlowBox = () => {
-      currentPage = this.nextFlowBox();
+    let cloneContextToNextPage = () => {
+      currentPage = this.nextPage();
       for (var i = this.context.length - 1; i >= 0; i--) {
         let clone = this.context[i].cloneNode(false);
         clone.innerHTML = '';
@@ -171,10 +170,13 @@ class Binder {
             origText = origText.substr(pos);
             pos = 0;
           }
+          else {
+            console.error(`Bindery: Shouldn't have tried to add "${origText.substr(0,25)}"`);
+          }
           console.log(addWordSteps + " iterations");
           // Start on new page
           finishPage();
-          cloneContextToNextFlowBox();
+          cloneContextToNextPage();
           textNode = document.createTextNode(origText);
           this.currentEl().appendChild(textNode);
 
@@ -212,8 +214,6 @@ class Binder {
       else this.currentEl().appendChild(node);
       this.context.push(node);
 
-      currentPage.footer.innerHTML += "And here's something else to add<br>";
-
       // This can be added instantly without searching for the overflow point
       if (!hasOverflowed(node)) {
         throttle(doneCallback);
@@ -225,7 +225,7 @@ class Binder {
         if (nodeH < flowH) {
           this.context.pop();
           finishPage();
-          cloneContextToNextFlowBox();
+          cloneContextToNextPage();
           addElementNode(node, doneCallback);
           return;
         }
@@ -258,14 +258,14 @@ class Binder {
             if (child.getAttribute("bindery-break") == "before") {
               if (currentPage.flowContent.innerText !== "") {
                 finishPage();
-                cloneContextToNextFlowBox();
+                cloneContextToNextPage();
               }
             }
             if (child.hasAttribute("bindery-spread")) {
               let spreadMode = child.getAttribute("bindery-spread");
               let oldBox = currentPage;
               let oldContext = this.context.slice(0);
-              cloneContextToNextFlowBox();
+              cloneContextToNextPage();
               if (spreadMode == "bleed") {
                 currentPage.element.classList.add("bleed");
               }
@@ -276,6 +276,16 @@ class Binder {
                 addNextChild();
               });
               break;
+            }
+            let footNote = el("div", "footnote");
+            footNote.textContent = `* ${child.textContent.substr(0,28)}`
+            currentPage.footer.appendChild(footNote);
+            if (hasOverflowed(node)) {
+              console.error(`This was gonna be a problem: "${child.textContent.substr(0,28)}"`);
+              currentPage.footer.removeChild(footNote);
+              finishPage();
+              cloneContextToNextPage();
+              currentPage.footer.appendChild(footNote);
             }
             throttle(() => {
               addElementNode(child, () => {
@@ -292,7 +302,7 @@ class Binder {
       addNextChild();
     }
 
-    let currentPage = this.nextFlowBox();
+    let currentPage = this.nextPage();
     addElementNode(this.source, () => {
       console.log("wow we're done!");
       doneBinding(this.book);
