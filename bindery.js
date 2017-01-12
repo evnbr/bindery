@@ -56,9 +56,57 @@ class Page {
   }
 }
 
+class ElementPath {
+  constructor() {
+    this.items = [];
+    this.root = null;
+    this.last = null;
+  }
+  push(item) {
+    this.items.push(item);
+    this.update();
+  }
+  pop() {
+    const i = this.items.pop();
+    this.update();
+    return i;
+  }
+  update() {
+    this.root = this.items[0];
+    this.last = this.items[this.items.length-1];
+  }
+  clone() {
+    let newPath = new ElementPath();
+    for (var i = this.items.length - 1; i >= 0; i--) {
+      let clone = this.items[i].cloneNode(false);
+      clone.innerHTML = '';
+      clone.setAttribute("bindery-continuation", true);
+      if (clone.id) {
+        console.warn(`Bindery: Added a break to ${prettyName(clone)}, so "${clone.id}" is no longer a unique ID.`);
+      }
+      if (i < this.items.length - 1) {
+        clone.appendChild(newPath.items[i+1]);
+      }
+      newPath.items[i] = clone;
+    }
+    newPath.update();
+    return newPath;
+  }
+}
+
 class Binder {
   constructor(opts) {
     this.source = opts.source;
+    opts.template = `
+      <div bindery-page>
+        <div bindery-flowbox>
+          <div bindery-content>
+          </div>
+        </div>
+        <div bindery-num></div>
+        <div bindery-footer></div>
+      </div>
+    `;
 
     if (typeof opts.template == "string") {
       let temp = document.createElement("div");
@@ -73,14 +121,9 @@ class Binder {
       console.error(`Bindery: Template should be an element or a string`);
     }
 
-    this.book = new Book({
-      target: opts.target,
-    });
+    this.book = new Book({ target: opts.target });
 
-    this.elementPath = [];
-  }
-  currentEl() {
-    return this.elementPath[this.elementPath.length-1];
+    this.elementPath = new ElementPath();
   }
   nextPage() {
     let pg = new Page(this.template);
@@ -105,44 +148,28 @@ class Binder {
       return contentH >= boxH;
     }
 
-    let finishPage = () => {
-      // console.log(`Finished page with `)
-      this.measureArea.removeChild(currentPage.element);
+    let finishPage = (pg) => {
+      this.measureArea.removeChild(pg.element);
     }
 
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
     let makeContinuation = () => {
+      this.elementPath = this.elementPath.clone();
       let newPage = this.nextPage();
-      for (var i = this.elementPath.length - 1; i >= 0; i--) {
-        let clone = this.elementPath[i].cloneNode(false);
-        clone.innerHTML = '';
-        clone.setAttribute("bindery-continuation", true);
-        if (clone.id) {
-          console.warn(`Bindery: Added a break to ${prettyName(clone)}, so "${clone.id}" is no longer a unique ID.`);
-        }
-        if (i < this.elementPath.length - 1) {
-          clone.appendChild(this.elementPath[i+1]);
-        }
-        this.elementPath[i] = clone;
-      }
-      newPage.flowContent.appendChild(this.elementPath[0]);
+      newPage.flowContent.appendChild(this.elementPath.root);
       return newPage;
     };
 
 
-
-
     // Adds an text node by adding each word one by one
     // until it overflows
-    let addTextNode = (origTextNode, doneCallback, abortCallback) => {
+    let addTextNode = (node, doneCallback, abortCallback) => {
 
-      this.currentEl().appendChild(origTextNode);
+      this.elementPath.last.appendChild(node);
 
-      let textNode = origTextNode;
+      let textNode = node;
       let origText = textNode.nodeValue;
-
-      let posShift = 1;
 
       let pos = 0;
       let lastPos = pos;
@@ -180,10 +207,10 @@ class Binder {
           pos = 0;
 
           // Start on new page
-          finishPage();
+          finishPage(currentPage);
           currentPage = makeContinuation();
           textNode = document.createTextNode(origText);
-          this.currentEl().appendChild(textNode);
+          this.elementPath.last.appendChild(textNode);
 
           // If the remainder fits there, we're done
           if (!hasOverflowed()) {
@@ -191,20 +218,14 @@ class Binder {
             return;
           }
         }
-        if (hasOverflowed()) { // Go back
-          throttle(() => { step(pos - dist/2); });
-        }
-        else {
-          throttle(() => { step(pos + dist/2); });
-        }
+        // Search backward
+        if (hasOverflowed()) throttle(() => { step(pos - dist/2); });
+        // Search forward
+        else throttle(() => { step(pos + dist/2); });
       }
 
-      if (hasOverflowed()) {
-        step(origText.length/2); // find breakpoint
-      }
-      else {
-        throttle(doneCallback); // add in one go
-      }
+      if (hasOverflowed()) step(origText.length/2); // find breakpoint
+      else throttle(doneCallback); // add in one go
     }
 
 
@@ -213,8 +234,8 @@ class Binder {
     let addElementNode = (node, doneCallback) => {
 
       // Add this node to the current page or context
-      if (this.elementPath.length == 0) currentPage.flowContent.appendChild(node);
-      else this.currentEl().appendChild(node);
+      if (this.elementPath.items.length == 0) currentPage.flowContent.appendChild(node);
+      else this.elementPath.last.appendChild(node);
       this.elementPath.push(node);
 
       // This can be added instantly without searching for the overflow point
@@ -222,12 +243,13 @@ class Binder {
         throttle(doneCallback);
         return;
       }
+
       if (hasOverflowed() && node.getAttribute("bindery-break") == "avoid")  {
         let nodeH = node.getBoundingClientRect().height;
         let flowH = currentPage.flowBox.getBoundingClientRect().height;
         if (nodeH < flowH) {
           this.elementPath.pop();
-          finishPage();
+          finishPage(currentPage);
           currentPage = makeContinuation();
           addElementNode(node, doneCallback);
           return;
@@ -251,17 +273,17 @@ class Binder {
         index += 1;
         switch (child.nodeType) {
           case Node.TEXT_NODE:
-            let undo = () => {
+            let cancel = () => {
               this.elementPath.pop();
               let fn = currentPage.footer.lastChild;
-              finishPage();
+              finishPage(currentPage);
               currentPage = makeContinuation();
               currentPage.footer.appendChild(fn);
-              this.currentEl().appendChild(node);
+              this.elementPath.last.appendChild(node);
               this.elementPath.push(node);
-              addTextNode(child, addNextChild, undo);
+              addTextNode(child, addNextChild, cancel);
             }
-            addTextNode(child, addNextChild, undo);
+            addTextNode(child, addNextChild, cancel);
             break;
           case Node.ELEMENT_NODE: {
             if (child.tagName == "SCRIPT") {
@@ -270,20 +292,20 @@ class Binder {
             }
             if (child.getAttribute("bindery-break") == "before") {
               if (currentPage.flowContent.innerText !== "") {
-                finishPage();
+                finishPage(currentPage);
                 currentPage = makeContinuation();
               }
             }
             if (child.hasAttribute("bindery-spread")) {
               let spreadMode = child.getAttribute("bindery-spread");
               let oldBox = currentPage;
-              let oldContext = this.elementPath.slice(0);
+              let oldContext = this.elementPath;
               currentPage = makeContinuation();
               if (spreadMode == "bleed") {
                 currentPage.element.classList.add("bleed");
               }
               addElementNode(child, () => {
-                finishPage();
+                finishPage(currentPage);
                 currentPage = oldBox;
                 this.elementPath = oldContext;
                 addNextChild();
@@ -296,7 +318,7 @@ class Binder {
 
             if (hasOverflowed()) {
               currentPage.footer.removeChild(fn);
-              finishPage();
+              finishPage(currentPage);
               currentPage = makeContinuation();
               currentPage.footer.appendChild(fn);
             }
@@ -321,11 +343,12 @@ class Binder {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);
 
-      doneBinding(this.book);
       let printer = new Printer({
         book: this.book,
       });
       printer.printOrdered();
+
+      doneBinding(this.book);
     });
   }
 }

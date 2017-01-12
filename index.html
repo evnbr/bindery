@@ -52,7 +52,7 @@
 
 		<script>
     for (var i = 0; i < 20; i++) {
-      document.write(`<p>This is paragraph 2:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
+      document.write(`<p>This is paragraph 2.1:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
     }
     </script>
 		<h2 bindery-break="before">Section 3</h2>
@@ -88,16 +88,6 @@
 				leftPages: "l",
 				allPages: "page"
 			},
-      template: `
-        <div bindery-page>
-          <div bindery-flowbox>
-						<div bindery-content>
-						</div>
-					</div>
-          <div bindery-num></div>
-          <div bindery-footer></div>
-        </div>
-      `
     });
     binder.bind((book) => {
 			console.log(book);
