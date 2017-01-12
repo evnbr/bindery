@@ -77,10 +77,10 @@ class Binder {
       target: opts.target,
     });
 
-    this.context = [];
+    this.elementPath = [];
   }
   currentEl() {
-    return this.context[this.context.length-1];
+    return this.elementPath[this.elementPath.length-1];
   }
   nextPage() {
     let pg = new Page(this.template);
@@ -93,7 +93,7 @@ class Binder {
     this.measureArea = el("div", "measureArea");
     document.body.appendChild(this.measureArea);
 
-    let DELAY = 10; // ms
+    const DELAY = 10; // ms
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();
@@ -112,21 +112,22 @@ class Binder {
 
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
-    let cloneContextToNextPage = () => {
-      currentPage = this.nextPage();
-      for (var i = this.context.length - 1; i >= 0; i--) {
-        let clone = this.context[i].cloneNode(false);
+    let makeContinuation = () => {
+      let newPage = this.nextPage();
+      for (var i = this.elementPath.length - 1; i >= 0; i--) {
+        let clone = this.elementPath[i].cloneNode(false);
         clone.innerHTML = '';
         clone.setAttribute("bindery-continuation", true);
         if (clone.id) {
           console.warn(`Bindery: Added a break to ${prettyName(clone)}, so "${clone.id}" is no longer a unique ID.`);
         }
-        if (i < this.context.length - 1) {
-          clone.appendChild(this.context[i+1]);
+        if (i < this.elementPath.length - 1) {
+          clone.appendChild(this.elementPath[i+1]);
         }
-        this.context[i] = clone;
+        this.elementPath[i] = clone;
       }
-      currentPage.flowContent.appendChild(this.context[0]);
+      newPage.flowContent.appendChild(this.elementPath[0]);
+      return newPage;
     };
 
 
@@ -165,22 +166,22 @@ class Binder {
 
           // Back out to word boundary
           while(origText.charAt(pos) !== " " && pos > -1) pos--;
-
           textNode.nodeValue = origText.substr(0, pos);
-          if (pos > 0) {
-            origText = origText.substr(pos);
-            pos = 0;
-          }
-          else {
+
+          if (pos < 1) {
             // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
             textNode.nodeValue = origText;
             abortCallback();
             return;
           }
           console.log(addWordIterations + " iterations");
+
+          origText = origText.substr(pos);
+          pos = 0;
+
           // Start on new page
           finishPage();
-          cloneContextToNextPage();
+          currentPage = makeContinuation();
           textNode = document.createTextNode(origText);
           this.currentEl().appendChild(textNode);
 
@@ -212,9 +213,9 @@ class Binder {
     let addElementNode = (node, doneCallback) => {
 
       // Add this node to the current page or context
-      if (this.context.length == 0) currentPage.flowContent.appendChild(node);
+      if (this.elementPath.length == 0) currentPage.flowContent.appendChild(node);
       else this.currentEl().appendChild(node);
-      this.context.push(node);
+      this.elementPath.push(node);
 
       // This can be added instantly without searching for the overflow point
       if (!hasOverflowed()) {
@@ -225,9 +226,9 @@ class Binder {
         let nodeH = node.getBoundingClientRect().height;
         let flowH = currentPage.flowBox.getBoundingClientRect().height;
         if (nodeH < flowH) {
-          this.context.pop();
+          this.elementPath.pop();
           finishPage();
-          cloneContextToNextPage();
+          currentPage = makeContinuation();
           addElementNode(node, doneCallback);
           return;
         }
@@ -251,13 +252,13 @@ class Binder {
         switch (child.nodeType) {
           case Node.TEXT_NODE:
             let undo = () => {
-              this.context.pop();
+              this.elementPath.pop();
               let fn = currentPage.footer.lastChild;
               finishPage();
-              cloneContextToNextPage();
+              currentPage = makeContinuation();
               currentPage.footer.appendChild(fn);
               this.currentEl().appendChild(node);
-              this.context.push(node);
+              this.elementPath.push(node);
               addTextNode(child, addNextChild, undo);
             }
             addTextNode(child, addNextChild, undo);
@@ -270,39 +271,39 @@ class Binder {
             if (child.getAttribute("bindery-break") == "before") {
               if (currentPage.flowContent.innerText !== "") {
                 finishPage();
-                cloneContextToNextPage();
+                currentPage = makeContinuation();
               }
             }
             if (child.hasAttribute("bindery-spread")) {
               let spreadMode = child.getAttribute("bindery-spread");
               let oldBox = currentPage;
-              let oldContext = this.context.slice(0);
-              cloneContextToNextPage();
+              let oldContext = this.elementPath.slice(0);
+              currentPage = makeContinuation();
               if (spreadMode == "bleed") {
                 currentPage.element.classList.add("bleed");
               }
               addElementNode(child, () => {
                 finishPage();
                 currentPage = oldBox;
-                this.context = oldContext;
+                this.elementPath = oldContext;
                 addNextChild();
               });
               break;
             }
-            let footNote = el("div", "footnote");
-            footNote.textContent = `* ${child.textContent.substr(0,28)}`
-            currentPage.footer.appendChild(footNote);
+            let fn = el("div", "footnote");
+            fn.textContent = `* ${child.textContent.substr(0,28)}`
+            currentPage.footer.appendChild(fn);
 
             if (hasOverflowed()) {
-              currentPage.footer.removeChild(footNote);
+              currentPage.footer.removeChild(fn);
               finishPage();
-              cloneContextToNextPage();
-              currentPage.footer.appendChild(footNote);
+              currentPage = makeContinuation();
+              currentPage.footer.appendChild(fn);
             }
 
             throttle(() => {
               addElementNode(child, () => {
-                this.context.pop();
+                this.elementPath.pop();
                 addNextChild();
               })
             });
