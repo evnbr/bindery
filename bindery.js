@@ -77,9 +77,6 @@ class Binder {
       target: opts.target,
     });
 
-    this.measureArea = el("div", "measureArea");
-    document.body.appendChild(this.measureArea);
-
     this.context = [];
   }
   currentEl() {
@@ -92,6 +89,10 @@ class Binder {
     return pg;
   }
   bind(doneBinding) {
+
+    this.measureArea = el("div", "measureArea");
+    document.body.appendChild(this.measureArea);
+
     let DELAY = 10; // ms
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
@@ -133,7 +134,7 @@ class Binder {
 
     // Adds an text node by adding each word one by one
     // until it overflows
-    let addTextNode = (origTextNode, doneCallback) => {
+    let addTextNode = (origTextNode, doneCallback, abortCallback) => {
 
       this.currentEl().appendChild(origTextNode);
 
@@ -144,10 +145,8 @@ class Binder {
 
       let pos = 0;
       let lastPos = pos;
-      let addWordSteps = 0;
 
-      let addWord = (rawPos) => {
-        addWordSteps++;
+      let step = (rawPos) => {
 
         lastPos = pos;
         pos = parseInt(rawPos);
@@ -171,9 +170,12 @@ class Binder {
             pos = 0;
           }
           else {
-            console.error(`Bindery: Shouldn't have tried to add "${origText.substr(0,25)}"`);
+            console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
+            textNode.nodeValue = origText;
+            abortCallback();
+            return;
           }
-          console.log(addWordSteps + " iterations");
+          console.log(stepSteps + " iterations");
           // Start on new page
           finishPage();
           cloneContextToNextPage();
@@ -187,20 +189,18 @@ class Binder {
           }
         }
         if (hasOverflowed(this.currentEl())) { // Go back
-          throttle(() => { addWord(pos - dist/2); });
+          throttle(() => { step(pos - dist/2); });
         }
         else {
-          throttle(() => { addWord(pos + dist/2); });
+          throttle(() => { step(pos + dist/2); });
         }
       }
 
-      // we added it all in one go
-      if (!hasOverflowed(this.currentEl())) {
-        throttle(doneCallback);
+      if (hasOverflowed(this.currentEl())) {
+        step(origText.length/2); // find breakpoint
       }
-      // iterate word-by-word
       else {
-        addWord(origText.length/2);
+        throttle(doneCallback); // we added it all in one go
       }
     }
 
@@ -210,7 +210,7 @@ class Binder {
     let addElementNode = (node, doneCallback) => {
 
       // Add this node to the current page or context
-      if (this.context.length == 0) currentPage.flowContent.appendChild(this.source);
+      if (this.context.length == 0) currentPage.flowContent.appendChild(node);
       else this.currentEl().appendChild(node);
       this.context.push(node);
 
@@ -248,7 +248,17 @@ class Binder {
         index += 1;
         switch (child.nodeType) {
           case Node.TEXT_NODE:
-            addTextNode(child, addNextChild);
+            let undo = () => {
+              this.context.pop();
+              let fn = currentPage.footer.lastChild;
+              finishPage();
+              cloneContextToNextPage();
+              currentPage.footer.appendChild(fn);
+              this.currentEl().appendChild(node);
+              this.context.push(node);
+              addTextNode(child, addNextChild, undo);
+            }
+            addTextNode(child, addNextChild, undo);
             break;
           case Node.ELEMENT_NODE: {
             if (child.tagName == "SCRIPT") {
@@ -280,13 +290,14 @@ class Binder {
             let footNote = el("div", "footnote");
             footNote.textContent = `* ${child.textContent.substr(0,28)}`
             currentPage.footer.appendChild(footNote);
+
             if (hasOverflowed(node)) {
-              console.error(`This was gonna be a problem: "${child.textContent.substr(0,28)}"`);
               currentPage.footer.removeChild(footNote);
               finishPage();
               cloneContextToNextPage();
               currentPage.footer.appendChild(footNote);
             }
+
             throttle(() => {
               addElementNode(child, () => {
                 this.context.pop();
@@ -305,6 +316,8 @@ class Binder {
     let currentPage = this.nextPage();
     addElementNode(this.source, () => {
       console.log("wow we're done!");
+      document.body.removeChild(this.measureArea);
+
       doneBinding(this.book);
       let printer = new Printer({
         book: this.book,
@@ -320,6 +333,4 @@ let el = (type, className) => {
   return element;
 }
 
-let last = (arr) => arr[arr.length - 1];
-
-let prettyName = (node) => `"${node.tagName.toLowerCase()}${node.id ? "#"+node.id : ""}.${[...node.classList].join(".")}"`;
+let prettyName = (node) => `"${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ""}.${[...node.classList].join(".")}"`;
