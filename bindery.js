@@ -145,8 +145,10 @@ class Binder {
 
       let pos = 0;
       let lastPos = pos;
+      let addWordIterations = 0;
 
       let step = (rawPos) => {
+        addWordIterations++;
 
         lastPos = pos;
         pos = parseInt(rawPos);
@@ -170,12 +172,12 @@ class Binder {
             pos = 0;
           }
           else {
-            console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
+            // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
             textNode.nodeValue = origText;
             abortCallback();
             return;
           }
-          console.log(stepSteps + " iterations");
+          console.log(addWordIterations + " iterations");
           // Start on new page
           finishPage();
           cloneContextToNextPage();
@@ -183,12 +185,12 @@ class Binder {
           this.currentEl().appendChild(textNode);
 
           // If the remainder fits there, we're done
-          if (!hasOverflowed(this.currentEl())) {
+          if (!hasOverflowed()) {
             throttle(doneCallback);
             return;
           }
         }
-        if (hasOverflowed(this.currentEl())) { // Go back
+        if (hasOverflowed()) { // Go back
           throttle(() => { step(pos - dist/2); });
         }
         else {
@@ -196,11 +198,11 @@ class Binder {
         }
       }
 
-      if (hasOverflowed(this.currentEl())) {
+      if (hasOverflowed()) {
         step(origText.length/2); // find breakpoint
       }
       else {
-        throttle(doneCallback); // we added it all in one go
+        throttle(doneCallback); // add in one go
       }
     }
 
@@ -215,11 +217,11 @@ class Binder {
       this.context.push(node);
 
       // This can be added instantly without searching for the overflow point
-      if (!hasOverflowed(node)) {
+      if (!hasOverflowed()) {
         throttle(doneCallback);
         return;
       }
-      if (hasOverflowed(node) && node.getAttribute("bindery-break") == "avoid")  {
+      if (hasOverflowed() && node.getAttribute("bindery-break") == "avoid")  {
         let nodeH = node.getBoundingClientRect().height;
         let flowH = currentPage.flowBox.getBoundingClientRect().height;
         if (nodeH < flowH) {
@@ -291,7 +293,7 @@ class Binder {
             footNote.textContent = `* ${child.textContent.substr(0,28)}`
             currentPage.footer.appendChild(footNote);
 
-            if (hasOverflowed(node)) {
+            if (hasOverflowed()) {
               currentPage.footer.removeChild(footNote);
               finishPage();
               cloneContextToNextPage();
