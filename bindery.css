@@ -1,32 +1,78 @@
-[bindery-page] {
-  outline: 1px solid red;
-  width: 400px;
-  height: 600px;
-  position: relative;
-  overflow: hidden;
-  flex: none;
-  margin: auto;
+@media screen {
+  [bindery-page] {
+    outline: 1px solid red;
+  }
+  [bindery-print-wrapper] {
+  }
+  [bindery-flowbox] {
+    outline: 1px solid cyan;
+  }
+  [bindery-footer] {
+    outline: 1px solid cyan;
+  }
+  [bindery-content] {
+    outline: 1px solid lime;
+  }
+  [bindery-num] {
+    outline: 1px solid cyan;
+  }
+}
+
+@media print {
+  [bindery-print-wrapper] {
+    border: 1px solid black;
+    margin: 8px;
+  }
+}
+
+.measureArea {
+  outline: 1px solid cyan;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.measureArea p {
+  outline: 1px solid cyan;
+  /*color: cyan;*/
 }
 
 [bindery-print-wrapper] {
   page-break-after: always;
   display: flex;
   margin: 10px;
-  /*display: inline-block;*/
   width: 800px;
   margin: auto;
 }
 
+[bindery-page] {
+  width: 400px;
+  height: 600px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  margin: auto;
+}
+
 [bindery-flowbox] {
-  outline: 1px solid cyan;
-  position: absolute;
-  top: 40px;
-  left: 40px;
-  right: 40px;
-  bottom: 40px;
+  margin: 40px;
+  margin-bottom: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+[bindery-footer] {
+  margin: 40px;
+  margin-top: 10px;
+  flex: 0 1 auto;
 }
 
 [bindery-flowbox].bleed {
+  margin: 0;
   outline: 1px solid cyan;
   position: absolute;
   top: -20px;
@@ -36,12 +82,15 @@
 }
 
 [bindery-num] {
-  outline: 1px solid cyan;
   position: absolute;
-  left: 20px;
-  right: 20px;
   text-align: center;
   bottom: 20px;
+}
+[bindery-left] [bindery-num] {
+  left: 20px;
+}
+[bindery-right] [bindery-num] {
+  right: 20px;
 }
 
 [bindery-continuation] {

@@ -7,10 +7,11 @@ class Printer {
   }
   printOrdered() {
     if (this.book.pages.length % 2 !== 0) {
-      this.book.addPage();
+      let pg = new Page(binder.template);
+      this.book.addPage(pg);
     }
-    let spacerPage = new Page(this.book.pageTemplate);
-    let spacerPage2 = new Page(this.book.pageTemplate);
+    let spacerPage = new Page(binder.template);
+    let spacerPage2 = new Page(binder.template);
     spacerPage.element.style.visibility = "hidden";
     spacerPage2.element.style.visibility = "hidden";
     this.book.pages.unshift(spacerPage);
@@ -18,8 +19,12 @@ class Printer {
 
     for (var i = 0; i < this.book.pages.length; i += 2) {
       let wrap = this.printWrapper.cloneNode(false);
-      wrap.appendChild(this.book.pages[i].element);
-      wrap.appendChild(this.book.pages[i+1].element);
+      let l = this.book.pages[i].element;
+      let r = this.book.pages[i+1].element;
+      l.setAttribute("bindery-left", true);
+      r.setAttribute("bindery-right", true);
+      wrap.appendChild(l);
+      wrap.appendChild(r);
       this.target.appendChild(wrap);
     }
   }
@@ -28,17 +33,13 @@ class Printer {
 class Book {
   constructor(opts) {
     this.target = opts.target;
-    this.pageTemplate = opts.template;
     this.pageNum = 1;
     this.pages = [];
   }
-  addPage() {
-    let page = new Page(this.pageTemplate);
+  addPage(page) {
     page.setNumber(this.pageNum);
     this.pageNum++;
     this.pages.push(page);
-    this.target.appendChild(page.element);
-    return page;
   }
 }
 
@@ -46,6 +47,8 @@ class Page {
   constructor(template) {
     this.element = template.cloneNode(true);
     this.flowBox = this.element.querySelector("[bindery-flowbox]");
+    this.flowContent = this.element.querySelector("[bindery-content]");
+    this.footer = this.element.querySelector("[bindery-footer]");
   }
   setNumber(n) {
     let num = this.element.querySelector("[bindery-num]");
@@ -72,8 +75,10 @@ class Binder {
 
     this.book = new Book({
       target: opts.target,
-      template: this.template,
-    })
+    });
+
+    this.measureArea = el("div", "measureArea");
+    document.body.appendChild(this.measureArea);
 
     this.context = [];
   }
@@ -81,24 +86,34 @@ class Binder {
     return this.context[this.context.length-1];
   }
   nextFlowBox() {
-    let pg = this.book.addPage();
-    return pg.flowBox;
+    let pg = new Page(this.template);
+    this.measureArea.appendChild(pg.element);
+    this.book.addPage(pg);
+    return pg;
   }
   bind(doneBinding) {
-    let DELAY = 10; // ms
+    let DELAY = 50; // ms
+    let throttle = (func) => {
+      if (DELAY > 0) setTimeout(func, DELAY);
+      else func();
+    }
 
-    let hasOverflowed = (t) => {
-      let elementBottom = t.getBoundingClientRect().bottom;
-      let pageY = currentFlowBox.getBoundingClientRect().top;
-      let pageH = currentFlowBox.getBoundingClientRect().height;
+    let hasOverflowed = () => {
+      let elementBottom = currentPage.flowContent.getBoundingClientRect().bottom;
+      let pageY = currentPage.flowBox.getBoundingClientRect().top;
+      let pageH = currentPage.flowBox.getBoundingClientRect().height;
       elementBottom = elementBottom - pageY;
       return elementBottom > pageH;
+    }
+
+    let finishPage = () => {
+      this.measureArea.removeChild(currentPage.element);
     }
 
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
     let cloneContextToNextFlowBox = () => {
-      currentFlowBox = this.nextFlowBox();
+      currentPage = this.nextFlowBox();
       for (var i = this.context.length - 1; i >= 0; i--) {
         let clone = this.context[i].cloneNode(false);
         clone.innerHTML = '';
@@ -111,25 +126,15 @@ class Binder {
         }
         this.context[i] = clone;
       }
-      currentFlowBox.appendChild(this.context[0]);
+      currentPage.flowContent.appendChild(this.context[0]);
     };
 
 
-    let getAllSpaces = (str) => {
-      let indexes = [];
-      for (var i = 0; i < str.length; i++) {
-        if (str.charAt(i) == " ") {
-          indexes.push(i);
-        }
-      }
-      return indexes;
-    }
+
+
     // Adds an text node by adding each word one by one
     // until it overflows
     let addTextNode = (origTextNode, doneCallback) => {
-      let delayedDone = () => {
-        setTimeout(doneCallback, DELAY);
-      }
 
       this.currentEl().appendChild(origTextNode);
 
@@ -140,24 +145,25 @@ class Binder {
 
       let pos = 0;
       let lastPos = pos;
+      let addWordSteps = 0;
 
       let addWord = (rawPos) => {
+        addWordSteps++;
 
         lastPos = pos;
         pos = parseInt(rawPos);
         let dist = Math.abs(lastPos - pos);
 
-        console.log(`Pos: ${pos} Dist: ${dist}`);
 
         if (pos > origText.length - 1) {
-          delayedDone()
+          throttle(doneCallback);
           return;
         }
         textNode.nodeValue = origText.substr(0, pos);
 
         if (dist < 1) { // Is done
-          // Go back to before we overflowed
 
+          // Back out to word boundary
           while(origText.charAt(pos) !== " " && pos > -1) pos--;
 
           textNode.nodeValue = origText.substr(0, pos);
@@ -165,34 +171,30 @@ class Binder {
             origText = origText.substr(pos);
             pos = 0;
           }
-
+          console.log(addWordSteps + " iterations");
           // Start on new page
+          finishPage();
           cloneContextToNextFlowBox();
           textNode = document.createTextNode(origText);
           this.currentEl().appendChild(textNode);
 
           // If the remainder fits there, we're done
           if (!hasOverflowed(this.currentEl())) {
-            delayedDone()
+            throttle(doneCallback);
             return;
           }
         }
-
         if (hasOverflowed(this.currentEl())) { // Go back
-          setTimeout(() => {
-            addWord(pos - dist/2);
-          }, DELAY);
+          throttle(() => { addWord(pos - dist/2); });
         }
         else {
-          setTimeout(() => {
-            addWord(pos + dist/2);
-          }, DELAY);
+          throttle(() => { addWord(pos + dist/2); });
         }
       }
 
       // we added it all in one go
       if (!hasOverflowed(this.currentEl())) {
-        delayedDone();
+        throttle(doneCallback);
       }
       // iterate word-by-word
       else {
@@ -206,20 +208,23 @@ class Binder {
     let addElementNode = (node, doneCallback) => {
 
       // Add this node to the current page or context
-      if (this.context.length == 0) currentFlowBox.appendChild(this.source);
+      if (this.context.length == 0) currentPage.flowContent.appendChild(this.source);
       else this.currentEl().appendChild(node);
       this.context.push(node);
 
+      currentPage.footer.innerHTML += "And here's something else to add<br>";
+
       // This can be added instantly without searching for the overflow point
       if (!hasOverflowed(node)) {
-        doneCallback();
+        throttle(doneCallback);
         return;
       }
       if (hasOverflowed(node) && node.getAttribute("bindery-break") == "avoid")  {
         let nodeH = node.getBoundingClientRect().height;
-        let flowH = currentFlowBox.getBoundingClientRect().height;
+        let flowH = currentPage.flowBox.getBoundingClientRect().height;
         if (nodeH < flowH) {
           this.context.pop();
+          finishPage();
           cloneContextToNextFlowBox();
           addElementNode(node, doneCallback);
           return;
@@ -251,40 +256,43 @@ class Binder {
               break;
             }
             if (child.getAttribute("bindery-break") == "before") {
-              if (currentFlowBox.innerText !== "") {
+              if (currentPage.flowContent.innerText !== "") {
+                finishPage();
                 cloneContextToNextFlowBox();
               }
             }
             if (child.hasAttribute("bindery-spread")) {
               let spreadMode = child.getAttribute("bindery-spread");
-              let oldBox = currentFlowBox;
+              let oldBox = currentPage;
               let oldContext = this.context.slice(0);
               cloneContextToNextFlowBox();
               if (spreadMode == "bleed") {
-                currentFlowBox.classList.add("bleed");
+                currentPage.element.classList.add("bleed");
               }
               addElementNode(child, () => {
-                currentFlowBox = oldBox;
+                finishPage();
+                currentPage = oldBox;
                 this.context = oldContext;
                 addNextChild();
               });
               break;
             }
-            addElementNode(child, () => {
-              this.context.pop();
-              addNextChild();
+            throttle(() => {
+              addElementNode(child, () => {
+                this.context.pop();
+                addNextChild();
+              })
             });
             break;
           }
           default:
             console.log(`Bindery: Unknown node type: ${child.nodeType}`);
         }
-
       }
       addNextChild();
     }
 
-    let currentFlowBox = this.nextFlowBox();
+    let currentPage = this.nextFlowBox();
     addElementNode(this.source, () => {
       console.log("wow we're done!");
       doneBinding(this.book);

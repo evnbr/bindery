@@ -13,11 +13,9 @@ html {
 h2 {
   font-size: 2em;
   margin-bottom: 1rem;
-  outline: 1px solid lime;
 }
 
 p {
-  outline: 1px solid purple;
   text-indent: 1rem;
 }
 
