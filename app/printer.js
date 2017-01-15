@@ -2,18 +2,17 @@ class Printer {
   constructor(opts) {
     this.book = opts.book;
     this.target = this.book.target;
+    this.template = opts.template;
     this.printWrapper = document.createElement("div");
     this.printWrapper.setAttribute("bindery-print-wrapper", true);
-
-
   }
   setOrdered() {
     if (this.book.pages.length % 2 !== 0) {
-      let pg = new Page(binder.template);
+      let pg = new Page(this.template);
       this.book.addPage(pg);
     }
-    let spacerPage = new Page(binder.template);
-    let spacerPage2 = new Page(binder.template);
+    let spacerPage = new Page(this.template);
+    let spacerPage2 = new Page(this.template);
     spacerPage.element.style.visibility = "hidden";
     spacerPage2.element.style.visibility = "hidden";
     this.book.pages.unshift(spacerPage);
@@ -32,11 +31,11 @@ class Printer {
   }
   setInteractive() {
     if (this.book.pages.length % 2 !== 0) {
-      let pg = new Page(binder.template);
+      let pg = new Page(this.template);
       this.book.addPage(pg);
     }
-    let spacerPage = new Page(binder.template);
-    let spacerPage2 = new Page(binder.template);
+    let spacerPage = new Page(this.template);
+    let spacerPage2 = new Page(this.template);
     spacerPage.element.style.visibility = "hidden";
     spacerPage2.element.style.visibility = "hidden";
     this.book.pages.unshift(spacerPage);
@@ -55,3 +54,5 @@ class Printer {
     }
   }
 }
+
+module.exports = Printer;

@@ -10,3 +10,5 @@ class Page {
     num.textContent = n;
   }
 }
+
+module.exports = Page;

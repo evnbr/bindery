@@ -1,3 +1,9 @@
+Book = require("./book");
+Page = require("./page");
+Printer = require("./printer");
+el = require("./el");
+
+
 class ElementPath {
   constructor() {
     this.items = [];
@@ -326,6 +332,7 @@ class Binder {
 
       let printer = new Printer({
         book: this.book,
+        template: this.template
       });
       printer.setOrdered();
 
@@ -334,10 +341,6 @@ class Binder {
   }
 }
 
-let el = (type, className) => {
-  element = document.createElement(type);
-  element.classList.add(className);
-  return element;
-}
-
 let prettyName = (node) => `"${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ""}.${[...node.classList].join(".")}"`;
+
+module.exports = Binder;

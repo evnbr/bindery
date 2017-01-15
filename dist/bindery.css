@@ -23,12 +23,18 @@
     background: #eee;
     padding: 20px;
   }
+  .export {
+    padding-top: 100px;
+  }
 }
 
 @media print {
   [bindery-print-wrapper] {
     border: 1px dashed black;
     margin: 8px;
+  }
+  [bindery-controls] {
+    display: none;
   }
 }
 
@@ -125,8 +131,8 @@
 
 [bindery-controls] {
   position: fixed;
-  background: white;
-  bottom: 0;
+  background: #f3f3f3;
+  top: 0;
   left: 0;
   right: 0;
   padding: 12px;

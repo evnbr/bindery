@@ -10,3 +10,5 @@ class Book {
     this.pages.push(page);
   }
 }
+
+module.exports = Book;
