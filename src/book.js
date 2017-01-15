@@ -1,4 +1,4 @@
-el = require("./el");
+const el = require("./el");
 
 class Book {
   constructor(opts) {

@@ -12,6 +12,8 @@ html {
 .content {
   font-family: Georgia;
   font-size: 16px;
+  margin: auto;
+  max-width: 800px;
 }
 
 h2 {

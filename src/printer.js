@@ -1,3 +1,5 @@
+const Page = require("./page");
+
 class Printer {
   constructor(opts) {
     this.book = opts.book;

@@ -1,5 +1,5 @@
 let el = (type, className) => {
-  element = document.createElement(type);
+  let element = document.createElement(type);
   element.classList.add(className);
   return element;
 }

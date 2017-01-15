@@ -1,8 +1,9 @@
-Book = require("./book");
-Page = require("./page");
-Printer = require("./printer");
-el = require("./el");
+require("style!css!./bindery.css");
 
+import Book from "./book";
+const Page = require("./page");
+const Printer = require("./printer");
+const el = require("./el");
 
 class ElementPath {
   constructor() {
@@ -286,6 +287,10 @@ class Binder {
           case Node.TEXT_NODE:
             let cancel = () => {
               binderState.elPath.pop();
+              if (binderState.elPath.items.length < 1) {
+                console.error("Bindery: Failed to add any node. Page might be too small?");
+                return;
+              }
 
               let fn = binderState.currentPage.footer.lastChild; // <--
 
