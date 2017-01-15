@@ -122,3 +122,36 @@
 [bindery-continuation] {
   text-indent: 0 !important;
 }
+
+[bindery-controls] {
+  position: fixed;
+  background: white;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px;
+  outline: 1px solid rgba(0,0,0,0.2);
+  z-index: 99;
+}
+
+[bindery-btn] {
+  -webkit-appearance: none;
+  border: none;
+  background: white;
+  padding: 6px 10px;
+  outline: 1px solid rgba(0,0,0,0.3);
+  cursor: pointer;
+  font-size: 14px;
+}
+[bindery-btn]:focus {
+  /*outline: 1px solid blue;*/
+}
+[bindery-btn]:hover {
+  /*background: black;
+  color: white;*/
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+}
+[bindery-btn]:active {
+  box-shadow: 0 0 0;
+  background: rgba(0,0,0,0.04);
+}

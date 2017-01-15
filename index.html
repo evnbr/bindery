@@ -78,6 +78,20 @@
     </script>
   </section>
 
+	<div bindery-controls>
+		<button bindery-btn>Cancel</button>
+
+		<div style="display: inline-block; padding-left: 120px;">
+			<button bindery-btn>Page Order</button>
+			<button bindery-btn>Booklet Order</button>
+			<button bindery-btn>Preview</button>
+		</div>
+
+		<div style="float: right;">
+			<button bindery-btn onClick="window.print();">Print</button>
+		</div>
+	</div>
+
 	<script type="text/javascript" src="bindery.js"></script>
 	<script type="text/javascript" src="printer.js"></script>
 	<script type="text/javascript" src="book.js"></script>
@@ -108,6 +122,19 @@
 				elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
 			},
 		});
+
+		binder.defineRule({
+			selector: "a",
+			beforeAdd: (elmt, state) => {
+				let fn = el("div", "footnote");
+				let pg = state.currentPage;
+				let n = pg.footer.querySelectorAll(".footnote").length;
+				fn.innerHTML = `${n} Link to <a href='#'>${elmt.href}</a>`;
+				pg.footer.appendChild(fn);
+				elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
+			},
+		});
+
 
 
     binder.bind((book) => {

@@ -242,10 +242,11 @@ class Binder {
       binderState.elPath.push(node);
 
       // This can be added instantly without searching for the overflow point
-      if (!hasOverflowed()) {
-        throttle(doneCallback);
-        return;
-      }
+      // but won't apply rules to this node's children
+      // if (!hasOverflowed()) {
+      //   throttle(doneCallback);
+      //   return;
+      // }
 
       if (hasOverflowed() && node.getAttribute("bindery-break") == "avoid")  {
         let nodeH = node.getBoundingClientRect().height;

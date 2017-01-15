@@ -7,6 +7,10 @@
 
 html {
   font-family: sans-serif;
+}
+
+.content {
+  font-family: Georgia;
   font-size: 16px;
 }
 
@@ -17,7 +21,6 @@ h2 {
 
 p {
   text-indent: 1rem;
-  font-family: Georgia;
 }
 
 sup {
