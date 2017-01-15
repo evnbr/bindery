@@ -1,10 +1,9 @@
 
 module.exports = {
-  entry: './app/bindery.js',
+  entry: './src/bindery.js',
   output: {
-    filename: 'bundle.js',
+    filename: 'bindery.js',
     libraryTarget: "var",
     library: "Bindery",
-    path: './dist'
   }
 }

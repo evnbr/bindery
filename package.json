@@ -1,12 +1,13 @@
 {
-  "name": "bindery2",
+  "name": "bindery",
   "version": "1.0.0",
   "description": "",
   "main": "bindery.js",
   "dependencies": {
+  },
+  "devDependencies": {
     "webpack": "^1.14.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js"

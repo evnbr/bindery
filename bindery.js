@@ -460,6 +460,7 @@ var Bindery =
 
 	    if (opts.target) {
 	      this.target = opts.target;
+	      this.target.setAttribute("bindery-export", true);
 	    }
 	    else {
 	      this.target = el("div");
