@@ -1,7 +1,10 @@
-Binder = require("./bindery");
-el = require("./el");
+let el = (type, className) => {
+  element = document.createElement(type);
+  element.classList.add(className);
+  return element;
+}
 
-let binder = new Binder({
+let binder = new Bindery({
   source: document.querySelector(".content"),
   target: document.querySelector(".export"),
 });

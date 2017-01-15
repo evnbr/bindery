@@ -1,3 +1,4 @@
+var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -44,62 +45,10 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	Binder = __webpack_require__(1);
-	el = __webpack_require__(5);
-
-	let binder = new Binder({
-	  source: document.querySelector(".content"),
-	  target: document.querySelector(".export"),
-	});
-
-	binder.defineRule({
-	  selector: "[bindery-break='before']",
-	  beforeAdd: (elmt, state) => {
-	    if (state.currentPage.flowContent.innerText !== "") {
-	      state.nextPage();
-	    }
-	  },
-	});
-
-	binder.defineRule({
-	  selector: "p",
-	  beforeAdd: (elmt, state) => {
-	    let fn = el("div", "footnote");
-	    let pg = state.currentPage;
-	    let n = pg.footer.querySelectorAll(".footnote").length;
-	    fn.textContent = `${n} ${elmt.textContent.substr(0,28)}`;
-	    pg.footer.appendChild(fn);
-	    elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
-	  },
-	});
-
-	binder.defineRule({
-	  selector: "a",
-	  beforeAdd: (elmt, state) => {
-	    let fn = el("div", "footnote");
-	    let pg = state.currentPage;
-	    let n = pg.footer.querySelectorAll(".footnote").length;
-	    fn.innerHTML = `${n} Link to <a href='#'>${elmt.href}</a>`;
-	    pg.footer.appendChild(fn);
-	    elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
-	  },
-	});
-
-
-
-	binder.bind((book) => {
-	  console.log(book);
-	});
-
-
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	Book = __webpack_require__(2);
-	Page = __webpack_require__(3);
-	Printer = __webpack_require__(4);
-	el = __webpack_require__(5);
+	Book = __webpack_require__(1);
+	Page = __webpack_require__(2);
+	Printer = __webpack_require__(3);
+	el = __webpack_require__(4);
 
 
 	class ElementPath {
@@ -445,7 +394,7 @@
 
 
 /***/ },
-/* 2 */
+/* 1 */
 /***/ function(module, exports) {
 
 	class Book {
@@ -465,7 +414,7 @@
 
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports) {
 
 	class Page {
@@ -485,7 +434,7 @@
 
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	class Printer {
@@ -549,7 +498,7 @@
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	let el = (type, className) => {
