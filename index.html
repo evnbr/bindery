@@ -78,34 +78,34 @@
     </script>
   </section>
 
-  <script type="text/javascript" src="bindery.js"></script>
+	<script type="text/javascript" src="bindery.js"></script>
+	<script type="text/javascript" src="printer.js"></script>
+	<script type="text/javascript" src="book.js"></script>
+	<script type="text/javascript" src="page.js"></script>
   <script>
     let binder = new Binder({
       source: document.querySelector(".content"),
       target: document.querySelector(".export"),
-			classes: {
-				rightPages: "r",
-				leftPages: "l",
-				allPages: "page"
-			},
     });
 
-		let n = 0;
+		binder.defineRule({
+      selector: "[bindery-break='before']",
+      beforeAdd: (elmt, state) => {
+        if (state.currentPage.flowContent.innerText !== "") {
+          state.nextPage();
+        }
+      },
+    });
+
 		binder.defineRule({
 		  selector: "p",
-		  beforeAdd: (elmt, pg) => {
+		  beforeAdd: (elmt, state) => {
 				let fn = el("div", "footnote");
+				let pg = state.currentPage;
+				let n = pg.footer.querySelectorAll(".footnote").length;
 				fn.textContent = `${n} ${elmt.textContent.substr(0,28)}`;
-				n++;
 				pg.footer.appendChild(fn);
 				elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
-			},
-			cancelAdd: (elmt, pg) => {
-			  let fn = pg.footer.lastChild;
-			  pg.footer.removeChild(fn);
-				n--;
-			},
-			afterAdd: (elmt, pg) => {
 			},
 		});
 
@@ -113,6 +113,7 @@
     binder.bind((book) => {
 			console.log(book);
 		});
+
   </script>
 
 </body>

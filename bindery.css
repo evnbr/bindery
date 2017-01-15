@@ -101,6 +101,24 @@
   right: 20px;
 }
 
+
+[bindery-preview] {
+  perspective: 1200px;
+  /*width: 60px;*/
+  height: 0;
+  width: 0;
+}
+[bindery-preview] [bindery-page] {
+  position: absolute;
+}
+[bindery-preview] [bindery-left] {
+  transform: rotateY(50deg);
+}
+[bindery-preview] [bindery-right] {
+  transform: rotateY(-50deg);
+}
+
+
 [bindery-continuation] {
   text-indent: 0 !important;
 }
