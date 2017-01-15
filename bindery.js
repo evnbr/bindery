@@ -59,8 +59,7 @@ class Page {
 class ElementPath {
   constructor() {
     this.items = [];
-    this.root = null;
-    this.last = null;
+    this.update();
   }
   push(item) {
     this.items.push(item);
@@ -84,9 +83,7 @@ class ElementPath {
       if (clone.id) {
         console.warn(`Bindery: Added a break to ${prettyName(clone)}, so "${clone.id}" is no longer a unique ID.`);
       }
-      if (i < this.items.length - 1) {
-        clone.appendChild(newPath.items[i+1]);
-      }
+      if (i < this.items.length - 1) clone.appendChild(newPath.items[i+1]);
       newPath.items[i] = clone;
     }
     newPath.update();
@@ -122,24 +119,82 @@ class Binder {
     }
 
     this.book = new Book({ target: opts.target });
-
-    this.elementPath = new ElementPath();
+    this.rules = [];
   }
-  nextPage() {
+  defineRule(rule) {
+    this.rules.push(rule);
+  }
+  addPage() {
     let pg = new Page(this.template);
     this.measureArea.appendChild(pg.element);
     this.book.addPage(pg);
     return pg;
   }
   bind(doneBinding) {
+    let elementPath = new ElementPath();
 
     this.measureArea = el("div", "measureArea");
     document.body.appendChild(this.measureArea);
 
-    const DELAY = 10; // ms
+    const DELAY = 0; // ms
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();
+    }
+
+    this.defineRule({
+      selector: "[bindery-break='before']",
+      beforeAdd: (elmt, pg) => {
+        if (pg.flowContent.innerText !== "") {
+          finishPage(currentPage);
+          currentPage = makeContinuation();
+        }
+      },
+    });
+
+    let prevPage, prevElementPath;
+    this.defineRule({
+      selector: "[bindery-spread]",
+      beforeAdd: (elmt, pg) => {
+        let spreadMode = elmt.getAttribute("bindery-spread");
+        prevPage = currentPage;
+        prevElementPath = elementPath;
+        currentPage = makeContinuation();
+        if (spreadMode == "bleed") {
+          currentPage.element.classList.add("bleed");
+        }
+      },
+      afterAdd: (elmt, pg) => {
+        finishPage(currentPage);
+        currentPage = prevPage;
+        elementPath = prevElementPath;
+      },
+    });
+
+
+    let beforeAddRules = (elmt) => {
+      this.rules.forEach( (rule) => {
+        if (elmt.matches(rule.selector)) {
+          if (rule.beforeAdd) {
+            rule.beforeAdd(elmt, currentPage);
+            if (hasOverflowed()) {
+              rule.cancelAdd(elmt, currentPage);
+              finishPage(currentPage);
+              currentPage = makeContinuation();
+              rule.beforeAdd(elmt, currentPage);
+            }
+          }
+        }
+      });
+    }
+    let afterAddRules = (elmt) => {
+      this.rules.forEach( (rule) => {
+        if (elmt.matches(rule.selector)) {
+          if (rule.afterAdd) {
+            rule.afterAdd(elmt, currentPage);
+          }
+        }
+      });
     }
 
     let hasOverflowed = () => {
@@ -155,9 +210,9 @@ class Binder {
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
     let makeContinuation = () => {
-      this.elementPath = this.elementPath.clone();
-      let newPage = this.nextPage();
-      newPage.flowContent.appendChild(this.elementPath.root);
+      elementPath = elementPath.clone();
+      let newPage = this.addPage();
+      newPage.flowContent.appendChild(elementPath.root);
       return newPage;
     };
 
@@ -166,7 +221,7 @@ class Binder {
     // until it overflows
     let addTextNode = (node, doneCallback, abortCallback) => {
 
-      this.elementPath.last.appendChild(node);
+      elementPath.last.appendChild(node);
 
       let textNode = node;
       let origText = textNode.nodeValue;
@@ -210,7 +265,7 @@ class Binder {
           finishPage(currentPage);
           currentPage = makeContinuation();
           textNode = document.createTextNode(origText);
-          this.elementPath.last.appendChild(textNode);
+          elementPath.last.appendChild(textNode);
 
           // If the remainder fits there, we're done
           if (!hasOverflowed()) {
@@ -234,9 +289,9 @@ class Binder {
     let addElementNode = (node, doneCallback) => {
 
       // Add this node to the current page or context
-      if (this.elementPath.items.length == 0) currentPage.flowContent.appendChild(node);
-      else this.elementPath.last.appendChild(node);
-      this.elementPath.push(node);
+      if (elementPath.items.length == 0) currentPage.flowContent.appendChild(node);
+      else elementPath.last.appendChild(node);
+      elementPath.push(node);
 
       // This can be added instantly without searching for the overflow point
       if (!hasOverflowed()) {
@@ -248,7 +303,7 @@ class Binder {
         let nodeH = node.getBoundingClientRect().height;
         let flowH = currentPage.flowBox.getBoundingClientRect().height;
         if (nodeH < flowH) {
-          this.elementPath.pop();
+          elementPath.pop();
           finishPage(currentPage);
           currentPage = makeContinuation();
           addElementNode(node, doneCallback);
@@ -274,13 +329,17 @@ class Binder {
         switch (child.nodeType) {
           case Node.TEXT_NODE:
             let cancel = () => {
-              this.elementPath.pop();
-              let fn = currentPage.footer.lastChild;
+              elementPath.pop();
+
+              let fn = currentPage.footer.lastChild; // <--
+
               finishPage(currentPage);
               currentPage = makeContinuation();
-              currentPage.footer.appendChild(fn);
-              this.elementPath.last.appendChild(node);
-              this.elementPath.push(node);
+
+              currentPage.footer.appendChild(fn); // <--
+
+              elementPath.last.appendChild(node);
+              elementPath.push(node);
               addTextNode(child, addNextChild, cancel);
             }
             addTextNode(child, addNextChild, cancel);
@@ -290,42 +349,13 @@ class Binder {
               addNextChild(); // skip
               break;
             }
-            if (child.getAttribute("bindery-break") == "before") {
-              if (currentPage.flowContent.innerText !== "") {
-                finishPage(currentPage);
-                currentPage = makeContinuation();
-              }
-            }
-            if (child.hasAttribute("bindery-spread")) {
-              let spreadMode = child.getAttribute("bindery-spread");
-              let oldBox = currentPage;
-              let oldContext = this.elementPath;
-              currentPage = makeContinuation();
-              if (spreadMode == "bleed") {
-                currentPage.element.classList.add("bleed");
-              }
-              addElementNode(child, () => {
-                finishPage(currentPage);
-                currentPage = oldBox;
-                this.elementPath = oldContext;
-                addNextChild();
-              });
-              break;
-            }
-            let fn = el("div", "footnote");
-            fn.textContent = `* ${child.textContent.substr(0,28)}`
-            currentPage.footer.appendChild(fn);
 
-            if (hasOverflowed()) {
-              currentPage.footer.removeChild(fn);
-              finishPage(currentPage);
-              currentPage = makeContinuation();
-              currentPage.footer.appendChild(fn);
-            }
+            beforeAddRules(child);
 
             throttle(() => {
               addElementNode(child, () => {
-                this.elementPath.pop();
+                elementPath.pop();
+                afterAddRules(child);
                 addNextChild();
               })
             });
@@ -335,10 +365,12 @@ class Binder {
             console.log(`Bindery: Unknown node type: ${child.nodeType}`);
         }
       }
+
+      // kick it off
       addNextChild();
     }
 
-    let currentPage = this.nextPage();
+    let currentPage = this.addPage();
     addElementNode(this.source, () => {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);

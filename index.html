@@ -89,6 +89,27 @@
 				allPages: "page"
 			},
     });
+
+		let n = 0;
+		binder.defineRule({
+		  selector: "p",
+		  beforeAdd: (elmt, pg) => {
+				let fn = el("div", "footnote");
+				fn.textContent = `${n} ${elmt.textContent.substr(0,28)}`;
+				n++;
+				pg.footer.appendChild(fn);
+				elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
+			},
+			cancelAdd: (elmt, pg) => {
+			  let fn = pg.footer.lastChild;
+			  pg.footer.removeChild(fn);
+				n--;
+			},
+			afterAdd: (elmt, pg) => {
+			},
+		});
+
+
     binder.bind((book) => {
 			console.log(book);
 		});

@@ -20,6 +20,10 @@ p {
   font-family: Georgia;
 }
 
+sup {
+  font-size: 0.5em;
+}
+
 figure {
   width: 100%;
   background: gray;
