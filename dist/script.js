@@ -6,7 +6,6 @@ let el = (type, className) => {
 
 let binder = new Bindery({
   source: document.querySelector(".content"),
-  target: document.querySelector(".export"),
 });
 
 binder.defineRule({

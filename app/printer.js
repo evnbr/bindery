@@ -1,7 +1,16 @@
 class Printer {
   constructor(opts) {
     this.book = opts.book;
-    this.target = this.book.target;
+
+    if (opts.target) {
+      this.target = opts.target;
+    }
+    else {
+      this.target = el("div");
+      this.target.setAttribute("bindery-export", true);
+      document.body.appendChild(this.target);
+    }
+
     this.template = opts.template;
     this.printWrapper = document.createElement("div");
     this.printWrapper.setAttribute("bindery-print-wrapper", true);

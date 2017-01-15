@@ -19,11 +19,11 @@
   [bindery-num] {
     outline: 1px solid cyan;
   }
-  .export, .measureArea {
+  [bindery-export], .measureArea {
     background: #eee;
     padding: 20px;
   }
-  .export {
+  [bindery-export] {
     padding-top: 100px;
   }
 }

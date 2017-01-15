@@ -46,9 +46,9 @@ var Bindery =
 /***/ function(module, exports, __webpack_require__) {
 
 	Book = __webpack_require__(1);
-	Page = __webpack_require__(2);
-	Printer = __webpack_require__(3);
-	el = __webpack_require__(4);
+	Page = __webpack_require__(3);
+	Printer = __webpack_require__(4);
+	el = __webpack_require__(2);
 
 
 	class ElementPath {
@@ -89,6 +89,7 @@ var Bindery =
 	class Binder {
 	  constructor(opts) {
 	    this.source = opts.source;
+	    this.target = opts.target;
 	    opts.template = `
 	      <div bindery-page>
 	        <div bindery-flowbox>
@@ -113,7 +114,7 @@ var Bindery =
 	      console.error(`Bindery: Template should be an element or a string`);
 	    }
 
-	    this.book = new Book({ target: opts.target });
+	    this.book = new Book();
 	    this.rules = [];
 	  }
 	  defineRule(rule) {
@@ -379,7 +380,8 @@ var Bindery =
 
 	      let printer = new Printer({
 	        book: this.book,
-	        template: this.template
+	        template: this.template,
+	        target: this.target,
 	      });
 	      printer.setOrdered();
 
@@ -395,11 +397,13 @@ var Bindery =
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	el = __webpack_require__(2);
 
 	class Book {
 	  constructor(opts) {
-	    this.target = opts.target;
+
 	    this.pageNum = 1;
 	    this.pages = [];
 	  }
@@ -415,6 +419,19 @@ var Bindery =
 
 /***/ },
 /* 2 */
+/***/ function(module, exports) {
+
+	let el = (type, className) => {
+	  element = document.createElement(type);
+	  element.classList.add(className);
+	  return element;
+	}
+
+	module.exports = el;
+
+
+/***/ },
+/* 3 */
 /***/ function(module, exports) {
 
 	class Page {
@@ -434,13 +451,22 @@ var Bindery =
 
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports) {
 
 	class Printer {
 	  constructor(opts) {
 	    this.book = opts.book;
-	    this.target = this.book.target;
+
+	    if (opts.target) {
+	      this.target = opts.target;
+	    }
+	    else {
+	      this.target = el("div");
+	      this.target.setAttribute("bindery-export", true);
+	      document.body.appendChild(this.target);
+	    }
+
 	    this.template = opts.template;
 	    this.printWrapper = document.createElement("div");
 	    this.printWrapper.setAttribute("bindery-print-wrapper", true);
@@ -495,19 +521,6 @@ var Bindery =
 	}
 
 	module.exports = Printer;
-
-
-/***/ },
-/* 4 */
-/***/ function(module, exports) {
-
-	let el = (type, className) => {
-	  element = document.createElement(type);
-	  element.classList.add(className);
-	  return element;
-	}
-
-	module.exports = el;
 
 
 /***/ }

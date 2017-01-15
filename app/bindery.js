@@ -42,6 +42,7 @@ class ElementPath {
 class Binder {
   constructor(opts) {
     this.source = opts.source;
+    this.target = opts.target;
     opts.template = `
       <div bindery-page>
         <div bindery-flowbox>
@@ -66,7 +67,7 @@ class Binder {
       console.error(`Bindery: Template should be an element or a string`);
     }
 
-    this.book = new Book({ target: opts.target });
+    this.book = new Book();
     this.rules = [];
   }
   defineRule(rule) {
@@ -332,7 +333,8 @@ class Binder {
 
       let printer = new Printer({
         book: this.book,
-        template: this.template
+        template: this.template,
+        target: this.target,
       });
       printer.setOrdered();
 
