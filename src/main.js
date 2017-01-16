@@ -1,8 +1,9 @@
-require("style!css!./bindery.css");
+import css from "style!css!./bindery.css";
 
 import Book from "./book";
 import Page from "./page";
 import Printer from "./printer";
+import Controls from "./controls";
 import el from "./el";
 
 class ElementPath {
@@ -69,6 +70,7 @@ class Binder {
     }
 
     this.book = new Book();
+    this.controls = new Controls();
     this.rules = [];
 
     this.printer = new Printer({
@@ -356,6 +358,7 @@ class Binder {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);
 
+      this.controls.setState("done");
       this.printer.setOrdered();
 
       if (doneBinding) doneBinding(this.book);
