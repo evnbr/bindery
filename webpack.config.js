@@ -1,5 +1,6 @@
 
 module.exports = {
+  devtool: 'source-map',
   entry: './src/main.js',
   output: {
     filename: 'bindery.js',

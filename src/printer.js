@@ -1,4 +1,4 @@
-const Page = require("./page");
+import Page from "./page";
 
 class Printer {
   constructor(opts) {
@@ -15,7 +15,7 @@ class Printer {
     }
 
     this.template = opts.template;
-    this.printWrapper = document.createElement("div");
+    this.printWrapper = el("div");
     this.printWrapper.setAttribute("bindery-print-wrapper", true);
   }
   setOrdered() {
@@ -67,4 +67,4 @@ class Printer {
   }
 }
 
-module.exports = Printer;
+export default Printer;

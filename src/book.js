@@ -1,5 +1,3 @@
-const el = require("./el");
-
 class Book {
   constructor(opts) {
 
