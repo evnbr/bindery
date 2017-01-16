@@ -9,17 +9,18 @@ class Printer {
       this.target.setAttribute("bindery-export", true);
     }
     else {
-      this.target = el("div");
-      this.target.setAttribute("bindery-export", true);
+      this.target = el("div", {"bindery-export": true});
       document.body.appendChild(this.target);
     }
 
     this.template = opts.template;
-    this.printWrapper = el("div");
-    this.printWrapper.setAttribute("bindery-print-wrapper", true);
+    this.printWrapper = el("div", {"bindery-print-wrapper": true});
   }
   cancel() {
     this.target.style.display = "none";
+  }
+  toggleGuides() {
+    this.target.classList.toggle("bindery-show-guides");
   }
   setOrdered() {
     this.target.style.display = "block";

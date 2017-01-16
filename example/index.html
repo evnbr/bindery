@@ -81,8 +81,10 @@
 		<div style="display: inline-block; margin-left: 20px;">
 			<button bindery-btn>Sequential</button>
 			<button bindery-btn>Booklet</button>
-			<button bindery-btn>Bound</button>
-			<button bindery-btn>Guides</button>
+		</div>
+		<div style="display: inline-block; margin-left: 20px;">
+			<button bindery-btn onClick="binder.printer.toggleGuides();">Guides</button>
+			<button bindery-btn onClick="binder.printer.toggleGuides();">Preview</button>
 		</div>
 
 		<div style="float: right;">

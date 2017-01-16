@@ -81,7 +81,6 @@ class Binder {
   cancel() {
     this.printer.cancel();
     this.book = new Book();
-    this.rules = [];
     this.source.style.display = "";
     this.printer = new Printer({
       book: this.book,
@@ -352,12 +351,12 @@ class Binder {
     state.currentPage = this.addPage();
     let content = this.source.cloneNode(true);
     content.style.margin = 0; // TODO: make this clearer
+    this.source.style.display = "none";
     addElementNode(content, () => {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);
 
       this.printer.setOrdered();
-      this.source.style.display = "none";
 
       if (doneBinding) doneBinding(this.book);
     });

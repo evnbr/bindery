@@ -3,20 +3,34 @@
     outline: 1px solid rgba(0,0,0,0.3);
     background: white;
     box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+    overflow: hidden;
   }
+  .bindery-show-guides [bindery-page] {
+    overflow: visible;
+  }
+  .bindery-show-guides [bindery-page]::after {
+    content: "";
+    outline: 1px solid magenta;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
   [bindery-print-wrapper] {
     /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/
   }
-  [bindery-flowbox] {
+  .bindery-show-guides [bindery-flowbox] {
     outline: 1px solid cyan;
   }
-  [bindery-footer] {
+  .bindery-show-guides [bindery-footer] {
     outline: 1px solid cyan;
   }
-  [bindery-content] {
+  .bindery-show-guides [bindery-content] {
     outline: 1px solid lime;
   }
-  [bindery-num] {
+  .bindery-show-guides [bindery-num] {
     outline: 1px solid cyan;
   }
   [bindery-export], .measureArea {
@@ -28,7 +42,7 @@
 @media print {
   [bindery-print-wrapper] {
     border: 1px dashed black;
-    margin: 8px;
+    margin: 20px;
   }
   [bindery-controls] {
     display: none;
@@ -52,16 +66,14 @@
 [bindery-print-wrapper] {
   page-break-after: always;
   display: flex;
-  margin: 10px;
   width: 800px;
-  margin: 8px auto;
+  margin: 20px auto;
 }
 
 [bindery-page] {
   width: 400px;
   height: 600px;
   position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -84,12 +96,17 @@
 
 .bleed [bindery-flowbox] {
   margin: 0;
-  outline: 1px solid cyan;
   position: absolute;
   top: -20px;
-  left: -20px;
-  right: -20px;
   bottom: -20px;
+}
+[bindery-left].bleed [bindery-flowbox] {
+  right: 0;
+  left: -20px;
+}
+[bindery-right].bleed [bindery-flowbox] {
+  left: 0;
+  right: -20px;
 }
 
 [bindery-num] {
