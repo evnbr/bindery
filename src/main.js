@@ -70,6 +70,24 @@ class Binder {
 
     this.book = new Book();
     this.rules = [];
+
+    this.printer = new Printer({
+      book: this.book,
+      template: this.template,
+      target: this.target,
+    });
+
+  }
+  cancel() {
+    this.printer.cancel();
+    this.book = new Book();
+    this.rules = [];
+    this.source.style.display = "";
+    this.printer = new Printer({
+      book: this.book,
+      template: this.template,
+      target: this.target,
+    });
   }
   defineRule(rule) {
     this.rules.push(rule);
@@ -93,7 +111,7 @@ class Binder {
     this.measureArea = el(".measureArea");
     document.body.appendChild(this.measureArea);
 
-    const DELAY = 0; // ms
+    const DELAY = 1; // ms
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();
@@ -297,7 +315,7 @@ class Binder {
               finishPage(state.currentPage);
               state.currentPage = makeContinuation();
 
-              state.currentPage.footer.appendChild(fn); // <--
+              if (fn) state.currentPage.footer.appendChild(fn); // <--
 
               state.elPath.last.appendChild(node);
               state.elPath.push(node);
@@ -332,16 +350,14 @@ class Binder {
     }
 
     state.currentPage = this.addPage();
-    addElementNode(this.source, () => {
+    let content = this.source.cloneNode(true);
+    content.style.margin = 0; // TODO: make this clearer
+    addElementNode(content, () => {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);
 
-      let printer = new Printer({
-        book: this.book,
-        template: this.template,
-        target: this.target,
-      });
-      printer.setOrdered();
+      this.printer.setOrdered();
+      this.source.style.display = "none";
 
       if (doneBinding) doneBinding(this.book);
     });

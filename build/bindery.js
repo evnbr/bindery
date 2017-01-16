@@ -143,9 +143,28 @@ var Bindery =
 	
 	    this.book = new _book2.default();
 	    this.rules = [];
+	
+	    this.printer = new _printer2.default({
+	      book: this.book,
+	      template: this.template,
+	      target: this.target
+	    });
 	  }
 	
 	  _createClass(Binder, [{
+	    key: "cancel",
+	    value: function cancel() {
+	      this.printer.cancel();
+	      this.book = new _book2.default();
+	      this.rules = [];
+	      this.source.style.display = "";
+	      this.printer = new _printer2.default({
+	        book: this.book,
+	        template: this.template,
+	        target: this.target
+	      });
+	    }
+	  }, {
 	    key: "defineRule",
 	    value: function defineRule(rule) {
 	      this.rules.push(rule);
@@ -174,7 +193,7 @@ var Bindery =
 	      this.measureArea = (0, _el2.default)(".measureArea");
 	      document.body.appendChild(this.measureArea);
 	
-	      var DELAY = 0; // ms
+	      var DELAY = 1; // ms
 	      var throttle = function throttle(func) {
 	        if (DELAY > 0) setTimeout(func, DELAY);else func();
 	      };
@@ -378,7 +397,7 @@ var Bindery =
 	                  finishPage(state.currentPage);
 	                  state.currentPage = makeContinuation();
 	
-	                  state.currentPage.footer.appendChild(fn); // <--
+	                  if (fn) state.currentPage.footer.appendChild(fn); // <--
 	
 	                  state.elPath.last.appendChild(node);
 	                  state.elPath.push(node);
@@ -415,16 +434,14 @@ var Bindery =
 	      };
 	
 	      state.currentPage = this.addPage();
-	      addElementNode(this.source, function () {
+	      var content = this.source.cloneNode(true);
+	      content.style.margin = 0; // TODO: make this clearer
+	      addElementNode(content, function () {
 	        console.log("wow we're done!");
 	        document.body.removeChild(_this.measureArea);
 	
-	        var printer = new _printer2.default({
-	          book: _this.book,
-	          template: _this.template,
-	          target: _this.target
-	        });
-	        printer.setOrdered();
+	        _this.printer.setOrdered();
+	        _this.source.style.display = "none";
 	
 	        if (doneBinding) doneBinding(_this.book);
 	      });
@@ -546,8 +563,15 @@ var Bindery =
 	  }
 	
 	  _createClass(Printer, [{
+	    key: "cancel",
+	    value: function cancel() {
+	      this.target.style.display = "none";
+	    }
+	  }, {
 	    key: "setOrdered",
 	    value: function setOrdered() {
+	      this.target.style.display = "block";
+	
 	      if (this.book.pages.length % 2 !== 0) {
 	        var pg = new _page2.default(this.template);
 	        this.book.addPage(pg);
@@ -666,7 +690,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  [bindery-page] {\n    outline: 1px solid rgba(0,0,0,0.3);\n    background: white;\n    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);\n  }\n  [bindery-print-wrapper] {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  [bindery-content] {\n    outline: 1px solid lime;\n  }\n  [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  [bindery-export], .measureArea {\n    background: #eee;\n    padding: 20px;\n  }\n  [bindery-export] {\n    padding-top: 100px;\n  }\n}\n\n@media print {\n  [bindery-print-wrapper] {\n    border: 1px dashed black;\n    margin: 8px;\n  }\n  [bindery-controls] {\n    display: none;\n  }\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n\n.measureArea p {\n  outline: 1px solid cyan;\n  /*color: cyan;*/\n}\n\n[bindery-print-wrapper] {\n  page-break-after: always;\n  display: flex;\n  margin: 10px;\n  width: 800px;\n  margin: 8px auto;\n}\n\n[bindery-page] {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  outline: 1px solid cyan;\n  position: absolute;\n  top: -20px;\n  left: -20px;\n  right: -20px;\n  bottom: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-left] [bindery-num] {\n  left: 20px;\n}\n[bindery-right] [bindery-num] {\n  right: 20px;\n}\n\n\n[bindery-preview] {\n  perspective: 1200px;\n  /*width: 60px;*/\n  height: 0;\n  width: 0;\n}\n[bindery-preview] [bindery-page] {\n  position: absolute;\n}\n[bindery-preview] [bindery-left] {\n  transform: rotateY(50deg);\n}\n[bindery-preview] [bindery-right] {\n  transform: rotateY(-50deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n\n[bindery-controls] {\n  position: fixed;\n  background: #f3f3f3;\n  top: 0;\n  left: 0;\n  right: 0;\n  padding: 12px;\n  outline: 1px solid rgba(0,0,0,0.2);\n  z-index: 99;\n}\n\n[bindery-btn] {\n  -webkit-appearance: none;\n  border: none;\n  background: white;\n  padding: 6px 10px;\n  outline: 1px solid rgba(0,0,0,0.3);\n  cursor: pointer;\n  font-size: 14px;\n}\n[bindery-btn]:focus {\n  /*outline: 1px solid blue;*/\n}\n[bindery-btn]:hover {\n  /*background: black;\n  color: white;*/\n  box-shadow: 2px 2px 0px rgba(0,0,0,0.2);\n}\n[bindery-btn]:active {\n  box-shadow: 0 0 0;\n  background: rgba(0,0,0,0.04);\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  [bindery-page] {\n    outline: 1px solid rgba(0,0,0,0.3);\n    background: white;\n    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);\n  }\n  [bindery-print-wrapper] {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  [bindery-content] {\n    outline: 1px solid lime;\n  }\n  [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  [bindery-export], .measureArea {\n    background: #eee;\n    padding: 20px;\n  }\n}\n\n@media print {\n  [bindery-print-wrapper] {\n    border: 1px dashed black;\n    margin: 8px;\n  }\n  [bindery-controls] {\n    display: none;\n  }\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n\n.measureArea p {\n  outline: 1px solid cyan;\n  /*color: cyan;*/\n}\n\n[bindery-print-wrapper] {\n  page-break-after: always;\n  display: flex;\n  margin: 10px;\n  width: 800px;\n  margin: 8px auto;\n}\n\n[bindery-page] {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  outline: 1px solid cyan;\n  position: absolute;\n  top: -20px;\n  left: -20px;\n  right: -20px;\n  bottom: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-left] [bindery-num] {\n  left: 20px;\n}\n[bindery-right] [bindery-num] {\n  right: 20px;\n}\n\n\n[bindery-preview] {\n  perspective: 1200px;\n  /*width: 60px;*/\n  height: 0;\n  width: 0;\n}\n[bindery-preview] [bindery-page] {\n  position: absolute;\n}\n[bindery-preview] [bindery-left] {\n  transform: rotateY(50deg);\n}\n[bindery-preview] [bindery-right] {\n  transform: rotateY(-50deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n\n[bindery-controls] {\n  position: fixed;\n  bottom: 20px;\n  left: 0;\n  right: 0;\n  padding: 12px;\n  z-index: 99;\n  width: 600px;\n  margin: auto;\n  background: rgba(50,50,50,0.9);\n  outline: 1px solid rgba(0,0,0,0.3);\n  border-radius: 4px;\n}\n_::-webkit-:-webkit-full-screen:host:not(:root:root), [bindery-controls] {\n  background: rgba(0,0,0,0.5);\n  -webkit-backdrop-filter: blur(20px);\n}\n\n[bindery-btn] {\n  color: black;\n  -webkit-appearance: none;\n  border: none;\n  background: white;\n  padding: 6px 10px;\n  border: 1px solid rgba(0,0,0,0.3);\n  cursor: pointer;\n  font-size: 14px;\n  border-radius: 2px;\n}\n[bindery-btn]:focus {\n  /*outline: 1px solid blue;*/\n}\n[bindery-btn]:hover {\n  /*background: black;\n  color: white;*/\n  box-shadow: 2px 2px 0px rgba(0,0,0,0.2);\n}\n[bindery-btn]:active {\n  box-shadow: 0 0 0;\n  background: rgba(0,0,0,0.04);\n}\n", ""]);
 	
 	// exports
 

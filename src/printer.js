@@ -18,7 +18,12 @@ class Printer {
     this.printWrapper = el("div");
     this.printWrapper.setAttribute("bindery-print-wrapper", true);
   }
+  cancel() {
+    this.target.style.display = "none";
+  }
   setOrdered() {
+    this.target.style.display = "block";
+
     if (this.book.pages.length % 2 !== 0) {
       let pg = new Page(this.template);
       this.book.addPage(pg);

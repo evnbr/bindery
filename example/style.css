@@ -12,7 +12,7 @@ html {
 .content {
   font-family: Georgia;
   font-size: 16px;
-  margin: auto;
+  margin: 20px auto;
   max-width: 800px;
 }
 
@@ -45,4 +45,5 @@ figcaption {
   background: #ffffcc;
   border: 1px solid black;
   padding: 1rem;
+  margin: 1rem 0;
 }
