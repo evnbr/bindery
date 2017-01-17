@@ -1,5 +1,4 @@
 import css from "style!css!./controls.css";
-import el from "./el";
 import h from "hyperscript";
 
 // <div bindery-controls>
@@ -23,30 +22,22 @@ import h from "hyperscript";
 
 class Controls {
   constructor(opts) {
-    this.holder = el("div", {"bindery-controls": true});
+    this.holder = h("div.bindery-controls");
     document.body.appendChild(this.holder);
 
     this.states = {
-      start: el(
-          "button",
-          {
-            "bindery-btn": true,
-            onClick: () => {
-                binder.bind();
-                this.setState("working");
-            }
-          },
-          "Bind"
-        ),
-      working: el("div", { "bindery-status": true }, "Binding..."),
-      done: el(
-          "button",
-          {
-            "bindery-btn": true,
-            onClick: () => {  window.print(); }
-          },
-          "Print"
-        ),
+      start: h("button.bindery-btn", { onclick: () => {
+        binder.bind();
+        this.setState("working");
+      }}, "Bind"),
+      working: h("div.bindery-status", "Binding..."),
+      done: h("div", {},
+        h("button.bindery-btn", {style: {float: "right"}, onclick: () => {  window.print(); }}, "Print"),
+        h("button.bindery-btn", {onclick: () => {
+          binder.cancel();
+          this.setState("start");
+        }}, "Cancel")
+      )
     }
     this.state = ""
     this.setState("start");

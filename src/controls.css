@@ -1,4 +1,4 @@
-[bindery-controls] {
+.bindery-controls {
   position: fixed;
   bottom: 20px;
   left: 0;
@@ -11,17 +11,17 @@
   /*outline: 1px solid rgba(0,0,0,0.3);*/
   border-radius: 4px;
 }
-_::-webkit-:-webkit-full-screen:host:not(:root:root), [bindery-controls] {
+_::-webkit-:-webkit-full-screen:host:not(:root:root), .bindery-controls {
   background: rgba(0,0,0,0.5);
   -webkit-backdrop-filter: blur(20px);
 }
 
-[bindery-status] {
+.bindery-status {
   color: white;
   padding: 6px 10px;
 }
 
-[bindery-btn] {
+.bindery-btn {
   color: black;
   -webkit-appearance: none;
   border: none;
@@ -32,15 +32,15 @@ _::-webkit-:-webkit-full-screen:host:not(:root:root), [bindery-controls] {
   font-size: 14px;
   border-radius: 2px;
 }
-[bindery-btn]:focus {
+.bindery-btn:focus {
   /*outline: 1px solid blue;*/
 }
-[bindery-btn]:hover {
+.bindery-btn:hover {
   /*background: black;
   color: white;*/
   box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
 }
-[bindery-btn]:active {
+.bindery-btn:active {
   box-shadow: 0 0 0;
   background: rgba(0,0,0,0.04);
 }
