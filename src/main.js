@@ -106,6 +106,12 @@ class Binder {
       nextPage: () => {
         finishPage(state.currentPage);
         state.currentPage = makeContinuation();
+      },
+      finishPage: (pg) => {
+        finishPage(pg);
+      },
+      getNewPage: () => {
+        return makeContinuation();
       }
     }
 
@@ -117,25 +123,6 @@ class Binder {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();
     }
-
-
-    this.defineRule({
-      selector: "[bindery-spread]",
-      beforeAdd: (elmt, state) => {
-        let spreadMode = elmt.getAttribute("bindery-spread");
-        state.prevPage = state.currentPage;
-        state.prevElementPath = state.elPath;
-        state.currentPage = makeContinuation();
-        if (spreadMode == "bleed") {
-          state.currentPage.element.classList.add("bleed");
-        }
-      },
-      afterAdd: (elmt, state) => {
-        finishPage(state.currentPage);
-        state.currentPage = state.prevPage;
-        state.elPath = state.prevElementPath;
-      },
-    });
 
 
     let beforeAddRules = (elmt) => {
@@ -225,12 +212,13 @@ class Binder {
           while(origText.charAt(pos) !== " " && pos > -1) pos--;
           textNode.nodeValue = origText.substr(0, pos);
 
-          if (pos < 1) {
+          if (pos < 1 && origText.trim().length > 0) {
             // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
             textNode.nodeValue = origText;
             abortCallback();
             return;
           }
+          console.log(state.currentPage.element.parentNode);
           // console.log(addWordIterations + " iterations");
 
           origText = origText.substr(pos);
@@ -305,9 +293,11 @@ class Binder {
         switch (child.nodeType) {
           case Node.TEXT_NODE:
             let cancel = () => {
-              state.elPath.pop();
+              let lastEl = state.elPath.pop();
               if (state.elPath.items.length < 1) {
-                console.error("Bindery: Failed to add any node. Page might be too small?");
+                console.log(lastEl);
+                console.log(child);
+                console.error(`Bindery: Failed to add textNode "${child.nodeValue}" to ${prettyName(lastEl)}. Page might be too small?`);
                 return;
               }
 

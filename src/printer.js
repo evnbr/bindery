@@ -17,7 +17,8 @@ class Printer {
     this.printWrapper = el("div", {"bindery-print-wrapper": true});
   }
   cancel() {
-    this.target.style.display = "none";
+    // TODO this doesn't work if the target is an existing node
+    this.target.parentNode.removeChild(this.target);
   }
   toggleGuides() {
     this.target.classList.toggle("bindery-show-guides");
