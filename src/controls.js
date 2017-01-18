@@ -1,42 +1,40 @@
 import css from "style!css!./controls.css";
 import h from "hyperscript";
 
-// <div bindery-controls>
-//   <button bindery-btn onClick="binder.cancel();">Cancel</button>
-//
-//   <div style="display: inline-block; margin-left: 20px;">
-//     <button bindery-btn>Sequential</button>
-//     <button bindery-btn>Booklet</button>
-//   </div>
-//   <div style="display: inline-block; margin-left: 20px;">
-//     <button bindery-btn onClick="binder.printer.toggleGuides();">Guides</button>
-//     <button bindery-btn onClick="binder.printer.toggleGuides();">Preview</button>
-//   </div>
-//
-//   <div style="float: right;">
-//     <button bindery-btn onClick="binder.bind();">Bind</button>
-//     <button bindery-btn onClick="window.print();">Print</button>
-//   </div>
-// </div>
-
+const btn = function() {
+  return h("button.bindery-btn", ...arguments);
+}
+const btnMain = function() {
+  return h("button.bindery-btn.bindery-btn-main", ...arguments);
+}
 
 class Controls {
   constructor(opts) {
     this.holder = h("div.bindery-controls");
     document.body.appendChild(this.holder);
 
+    this.binder = opts.binder;
+
+    const start = () => {
+      this.setState("working");
+      this.binder.bind();
+    };
+    const done = () => {
+      this.binder.cancel();
+      this.setState("start");
+    };
+    const guides = () => {
+      this.binder.printer.toggleGuides();
+    };
+    const print = () =>  window.print();
+
     this.states = {
-      start: h("button.bindery-btn", { onclick: () => {
-        binder.bind();
-        this.setState("working");
-      }}, "Bind"),
+      start: btn({ onclick: start}, "Get Started"),
       working: h("div.bindery-status", "Binding..."),
       done: h("div", {},
-        h("button.bindery-btn", {style: {float: "right"}, onclick: () => {  window.print(); }}, "Print"),
-        h("button.bindery-btn", {onclick: () => {
-          binder.cancel();
-          this.setState("start");
-        }}, "Cancel")
+        btnMain({style: {float: "right"}, onclick: print}, "Print"),
+        btn({style: {float: "right"}, onclick: guides}, "Toggle Guides"),
+        btn({onclick: done}, "Done"),
       )
     }
     this.state = ""

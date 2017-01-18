@@ -44,9 +44,6 @@
     border: 1px dashed black;
     margin: 20px;
   }
-  [bindery-controls] {
-    display: none;
-  }
 }
 
 .measureArea {

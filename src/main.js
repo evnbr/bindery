@@ -70,7 +70,6 @@ class Binder {
     }
 
     this.book = new Book();
-    this.controls = new Controls();
     this.rules = [];
 
     this.printer = new Printer({
@@ -78,6 +77,11 @@ class Binder {
       template: this.template,
       target: this.target,
     });
+    this.controls = new Controls({
+      binder: this,
+      printer: this.printer,
+    });
+
 
   }
   cancel() {
@@ -118,7 +122,7 @@ class Binder {
     this.measureArea = el(".measureArea");
     document.body.appendChild(this.measureArea);
 
-    const DELAY = 1; // ms
+    const DELAY = 0; // ms
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();
@@ -218,8 +222,6 @@ class Binder {
             abortCallback();
             return;
           }
-          console.log(state.currentPage.element.parentNode);
-          // console.log(addWordIterations + " iterations");
 
           origText = origText.substr(pos);
           pos = 0;
