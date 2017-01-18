@@ -10,8 +10,14 @@ let el = (selector, attrs, text) => {
   if (classes) element.className = classes.map((c) => c.substr(1) ).join(" ");
   if (text) element.textContent = text;
   if (attrs) {
-    for (key in attrs) {
-      element.setAttribute(key, attrs[key]);
+    for (let key in attrs) {
+      let val = attrs[key];
+      if (key == "onClick") {
+        element.addEventListener("click", val)
+      }
+      else {
+        element.setAttribute(key, val);
+      }
     }
   }
 

@@ -49,19 +49,27 @@ var Bindery =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _book = __webpack_require__(1);
+	var _bindery = __webpack_require__(1);
+	
+	var _bindery2 = _interopRequireDefault(_bindery);
+	
+	var _book = __webpack_require__(5);
 	
 	var _book2 = _interopRequireDefault(_book);
 	
-	var _page = __webpack_require__(2);
+	var _page = __webpack_require__(6);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _printer = __webpack_require__(3);
+	var _printer = __webpack_require__(7);
 	
 	var _printer2 = _interopRequireDefault(_printer);
 	
-	var _el = __webpack_require__(4);
+	var _controls = __webpack_require__(8);
+	
+	var _controls2 = _interopRequireDefault(_controls);
+	
+	var _el = __webpack_require__(16);
 	
 	var _el2 = _interopRequireDefault(_el);
 	
@@ -70,8 +78,6 @@ var Bindery =
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	__webpack_require__(5);
 	
 	var ElementPath = function () {
 	  function ElementPath() {
@@ -149,6 +155,10 @@ var Bindery =
 	      template: this.template,
 	      target: this.target
 	    });
+	    this.controls = new _controls2.default({
+	      binder: this,
+	      printer: this.printer
+	    });
 	  }
 	
 	  _createClass(Binder, [{
@@ -186,34 +196,32 @@ var Bindery =
 	        nextPage: function nextPage() {
 	          finishPage(state.currentPage);
 	          state.currentPage = makeContinuation();
+	        },
+	        finishPage: function (_finishPage) {
+	          function finishPage(_x) {
+	            return _finishPage.apply(this, arguments);
+	          }
+	
+	          finishPage.toString = function () {
+	            return _finishPage.toString();
+	          };
+	
+	          return finishPage;
+	        }(function (pg) {
+	          finishPage(pg);
+	        }),
+	        getNewPage: function getNewPage() {
+	          return makeContinuation();
 	        }
 	      };
 	
 	      this.measureArea = (0, _el2.default)(".measureArea");
 	      document.body.appendChild(this.measureArea);
 	
-	      var DELAY = 1; // ms
+	      var DELAY = 0; // ms
 	      var throttle = function throttle(func) {
 	        if (DELAY > 0) setTimeout(func, DELAY);else func();
 	      };
-	
-	      this.defineRule({
-	        selector: "[bindery-spread]",
-	        beforeAdd: function beforeAdd(elmt, state) {
-	          var spreadMode = elmt.getAttribute("bindery-spread");
-	          state.prevPage = state.currentPage;
-	          state.prevElementPath = state.elPath;
-	          state.currentPage = makeContinuation();
-	          if (spreadMode == "bleed") {
-	            state.currentPage.element.classList.add("bleed");
-	          }
-	        },
-	        afterAdd: function afterAdd(elmt, state) {
-	          finishPage(state.currentPage);
-	          state.currentPage = state.prevPage;
-	          state.elPath = state.prevElementPath;
-	        }
-	      });
 	
 	      var beforeAddRules = function beforeAddRules(elmt) {
 	        _this.rules.forEach(function (rule) {
@@ -302,13 +310,12 @@ var Bindery =
 	              pos--;
 	            }textNode.nodeValue = origText.substr(0, pos);
 	
-	            if (pos < 1) {
+	            if (pos < 1 && origText.trim().length > 0) {
 	              // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
 	              textNode.nodeValue = origText;
 	              abortCallback();
 	              return;
 	            }
-	            // console.log(addWordIterations + " iterations");
 	
 	            origText = origText.substr(pos);
 	            pos = 0;
@@ -385,9 +392,11 @@ var Bindery =
 	            switch (child.nodeType) {
 	              case Node.TEXT_NODE:
 	                var cancel = function cancel() {
-	                  state.elPath.pop();
+	                  var lastEl = state.elPath.pop();
 	                  if (state.elPath.items.length < 1) {
-	                    console.error("Bindery: Failed to add any node. Page might be too small?");
+	                    console.log(lastEl);
+	                    console.log(child);
+	                    console.error("Bindery: Failed to add textNode \"" + child.nodeValue + "\" to " + prettyName(lastEl) + ". Page might be too small?");
 	                    return;
 	                  }
 	
@@ -440,6 +449,7 @@ var Bindery =
 	        console.log("wow we're done!");
 	        document.body.removeChild(_this.measureArea);
 	
+	        _this.controls.setState("done");
 	        _this.printer.setOrdered();
 	
 	        if (doneBinding) doneBinding(_this.book);
@@ -458,220 +468,15 @@ var Bindery =
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Book = function () {
-	  function Book(opts) {
-	    _classCallCheck(this, Book);
-	
-	    this.pageNum = 1;
-	    this.pages = [];
-	  }
-	
-	  _createClass(Book, [{
-	    key: "addPage",
-	    value: function addPage(page) {
-	      page.setNumber(this.pageNum);
-	      this.pageNum++;
-	      this.pages.push(page);
-	    }
-	  }]);
-	
-	  return Book;
-	}();
-	
-	module.exports = Book;
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Page = function () {
-	  function Page(template) {
-	    _classCallCheck(this, Page);
-	
-	    this.element = template.cloneNode(true);
-	    this.flowBox = this.element.querySelector("[bindery-flowbox]");
-	    this.flowContent = this.element.querySelector("[bindery-content]");
-	    this.footer = this.element.querySelector("[bindery-footer]");
-	  }
-	
-	  _createClass(Page, [{
-	    key: "setNumber",
-	    value: function setNumber(n) {
-	      var num = this.element.querySelector("[bindery-num]");
-	      num.textContent = n;
-	    }
-	  }]);
-	
-	  return Page;
-	}();
-	
-	module.exports = Page;
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _page = __webpack_require__(2);
-	
-	var _page2 = _interopRequireDefault(_page);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Printer = function () {
-	  function Printer(opts) {
-	    _classCallCheck(this, Printer);
-	
-	    this.book = opts.book;
-	
-	    if (opts.target) {
-	      this.target = opts.target;
-	      this.target.setAttribute("bindery-export", true);
-	    } else {
-	      this.target = el("div", { "bindery-export": true });
-	      document.body.appendChild(this.target);
-	    }
-	
-	    this.template = opts.template;
-	    this.printWrapper = el("div", { "bindery-print-wrapper": true });
-	  }
-	
-	  _createClass(Printer, [{
-	    key: "cancel",
-	    value: function cancel() {
-	      this.target.style.display = "none";
-	    }
-	  }, {
-	    key: "toggleGuides",
-	    value: function toggleGuides() {
-	      this.target.classList.toggle("bindery-show-guides");
-	    }
-	  }, {
-	    key: "setOrdered",
-	    value: function setOrdered() {
-	      this.target.style.display = "block";
-	
-	      if (this.book.pages.length % 2 !== 0) {
-	        var pg = new _page2.default(this.template);
-	        this.book.addPage(pg);
-	      }
-	      var spacerPage = new _page2.default(this.template);
-	      var spacerPage2 = new _page2.default(this.template);
-	      spacerPage.element.style.visibility = "hidden";
-	      spacerPage2.element.style.visibility = "hidden";
-	      this.book.pages.unshift(spacerPage);
-	      this.book.pages.push(spacerPage2);
-	
-	      for (var i = 0; i < this.book.pages.length; i += 2) {
-	        var wrap = this.printWrapper.cloneNode(false);
-	        var l = this.book.pages[i].element;
-	        var r = this.book.pages[i + 1].element;
-	        l.setAttribute("bindery-left", true);
-	        r.setAttribute("bindery-right", true);
-	        wrap.appendChild(l);
-	        wrap.appendChild(r);
-	        this.target.appendChild(wrap);
-	      }
-	    }
-	  }, {
-	    key: "setInteractive",
-	    value: function setInteractive() {
-	      if (this.book.pages.length % 2 !== 0) {
-	        var pg = new _page2.default(this.template);
-	        this.book.addPage(pg);
-	      }
-	      var spacerPage = new _page2.default(this.template);
-	      var spacerPage2 = new _page2.default(this.template);
-	      spacerPage.element.style.visibility = "hidden";
-	      spacerPage2.element.style.visibility = "hidden";
-	      this.book.pages.unshift(spacerPage);
-	      this.book.pages.push(spacerPage2);
-	
-	      for (var i = 0; i < this.book.pages.length; i += 2) {
-	        var wrap = this.printWrapper.cloneNode(false);
-	        wrap.setAttribute("bindery-preview", true);
-	        var l = this.book.pages[i].element;
-	        var r = this.book.pages[i + 1].element;
-	        l.setAttribute("bindery-left", true);
-	        r.setAttribute("bindery-right", true);
-	        wrap.appendChild(l);
-	        wrap.appendChild(r);
-	        this.target.appendChild(wrap);
-	      }
-	    }
-	  }]);
-	
-	  return Printer;
-	}();
-	
-	exports.default = Printer;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var el = function el(selector, attrs, text) {
-	
-	  var tags = selector.match(/^([a-zA-Z]+)/g);
-	  var ids = selector.match(/#([a-zA-Z0-9\-\_]+)/g);
-	  var classes = selector.match(/\.([a-zA-Z0-9\-\_]+)/g);
-	
-	  var element = document.createElement(tags ? tags[0] : "div");
-	
-	  if (ids) element.id = ids[0].substr(1);
-	  if (classes) element.className = classes.map(function (c) {
-	    return c.substr(1);
-	  }).join(" ");
-	  if (text) element.textContent = text;
-	  if (attrs) {
-	    for (key in attrs) {
-	      element.setAttribute(key, attrs[key]);
-	    }
-	  }
-	
-	  return element;
-	};
-	exports.default = el;
-
-/***/ },
-/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(6);
+	var content = __webpack_require__(2);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(8)(content, {});
+	var update = __webpack_require__(4)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -688,21 +493,21 @@ var Bindery =
 	}
 
 /***/ },
-/* 6 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(7)();
+	exports = module.exports = __webpack_require__(3)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  [bindery-page] {\n    outline: 1px solid rgba(0,0,0,0.3);\n    background: white;\n    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides [bindery-page] {\n    overflow: visible;\n  }\n  .bindery-show-guides [bindery-page]::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  [bindery-print-wrapper] {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  [bindery-export], .measureArea {\n    background: #eee;\n    padding: 20px;\n  }\n}\n\n@media print {\n  [bindery-print-wrapper] {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n  [bindery-controls] {\n    display: none;\n  }\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n\n.measureArea p {\n  outline: 1px solid cyan;\n  /*color: cyan;*/\n}\n\n[bindery-print-wrapper] {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n[bindery-page] {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-left].bleed [bindery-flowbox] {\n  right: 0;\n  left: -20px;\n}\n[bindery-right].bleed [bindery-flowbox] {\n  left: 0;\n  right: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-left] [bindery-num] {\n  left: 20px;\n}\n[bindery-right] [bindery-num] {\n  right: 20px;\n}\n\n\n[bindery-preview] {\n  perspective: 1200px;\n  /*width: 60px;*/\n  height: 0;\n  width: 0;\n}\n[bindery-preview] [bindery-page] {\n  position: absolute;\n}\n[bindery-preview] [bindery-left] {\n  transform: rotateY(50deg);\n}\n[bindery-preview] [bindery-right] {\n  transform: rotateY(-50deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n\n[bindery-controls] {\n  position: fixed;\n  bottom: 20px;\n  left: 0;\n  right: 0;\n  padding: 12px;\n  z-index: 99;\n  width: 600px;\n  margin: auto;\n  background: rgba(50,50,50,0.9);\n  outline: 1px solid rgba(0,0,0,0.3);\n  border-radius: 4px;\n}\n_::-webkit-:-webkit-full-screen:host:not(:root:root), [bindery-controls] {\n  background: rgba(0,0,0,0.5);\n  -webkit-backdrop-filter: blur(20px);\n}\n\n[bindery-btn] {\n  color: black;\n  -webkit-appearance: none;\n  border: none;\n  background: white;\n  padding: 6px 10px;\n  border: 1px solid rgba(0,0,0,0.3);\n  cursor: pointer;\n  font-size: 14px;\n  border-radius: 2px;\n}\n[bindery-btn]:focus {\n  /*outline: 1px solid blue;*/\n}\n[bindery-btn]:hover {\n  /*background: black;\n  color: white;*/\n  box-shadow: 2px 2px 0px rgba(0,0,0,0.2);\n}\n[bindery-btn]:active {\n  box-shadow: 0 0 0;\n  background: rgba(0,0,0,0.04);\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  [bindery-page] {\n    outline: 1px solid rgba(0,0,0,0.3);\n    background: white;\n    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides [bindery-page] {\n    overflow: visible;\n  }\n  .bindery-show-guides [bindery-page]::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  [bindery-print-wrapper] {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  [bindery-export], .measureArea {\n    background: #eee;\n    padding: 20px;\n  }\n}\n\n@media print {\n  [bindery-print-wrapper] {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea [bindery-page] {\n  background: transparent;\n  box-shadow: none;\n}\n\n[bindery-print-wrapper] {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n[bindery-page] {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-left].bleed [bindery-flowbox] {\n  right: 0;\n  left: -20px;\n}\n[bindery-right].bleed [bindery-flowbox] {\n  left: 0;\n  right: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-left] [bindery-num] {\n  left: 20px;\n}\n[bindery-right] [bindery-num] {\n  right: 20px;\n}\n\n\n[bindery-preview] {\n  perspective: 1200px;\n  /*width: 60px;*/\n  height: 0;\n  width: 0;\n}\n[bindery-preview] [bindery-page] {\n  position: absolute;\n}\n[bindery-preview] [bindery-left] {\n  transform: rotateY(50deg);\n}\n[bindery-preview] [bindery-right] {\n  transform: rotateY(-50deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 7 */
+/* 3 */
 /***/ function(module, exports) {
 
 	/*
@@ -758,7 +563,7 @@ var Bindery =
 
 
 /***/ },
-/* 8 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -1008,6 +813,739 @@ var Bindery =
 			URL.revokeObjectURL(oldSrc);
 	}
 
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Book = function () {
+	  function Book(opts) {
+	    _classCallCheck(this, Book);
+	
+	    this.pageNum = 1;
+	    this.pages = [];
+	  }
+	
+	  _createClass(Book, [{
+	    key: "addPage",
+	    value: function addPage(page) {
+	      page.setNumber(this.pageNum);
+	      this.pageNum++;
+	      this.pages.push(page);
+	    }
+	  }]);
+	
+	  return Book;
+	}();
+	
+	module.exports = Book;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Page = function () {
+	  function Page(template) {
+	    _classCallCheck(this, Page);
+	
+	    this.element = template.cloneNode(true);
+	    this.flowBox = this.element.querySelector("[bindery-flowbox]");
+	    this.flowContent = this.element.querySelector("[bindery-content]");
+	    this.footer = this.element.querySelector("[bindery-footer]");
+	  }
+	
+	  _createClass(Page, [{
+	    key: "setNumber",
+	    value: function setNumber(n) {
+	      var num = this.element.querySelector("[bindery-num]");
+	      num.textContent = n;
+	    }
+	  }]);
+	
+	  return Page;
+	}();
+	
+	module.exports = Page;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _page = __webpack_require__(6);
+	
+	var _page2 = _interopRequireDefault(_page);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Printer = function () {
+	  function Printer(opts) {
+	    _classCallCheck(this, Printer);
+	
+	    this.book = opts.book;
+	
+	    if (opts.target) {
+	      this.target = opts.target;
+	      this.target.setAttribute("bindery-export", true);
+	    } else {
+	      this.target = el("div", { "bindery-export": true });
+	      document.body.appendChild(this.target);
+	    }
+	
+	    this.template = opts.template;
+	    this.printWrapper = el("div", { "bindery-print-wrapper": true });
+	  }
+	
+	  _createClass(Printer, [{
+	    key: "cancel",
+	    value: function cancel() {
+	      // TODO this doesn't work if the target is an existing node
+	      this.target.parentNode.removeChild(this.target);
+	    }
+	  }, {
+	    key: "toggleGuides",
+	    value: function toggleGuides() {
+	      this.target.classList.toggle("bindery-show-guides");
+	    }
+	  }, {
+	    key: "setOrdered",
+	    value: function setOrdered() {
+	      this.target.style.display = "block";
+	
+	      if (this.book.pages.length % 2 !== 0) {
+	        var pg = new _page2.default(this.template);
+	        this.book.addPage(pg);
+	      }
+	      var spacerPage = new _page2.default(this.template);
+	      var spacerPage2 = new _page2.default(this.template);
+	      spacerPage.element.style.visibility = "hidden";
+	      spacerPage2.element.style.visibility = "hidden";
+	      this.book.pages.unshift(spacerPage);
+	      this.book.pages.push(spacerPage2);
+	
+	      for (var i = 0; i < this.book.pages.length; i += 2) {
+	        var wrap = this.printWrapper.cloneNode(false);
+	        var l = this.book.pages[i].element;
+	        var r = this.book.pages[i + 1].element;
+	        l.setAttribute("bindery-left", true);
+	        r.setAttribute("bindery-right", true);
+	        wrap.appendChild(l);
+	        wrap.appendChild(r);
+	        this.target.appendChild(wrap);
+	      }
+	    }
+	  }, {
+	    key: "setInteractive",
+	    value: function setInteractive() {
+	      if (this.book.pages.length % 2 !== 0) {
+	        var pg = new _page2.default(this.template);
+	        this.book.addPage(pg);
+	      }
+	      var spacerPage = new _page2.default(this.template);
+	      var spacerPage2 = new _page2.default(this.template);
+	      spacerPage.element.style.visibility = "hidden";
+	      spacerPage2.element.style.visibility = "hidden";
+	      this.book.pages.unshift(spacerPage);
+	      this.book.pages.push(spacerPage2);
+	
+	      for (var i = 0; i < this.book.pages.length; i += 2) {
+	        var wrap = this.printWrapper.cloneNode(false);
+	        wrap.setAttribute("bindery-preview", true);
+	        var l = this.book.pages[i].element;
+	        var r = this.book.pages[i + 1].element;
+	        l.setAttribute("bindery-left", true);
+	        r.setAttribute("bindery-right", true);
+	        wrap.appendChild(l);
+	        wrap.appendChild(r);
+	        this.target.appendChild(wrap);
+	      }
+	    }
+	  }]);
+	
+	  return Printer;
+	}();
+	
+	exports.default = Printer;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _controls = __webpack_require__(9);
+	
+	var _controls2 = _interopRequireDefault(_controls);
+	
+	var _hyperscript = __webpack_require__(11);
+	
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var btn = function btn() {
+	  return _hyperscript2.default.apply(undefined, ["button.bindery-btn"].concat(Array.prototype.slice.call(arguments)));
+	};
+	var btnMain = function btnMain() {
+	  return _hyperscript2.default.apply(undefined, ["button.bindery-btn.bindery-btn-main"].concat(Array.prototype.slice.call(arguments)));
+	};
+	
+	var Controls = function () {
+	  function Controls(opts) {
+	    var _this = this;
+	
+	    _classCallCheck(this, Controls);
+	
+	    this.holder = (0, _hyperscript2.default)("div.bindery-controls");
+	    document.body.appendChild(this.holder);
+	
+	    this.binder = opts.binder;
+	
+	    var start = function start() {
+	      _this.setState("working");
+	      _this.binder.bind();
+	    };
+	    var done = function done() {
+	      _this.binder.cancel();
+	      _this.setState("start");
+	    };
+	    var guides = function guides() {
+	      _this.binder.printer.toggleGuides();
+	    };
+	    var print = function print() {
+	      return window.print();
+	    };
+	
+	    this.states = {
+	      start: btn({ onclick: start }, "Get Started"),
+	      working: (0, _hyperscript2.default)("div.bindery-status", "Binding..."),
+	      done: (0, _hyperscript2.default)("div", {}, btnMain({ style: { float: "right" }, onclick: print }, "Print"), btn({ style: { float: "right" }, onclick: guides }, "Toggle Guides"), btn({ onclick: done }, "Done"))
+	    };
+	    this.state = "";
+	    this.setState("start");
+	  }
+	
+	  _createClass(Controls, [{
+	    key: "setState",
+	    value: function setState(newState) {
+	      if (newState !== this.state && this.states[newState]) {
+	        this.state = newState;
+	        this.holder.innerHTML = "";
+	        this.holder.appendChild(this.states[newState]);
+	      }
+	    }
+	  }]);
+	
+	  return Controls;
+	}();
+	
+	module.exports = Controls;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(10);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../node_modules/css-loader/index.js!./controls.css", function() {
+				var newContent = require("!!./../node_modules/css-loader/index.js!./controls.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "@media print {\n  .bindery-controls {\n    display: none;\n  }\n}\n\n.bindery-controls {\n  position: fixed;\n  /*top: 0;*/\n  bottom: 20px;\n  left: 0;\n  right: 0;\n  padding: 12px;\n  z-index: 99;\n  width: 500px;\n  margin: auto;\n  background: rgba(50,50,50,0.9);\n  /*outline: 1px solid rgba(0,0,0,0.3);*/\n  border-radius: 4px;\n}\n_::-webkit-:-webkit-full-screen:host:not(:root:root), .bindery-controls {\n  background: rgba(0,0,0,0.5);\n  -webkit-backdrop-filter: blur(20px);\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  color: white;\n  -webkit-appearance: none;\n  border: none;\n  /*background: rgba(0,0,0,0.5);*/\n  padding: 6px 10px;\n  /*border: 1px solid rgba(0,0,0,0.3);*/\n  cursor: pointer;\n  font-size: 16px;\n  background: transparent;\n  /*border-radius: 2px;*/\n}\n.bindery-btn-main {\n  background: blue;\n  color: white;\n}\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n}\n.bindery-btn:hover {\n  /*background: black;\n  color: white;*/\n  box-shadow: 2px 2px 0px rgba(0,0,0,0.2);\n}\n.bindery-btn:active {\n  box-shadow: 0 0 0;\n  background: rgba(0,0,0,0.04);\n}\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var split = __webpack_require__(12)
+	var ClassList = __webpack_require__(13)
+	
+	var w = typeof window === 'undefined' ? __webpack_require__(15) : window
+	var document = w.document
+	var Text = w.Text
+	
+	function context () {
+	
+	  var cleanupFuncs = []
+	
+	  function h() {
+	    var args = [].slice.call(arguments), e = null
+	    function item (l) {
+	      var r
+	      function parseClass (string) {
+	        // Our minimal parser doesn’t understand escaping CSS special
+	        // characters like `#`. Don’t use them. More reading:
+	        // https://mathiasbynens.be/notes/css-escapes .
+	
+	        var m = split(string, /([\.#]?[^\s#.]+)/)
+	        if(/^\.|#/.test(m[1]))
+	          e = document.createElement('div')
+	        forEach(m, function (v) {
+	          var s = v.substring(1,v.length)
+	          if(!v) return
+	          if(!e)
+	            e = document.createElement(v)
+	          else if (v[0] === '.')
+	            ClassList(e).add(s)
+	          else if (v[0] === '#')
+	            e.setAttribute('id', s)
+	        })
+	      }
+	
+	      if(l == null)
+	        ;
+	      else if('string' === typeof l) {
+	        if(!e)
+	          parseClass(l)
+	        else
+	          e.appendChild(r = document.createTextNode(l))
+	      }
+	      else if('number' === typeof l
+	        || 'boolean' === typeof l
+	        || l instanceof Date
+	        || l instanceof RegExp ) {
+	          e.appendChild(r = document.createTextNode(l.toString()))
+	      }
+	      //there might be a better way to handle this...
+	      else if (isArray(l))
+	        forEach(l, item)
+	      else if(isNode(l))
+	        e.appendChild(r = l)
+	      else if(l instanceof Text)
+	        e.appendChild(r = l)
+	      else if ('object' === typeof l) {
+	        for (var k in l) {
+	          if('function' === typeof l[k]) {
+	            if(/^on\w+/.test(k)) {
+	              (function (k, l) { // capture k, l in the closure
+	                if (e.addEventListener){
+	                  e.addEventListener(k.substring(2), l[k], false)
+	                  cleanupFuncs.push(function(){
+	                    e.removeEventListener(k.substring(2), l[k], false)
+	                  })
+	                }else{
+	                  e.attachEvent(k, l[k])
+	                  cleanupFuncs.push(function(){
+	                    e.detachEvent(k, l[k])
+	                  })
+	                }
+	              })(k, l)
+	            } else {
+	              // observable
+	              e[k] = l[k]()
+	              cleanupFuncs.push(l[k](function (v) {
+	                e[k] = v
+	              }))
+	            }
+	          }
+	          else if(k === 'style') {
+	            if('string' === typeof l[k]) {
+	              e.style.cssText = l[k]
+	            }else{
+	              for (var s in l[k]) (function(s, v) {
+	                if('function' === typeof v) {
+	                  // observable
+	                  e.style.setProperty(s, v())
+	                  cleanupFuncs.push(v(function (val) {
+	                    e.style.setProperty(s, val)
+	                  }))
+	                } else
+	                  var match = l[k][s].match(/(.*)\W+!important\W*$/);
+	                  if (match) {
+	                    e.style.setProperty(s, match[1], 'important')
+	                  } else {
+	                    e.style.setProperty(s, l[k][s])
+	                  }
+	              })(s, l[k][s])
+	            }
+	          } else if(k === 'attrs') {
+	            for (var v in l[k]) {
+	              e.setAttribute(v, l[k][v])
+	            }
+	          }
+	          else if (k.substr(0, 5) === "data-") {
+	            e.setAttribute(k, l[k])
+	          } else {
+	            e[k] = l[k]
+	          }
+	        }
+	      } else if ('function' === typeof l) {
+	        //assume it's an observable!
+	        var v = l()
+	        e.appendChild(r = isNode(v) ? v : document.createTextNode(v))
+	
+	        cleanupFuncs.push(l(function (v) {
+	          if(isNode(v) && r.parentElement)
+	            r.parentElement.replaceChild(v, r), r = v
+	          else
+	            r.textContent = v
+	        }))
+	      }
+	
+	      return r
+	    }
+	    while(args.length)
+	      item(args.shift())
+	
+	    return e
+	  }
+	
+	  h.cleanup = function () {
+	    for (var i = 0; i < cleanupFuncs.length; i++){
+	      cleanupFuncs[i]()
+	    }
+	    cleanupFuncs.length = 0
+	  }
+	
+	  return h
+	}
+	
+	var h = module.exports = context()
+	h.context = context
+	
+	function isNode (el) {
+	  return el && el.nodeName && el.nodeType
+	}
+	
+	function forEach (arr, fn) {
+	  if (arr.forEach) return arr.forEach(fn)
+	  for (var i = 0; i < arr.length; i++) fn(arr[i], i)
+	}
+	
+	function isArray (arr) {
+	  return Object.prototype.toString.call(arr) == '[object Array]'
+	}
+	
+	
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	/*!
+	 * Cross-Browser Split 1.1.1
+	 * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
+	 * Available under the MIT License
+	 * ECMAScript compliant, uniform cross-browser split method
+	 */
+	
+	/**
+	 * Splits a string into an array of strings using a regex or string separator. Matches of the
+	 * separator are not included in the result array. However, if `separator` is a regex that contains
+	 * capturing groups, backreferences are spliced into the result each time `separator` is matched.
+	 * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
+	 * cross-browser.
+	 * @param {String} str String to split.
+	 * @param {RegExp|String} separator Regex or string to use for separating the string.
+	 * @param {Number} [limit] Maximum number of items to include in the result array.
+	 * @returns {Array} Array of substrings.
+	 * @example
+	 *
+	 * // Basic use
+	 * split('a b c d', ' ');
+	 * // -> ['a', 'b', 'c', 'd']
+	 *
+	 * // With limit
+	 * split('a b c d', ' ', 2);
+	 * // -> ['a', 'b']
+	 *
+	 * // Backreferences in result array
+	 * split('..word1 word2..', /([a-z]+)(\d+)/i);
+	 * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
+	 */
+	module.exports = (function split(undef) {
+	
+	  var nativeSplit = String.prototype.split,
+	    compliantExecNpcg = /()??/.exec("")[1] === undef,
+	    // NPCG: nonparticipating capturing group
+	    self;
+	
+	  self = function(str, separator, limit) {
+	    // If `separator` is not a regex, use `nativeSplit`
+	    if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
+	      return nativeSplit.call(str, separator, limit);
+	    }
+	    var output = [],
+	      flags = (separator.ignoreCase ? "i" : "") + (separator.multiline ? "m" : "") + (separator.extended ? "x" : "") + // Proposed for ES6
+	      (separator.sticky ? "y" : ""),
+	      // Firefox 3+
+	      lastLastIndex = 0,
+	      // Make `global` and avoid `lastIndex` issues by working with a copy
+	      separator = new RegExp(separator.source, flags + "g"),
+	      separator2, match, lastIndex, lastLength;
+	    str += ""; // Type-convert
+	    if (!compliantExecNpcg) {
+	      // Doesn't need flags gy, but they don't hurt
+	      separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
+	    }
+	    /* Values for `limit`, per the spec:
+	     * If undefined: 4294967295 // Math.pow(2, 32) - 1
+	     * If 0, Infinity, or NaN: 0
+	     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
+	     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
+	     * If other: Type-convert, then use the above rules
+	     */
+	    limit = limit === undef ? -1 >>> 0 : // Math.pow(2, 32) - 1
+	    limit >>> 0; // ToUint32(limit)
+	    while (match = separator.exec(str)) {
+	      // `separator.lastIndex` is not reliable cross-browser
+	      lastIndex = match.index + match[0].length;
+	      if (lastIndex > lastLastIndex) {
+	        output.push(str.slice(lastLastIndex, match.index));
+	        // Fix browsers whose `exec` methods don't consistently return `undefined` for
+	        // nonparticipating capturing groups
+	        if (!compliantExecNpcg && match.length > 1) {
+	          match[0].replace(separator2, function() {
+	            for (var i = 1; i < arguments.length - 2; i++) {
+	              if (arguments[i] === undef) {
+	                match[i] = undef;
+	              }
+	            }
+	          });
+	        }
+	        if (match.length > 1 && match.index < str.length) {
+	          Array.prototype.push.apply(output, match.slice(1));
+	        }
+	        lastLength = match[0].length;
+	        lastLastIndex = lastIndex;
+	        if (output.length >= limit) {
+	          break;
+	        }
+	      }
+	      if (separator.lastIndex === match.index) {
+	        separator.lastIndex++; // Avoid an infinite loop
+	      }
+	    }
+	    if (lastLastIndex === str.length) {
+	      if (lastLength || !separator.test("")) {
+	        output.push("");
+	      }
+	    } else {
+	      output.push(str.slice(lastLastIndex));
+	    }
+	    return output.length > limit ? output.slice(0, limit) : output;
+	  };
+	
+	  return self;
+	})();
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// contains, add, remove, toggle
+	var indexof = __webpack_require__(14)
+	
+	module.exports = ClassList
+	
+	function ClassList(elem) {
+	    var cl = elem.classList
+	
+	    if (cl) {
+	        return cl
+	    }
+	
+	    var classList = {
+	        add: add
+	        , remove: remove
+	        , contains: contains
+	        , toggle: toggle
+	        , toString: $toString
+	        , length: 0
+	        , item: item
+	    }
+	
+	    return classList
+	
+	    function add(token) {
+	        var list = getTokens()
+	        if (indexof(list, token) > -1) {
+	            return
+	        }
+	        list.push(token)
+	        setTokens(list)
+	    }
+	
+	    function remove(token) {
+	        var list = getTokens()
+	            , index = indexof(list, token)
+	
+	        if (index === -1) {
+	            return
+	        }
+	
+	        list.splice(index, 1)
+	        setTokens(list)
+	    }
+	
+	    function contains(token) {
+	        return indexof(getTokens(), token) > -1
+	    }
+	
+	    function toggle(token) {
+	        if (contains(token)) {
+	            remove(token)
+	            return false
+	        } else {
+	            add(token)
+	            return true
+	        }
+	    }
+	
+	    function $toString() {
+	        return elem.className
+	    }
+	
+	    function item(index) {
+	        var tokens = getTokens()
+	        return tokens[index] || null
+	    }
+	
+	    function getTokens() {
+	        var className = elem.className
+	
+	        return filter(className.split(" "), isTruthy)
+	    }
+	
+	    function setTokens(list) {
+	        var length = list.length
+	
+	        elem.className = list.join(" ")
+	        classList.length = length
+	
+	        for (var i = 0; i < list.length; i++) {
+	            classList[i] = list[i]
+	        }
+	
+	        delete list[length]
+	    }
+	}
+	
+	function filter (arr, fn) {
+	    var ret = []
+	    for (var i = 0; i < arr.length; i++) {
+	        if (fn(arr[i])) ret.push(arr[i])
+	    }
+	    return ret
+	}
+	
+	function isTruthy(value) {
+	    return !!value
+	}
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	
+	var indexOf = [].indexOf;
+	
+	module.exports = function(arr, obj){
+	  if (indexOf) return arr.indexOf(obj);
+	  for (var i = 0; i < arr.length; ++i) {
+	    if (arr[i] === obj) return i;
+	  }
+	  return -1;
+	};
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	/* (ignored) */
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var el = function el(selector, attrs, text) {
+	
+	  var tags = selector.match(/^([a-zA-Z]+)/g);
+	  var ids = selector.match(/#([a-zA-Z0-9\-\_]+)/g);
+	  var classes = selector.match(/\.([a-zA-Z0-9\-\_]+)/g);
+	
+	  var element = document.createElement(tags ? tags[0] : "div");
+	
+	  if (ids) element.id = ids[0].substr(1);
+	  if (classes) element.className = classes.map(function (c) {
+	    return c.substr(1);
+	  }).join(" ");
+	  if (text) element.textContent = text;
+	  if (attrs) {
+	    for (var key in attrs) {
+	      var val = attrs[key];
+	      if (key == "onClick") {
+	        element.addEventListener("click", val);
+	      } else {
+	        element.setAttribute(key, val);
+	      }
+	    }
+	  }
+	
+	  return element;
+	};
+	exports.default = el;
 
 /***/ }
 /******/ ]);

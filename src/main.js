@@ -1,8 +1,9 @@
-require("style!css!./bindery.css");
+import css from "style!css!./bindery.css";
 
 import Book from "./book";
 import Page from "./page";
 import Printer from "./printer";
+import Controls from "./controls";
 import el from "./el";
 
 class ElementPath {
@@ -76,6 +77,11 @@ class Binder {
       template: this.template,
       target: this.target,
     });
+    this.controls = new Controls({
+      binder: this,
+      printer: this.printer,
+    });
+
 
   }
   cancel() {
@@ -104,36 +110,23 @@ class Binder {
       nextPage: () => {
         finishPage(state.currentPage);
         state.currentPage = makeContinuation();
+      },
+      finishPage: (pg) => {
+        finishPage(pg);
+      },
+      getNewPage: () => {
+        return makeContinuation();
       }
     }
 
     this.measureArea = el(".measureArea");
     document.body.appendChild(this.measureArea);
 
-    const DELAY = 1; // ms
+    const DELAY = 0; // ms
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();
     }
-
-
-    this.defineRule({
-      selector: "[bindery-spread]",
-      beforeAdd: (elmt, state) => {
-        let spreadMode = elmt.getAttribute("bindery-spread");
-        state.prevPage = state.currentPage;
-        state.prevElementPath = state.elPath;
-        state.currentPage = makeContinuation();
-        if (spreadMode == "bleed") {
-          state.currentPage.element.classList.add("bleed");
-        }
-      },
-      afterAdd: (elmt, state) => {
-        finishPage(state.currentPage);
-        state.currentPage = state.prevPage;
-        state.elPath = state.prevElementPath;
-      },
-    });
 
 
     let beforeAddRules = (elmt) => {
@@ -223,13 +216,12 @@ class Binder {
           while(origText.charAt(pos) !== " " && pos > -1) pos--;
           textNode.nodeValue = origText.substr(0, pos);
 
-          if (pos < 1) {
+          if (pos < 1 && origText.trim().length > 0) {
             // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
             textNode.nodeValue = origText;
             abortCallback();
             return;
           }
-          // console.log(addWordIterations + " iterations");
 
           origText = origText.substr(pos);
           pos = 0;
@@ -303,9 +295,11 @@ class Binder {
         switch (child.nodeType) {
           case Node.TEXT_NODE:
             let cancel = () => {
-              state.elPath.pop();
+              let lastEl = state.elPath.pop();
               if (state.elPath.items.length < 1) {
-                console.error("Bindery: Failed to add any node. Page might be too small?");
+                console.log(lastEl);
+                console.log(child);
+                console.error(`Bindery: Failed to add textNode "${child.nodeValue}" to ${prettyName(lastEl)}. Page might be too small?`);
                 return;
               }
 
@@ -356,6 +350,7 @@ class Binder {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);
 
+      this.controls.setState("done");
       this.printer.setOrdered();
 
       if (doneBinding) doneBinding(this.book);
