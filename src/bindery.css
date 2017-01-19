@@ -18,7 +18,7 @@
     bottom: 0;
   }
 
-  [bindery-print-wrapper] {
+  .bindery-print-wrapper {
     /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/
   }
   .bindery-show-guides [bindery-flowbox] {
@@ -40,7 +40,7 @@
 }
 
 @media print {
-  [bindery-print-wrapper] {
+  .bindery-print-wrapper {
     border: 1px dashed black;
     margin: 20px;
   }
@@ -65,7 +65,7 @@
   box-shadow: none;
 }
 
-[bindery-print-wrapper] {
+.bindery-print-wrapper {
   page-break-after: always;
   display: flex;
   width: 800px;
@@ -124,20 +124,42 @@
 }
 
 
-[bindery-preview] {
-  perspective: 1200px;
-  /*width: 60px;*/
-  height: 0;
-  width: 0;
+.bindery-stage3d {
+  perspective: 2400px;
+  min-height: 100vh;
+  transform-style: preserve-3d;
 }
-[bindery-preview] [bindery-page] {
+
+.bindery-page3d {
+  margin: auto;
+  width: 400px;
+  height: 600px;
+  transform: rotateY(0);
+  transition: all 0.8s;
+  transform-style: preserve-3d;
+  transform-origin: left;
   position: absolute;
+  left: 0;
+  right: 0;
 }
-[bindery-preview] [bindery-left] {
-  transform: rotateY(50deg);
+
+.bindery-page3d:hover {
+  outline: 1px solid red;
+  /*transform: translate3d(20px, 0, 0);*/
 }
-[bindery-preview] [bindery-right] {
-  transform: rotateY(-50deg);
+.bindery-page3d.flipped {
+  transform: rotateY(-180deg);
+}
+
+.bindery-page3d [bindery-page] {
+  position: absolute;
+  backface-visibility: hidden;
+}
+.bindery-page3d .bindery-page3d-front {
+  transform: rotateY(0);
+}
+.bindery-page3d .bindery-page3d-back {
+  transform: rotateY(-180deg);
 }
 
 

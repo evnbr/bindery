@@ -26,6 +26,12 @@ class Controls {
     const guides = () => {
       this.binder.printer.toggleGuides();
     };
+    const interactive = () => {
+      this.binder.printer.setInteractive();
+    };
+    const ordered = () => {
+      this.binder.printer.setOrdered();
+    };
     const print = () =>  window.print();
 
     this.states = {
@@ -34,6 +40,8 @@ class Controls {
       done: h("div", {},
         btnMain({style: {float: "right"}, onclick: print}, "Print"),
         btn({style: {float: "right"}, onclick: guides}, "Toggle Guides"),
+        btn({style: {float: "right"}, onclick: ordered}, "Grid"),
+        btn({style: {float: "right"}, onclick: interactive}, "Preview"),
         btn({onclick: done}, "Done"),
       )
     }
