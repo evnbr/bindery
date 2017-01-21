@@ -27,7 +27,26 @@ class Printer {
   toggleGuides() {
     this.target.classList.toggle("bindery-show-guides");
   }
-  setOrdered() {
+  toggleDouble() {
+    this.doubleSided = !this.doubleSided;
+    this.update();
+  }
+  toggleInteractive() {
+    this.mode = this.mode == "grid" ? "preview" : "grid";
+    this.update();
+  }
+  update() {
+    switch (this.mode) {
+      case "grid":
+        this.renderGrid();
+        break;
+      case "preview":
+        this.renderPreview();
+        break;
+    }
+  }
+  renderGrid() {
+    this.mode = "grid";
     this.target.style.display = "block";
     this.target.innerHTML = "";
 
@@ -53,20 +72,21 @@ class Printer {
       if (this.doubleSided) {
         let l = pages[i].element;
         let r = pages[i+1].element;
-        l.setAttribute("bindery-left", true);
-        r.setAttribute("bindery-right", true);
+        l.setAttribute("bindery-side", "left");
+        r.setAttribute("bindery-side", "right");
         wrap.appendChild(l);
         wrap.appendChild(r);
       }
       else {
         let pg = pages[i].element;
-        pg.setAttribute("bindery-right", true);
+        pg.setAttribute("bindery-side", "right");
         wrap.appendChild(pg);
       }
       this.target.appendChild(wrap);
     }
   }
-  setInteractive() {
+  renderPreview() {
+    this.mode = "preview";
     this.target.style.display = "block";
     this.target.innerHTML = "";
     this.flaps = [];

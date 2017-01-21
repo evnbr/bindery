@@ -103,11 +103,11 @@
   top: -20px;
   bottom: -20px;
 }
-[bindery-left].bleed [bindery-flowbox] {
+[bindery-side="left"].bleed [bindery-flowbox] {
   right: 0;
   left: -20px;
 }
-[bindery-right].bleed [bindery-flowbox] {
+[bindery-side="right"].bleed [bindery-flowbox] {
   left: 0;
   right: -20px;
 }
@@ -117,10 +117,10 @@
   text-align: center;
   bottom: 20px;
 }
-[bindery-left] [bindery-num] {
+[bindery-side="left"] [bindery-num] {
   left: 20px;
 }
-[bindery-right] [bindery-num] {
+[bindery-side="right"] [bindery-num] {
   right: 20px;
 }
 

@@ -450,7 +450,7 @@ var Bindery =
 	        document.body.removeChild(_this.measureArea);
 	
 	        _this.controls.setState("done");
-	        _this.printer.setOrdered();
+	        _this.printer.renderGrid();
 	
 	        if (doneBinding) doneBinding(_this.book);
 	      });
@@ -501,7 +501,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  [bindery-export], .measureArea {\n    background: #ddd;\n    padding: 20px;\n  }\n}\n\n@media print {\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-left].bleed [bindery-flowbox] {\n  right: 0;\n  left: -20px;\n}\n[bindery-right].bleed [bindery-flowbox] {\n  left: 0;\n  right: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-left] [bindery-num] {\n  left: 20px;\n}\n[bindery-right] [bindery-num] {\n  right: 20px;\n}\n\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  [bindery-export], .measureArea {\n    background: #ddd;\n    padding: 20px;\n  }\n}\n\n@media print {\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed [bindery-flowbox] {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed [bindery-flowbox] {\n  left: 0;\n  right: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] [bindery-num] {\n  left: 20px;\n}\n[bindery-side=\"right\"] [bindery-num] {\n  right: 20px;\n}\n\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
 	
 	// exports
 
@@ -936,8 +936,33 @@ var Bindery =
 	      this.target.classList.toggle("bindery-show-guides");
 	    }
 	  }, {
-	    key: "setOrdered",
-	    value: function setOrdered() {
+	    key: "toggleDouble",
+	    value: function toggleDouble() {
+	      this.doubleSided = !this.doubleSided;
+	      this.update();
+	    }
+	  }, {
+	    key: "toggleInteractive",
+	    value: function toggleInteractive() {
+	      this.mode = this.mode == "grid" ? "preview" : "grid";
+	      this.update();
+	    }
+	  }, {
+	    key: "update",
+	    value: function update() {
+	      switch (this.mode) {
+	        case "grid":
+	          this.renderGrid();
+	          break;
+	        case "preview":
+	          this.renderPreview();
+	          break;
+	      }
+	    }
+	  }, {
+	    key: "renderGrid",
+	    value: function renderGrid() {
+	      this.mode = "grid";
 	      this.target.style.display = "block";
 	      this.target.innerHTML = "";
 	
@@ -962,21 +987,22 @@ var Bindery =
 	        if (this.doubleSided) {
 	          var l = pages[i].element;
 	          var r = pages[i + 1].element;
-	          l.setAttribute("bindery-left", true);
-	          r.setAttribute("bindery-right", true);
+	          l.setAttribute("bindery-side", "left");
+	          r.setAttribute("bindery-side", "right");
 	          wrap.appendChild(l);
 	          wrap.appendChild(r);
 	        } else {
 	          var _pg = pages[i].element;
-	          _pg.setAttribute("bindery-right", true);
+	          _pg.setAttribute("bindery-side", "right");
 	          wrap.appendChild(_pg);
 	        }
 	        this.target.appendChild(wrap);
 	      }
 	    }
 	  }, {
-	    key: "setInteractive",
-	    value: function setInteractive() {
+	    key: "renderPreview",
+	    value: function renderPreview() {
+	      this.mode = "preview";
 	      this.target.style.display = "block";
 	      this.target.innerHTML = "";
 	      this.flaps = [];
@@ -1543,10 +1569,10 @@ var Bindery =
 	      _this.binder.printer.toggleGuides();
 	    };
 	    var interactive = function interactive() {
-	      _this.binder.printer.setInteractive();
+	      _this.binder.printer.toggleInteractive();
 	    };
-	    var ordered = function ordered() {
-	      _this.binder.printer.setOrdered();
+	    var double = function double() {
+	      _this.binder.printer.toggleDouble();
 	    };
 	    var print = function print() {
 	      return window.print();
@@ -1555,7 +1581,7 @@ var Bindery =
 	    this.states = {
 	      start: btn({ onclick: start }, "Get Started"),
 	      working: (0, _hyperscript2.default)("div.bindery-status", "Binding..."),
-	      done: (0, _hyperscript2.default)("div", {}, btnMain({ style: { float: "right" }, onclick: print }, "Print"), btn({ style: { float: "right" }, onclick: guides }, "Guides"), btn({ style: { float: "right" }, onclick: ordered }, "Grid"), btn({ style: { float: "right" }, onclick: interactive }, "Preview"), btn({ onclick: done }, "Done"))
+	      done: (0, _hyperscript2.default)("div", {}, btnMain({ style: { float: "right" }, onclick: print }, "Print"), btn({ style: { float: "right" }, onclick: guides }, "Guides"), btn({ style: { float: "right" }, onclick: double }, "Double Sided"), btn({ style: { float: "right" }, onclick: interactive }, "Preview"), btn({ onclick: done }, "Done"))
 	    };
 	    this.state = "";
 	    this.setState("start");
