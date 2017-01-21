@@ -1,14 +1,15 @@
 @media screen {
-  [bindery-page] {
-    outline: 1px solid rgba(0,0,0,0.3);
+  .bindery-page {
+    outline: 1px solid rgba(0,0,0,0.1);
     background: white;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
     overflow: hidden;
   }
-  .bindery-show-guides [bindery-page] {
+  .bindery-show-guides .bindery-page {
     overflow: visible;
   }
-  .bindery-show-guides [bindery-page]::after {
+  .bindery-show-guides .bindery-page::after {
     content: "";
     outline: 1px solid magenta;
     position: absolute;
@@ -34,7 +35,7 @@
     outline: 1px solid cyan;
   }
   [bindery-export], .measureArea {
-    background: #eee;
+    background: #ddd;
     padding: 20px;
   }
 }
@@ -60,7 +61,7 @@
   background: transparent;
 }
 
-.measureArea [bindery-page] {
+.measureArea .bindery-page {
   background: transparent;
   box-shadow: none;
 }
@@ -72,7 +73,7 @@
   margin: 20px auto;
 }
 
-[bindery-page] {
+.bindery-page {
   width: 400px;
   height: 600px;
   position: relative;
@@ -125,7 +126,7 @@
 
 
 .bindery-stage3d {
-  perspective: 2400px;
+  perspective: 2000px;
   min-height: 100vh;
   transform-style: preserve-3d;
 }
@@ -140,7 +141,7 @@
   transform-origin: left;
   position: absolute;
   left: 0;
-  right: 0;
+  right: -380px;
 }
 
 .bindery-page3d:hover {
@@ -151,10 +152,12 @@
   transform: rotateY(-180deg);
 }
 
-.bindery-page3d [bindery-page] {
+.bindery-page3d .bindery-page {
   position: absolute;
   backface-visibility: hidden;
 }
+
+
 .bindery-page3d .bindery-page3d-front {
   transform: rotateY(0);
 }

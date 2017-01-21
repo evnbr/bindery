@@ -16,6 +16,9 @@ class Printer {
 
     this.template = opts.template;
     this.printWrapper = h("div.bindery-print-wrapper");
+
+    this.doubleSided = false;
+    this.currentLeaf = 0;
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
@@ -28,27 +31,38 @@ class Printer {
     this.target.style.display = "block";
     this.target.innerHTML = "";
 
-    if (this.book.pages.length % 2 !== 0) {
-      let pg = new Page(this.template);
-      this.book.addPage(pg);
-    }
-    if (!(this.book.pages[0].element.style.visibility == "hidden")) {
+    let pages = this.book.pages.slice();
+
+    if (this.doubleSided) {
+      if (this.book.pages.length % 2 !== 0) {
+        let pg = new Page(this.template);
+        this.book.addPage(pg);
+      }
       let spacerPage = new Page(this.template);
       let spacerPage2 = new Page(this.template);
       spacerPage.element.style.visibility = "hidden";
       spacerPage2.element.style.visibility = "hidden";
-      this.book.pages.unshift(spacerPage);
-      this.book.pages.push(spacerPage2);
+      pages.unshift(spacerPage);
+      pages.push(spacerPage2);
     }
 
-    for (var i = 0; i < this.book.pages.length; i += 2) {
+
+    for (var i = 0; i < pages.length; i += (this.doubleSided ? 2 : 1)) {
       let wrap = this.printWrapper.cloneNode(false);
-      let l = this.book.pages[i].element;
-      let r = this.book.pages[i+1].element;
-      l.setAttribute("bindery-left", true);
-      r.setAttribute("bindery-right", true);
-      wrap.appendChild(l);
-      wrap.appendChild(r);
+
+      if (this.doubleSided) {
+        let l = pages[i].element;
+        let r = pages[i+1].element;
+        l.setAttribute("bindery-left", true);
+        r.setAttribute("bindery-right", true);
+        wrap.appendChild(l);
+        wrap.appendChild(r);
+      }
+      else {
+        let pg = pages[i].element;
+        pg.setAttribute("bindery-right", true);
+        wrap.appendChild(pg);
+      }
       this.target.appendChild(wrap);
     }
   }
@@ -57,35 +71,45 @@ class Printer {
     this.target.innerHTML = "";
     this.flaps = [];
 
-    if (this.book.pages.length % 2 !== 0) {
-      let pg = new Page(this.template);
-      this.book.addPage(pg);
+    let pages = this.book.pages.slice();
+
+    if (this.doubleSided) {
+      if (this.book.pages.length % 2 !== 0) {
+        let pg = new Page(this.template);
+        this.book.addPage(pg);
+      }
     }
-    if (!(this.book.pages[0].element.style.visibility == "hidden")) {
-      let spacerPage = new Page(this.template);
-      let spacerPage2 = new Page(this.template);
-      spacerPage.element.style.visibility = "hidden";
-      spacerPage2.element.style.visibility = "hidden";
-      this.book.pages.unshift(spacerPage);
-      this.book.pages.push(spacerPage2);
-    }
+    let spacerPage = new Page(this.template);
+    let spacerPage2 = new Page(this.template);
+    spacerPage.element.style.visibility = "hidden";
+    spacerPage2.element.style.visibility = "hidden";
+    pages.unshift(spacerPage);
+    pages.push(spacerPage2);
 
     let leafIndex = 0;
-    for (let i = 1; i < this.book.pages.length - 1; i += 2) {
+    for (let i = 1; i < pages.length - 1; i += (this.doubleSided ? 2 : 1)) {
       leafIndex++;
       let li = leafIndex;
       let flap = h("div.bindery-page3d", {onclick: () => {
-        this.setLeaf(li-1);
+        // this.setLeaf(li-1);
       }});
+      this.makeDraggable(flap);
       this.target.classList.add("bindery-stage3d");
       this.flaps.push(flap);
 
-      let l = this.book.pages[i].element;
-      let r = this.book.pages[i+1].element;
+      let l = pages[i].element;
       l.classList.add("bindery-page3d-front");
-      r.classList.add("bindery-page3d-back");
       flap.appendChild(l);
-      flap.appendChild(r);
+      if (this.doubleSided) {
+        flap.classList.add("bindery-doubleSided");
+        let r = pages[i+1].element;
+        r.classList.add("bindery-page3d-back");
+        flap.appendChild(r);
+      }
+      else {
+        let r = h(".bindery-page.bindery-page3d-back")
+        flap.appendChild(r);
+      }
       // flap.style.zIndex = `${this.book.pages.length - i}`;
       // flap.style.top = `${i * 4}px`;
       flap.style.left = `${i * 4}px`;
@@ -94,17 +118,47 @@ class Printer {
     this.setLeaf(0);
   }
   setLeaf(n) {
+    this.currentLeaf = n;
     this.flaps.forEach((flap, i) => {
       let z = this.flaps.length - Math.abs(i - n);
-      if (i < n) {
-        flap.style.transform = `translate3d(0,0,${z*5}px) rotateY(${-180}deg)`;
+      flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${z*5}px) rotateY(${(i < n) ? -180 : 0}deg)`;
+    });
+  }
+  makeDraggable(flap) {
+    let isDragging = false;
+    let pct = 0;
+    flap.addEventListener("mousedown", () => {
+      isDragging = true;
+      flap.style.transition = "none";
+    })
+    document.body.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        let pt = coords(e);
+        pct = progress01(pt.x, 1000, 200);
+        let ang = transition(pct, 0, -180);
+        let z = this.flaps.length;
+        flap.style.transform = `translate3d(${0}px,0,${z*5}px) rotateY(${ang}deg)`;
       }
-      else {
-        flap.style.transform = `translate3d(0,0,${z*5}px) rotateY(${0}deg)`;
+    });
+    document.body.addEventListener("mouseup", (e) => {
+      if (isDragging) {
+        isDragging = false;
+        flap.style.transition = "";
+        if (pct > 0.5) this.setLeaf(this.currentLeaf);
+        else this.setLeaf(this.currentLeaf+1);
       }
-
     });
   }
 }
+
+let transition = (pct, a, b) => a + pct * (b-a);
+let clamp = (val, min, max) => val <= min ? min : val >= max ? max : val;
+let progress = (val, a, b) => (val - a)/(b-a);
+let progress01 = (val, a, b) => clamp(progress(val, a, b), 0, 1);
+let coords = (e) => {
+  return ( (e = e.touches && e.touches[0] || e), ({ x:e.pageX, y:e.pageY }) );
+}
+
 
 export default Printer;

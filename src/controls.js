@@ -39,7 +39,7 @@ class Controls {
       working: h("div.bindery-status", "Binding..."),
       done: h("div", {},
         btnMain({style: {float: "right"}, onclick: print}, "Print"),
-        btn({style: {float: "right"}, onclick: guides}, "Toggle Guides"),
+        btn({style: {float: "right"}, onclick: guides}, "Guides"),
         btn({style: {float: "right"}, onclick: ordered}, "Grid"),
         btn({style: {float: "right"}, onclick: interactive}, "Preview"),
         btn({onclick: done}, "Done"),

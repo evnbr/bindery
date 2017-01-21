@@ -134,7 +134,7 @@ var Bindery =
 	
 	    this.source = opts.source;
 	    this.target = opts.target;
-	    opts.template = "\n      <div bindery-page>\n        <div bindery-flowbox>\n          <div bindery-content>\n          </div>\n        </div>\n        <div bindery-num></div>\n        <div bindery-footer></div>\n      </div>\n    ";
+	    opts.template = "\n      <div class=\"bindery-page\">\n        <div bindery-flowbox>\n          <div bindery-content>\n          </div>\n        </div>\n        <div bindery-num></div>\n        <div bindery-footer></div>\n      </div>\n    ";
 	
 	    if (typeof opts.template == "string") {
 	      var temp = (0, _el2.default)("div");
@@ -501,7 +501,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  [bindery-page] {\n    outline: 1px solid rgba(0,0,0,0.3);\n    background: white;\n    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides [bindery-page] {\n    overflow: visible;\n  }\n  .bindery-show-guides [bindery-page]::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  [bindery-export], .measureArea {\n    background: #eee;\n    padding: 20px;\n  }\n}\n\n@media print {\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea [bindery-page] {\n  background: transparent;\n  box-shadow: none;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n[bindery-page] {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-left].bleed [bindery-flowbox] {\n  right: 0;\n  left: -20px;\n}\n[bindery-right].bleed [bindery-flowbox] {\n  left: 0;\n  right: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-left] [bindery-num] {\n  left: 20px;\n}\n[bindery-right] [bindery-num] {\n  right: 20px;\n}\n\n\n.bindery-stage3d {\n  perspective: 2400px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: 0;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d [bindery-page] {\n  position: absolute;\n  backface-visibility: hidden;\n}\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  [bindery-export], .measureArea {\n    background: #ddd;\n    padding: 20px;\n  }\n}\n\n@media print {\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-left].bleed [bindery-flowbox] {\n  right: 0;\n  left: -20px;\n}\n[bindery-right].bleed [bindery-flowbox] {\n  left: 0;\n  right: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-left] [bindery-num] {\n  left: 20px;\n}\n[bindery-right] [bindery-num] {\n  right: 20px;\n}\n\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
 	
 	// exports
 
@@ -919,6 +919,9 @@ var Bindery =
 	
 	    this.template = opts.template;
 	    this.printWrapper = (0, _hyperscript2.default)("div.bindery-print-wrapper");
+	
+	    this.doubleSided = false;
+	    this.currentLeaf = 0;
 	  }
 	
 	  _createClass(Printer, [{
@@ -938,91 +941,128 @@ var Bindery =
 	      this.target.style.display = "block";
 	      this.target.innerHTML = "";
 	
-	      if (this.book.pages.length % 2 !== 0) {
-	        var pg = new _page2.default(this.template);
-	        this.book.addPage(pg);
-	      }
-	      if (!(this.book.pages[0].element.style.visibility == "hidden")) {
+	      var pages = this.book.pages.slice();
+	
+	      if (this.doubleSided) {
+	        if (this.book.pages.length % 2 !== 0) {
+	          var pg = new _page2.default(this.template);
+	          this.book.addPage(pg);
+	        }
 	        var spacerPage = new _page2.default(this.template);
 	        var spacerPage2 = new _page2.default(this.template);
 	        spacerPage.element.style.visibility = "hidden";
 	        spacerPage2.element.style.visibility = "hidden";
-	        this.book.pages.unshift(spacerPage);
-	        this.book.pages.push(spacerPage2);
+	        pages.unshift(spacerPage);
+	        pages.push(spacerPage2);
 	      }
 	
-	      for (var i = 0; i < this.book.pages.length; i += 2) {
+	      for (var i = 0; i < pages.length; i += this.doubleSided ? 2 : 1) {
 	        var wrap = this.printWrapper.cloneNode(false);
-	        var l = this.book.pages[i].element;
-	        var r = this.book.pages[i + 1].element;
-	        l.setAttribute("bindery-left", true);
-	        r.setAttribute("bindery-right", true);
-	        wrap.appendChild(l);
-	        wrap.appendChild(r);
+	
+	        if (this.doubleSided) {
+	          var l = pages[i].element;
+	          var r = pages[i + 1].element;
+	          l.setAttribute("bindery-left", true);
+	          r.setAttribute("bindery-right", true);
+	          wrap.appendChild(l);
+	          wrap.appendChild(r);
+	        } else {
+	          var _pg = pages[i].element;
+	          _pg.setAttribute("bindery-right", true);
+	          wrap.appendChild(_pg);
+	        }
 	        this.target.appendChild(wrap);
 	      }
 	    }
 	  }, {
 	    key: "setInteractive",
 	    value: function setInteractive() {
-	      var _this = this;
-	
 	      this.target.style.display = "block";
 	      this.target.innerHTML = "";
 	      this.flaps = [];
 	
-	      if (this.book.pages.length % 2 !== 0) {
-	        var pg = new _page2.default(this.template);
-	        this.book.addPage(pg);
+	      var pages = this.book.pages.slice();
+	
+	      if (this.doubleSided) {
+	        if (this.book.pages.length % 2 !== 0) {
+	          var pg = new _page2.default(this.template);
+	          this.book.addPage(pg);
+	        }
 	      }
-	      if (!(this.book.pages[0].element.style.visibility == "hidden")) {
-	        var spacerPage = new _page2.default(this.template);
-	        var spacerPage2 = new _page2.default(this.template);
-	        spacerPage.element.style.visibility = "hidden";
-	        spacerPage2.element.style.visibility = "hidden";
-	        this.book.pages.unshift(spacerPage);
-	        this.book.pages.push(spacerPage2);
-	      }
+	      var spacerPage = new _page2.default(this.template);
+	      var spacerPage2 = new _page2.default(this.template);
+	      spacerPage.element.style.visibility = "hidden";
+	      spacerPage2.element.style.visibility = "hidden";
+	      pages.unshift(spacerPage);
+	      pages.push(spacerPage2);
 	
 	      var leafIndex = 0;
-	
-	      var _loop = function _loop(i) {
+	      for (var i = 1; i < pages.length - 1; i += this.doubleSided ? 2 : 1) {
 	        leafIndex++;
 	        var li = leafIndex;
 	        var flap = (0, _hyperscript2.default)("div.bindery-page3d", { onclick: function onclick() {
-	            _this.setLeaf(li - 1);
+	            // this.setLeaf(li-1);
 	          } });
-	        _this.target.classList.add("bindery-stage3d");
-	        _this.flaps.push(flap);
+	        this.makeDraggable(flap);
+	        this.target.classList.add("bindery-stage3d");
+	        this.flaps.push(flap);
 	
-	        var l = _this.book.pages[i].element;
-	        var r = _this.book.pages[i + 1].element;
+	        var l = pages[i].element;
 	        l.classList.add("bindery-page3d-front");
-	        r.classList.add("bindery-page3d-back");
 	        flap.appendChild(l);
-	        flap.appendChild(r);
+	        if (this.doubleSided) {
+	          flap.classList.add("bindery-doubleSided");
+	          var r = pages[i + 1].element;
+	          r.classList.add("bindery-page3d-back");
+	          flap.appendChild(r);
+	        } else {
+	          var _r = (0, _hyperscript2.default)(".bindery-page.bindery-page3d-back");
+	          flap.appendChild(_r);
+	        }
 	        // flap.style.zIndex = `${this.book.pages.length - i}`;
 	        // flap.style.top = `${i * 4}px`;
 	        flap.style.left = i * 4 + "px";
-	        _this.target.appendChild(flap);
-	      };
-	
-	      for (var i = 1; i < this.book.pages.length - 1; i += 2) {
-	        _loop(i);
+	        this.target.appendChild(flap);
 	      }
 	      this.setLeaf(0);
 	    }
 	  }, {
 	    key: "setLeaf",
 	    value: function setLeaf(n) {
+	      var _this = this;
+	
+	      this.currentLeaf = n;
+	      this.flaps.forEach(function (flap, i) {
+	        var z = _this.flaps.length - Math.abs(i - n);
+	        flap.style.transform = "translate3d(" + (i < n ? 4 : 0) + "px,0," + z * 5 + "px) rotateY(" + (i < n ? -180 : 0) + "deg)";
+	      });
+	    }
+	  }, {
+	    key: "makeDraggable",
+	    value: function makeDraggable(flap) {
 	      var _this2 = this;
 	
-	      this.flaps.forEach(function (flap, i) {
-	        var z = _this2.flaps.length - Math.abs(i - n);
-	        if (i < n) {
-	          flap.style.transform = "translate3d(0,0," + z * 5 + "px) rotateY(" + -180 + "deg)";
-	        } else {
-	          flap.style.transform = "translate3d(0,0," + z * 5 + "px) rotateY(" + 0 + "deg)";
+	      var isDragging = false;
+	      var pct = 0;
+	      flap.addEventListener("mousedown", function () {
+	        isDragging = true;
+	        flap.style.transition = "none";
+	      });
+	      document.body.addEventListener("mousemove", function (e) {
+	        if (isDragging) {
+	          e.preventDefault();
+	          var pt = coords(e);
+	          pct = progress01(pt.x, 1000, 200);
+	          var ang = transition(pct, 0, -180);
+	          var z = _this2.flaps.length;
+	          flap.style.transform = "translate3d(" + 0 + "px,0," + z * 5 + "px) rotateY(" + ang + "deg)";
+	        }
+	      });
+	      document.body.addEventListener("mouseup", function (e) {
+	        if (isDragging) {
+	          isDragging = false;
+	          flap.style.transition = "";
+	          if (pct > 0.5) _this2.setLeaf(_this2.currentLeaf);else _this2.setLeaf(_this2.currentLeaf + 1);
 	        }
 	      });
 	    }
@@ -1030,6 +1070,22 @@ var Bindery =
 	
 	  return Printer;
 	}();
+	
+	var transition = function transition(pct, a, b) {
+	  return a + pct * (b - a);
+	};
+	var clamp = function clamp(val, min, max) {
+	  return val <= min ? min : val >= max ? max : val;
+	};
+	var progress = function progress(val, a, b) {
+	  return (val - a) / (b - a);
+	};
+	var progress01 = function progress01(val, a, b) {
+	  return clamp(progress(val, a, b), 0, 1);
+	};
+	var coords = function coords(e) {
+	  return e = e.touches && e.touches[0] || e, { x: e.pageX, y: e.pageY };
+	};
 	
 	exports.default = Printer;
 
@@ -1499,7 +1555,7 @@ var Bindery =
 	    this.states = {
 	      start: btn({ onclick: start }, "Get Started"),
 	      working: (0, _hyperscript2.default)("div.bindery-status", "Binding..."),
-	      done: (0, _hyperscript2.default)("div", {}, btnMain({ style: { float: "right" }, onclick: print }, "Print"), btn({ style: { float: "right" }, onclick: guides }, "Toggle Guides"), btn({ style: { float: "right" }, onclick: ordered }, "Grid"), btn({ style: { float: "right" }, onclick: interactive }, "Preview"), btn({ onclick: done }, "Done"))
+	      done: (0, _hyperscript2.default)("div", {}, btnMain({ style: { float: "right" }, onclick: print }, "Print"), btn({ style: { float: "right" }, onclick: guides }, "Guides"), btn({ style: { float: "right" }, onclick: ordered }, "Grid"), btn({ style: { float: "right" }, onclick: interactive }, "Preview"), btn({ onclick: done }, "Done"))
 	    };
 	    this.state = "";
 	    this.setState("start");

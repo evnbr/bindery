@@ -46,7 +46,7 @@ class Binder {
     this.source = opts.source;
     this.target = opts.target;
     opts.template = `
-      <div bindery-page>
+      <div class="bindery-page">
         <div bindery-flowbox>
           <div bindery-content>
           </div>
