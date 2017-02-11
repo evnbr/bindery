@@ -351,7 +351,7 @@ class Binder {
       document.body.removeChild(this.measureArea);
 
       this.controls.setState("done");
-      this.printer.renderGrid();
+      this.printer.update();
 
       if (doneBinding) doneBinding(this.book);
     });

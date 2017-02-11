@@ -22,6 +22,8 @@ class Printer {
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
+    document.body.classList.remove("bindery-viewing");
+
     this.target.parentNode.removeChild(this.target);
   }
   toggleGuides() {
@@ -31,11 +33,16 @@ class Printer {
     this.doubleSided = !this.doubleSided;
     this.update();
   }
+  setGrid() {
+    this.mode = "grid";
+    this.update();
+  }
   toggleInteractive() {
     this.mode = this.mode == "grid" ? "preview" : "grid";
     this.update();
   }
   update() {
+    document.body.classList.add("bindery-viewing");
     switch (this.mode) {
       case "grid":
         this.renderGrid();
@@ -43,6 +50,8 @@ class Printer {
       case "preview":
         this.renderPreview();
         break;
+      default:
+        this.renderGrid();
     }
   }
   renderGrid() {

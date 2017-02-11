@@ -35,17 +35,30 @@
     outline: 1px solid cyan;
   }
   [bindery-export], .measureArea {
-    background: #ddd;
+    background: #f1f1f1;
     padding: 20px;
+    z-index: 99;
+    position: relative;
   }
 }
 
 @media print {
+  /* Don't print anything that hasn't been exported. This hides extra controls/ */
+  .bindery-viewing > :not([bindery-export]) {
+    display: none !important;
+  }
+
   .bindery-print-wrapper {
     border: 1px dashed black;
     margin: 20px;
   }
 }
+
+/* Don't print anything that hasn't been exported. This hides extra controls/ */
+.bindery-viewing > :not([bindery-export]) {
+  display: none !important;
+}
+
 
 .measureArea {
   outline: 1px solid cyan;

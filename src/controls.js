@@ -32,16 +32,19 @@ class Controls {
     const double = () => {
       this.binder.printer.toggleDouble();
     };
-    const print = () =>  window.print();
+    const print = () =>  {
+      this.binder.printer.setGrid();
+      window.print();
+    }
 
     this.states = {
-      start: btn({ onclick: start}, "Get Started"),
+      // start: , btn({ onclick: start}, "Get Started"),
       working: h("div.bindery-status", "Binding..."),
       done: h("div", {},
         btnMain({style: {float: "right"}, onclick: print}, "Print"),
-        btn({style: {float: "right"}, onclick: guides}, "Guides"),
-        btn({style: {float: "right"}, onclick: double}, "Double Sided"),
         btn({style: {float: "right"}, onclick: interactive}, "Preview"),
+        btn({style: {float: "right"}, onclick: guides}, "Guides"),
+        btn({style: {float: "right"}, onclick: double}, "Facing Pages"),
         btn({onclick: done}, "Done"),
       )
     }
@@ -49,6 +52,8 @@ class Controls {
     this.setState("start");
   }
   setState(newState) {
+    this.holder.style.display = (newState == "start") ? "none" : "block";
+
     if (newState !== this.state && this.states[newState]) {
       this.state = newState;
       this.holder.innerHTML = "";

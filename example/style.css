@@ -9,11 +9,12 @@ html {
   font-family: sans-serif;
 }
 
-.content {
+.content, .intro {
   font-family: Georgia;
   font-size: 16px;
   margin: 20px auto;
   max-width: 800px;
+  padding: 20px;
 }
 
 h2 {
@@ -46,4 +47,17 @@ figcaption {
   border: 1px solid black;
   padding: 1rem;
   margin: 1rem 0;
+}
+
+
+#makeBook {
+  /*position: fixed;*/
+  /*bottom: 1em;*/
+  /*right: 1em;*/
+  display: inline-block;
+  background: black;
+  color: white;
+  font-family: sans-serif;
+  padding: 1em 1.5em;
+  cursor: pointer;
 }

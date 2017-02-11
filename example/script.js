@@ -23,6 +23,10 @@ let binder = new Bindery({
   source: document.querySelector(".content"),
 });
 
+document.getElementById("makeBook").addEventListener("click", function(e) {
+  binder.bind();
+});
+
 binder.defineRule({
   selector: "[bindery-break='before']",
   beforeAdd: (elmt, state) => {

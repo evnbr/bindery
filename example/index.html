@@ -10,10 +10,16 @@
 
 <body>
 
+	<section class="intro">
+		<h2>Bindery.js</h2>
+		<div id="makeBook">Make Book</div>
+	</section>
+
   <section class="content">
     <h2 bindery-break="before">
       Section 1 and maybe the ok <a href="#">something longer</a>
     </h2>
+
     <script>
       for (var i = 0; i < 10; i++) {
         document.write(`<p>This is paragraph 1:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
