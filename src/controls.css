@@ -1,5 +1,15 @@
-.bindery-viewing .bindery-controls {
-  display: block !important;
+@media screen {
+  .bindery-viewing .bindery-controls {
+    display: block !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .bindery-viewing .bindery-controls {
+    background: none;
+    -webkit-backdrop-filter: none;
+    outline: 0;
+  }
 }
 
 .bindery-controls {
@@ -14,12 +24,12 @@
   /*width: 500px;*/
   margin: auto;
   /*background: rgba(50,50,50,0.9);*/
-  /*background: white;*/
-  /*outline: 1px solid rgba(0,0,0,0.3);*/
+  background: #f1f1f1;
+  outline: 1px solid rgba(0,0,0,0.05);
   /*border-radius: 4px;*/
 }
 _::-webkit-:-webkit-full-screen:host:not(:root:root), .bindery-controls {
-  background: rgba(0,0,0,0.5);
+  background: rgba(250, 250, 250, 0.6);
   -webkit-backdrop-filter: blur(20px);
 }
 
@@ -29,24 +39,27 @@ _::-webkit-:-webkit-full-screen:host:not(:root:root), .bindery-controls {
 }
 
 .bindery-btn {
-  /*color: white;*/
   -webkit-appearance: none;
-  /*border: none;*/
-  /*background: rgba(0,0,0,0.5);*/
-  /*background: white;*/
   padding: 8px 12px;
-  color: black;
-  /*border: 1px solid rgba(0,0,0,0.3);*/
-  /*border: 1px solid currentColor;*/
+  color: #444;
   border: none;
+  background: transparent;
   cursor: pointer;
   font-size: 12px;
-  background: #f1f1f1;
   border-radius: 2px;
-  margin-right: 4px;
+  margin-left: 4px;
   text-transform: uppercase;
   letter-spacing: 0.01em;
   font-weight: 500;
+  /*padding: 6px 12px;*/
+  /*background: white;*/
+  /*box-shadow: 0 0 0 0.5px rgba(0,0,0,0.2), 0 1px 0 0 rgba(0,0,0,0.1);*/
+  /*box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 0 0 rgba(0, 0, 0, 0.1);*/
+  /*border-radius: 3px;*/
+}
+.bindery-btn-toggle {
+  /*background: white;*/
+  /*border: 1px solid rgba(0,0,0,0.2);*/
 }
 .bindery-btn-main {
   background: navy;

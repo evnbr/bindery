@@ -7,6 +7,9 @@ const btn = function() {
 const btnMain = function() {
   return h("button.bindery-btn.bindery-btn-main", ...arguments);
 }
+const btnToggle = function() {
+  return h("button.bindery-btn.bindery-btn-toggle", ...arguments);
+}
 
 class Controls {
   constructor(opts) {
@@ -42,9 +45,9 @@ class Controls {
       working: h("div.bindery-status", "Binding..."),
       done: h("div", {},
         btnMain({style: {float: "right"}, onclick: print}, "Print"),
-        btn({style: {float: "right"}, onclick: interactive}, "Preview"),
+        btnToggle({style: {float: "right"}, onclick: interactive}, "Preview"),
         btn({style: {float: "right"}, onclick: guides}, "Guides"),
-        btn({style: {float: "right"}, onclick: double}, "Facing Pages"),
+        btnToggle({style: {float: "right"}, onclick: double}, "Facing Pages"),
         btn({onclick: done}, "Done"),
       )
     }
