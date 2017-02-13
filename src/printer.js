@@ -7,12 +7,12 @@ class Printer {
 
     if (opts.target) {
       this.target = opts.target;
-      this.target.setAttribute("bindery-export", true);
     }
     else {
-      this.target = el("div", {"bindery-export": true});
+      this.target = h("div");
       document.body.appendChild(this.target);
     }
+    this.target.setAttribute("bindery-export", true);
 
     this.template = opts.template;
     this.printWrapper = h("div.bindery-print-wrapper");
@@ -64,6 +64,7 @@ class Printer {
       if (this.book.pages.length % 2 !== 0) {
         let pg = new Page(this.template);
         this.book.addPage(pg);
+        pages.push(pg);
       }
       let spacerPage = new Page(this.template);
       let spacerPage2 = new Page(this.template);

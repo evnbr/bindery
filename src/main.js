@@ -7,7 +7,8 @@ import Book from "./book";
 import Page from "./page";
 import Printer from "./printer";
 import Controls from "./controls";
-import el from "./el";
+import h from "hyperscript";
+
 
 
 class Binder {
@@ -26,7 +27,7 @@ class Binder {
     `;
 
     if (typeof opts.template == "string") {
-      let temp = el("div");
+      let temp = h("div");
       temp.innerHTML = opts.template;
       this.template = temp.children[0];
     }
@@ -38,6 +39,7 @@ class Binder {
       console.error(`Bindery: Template should be an element or a string`);
     }
 
+    this.h = h;
     this.book = new Book();
     this.rules = [];
 
@@ -88,7 +90,7 @@ class Binder {
       }
     }
 
-    this.measureArea = el(".measureArea");
+    this.measureArea = h(".measureArea");
     document.body.appendChild(this.measureArea);
 
     const DELAY = 0; // ms

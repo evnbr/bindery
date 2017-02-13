@@ -77,9 +77,9 @@ var Bindery =
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
-	var _el = __webpack_require__(18);
+	var _hyperscript = __webpack_require__(10);
 	
-	var _el2 = _interopRequireDefault(_el);
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -96,7 +96,7 @@ var Bindery =
 	    opts.template = "\n      <div class=\"bindery-page\">\n        <div bindery-flowbox>\n          <div bindery-content>\n          </div>\n        </div>\n        <div bindery-num></div>\n        <div bindery-footer></div>\n      </div>\n    ";
 	
 	    if (typeof opts.template == "string") {
-	      var temp = (0, _el2.default)("div");
+	      var temp = (0, _hyperscript2.default)("div");
 	      temp.innerHTML = opts.template;
 	      this.template = temp.children[0];
 	    } else if (opts.template instanceof HTMLElement) {
@@ -106,6 +106,7 @@ var Bindery =
 	      console.error("Bindery: Template should be an element or a string");
 	    }
 	
+	    this.h = _hyperscript2.default;
 	    this.book = new _book2.default();
 	    this.rules = [];
 	
@@ -174,7 +175,7 @@ var Bindery =
 	        }
 	      };
 	
-	      this.measureArea = (0, _el2.default)(".measureArea");
+	      this.measureArea = (0, _hyperscript2.default)(".measureArea");
 	      document.body.appendChild(this.measureArea);
 	
 	      var DELAY = 0; // ms
@@ -948,11 +949,11 @@ var Bindery =
 	
 	    if (opts.target) {
 	      this.target = opts.target;
-	      this.target.setAttribute("bindery-export", true);
 	    } else {
-	      this.target = el("div", { "bindery-export": true });
+	      this.target = (0, _hyperscript2.default)("div");
 	      document.body.appendChild(this.target);
 	    }
+	    this.target.setAttribute("bindery-export", true);
 	
 	    this.template = opts.template;
 	    this.printWrapper = (0, _hyperscript2.default)("div.bindery-print-wrapper");
@@ -1019,6 +1020,7 @@ var Bindery =
 	        if (this.book.pages.length % 2 !== 0) {
 	          var pg = new _page2.default(this.template);
 	          this.book.addPage(pg);
+	          pages.push(pg);
 	        }
 	        var spacerPage = new _page2.default(this.template);
 	        var spacerPage2 = new _page2.default(this.template);
@@ -1695,43 +1697,6 @@ var Bindery =
 	
 	// exports
 
-
-/***/ },
-/* 18 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var el = function el(selector, attrs, text) {
-	
-	  var tags = selector.match(/^([a-zA-Z]+)/g);
-	  var ids = selector.match(/#([a-zA-Z0-9\-\_]+)/g);
-	  var classes = selector.match(/\.([a-zA-Z0-9\-\_]+)/g);
-	
-	  var element = document.createElement(tags ? tags[0] : "div");
-	
-	  if (ids) element.id = ids[0].substr(1);
-	  if (classes) element.className = classes.map(function (c) {
-	    return c.substr(1);
-	  }).join(" ");
-	  if (text) element.textContent = text;
-	  if (attrs) {
-	    for (var key in attrs) {
-	      var val = attrs[key];
-	      if (key == "onClick") {
-	        element.addEventListener("click", val);
-	      } else {
-	        element.setAttribute(key, val);
-	      }
-	    }
-	  }
-	
-	  return element;
-	};
-	exports.default = el;
 
 /***/ }
 /******/ ]);
