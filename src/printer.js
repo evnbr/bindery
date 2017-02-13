@@ -17,13 +17,12 @@ class Printer {
     this.template = opts.template;
     this.printWrapper = h("div.bindery-print-wrapper");
 
-    this.doubleSided = false;
+    this.doubleSided = true;
     this.currentLeaf = 0;
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
     document.body.classList.remove("bindery-viewing");
-
     this.target.parentNode.removeChild(this.target);
   }
   toggleGuides() {

@@ -1,45 +1,14 @@
 import css from "style!css!./bindery.css";
 
+import ElementPath from "./ElementPath"
+import elementName from "./ElementName"
+
 import Book from "./book";
 import Page from "./page";
 import Printer from "./printer";
 import Controls from "./controls";
 import el from "./el";
 
-class ElementPath {
-  constructor() {
-    this.items = [];
-    this.update();
-  }
-  push(item) {
-    this.items.push(item);
-    this.update();
-  }
-  pop() {
-    const i = this.items.pop();
-    this.update();
-    return i;
-  }
-  update() {
-    this.root = this.items[0];
-    this.last = this.items[this.items.length-1];
-  }
-  clone() {
-    let newPath = new ElementPath();
-    for (var i = this.items.length - 1; i >= 0; i--) {
-      let clone = this.items[i].cloneNode(false);
-      clone.innerHTML = '';
-      clone.setAttribute("bindery-continuation", true);
-      if (clone.id) {
-        console.warn(`Bindery: Added a break to ${prettyName(clone)}, so "${clone.id}" is no longer a unique ID.`);
-      }
-      if (i < this.items.length - 1) clone.appendChild(newPath.items[i+1]);
-      newPath.items[i] = clone;
-    }
-    newPath.update();
-    return newPath;
-  }
-}
 
 class Binder {
   constructor(opts) {
@@ -276,7 +245,7 @@ class Binder {
           return;
         }
         else {
-          console.warn(`Bindery: Cannot avoid breaking ${prettyName(node)}, it's taller than the flow box.`);
+          console.warn(`Bindery: Cannot avoid breaking ${elementName(node)}, it's taller than the flow box.`);
         }
       }
 
@@ -299,7 +268,7 @@ class Binder {
               if (state.elPath.items.length < 1) {
                 console.log(lastEl);
                 console.log(child);
-                console.error(`Bindery: Failed to add textNode "${child.nodeValue}" to ${prettyName(lastEl)}. Page might be too small?`);
+                console.error(`Bindery: Failed to add textNode "${child.nodeValue}" to ${elementName(lastEl)}. Page might be too small?`);
                 return;
               }
 
@@ -345,6 +314,7 @@ class Binder {
     state.currentPage = this.addPage();
     let content = this.source.cloneNode(true);
     content.style.margin = 0; // TODO: make this clearer
+    content.style.padding = 0; // TODO: make this clearer
     this.source.style.display = "none";
     addElementNode(content, () => {
       console.log("wow we're done!");
@@ -358,6 +328,5 @@ class Binder {
   }
 }
 
-let prettyName = (node) => `"${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ""}.${[...node.classList].join(".")}"`;
 
 module.exports = Binder;
