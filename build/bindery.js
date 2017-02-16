@@ -85,6 +85,14 @@ var Bindery =
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
+	var _fullPage = __webpack_require__(21);
+	
+	var _fullPage2 = _interopRequireDefault(_fullPage);
+	
+	var _footnote = __webpack_require__(24);
+	
+	var _footnote2 = _interopRequireDefault(_footnote);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -142,8 +150,8 @@ var Bindery =
 	      this.rules.push(rule);
 	    }
 	  }, {
-	    key: "defineAction",
-	    value: function defineAction(opt) {
+	    key: "addRule",
+	    value: function addRule(opt) {
 	      opt.rule.selector = opt.selector;
 	      this.rules.push(opt.rule);
 	    }
@@ -431,10 +439,12 @@ var Bindery =
 	      return _hyperscript2.default;
 	    }
 	  }, {
-	    key: "Rules",
+	    key: "rule",
 	    get: function get() {
 	      return {
-	        Spread: _spread2.default
+	        spread: _spread2.default,
+	        fullPage: _fullPage2.default,
+	        footnote: _footnote2.default
 	      };
 	    }
 	  }]);
@@ -1805,6 +1815,106 @@ var Bindery =
 	
 	// exports
 
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _fullPage = __webpack_require__(22);
+	
+	var _fullPage2 = _interopRequireDefault(_fullPage);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	  beforeAdd: function beforeAdd(elmt, state) {
+	    var spreadMode = elmt.getAttribute("bindery-fullpage");
+	    state.prevPage = state.currentPage;
+	    state.prevElementPath = state.elPath;
+	    state.currentPage = state.getNewPage();
+	    if (spreadMode == "bleed") {
+	      state.currentPage.element.classList.add("bleed");
+	    }
+	  },
+	  afterAdd: function afterAdd(elmt, state) {
+	    state.finishPage(state.currentPage);
+	    state.currentPage = state.prevPage;
+	    state.elPath = state.prevElementPath;
+	  }
+	};
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(23);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./fullPage.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./fullPage.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "/* TODO */\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _hyperscript = __webpack_require__(10);
+	
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	  selector: "a",
+	  beforeAdd: function beforeAdd(elmt, state) {
+	    var fn = (0, _hyperscript2.default)(".footnote");
+	    var n = state.currentPage.footer.querySelectorAll(".footnote").length;
+	    fn.innerHTML = n + " Link to <a href='#'>" + elmt.href + "</a>";
+	    state.currentPage.footer.appendChild(fn);
+	    elmt.insertAdjacentHTML("beforeend", "<sup>" + n + "</sup>");
+	  }
+	};
 
 /***/ }
 /******/ ]);

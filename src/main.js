@@ -9,8 +9,9 @@ import Printer from "./printer";
 import Controls from "./Controls/controls";
 import h from "hyperscript";
 
-import Spread from "./Spread/spread";
-
+import spread from "./Spread/spread";
+import fullPage from "./FullPage/fullPage";
+import footnote from "./Footnote/footnote";
 
 
 class Binder {
@@ -69,16 +70,18 @@ class Binder {
     return h;
   }
 
-  static get Rules() {
+  static get rule() {
     return {
-      Spread: Spread,
+      spread: spread,
+      fullPage: fullPage,
+      footnote: footnote,
     }
   }
 
   defineRule(rule) {
     this.rules.push(rule);
   }
-  defineAction(opt) {
+  addRule(opt) {
     opt.rule.selector = opt.selector
     this.rules.push(opt.rule);
   }

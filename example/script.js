@@ -31,36 +31,17 @@ binder.defineRule({
   },
 });
 
-binder.defineRule({
+binder.addRule({
   selector: "a",
-  beforeAdd: (elmt, state) => {
-    let fn = Bindery.h(".footnote");
-    let n = state.currentPage.footer.querySelectorAll(".footnote").length;
-    fn.innerHTML = `${n} Link to <a href='#'>${elmt.href}</a>`;
-    state.currentPage.footer.appendChild(fn);
-    elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
-  },
+  rule: Bindery.rule.footnote,
 });
 
-binder.defineRule({
-  selector: "[bindery-fullpage]",
-  beforeAdd: (elmt, state) => {
-    let spreadMode = elmt.getAttribute("bindery-fullpage");
-    state.prevPage = state.currentPage;
-    state.prevElementPath = state.elPath;
-    state.currentPage = state.getNewPage();
-    if (spreadMode == "bleed") {
-      state.currentPage.element.classList.add("bleed");
-    }
-  },
-  afterAdd: (elmt, state) => {
-    state.finishPage(state.currentPage);
-    state.currentPage = state.prevPage;
-    state.elPath = state.prevElementPath;
-  },
+binder.addRule({
+  selector: ".med-figure",
+  rule: Bindery.rule.fullPage,
 });
 
-binder.defineAction({
+binder.addRule({
   selector: ".big-figure",
-  rule: Bindery.Rules.Spread,
+  rule: Bindery.rule.spread,
 });
