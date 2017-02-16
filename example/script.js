@@ -5,11 +5,7 @@ let binder = new Bindery({
     { selector: "a",           rule: Bindery.rule.footnote },
     { selector: ".med-figure", rule: Bindery.rule.fullPage },
     { selector: ".big-figure", rule: Bindery.rule.spread }
-  ]
-});
-
-document.getElementById("makeBook").addEventListener("click", function(e) {
-  binder.bind();
+  ],
 });
 
 // binder.defineRule({
