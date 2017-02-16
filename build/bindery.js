@@ -156,6 +156,16 @@ var Bindery =
 	      this.rules.push(opt.rule);
 	    }
 	  }, {
+	    key: "addRules",
+	    value: function addRules() {
+	      var _this = this;
+	
+	      [].concat(Array.prototype.slice.call(arguments)).forEach(function (opt) {
+	        opt.rule.selector = opt.selector;
+	        _this.rules.push(opt.rule);
+	      });
+	    }
+	  }, {
 	    key: "addPage",
 	    value: function addPage() {
 	      var pg = new _page2.default(this.template);
@@ -166,7 +176,7 @@ var Bindery =
 	  }, {
 	    key: "bind",
 	    value: function bind(doneBinding) {
-	      var _this = this;
+	      var _this2 = this;
 	
 	      var state = {
 	        elPath: new _ElementPath2.default(),
@@ -201,7 +211,7 @@ var Bindery =
 	      };
 	
 	      var beforeAddRules = function beforeAddRules(elmt) {
-	        _this.rules.forEach(function (rule) {
+	        _this2.rules.forEach(function (rule) {
 	          if (elmt.matches(rule.selector)) {
 	            if (rule.beforeAdd) {
 	
@@ -211,7 +221,7 @@ var Bindery =
 	
 	              if (hasOverflowed()) {
 	                // restore from backup
-	                _this.measureArea.replaceChild(backupPg, state.currentPage.element);
+	                _this2.measureArea.replaceChild(backupPg, state.currentPage.element);
 	                elmt.innerHTML = backupElmt.innerHTML; // TODO: fix this
 	                state.currentPage.element = backupPg;
 	
@@ -225,7 +235,7 @@ var Bindery =
 	        });
 	      };
 	      var afterAddRules = function afterAddRules(elmt) {
-	        _this.rules.forEach(function (rule) {
+	        _this2.rules.forEach(function (rule) {
 	          if (elmt.matches(rule.selector)) {
 	            if (rule.afterAdd) {
 	              rule.afterAdd(elmt, state);
@@ -241,14 +251,14 @@ var Bindery =
 	      };
 	
 	      var finishPage = function finishPage(pg) {
-	        _this.measureArea.removeChild(pg.element);
+	        _this2.measureArea.removeChild(pg.element);
 	      };
 	
 	      // Creates clones for ever level of tag
 	      // we were in when we overflowed the last page
 	      var makeContinuation = function makeContinuation() {
 	        state.elPath = state.elPath.clone();
-	        var newPage = _this.addPage();
+	        var newPage = _this2.addPage();
 	        newPage.flowContent.appendChild(state.elPath.root);
 	        return newPage;
 	      };
@@ -425,12 +435,12 @@ var Bindery =
 	      this.source.style.display = "none";
 	      addElementNode(content, function () {
 	        console.log("wow we're done!");
-	        document.body.removeChild(_this.measureArea);
+	        document.body.removeChild(_this2.measureArea);
 	
-	        _this.controls.setState("done");
-	        _this.printer.update();
+	        _this2.controls.setState("done");
+	        _this2.printer.update();
 	
-	        if (doneBinding) doneBinding(_this.book);
+	        if (doneBinding) doneBinding(_this2.book);
 	      });
 	    }
 	  }], [{
@@ -1759,17 +1769,12 @@ var Bindery =
 	    rightPage.flowBox.appendChild(dupedContent);
 	    rightPage.flowContent = dupedContent;
 	
-	    // let spreadMode = elmt.getAttribute("bindery-spread");
-	    // if (spreadMode == "bleed") {
 	    state.currentPage.element.classList.add("bindery-spread");
 	    rightPage.element.classList.add("bindery-spread");
 	    state.currentPage.element.classList.add("bleed");
 	    rightPage.element.classList.add("bleed");
-	    // }
-	
 	
 	    state.finishPage(state.currentPage);
-	    // state.finishPage(rightPage);
 	
 	    state.currentPage = state.prevPage;
 	    state.elPath = state.prevElementPath;
@@ -1834,11 +1839,10 @@ var Bindery =
 	
 	exports.default = {
 	  beforeAdd: function beforeAdd(elmt, state) {
-	    var spreadMode = elmt.getAttribute("bindery-fullpage");
 	    state.prevPage = state.currentPage;
 	    state.prevElementPath = state.elPath;
 	    state.currentPage = state.getNewPage();
-	    if (spreadMode == "bleed") {
+	    if (elmt.classList.contains("bleed")) {
 	      state.currentPage.element.classList.add("bleed");
 	    }
 	  },

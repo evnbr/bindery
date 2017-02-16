@@ -2,11 +2,10 @@ import css from "style!css!./fullPage.css";
 
 export default {
   beforeAdd: (elmt, state) => {
-    let spreadMode = elmt.getAttribute("bindery-fullpage");
     state.prevPage = state.currentPage;
     state.prevElementPath = state.elPath;
     state.currentPage = state.getNewPage();
-    if (spreadMode == "bleed") {
+    if (elmt.classList.contains("bleed")) {
       state.currentPage.element.classList.add("bleed");
     }
   },

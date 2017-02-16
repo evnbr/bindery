@@ -82,8 +82,14 @@ class Binder {
     this.rules.push(rule);
   }
   addRule(opt) {
-    opt.rule.selector = opt.selector
+    opt.rule.selector = opt.selector;
     this.rules.push(opt.rule);
+  }
+  addRules() {
+    [...arguments].forEach((opt) => {
+      opt.rule.selector = opt.selector;
+      this.rules.push(opt.rule);
+    });
   }
   addPage() {
     let pg = new Page(this.template);

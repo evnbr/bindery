@@ -31,17 +31,8 @@ binder.defineRule({
   },
 });
 
-binder.addRule({
-  selector: "a",
-  rule: Bindery.rule.footnote,
-});
-
-binder.addRule({
-  selector: ".med-figure",
-  rule: Bindery.rule.fullPage,
-});
-
-binder.addRule({
-  selector: ".big-figure",
-  rule: Bindery.rule.spread,
-});
+binder.addRules(
+  { selector: "a",           rule: Bindery.rule.footnote },
+  { selector: ".med-figure", rule: Bindery.rule.fullPage },
+  { selector: ".big-figure", rule: Bindery.rule.spread }
+);
