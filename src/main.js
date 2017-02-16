@@ -5,7 +5,7 @@ import elementName from "./ElementName"
 
 import Book from "./book";
 import Page from "./Page/page";
-import Printer from "./printer";
+import Viewer from "./Viewer/viewer";
 import Controls from "./Controls/controls";
 import h from "hyperscript";
 
@@ -23,21 +23,21 @@ class Binder {
     this.book = new Book();
     this.rules = [];
 
-    this.printer = new Printer({
+    this.viewer = new Viewer({
       book: this.book,
       target: this.target,
     });
     this.controls = new Controls({
       binder: this,
-      printer: this.printer,
+      viewer: this.viewer,
     });
 
   }
   cancel() {
-    this.printer.cancel();
+    this.viewer.cancel();
     this.book = new Book();
     this.source.style.display = "";
-    this.printer = new Printer({
+    this.viewer = new Viewer({
       book: this.book,
       target: this.target,
     });
@@ -322,7 +322,7 @@ class Binder {
       document.body.removeChild(this.measureArea);
 
       this.controls.setState("done");
-      this.printer.update();
+      this.viewer.update();
 
       if (doneBinding) doneBinding(this.book);
     });

@@ -1,32 +1,3 @@
-@media screen {
-  .bindery-viewing {
-    background: #f1f1f1 !important;
-  }
-  [bindery-export], .measureArea {
-    background: #f1f1f1;
-    padding: 20px;
-    z-index: 99;
-    position: relative;
-  }
-}
-
-@media print {
-  /* Don't print anything that hasn't been exported. This hides extra controls/ */
-  .bindery-viewing > :not([bindery-export]) {
-    display: none !important;
-  }
-
-  .bindery-print-wrapper {
-    border: 1px dashed black;
-    margin: 20px;
-  }
-}
-
-/* Don't print anything that hasn't been exported. This hides extra controls/ */
-.bindery-viewing > :not([bindery-export]) {
-  display: none !important;
-}
-
 .measureArea {
   outline: 1px solid cyan;
   position: absolute;
@@ -45,53 +16,6 @@
   background: transparent;
   box-shadow: none;
 }
-
-.bindery-print-wrapper {
-  page-break-after: always;
-  display: flex;
-  width: 800px;
-  margin: 20px auto;
-}
-
-.bindery-stage3d {
-  perspective: 2000px;
-  min-height: 100vh;
-  transform-style: preserve-3d;
-}
-
-.bindery-page3d {
-  margin: auto;
-  width: 400px;
-  height: 600px;
-  transform: rotateY(0);
-  transition: all 0.8s;
-  transform-style: preserve-3d;
-  transform-origin: left;
-  position: absolute;
-  left: 0;
-  right: -380px;
-}
-
-.bindery-page3d:hover {
-  outline: 1px solid red;
-  /*transform: translate3d(20px, 0, 0);*/
-}
-.bindery-page3d.flipped {
-  transform: rotateY(-180deg);
-}
-
-.bindery-page3d .bindery-page {
-  position: absolute;
-  backface-visibility: hidden;
-}
-
-.bindery-page3d .bindery-page3d-front {
-  transform: rotateY(0);
-}
-.bindery-page3d .bindery-page3d-back {
-  transform: rotateY(-180deg);
-}
-
 
 [bindery-continuation] {
   text-indent: 0 !important;

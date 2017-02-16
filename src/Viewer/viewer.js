@@ -1,4 +1,6 @@
-import Page from "./Page/page";
+import css from "style!css!./viewer.css";
+
+import Page from "../Page/page";
 import h from "hyperscript";
 
 class Printer {

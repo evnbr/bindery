@@ -22,16 +22,16 @@
   .bindery-print-wrapper {
     /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/
   }
-  .bindery-show-guides [bindery-flowbox] {
+  .bindery-show-guides .bindery-flowbox {
     outline: 1px solid cyan;
   }
-  .bindery-show-guides [bindery-footer] {
+  .bindery-show-guides .bindery-footer {
     outline: 1px solid cyan;
   }
-  .bindery-show-guides [bindery-content] {
+  .bindery-show-guides .bindery-content {
     outline: 1px solid lime;
   }
-  .bindery-show-guides [bindery-num] {
+  .bindery-show-guides .bindery-num {
     outline: 1px solid cyan;
   }
 }

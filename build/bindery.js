@@ -69,11 +69,11 @@ var Bindery =
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _printer = __webpack_require__(16);
+	var _viewer = __webpack_require__(16);
 	
-	var _printer2 = _interopRequireDefault(_printer);
+	var _viewer2 = _interopRequireDefault(_viewer);
 	
-	var _controls = __webpack_require__(17);
+	var _controls = __webpack_require__(19);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
@@ -81,15 +81,15 @@ var Bindery =
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _spread = __webpack_require__(20);
+	var _spread = __webpack_require__(22);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
-	var _fullPage = __webpack_require__(23);
+	var _fullPage = __webpack_require__(25);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
-	var _footnote = __webpack_require__(26);
+	var _footnote = __webpack_require__(28);
 	
 	var _footnote2 = _interopRequireDefault(_footnote);
 	
@@ -109,23 +109,23 @@ var Bindery =
 	    this.book = new _book2.default();
 	    this.rules = [];
 	
-	    this.printer = new _printer2.default({
+	    this.viewer = new _viewer2.default({
 	      book: this.book,
 	      target: this.target
 	    });
 	    this.controls = new _controls2.default({
 	      binder: this,
-	      printer: this.printer
+	      viewer: this.viewer
 	    });
 	  }
 	
 	  _createClass(Binder, [{
 	    key: "cancel",
 	    value: function cancel() {
-	      this.printer.cancel();
+	      this.viewer.cancel();
 	      this.book = new _book2.default();
 	      this.source.style.display = "";
-	      this.printer = new _printer2.default({
+	      this.viewer = new _viewer2.default({
 	        book: this.book,
 	        target: this.target
 	      });
@@ -424,7 +424,7 @@ var Bindery =
 	        document.body.removeChild(_this2.measureArea);
 	
 	        _this2.controls.setState("done");
-	        _this2.printer.update();
+	        _this2.viewer.update();
 	
 	        if (doneBinding) doneBinding(_this2.book);
 	      });
@@ -485,7 +485,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  [bindery-export], .measureArea {\n    background: #f1f1f1;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n  }\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not([bindery-export]) {\n    display: none !important;\n  }\n\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not([bindery-export]) {\n  display: none !important;\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
+	exports.push([module.id, ".measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
 	
 	// exports
 
@@ -1393,7 +1393,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n\n.bindery-num {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] .bindery-num {\n  left: 20px;\n}\n[bindery-side=\"right\"] .bindery-num {\n  right: 20px;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides .bindery-num {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n\n.bindery-num {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] .bindery-num {\n  left: 20px;\n}\n[bindery-side=\"right\"] .bindery-num {\n  right: 20px;\n}\n", ""]);
 	
 	// exports
 
@@ -1409,6 +1409,10 @@ var Bindery =
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _viewer = __webpack_require__(17);
+	
+	var _viewer2 = _interopRequireDefault(_viewer);
 	
 	var _page = __webpack_require__(8);
 	
@@ -1648,11 +1652,51 @@ var Bindery =
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(18);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./viewer.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./viewer.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  [bindery-export], .measureArea {\n    background: #f1f1f1;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n  }\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not([bindery-export]) {\n    display: none !important;\n  }\n\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not([bindery-export]) {\n  display: none !important;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
 	"use strict";
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _controls = __webpack_require__(18);
+	var _controls = __webpack_require__(20);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
@@ -1684,6 +1728,7 @@ var Bindery =
 	    document.body.appendChild(this.holder);
 	
 	    this.binder = opts.binder;
+	    var viewer = opts.viewer;
 	
 	    var start = function start() {
 	      _this.setState("working");
@@ -1694,16 +1739,16 @@ var Bindery =
 	      _this.setState("start");
 	    };
 	    var guides = function guides() {
-	      _this.binder.printer.toggleGuides();
+	      viewer.toggleGuides();
 	    };
 	    var interactive = function interactive() {
-	      _this.binder.printer.toggleInteractive();
+	      viewer.toggleInteractive();
 	    };
 	    var double = function double() {
-	      _this.binder.printer.toggleDouble();
+	      viewer.toggleDouble();
 	    };
 	    var print = function print() {
-	      _this.binder.printer.setGrid();
+	      viewer.setGrid();
 	      window.print();
 	    };
 	
@@ -1735,13 +1780,13 @@ var Bindery =
 	module.exports = Controls;
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(19);
+	var content = __webpack_require__(21);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1761,7 +1806,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1775,7 +1820,7 @@ var Bindery =
 
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1784,7 +1829,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _spread = __webpack_require__(21);
+	var _spread = __webpack_require__(23);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
@@ -1817,13 +1862,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(22);
+	var content = __webpack_require__(24);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1843,7 +1888,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1857,7 +1902,7 @@ var Bindery =
 
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1866,7 +1911,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _fullPage = __webpack_require__(24);
+	var _fullPage = __webpack_require__(26);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
@@ -1889,13 +1934,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(25);
+	var content = __webpack_require__(27);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1915,7 +1960,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1929,7 +1974,7 @@ var Bindery =
 
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
