@@ -9,6 +9,8 @@ import Printer from "./printer";
 import Controls from "./Controls/controls";
 import h from "hyperscript";
 
+import Spread from "./Spread/spread";
+
 
 
 class Binder {
@@ -39,7 +41,6 @@ class Binder {
       console.error(`Bindery: Template should be an element or a string`);
     }
 
-    this.h = h;
     this.book = new Book();
     this.rules = [];
 
@@ -53,7 +54,6 @@ class Binder {
       printer: this.printer,
     });
 
-
   }
   cancel() {
     this.printer.cancel();
@@ -65,8 +65,22 @@ class Binder {
       target: this.target,
     });
   }
+  static get h() {
+    return h;
+  }
+
+  static get Rules() {
+    return {
+      Spread: Spread,
+    }
+  }
+
   defineRule(rule) {
     this.rules.push(rule);
+  }
+  defineAction(opt) {
+    opt.rule.selector = opt.selector
+    this.rules.push(opt.rule);
   }
   addPage() {
     let pg = new Page(this.template);

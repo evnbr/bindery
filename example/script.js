@@ -6,6 +6,11 @@ document.getElementById("makeBook").addEventListener("click", function(e) {
   binder.bind();
 });
 
+
+// ------------------
+// R U L E S
+
+
 binder.defineRule({
   selector: "[bindery-break='before']",
   beforeAdd: (elmt, state) => {
@@ -20,7 +25,7 @@ binder.defineRule({
   beforeAdd: (elmt, state) => {
     let pg = state.currentPage;
     let n = pg.footer.querySelectorAll(".footnote").length;
-    let fn = binder.h(".footnote", {}, `${n} ${elmt.textContent.substr(0,28)}`);
+    let fn = Bindery.h(".footnote", {}, `${n} ${elmt.textContent.substr(0,28)}`);
     pg.footer.appendChild(fn);
     elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
   },
@@ -29,7 +34,7 @@ binder.defineRule({
 binder.defineRule({
   selector: "a",
   beforeAdd: (elmt, state) => {
-    let fn = binder.h(".footnote");
+    let fn = Bindery.h(".footnote");
     let n = state.currentPage.footer.querySelectorAll(".footnote").length;
     fn.innerHTML = `${n} Link to <a href='#'>${elmt.href}</a>`;
     state.currentPage.footer.appendChild(fn);
@@ -38,9 +43,9 @@ binder.defineRule({
 });
 
 binder.defineRule({
-  selector: "[bindery-spread]",
+  selector: "[bindery-fullpage]",
   beforeAdd: (elmt, state) => {
-    let spreadMode = elmt.getAttribute("bindery-spread");
+    let spreadMode = elmt.getAttribute("bindery-fullpage");
     state.prevPage = state.currentPage;
     state.prevElementPath = state.elPath;
     state.currentPage = state.getNewPage();
@@ -55,8 +60,7 @@ binder.defineRule({
   },
 });
 
-// setTimeout(() => {
-//   binder.bind((book) => {
-//     console.log(book);
-//   });
-// }, 500);
+binder.defineAction({
+  selector: ".big-figure",
+  rule: Bindery.Rules.Spread,
+});
