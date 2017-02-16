@@ -12,6 +12,7 @@ import h from "hyperscript";
 import spread from "./Spread/spread";
 import fullPage from "./FullPage/fullPage";
 import footnote from "./Footnote/footnote";
+import breakBefore from "./Rules/breakBefore";
 
 
 class Binder {
@@ -28,14 +29,16 @@ class Binder {
     }
 
     this.target = opts.target;
-
-
     this.rules = [];
 
     this.controls = new Controls({
       binder: this,
       viewer: this.viewer,
     });
+
+    if (opts.rules) {
+      this.addRules(...opts.rules);
+    }
 
   }
   cancel() {
@@ -48,6 +51,7 @@ class Binder {
       spread: spread,
       fullPage: fullPage,
       footnote: footnote,
+      breakBefore: breakBefore,
     }
   }
 

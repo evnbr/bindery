@@ -93,6 +93,10 @@ var Bindery =
 	
 	var _footnote2 = _interopRequireDefault(_footnote);
 	
+	var _breakBefore = __webpack_require__(29);
+	
+	var _breakBefore2 = _interopRequireDefault(_breakBefore);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -112,13 +116,16 @@ var Bindery =
 	    }
 	
 	    this.target = opts.target;
-	
 	    this.rules = [];
 	
 	    this.controls = new _controls2.default({
 	      binder: this,
 	      viewer: this.viewer
 	    });
+	
+	    if (opts.rules) {
+	      this.addRules.apply(this, _toConsumableArray(opts.rules));
+	    }
 	  }
 	
 	  _createClass(Binder, [{
@@ -438,7 +445,8 @@ var Bindery =
 	      return {
 	        spread: _spread2.default,
 	        fullPage: _fullPage2.default,
-	        footnote: _footnote2.default
+	        footnote: _footnote2.default,
+	        breakBefore: _breakBefore2.default
 	      };
 	    }
 	  }]);
@@ -1988,13 +1996,29 @@ var Bindery =
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
-	  selector: "a",
 	  beforeAdd: function beforeAdd(elmt, state) {
 	    var fn = (0, _hyperscript2.default)(".footnote");
 	    var n = state.currentPage.footer.querySelectorAll(".footnote").length;
 	    fn.innerHTML = n + " Link to <a href='#'>" + elmt.href + "</a>";
 	    state.currentPage.footer.appendChild(fn);
 	    elmt.insertAdjacentHTML("beforeend", "<sup>" + n + "</sup>");
+	  }
+	};
+
+/***/ },
+/* 29 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  beforeAdd: function beforeAdd(elmt, state) {
+	    if (state.currentPage.flowContent.innerText !== "") {
+	      state.nextPage();
+	    }
 	  }
 	};
 

@@ -1,23 +1,15 @@
 let binder = new Bindery({
   source: ".content",
+  rules: [
+    { selector: "h2",          rule: Bindery.rule.breakBefore },
+    { selector: "a",           rule: Bindery.rule.footnote },
+    { selector: ".med-figure", rule: Bindery.rule.fullPage },
+    { selector: ".big-figure", rule: Bindery.rule.spread }
+  ]
 });
 
 document.getElementById("makeBook").addEventListener("click", function(e) {
   binder.bind();
-});
-
-
-// ------------------
-// R U L E S
-
-
-binder.defineRule({
-  selector: "[bindery-break='before']",
-  beforeAdd: (elmt, state) => {
-    if (state.currentPage.flowContent.innerText !== "") {
-      state.nextPage();
-    }
-  },
 });
 
 // binder.defineRule({
@@ -30,9 +22,3 @@ binder.defineRule({
 //     elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
 //   },
 // });
-
-binder.addRules(
-  { selector: "a",           rule: Bindery.rule.footnote },
-  { selector: ".med-figure", rule: Bindery.rule.fullPage },
-  { selector: ".big-figure", rule: Bindery.rule.spread }
-);
