@@ -1,9 +1,9 @@
-[bindery-side="left"].bindery-spread [bindery-content] {
+[bindery-side="left"].bindery-spread .bindery-content {
   width: 200%;
   position: absolute;
   left: 0;
 }
-[bindery-side="right"].bindery-spread [bindery-content] {
+[bindery-side="right"].bindery-spread .bindery-content {
   width: 200%;
   position: absolute;
   right: 0;

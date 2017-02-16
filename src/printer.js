@@ -1,4 +1,4 @@
-import Page from "./page";
+import Page from "./Page/page";
 import h from "hyperscript";
 
 class Printer {
@@ -14,7 +14,6 @@ class Printer {
     }
     this.target.setAttribute("bindery-export", true);
 
-    this.template = opts.template;
     this.printWrapper = h("div.bindery-print-wrapper");
 
     this.doubleSided = true;
@@ -62,12 +61,12 @@ class Printer {
 
     if (this.doubleSided) {
       if (this.book.pages.length % 2 !== 0) {
-        let pg = new Page(this.template);
+        let pg = new Page();
         this.book.addPage(pg);
         pages.push(pg);
       }
-      let spacerPage = new Page(this.template);
-      let spacerPage2 = new Page(this.template);
+      let spacerPage = new Page();
+      let spacerPage2 = new Page();
       spacerPage.element.style.visibility = "hidden";
       spacerPage2.element.style.visibility = "hidden";
       pages.unshift(spacerPage);
@@ -104,12 +103,12 @@ class Printer {
 
     if (this.doubleSided) {
       if (this.book.pages.length % 2 !== 0) {
-        let pg = new Page(this.template);
+        let pg = new Page();
         this.book.addPage(pg);
       }
     }
-    let spacerPage = new Page(this.template);
-    let spacerPage2 = new Page(this.template);
+    let spacerPage = new Page();
+    let spacerPage2 = new Page();
     spacerPage.element.style.visibility = "hidden";
     spacerPage2.element.style.visibility = "hidden";
     pages.unshift(spacerPage);

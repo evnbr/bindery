@@ -4,7 +4,7 @@ import ElementPath from "./ElementPath"
 import elementName from "./ElementName"
 
 import Book from "./book";
-import Page from "./page";
+import Page from "./Page/page";
 import Printer from "./printer";
 import Controls from "./Controls/controls";
 import h from "hyperscript";
@@ -18,36 +18,13 @@ class Binder {
   constructor(opts) {
     this.source = opts.source;
     this.target = opts.target;
-    opts.template = `
-      <div class="bindery-page">
-        <div bindery-flowbox>
-          <div bindery-content>
-          </div>
-        </div>
-        <div bindery-num></div>
-        <div bindery-footer></div>
-      </div>
-    `;
 
-    if (typeof opts.template == "string") {
-      let temp = h("div");
-      temp.innerHTML = opts.template;
-      this.template = temp.children[0];
-    }
-    else if (opts.template instanceof HTMLElement) {
-      this.template = opts.template.cloneNode(true);
-      opts.template.remove(opts.template);
-    }
-    else {
-      console.error(`Bindery: Template should be an element or a string`);
-    }
 
     this.book = new Book();
     this.rules = [];
 
     this.printer = new Printer({
       book: this.book,
-      template: this.template,
       target: this.target,
     });
     this.controls = new Controls({
@@ -62,7 +39,6 @@ class Binder {
     this.source.style.display = "";
     this.printer = new Printer({
       book: this.book,
-      template: this.template,
       target: this.target,
     });
   }
@@ -92,7 +68,7 @@ class Binder {
     });
   }
   addPage() {
-    let pg = new Page(this.template);
+    let pg = new Page();
     this.measureArea.appendChild(pg.element);
     this.book.addPage(pg);
     return pg;

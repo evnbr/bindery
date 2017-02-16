@@ -69,27 +69,27 @@ var Bindery =
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _printer = __webpack_require__(9);
+	var _printer = __webpack_require__(16);
 	
 	var _printer2 = _interopRequireDefault(_printer);
 	
-	var _controls = __webpack_require__(15);
+	var _controls = __webpack_require__(17);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
-	var _hyperscript = __webpack_require__(10);
+	var _hyperscript = __webpack_require__(9);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _spread = __webpack_require__(18);
+	var _spread = __webpack_require__(20);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
-	var _fullPage = __webpack_require__(21);
+	var _fullPage = __webpack_require__(23);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
-	var _footnote = __webpack_require__(24);
+	var _footnote = __webpack_require__(26);
 	
 	var _footnote2 = _interopRequireDefault(_footnote);
 	
@@ -105,25 +105,12 @@ var Bindery =
 	
 	    this.source = opts.source;
 	    this.target = opts.target;
-	    opts.template = "\n      <div class=\"bindery-page\">\n        <div bindery-flowbox>\n          <div bindery-content>\n          </div>\n        </div>\n        <div bindery-num></div>\n        <div bindery-footer></div>\n      </div>\n    ";
-	
-	    if (typeof opts.template == "string") {
-	      var temp = (0, _hyperscript2.default)("div");
-	      temp.innerHTML = opts.template;
-	      this.template = temp.children[0];
-	    } else if (opts.template instanceof HTMLElement) {
-	      this.template = opts.template.cloneNode(true);
-	      opts.template.remove(opts.template);
-	    } else {
-	      console.error("Bindery: Template should be an element or a string");
-	    }
 	
 	    this.book = new _book2.default();
 	    this.rules = [];
 	
 	    this.printer = new _printer2.default({
 	      book: this.book,
-	      template: this.template,
 	      target: this.target
 	    });
 	    this.controls = new _controls2.default({
@@ -140,7 +127,6 @@ var Bindery =
 	      this.source.style.display = "";
 	      this.printer = new _printer2.default({
 	        book: this.book,
-	        template: this.template,
 	        target: this.target
 	      });
 	    }
@@ -168,7 +154,7 @@ var Bindery =
 	  }, {
 	    key: "addPage",
 	    value: function addPage() {
-	      var pg = new _page2.default(this.template);
+	      var pg = new _page2.default();
 	      this.measureArea.appendChild(pg.element);
 	      this.book.addPage(pg);
 	      return pg;
@@ -499,7 +485,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  [bindery-export], .measureArea {\n    background: #f1f1f1;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n  }\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not([bindery-export]) {\n    display: none !important;\n  }\n\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not([bindery-export]) {\n  display: none !important;\n}\n\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n[bindery-flowbox] {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n[bindery-footer] {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed [bindery-flowbox] {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed [bindery-flowbox] {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed [bindery-flowbox] {\n  left: 0;\n  right: -20px;\n}\n\n[bindery-num] {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] [bindery-num] {\n  left: 20px;\n}\n[bindery-side=\"right\"] [bindery-num] {\n  right: 20px;\n}\n\n\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  [bindery-export], .measureArea {\n    background: #f1f1f1;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n  }\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not([bindery-export]) {\n    display: none !important;\n  }\n\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not([bindery-export]) {\n  display: none !important;\n}\n\n.measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
 	
 	// exports
 
@@ -927,11 +913,21 @@ var Bindery =
 
 /***/ },
 /* 8 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _hyperscript = __webpack_require__(9);
+	
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
+	
+	var _page = __webpack_require__(14);
+	
+	var _page2 = _interopRequireDefault(_page);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -939,16 +935,16 @@ var Bindery =
 	  function Page(template) {
 	    _classCallCheck(this, Page);
 	
-	    this.element = template.cloneNode(true);
-	    this.flowBox = this.element.querySelector("[bindery-flowbox]");
-	    this.flowContent = this.element.querySelector("[bindery-content]");
-	    this.footer = this.element.querySelector("[bindery-footer]");
+	    this.element = (0, _hyperscript2.default)(".bindery-page", (0, _hyperscript2.default)(".bindery-flowbox", (0, _hyperscript2.default)(".bindery-content")), (0, _hyperscript2.default)(".bindery-num"), (0, _hyperscript2.default)(".bindery-footer"));
+	    this.flowBox = this.element.querySelector(".bindery-flowbox");
+	    this.flowContent = this.element.querySelector(".bindery-content");
+	    this.footer = this.element.querySelector(".bindery-footer");
 	  }
 	
 	  _createClass(Page, [{
 	    key: "setNumber",
 	    value: function setNumber(n) {
-	      var num = this.element.querySelector("[bindery-num]");
+	      var num = this.element.querySelector(".bindery-num");
 	      num.textContent = n;
 	    }
 	  }]);
@@ -962,257 +958,10 @@ var Bindery =
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	var split = __webpack_require__(10)
+	var ClassList = __webpack_require__(11)
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _page = __webpack_require__(8);
-	
-	var _page2 = _interopRequireDefault(_page);
-	
-	var _hyperscript = __webpack_require__(10);
-	
-	var _hyperscript2 = _interopRequireDefault(_hyperscript);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Printer = function () {
-	  function Printer(opts) {
-	    _classCallCheck(this, Printer);
-	
-	    this.book = opts.book;
-	
-	    if (opts.target) {
-	      this.target = opts.target;
-	    } else {
-	      this.target = (0, _hyperscript2.default)("div");
-	      document.body.appendChild(this.target);
-	    }
-	    this.target.setAttribute("bindery-export", true);
-	
-	    this.template = opts.template;
-	    this.printWrapper = (0, _hyperscript2.default)("div.bindery-print-wrapper");
-	
-	    this.doubleSided = true;
-	    this.currentLeaf = 0;
-	  }
-	
-	  _createClass(Printer, [{
-	    key: "cancel",
-	    value: function cancel() {
-	      // TODO this doesn't work if the target is an existing node
-	      document.body.classList.remove("bindery-viewing");
-	      this.target.parentNode.removeChild(this.target);
-	    }
-	  }, {
-	    key: "toggleGuides",
-	    value: function toggleGuides() {
-	      this.target.classList.toggle("bindery-show-guides");
-	    }
-	  }, {
-	    key: "toggleDouble",
-	    value: function toggleDouble() {
-	      this.doubleSided = !this.doubleSided;
-	      this.update();
-	    }
-	  }, {
-	    key: "setGrid",
-	    value: function setGrid() {
-	      this.mode = "grid";
-	      this.update();
-	    }
-	  }, {
-	    key: "toggleInteractive",
-	    value: function toggleInteractive() {
-	      this.mode = this.mode == "grid" ? "preview" : "grid";
-	      this.update();
-	    }
-	  }, {
-	    key: "update",
-	    value: function update() {
-	      document.body.classList.add("bindery-viewing");
-	      switch (this.mode) {
-	        case "grid":
-	          this.renderGrid();
-	          break;
-	        case "preview":
-	          this.renderPreview();
-	          break;
-	        default:
-	          this.renderGrid();
-	      }
-	    }
-	  }, {
-	    key: "renderGrid",
-	    value: function renderGrid() {
-	      this.mode = "grid";
-	      this.target.style.display = "block";
-	      this.target.innerHTML = "";
-	
-	      var pages = this.book.pages.slice();
-	
-	      if (this.doubleSided) {
-	        if (this.book.pages.length % 2 !== 0) {
-	          var pg = new _page2.default(this.template);
-	          this.book.addPage(pg);
-	          pages.push(pg);
-	        }
-	        var spacerPage = new _page2.default(this.template);
-	        var spacerPage2 = new _page2.default(this.template);
-	        spacerPage.element.style.visibility = "hidden";
-	        spacerPage2.element.style.visibility = "hidden";
-	        pages.unshift(spacerPage);
-	        pages.push(spacerPage2);
-	      }
-	
-	      for (var i = 0; i < pages.length; i += this.doubleSided ? 2 : 1) {
-	        var wrap = this.printWrapper.cloneNode(false);
-	
-	        if (this.doubleSided) {
-	          var l = pages[i].element;
-	          var r = pages[i + 1].element;
-	          l.setAttribute("bindery-side", "left");
-	          r.setAttribute("bindery-side", "right");
-	          wrap.appendChild(l);
-	          wrap.appendChild(r);
-	        } else {
-	          var _pg = pages[i].element;
-	          _pg.setAttribute("bindery-side", "right");
-	          wrap.appendChild(_pg);
-	        }
-	        this.target.appendChild(wrap);
-	      }
-	    }
-	  }, {
-	    key: "renderPreview",
-	    value: function renderPreview() {
-	      this.mode = "preview";
-	      this.target.style.display = "block";
-	      this.target.innerHTML = "";
-	      this.flaps = [];
-	
-	      var pages = this.book.pages.slice();
-	
-	      if (this.doubleSided) {
-	        if (this.book.pages.length % 2 !== 0) {
-	          var pg = new _page2.default(this.template);
-	          this.book.addPage(pg);
-	        }
-	      }
-	      var spacerPage = new _page2.default(this.template);
-	      var spacerPage2 = new _page2.default(this.template);
-	      spacerPage.element.style.visibility = "hidden";
-	      spacerPage2.element.style.visibility = "hidden";
-	      pages.unshift(spacerPage);
-	      pages.push(spacerPage2);
-	
-	      var leafIndex = 0;
-	      for (var i = 1; i < pages.length - 1; i += this.doubleSided ? 2 : 1) {
-	        leafIndex++;
-	        var li = leafIndex;
-	        var flap = (0, _hyperscript2.default)("div.bindery-page3d", { onclick: function onclick() {
-	            // this.setLeaf(li-1);
-	          } });
-	        this.makeDraggable(flap);
-	        this.target.classList.add("bindery-stage3d");
-	        this.flaps.push(flap);
-	
-	        var l = pages[i].element;
-	        l.classList.add("bindery-page3d-front");
-	        flap.appendChild(l);
-	        if (this.doubleSided) {
-	          flap.classList.add("bindery-doubleSided");
-	          var r = pages[i + 1].element;
-	          r.classList.add("bindery-page3d-back");
-	          flap.appendChild(r);
-	        } else {
-	          var _r = (0, _hyperscript2.default)(".bindery-page.bindery-page3d-back");
-	          flap.appendChild(_r);
-	        }
-	        // flap.style.zIndex = `${this.book.pages.length - i}`;
-	        // flap.style.top = `${i * 4}px`;
-	        flap.style.left = i * 4 + "px";
-	        this.target.appendChild(flap);
-	      }
-	      this.setLeaf(0);
-	    }
-	  }, {
-	    key: "setLeaf",
-	    value: function setLeaf(n) {
-	      var _this = this;
-	
-	      this.currentLeaf = n;
-	      this.flaps.forEach(function (flap, i) {
-	        var z = _this.flaps.length - Math.abs(i - n);
-	        flap.style.transform = "translate3d(" + (i < n ? 4 : 0) + "px,0," + z * 5 + "px) rotateY(" + (i < n ? -180 : 0) + "deg)";
-	      });
-	    }
-	  }, {
-	    key: "makeDraggable",
-	    value: function makeDraggable(flap) {
-	      var _this2 = this;
-	
-	      var isDragging = false;
-	      var pct = 0;
-	      flap.addEventListener("mousedown", function () {
-	        isDragging = true;
-	        flap.style.transition = "none";
-	      });
-	      document.body.addEventListener("mousemove", function (e) {
-	        if (isDragging) {
-	          e.preventDefault();
-	          var pt = coords(e);
-	          pct = progress01(pt.x, 1000, 200);
-	          var ang = transition(pct, 0, -180);
-	          var z = _this2.flaps.length;
-	          flap.style.transform = "translate3d(" + 0 + "px,0," + z * 5 + "px) rotateY(" + ang + "deg)";
-	        }
-	      });
-	      document.body.addEventListener("mouseup", function (e) {
-	        if (isDragging) {
-	          isDragging = false;
-	          flap.style.transition = "";
-	          if (pct > 0.5) _this2.setLeaf(_this2.currentLeaf);else _this2.setLeaf(_this2.currentLeaf + 1);
-	        }
-	      });
-	    }
-	  }]);
-	
-	  return Printer;
-	}();
-	
-	var transition = function transition(pct, a, b) {
-	  return a + pct * (b - a);
-	};
-	var clamp = function clamp(val, min, max) {
-	  return val <= min ? min : val >= max ? max : val;
-	};
-	var progress = function progress(val, a, b) {
-	  return (val - a) / (b - a);
-	};
-	var progress01 = function progress01(val, a, b) {
-	  return clamp(progress(val, a, b), 0, 1);
-	};
-	var coords = function coords(e) {
-	  return e = e.touches && e.touches[0] || e, { x: e.pageX, y: e.pageY };
-	};
-	
-	exports.default = Printer;
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var split = __webpack_require__(11)
-	var ClassList = __webpack_require__(12)
-	
-	var w = typeof window === 'undefined' ? __webpack_require__(14) : window
+	var w = typeof window === 'undefined' ? __webpack_require__(13) : window
 	var document = w.document
 	var Text = w.Text
 	
@@ -1372,7 +1121,7 @@ var Bindery =
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports) {
 
 	/*!
@@ -1484,11 +1233,11 @@ var Bindery =
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// contains, add, remove, toggle
-	var indexof = __webpack_require__(13)
+	var indexof = __webpack_require__(12)
 	
 	module.exports = ClassList
 	
@@ -1589,7 +1338,7 @@ var Bindery =
 
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports) {
 
 	
@@ -1604,24 +1353,310 @@ var Bindery =
 	};
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(15);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./page.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./page.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
 /* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides [bindery-flowbox] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-footer] {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides [bindery-content] {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides [bindery-num] {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n\n.bindery-num {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] .bindery-num {\n  left: 20px;\n}\n[bindery-side=\"right\"] .bindery-num {\n  right: 20px;\n}\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _page = __webpack_require__(8);
+	
+	var _page2 = _interopRequireDefault(_page);
+	
+	var _hyperscript = __webpack_require__(9);
+	
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Printer = function () {
+	  function Printer(opts) {
+	    _classCallCheck(this, Printer);
+	
+	    this.book = opts.book;
+	
+	    if (opts.target) {
+	      this.target = opts.target;
+	    } else {
+	      this.target = (0, _hyperscript2.default)("div");
+	      document.body.appendChild(this.target);
+	    }
+	    this.target.setAttribute("bindery-export", true);
+	
+	    this.printWrapper = (0, _hyperscript2.default)("div.bindery-print-wrapper");
+	
+	    this.doubleSided = true;
+	    this.currentLeaf = 0;
+	  }
+	
+	  _createClass(Printer, [{
+	    key: "cancel",
+	    value: function cancel() {
+	      // TODO this doesn't work if the target is an existing node
+	      document.body.classList.remove("bindery-viewing");
+	      this.target.parentNode.removeChild(this.target);
+	    }
+	  }, {
+	    key: "toggleGuides",
+	    value: function toggleGuides() {
+	      this.target.classList.toggle("bindery-show-guides");
+	    }
+	  }, {
+	    key: "toggleDouble",
+	    value: function toggleDouble() {
+	      this.doubleSided = !this.doubleSided;
+	      this.update();
+	    }
+	  }, {
+	    key: "setGrid",
+	    value: function setGrid() {
+	      this.mode = "grid";
+	      this.update();
+	    }
+	  }, {
+	    key: "toggleInteractive",
+	    value: function toggleInteractive() {
+	      this.mode = this.mode == "grid" ? "preview" : "grid";
+	      this.update();
+	    }
+	  }, {
+	    key: "update",
+	    value: function update() {
+	      document.body.classList.add("bindery-viewing");
+	      switch (this.mode) {
+	        case "grid":
+	          this.renderGrid();
+	          break;
+	        case "preview":
+	          this.renderPreview();
+	          break;
+	        default:
+	          this.renderGrid();
+	      }
+	    }
+	  }, {
+	    key: "renderGrid",
+	    value: function renderGrid() {
+	      this.mode = "grid";
+	      this.target.style.display = "block";
+	      this.target.innerHTML = "";
+	
+	      var pages = this.book.pages.slice();
+	
+	      if (this.doubleSided) {
+	        if (this.book.pages.length % 2 !== 0) {
+	          var pg = new _page2.default();
+	          this.book.addPage(pg);
+	          pages.push(pg);
+	        }
+	        var spacerPage = new _page2.default();
+	        var spacerPage2 = new _page2.default();
+	        spacerPage.element.style.visibility = "hidden";
+	        spacerPage2.element.style.visibility = "hidden";
+	        pages.unshift(spacerPage);
+	        pages.push(spacerPage2);
+	      }
+	
+	      for (var i = 0; i < pages.length; i += this.doubleSided ? 2 : 1) {
+	        var wrap = this.printWrapper.cloneNode(false);
+	
+	        if (this.doubleSided) {
+	          var l = pages[i].element;
+	          var r = pages[i + 1].element;
+	          l.setAttribute("bindery-side", "left");
+	          r.setAttribute("bindery-side", "right");
+	          wrap.appendChild(l);
+	          wrap.appendChild(r);
+	        } else {
+	          var _pg = pages[i].element;
+	          _pg.setAttribute("bindery-side", "right");
+	          wrap.appendChild(_pg);
+	        }
+	        this.target.appendChild(wrap);
+	      }
+	    }
+	  }, {
+	    key: "renderPreview",
+	    value: function renderPreview() {
+	      this.mode = "preview";
+	      this.target.style.display = "block";
+	      this.target.innerHTML = "";
+	      this.flaps = [];
+	
+	      var pages = this.book.pages.slice();
+	
+	      if (this.doubleSided) {
+	        if (this.book.pages.length % 2 !== 0) {
+	          var pg = new _page2.default();
+	          this.book.addPage(pg);
+	        }
+	      }
+	      var spacerPage = new _page2.default();
+	      var spacerPage2 = new _page2.default();
+	      spacerPage.element.style.visibility = "hidden";
+	      spacerPage2.element.style.visibility = "hidden";
+	      pages.unshift(spacerPage);
+	      pages.push(spacerPage2);
+	
+	      var leafIndex = 0;
+	      for (var i = 1; i < pages.length - 1; i += this.doubleSided ? 2 : 1) {
+	        leafIndex++;
+	        var li = leafIndex;
+	        var flap = (0, _hyperscript2.default)("div.bindery-page3d", { onclick: function onclick() {
+	            // this.setLeaf(li-1);
+	          } });
+	        this.makeDraggable(flap);
+	        this.target.classList.add("bindery-stage3d");
+	        this.flaps.push(flap);
+	
+	        var l = pages[i].element;
+	        l.classList.add("bindery-page3d-front");
+	        flap.appendChild(l);
+	        if (this.doubleSided) {
+	          flap.classList.add("bindery-doubleSided");
+	          var r = pages[i + 1].element;
+	          r.classList.add("bindery-page3d-back");
+	          flap.appendChild(r);
+	        } else {
+	          var _r = (0, _hyperscript2.default)(".bindery-page.bindery-page3d-back");
+	          flap.appendChild(_r);
+	        }
+	        // flap.style.zIndex = `${this.book.pages.length - i}`;
+	        // flap.style.top = `${i * 4}px`;
+	        flap.style.left = i * 4 + "px";
+	        this.target.appendChild(flap);
+	      }
+	      this.setLeaf(0);
+	    }
+	  }, {
+	    key: "setLeaf",
+	    value: function setLeaf(n) {
+	      var _this = this;
+	
+	      this.currentLeaf = n;
+	      this.flaps.forEach(function (flap, i) {
+	        var z = _this.flaps.length - Math.abs(i - n);
+	        flap.style.transform = "translate3d(" + (i < n ? 4 : 0) + "px,0," + z * 5 + "px) rotateY(" + (i < n ? -180 : 0) + "deg)";
+	      });
+	    }
+	  }, {
+	    key: "makeDraggable",
+	    value: function makeDraggable(flap) {
+	      var _this2 = this;
+	
+	      var isDragging = false;
+	      var pct = 0;
+	      flap.addEventListener("mousedown", function () {
+	        isDragging = true;
+	        flap.style.transition = "none";
+	      });
+	      document.body.addEventListener("mousemove", function (e) {
+	        if (isDragging) {
+	          e.preventDefault();
+	          var pt = coords(e);
+	          pct = progress01(pt.x, 1000, 200);
+	          var ang = transition(pct, 0, -180);
+	          var z = _this2.flaps.length;
+	          flap.style.transform = "translate3d(" + 0 + "px,0," + z * 5 + "px) rotateY(" + ang + "deg)";
+	        }
+	      });
+	      document.body.addEventListener("mouseup", function (e) {
+	        if (isDragging) {
+	          isDragging = false;
+	          flap.style.transition = "";
+	          if (pct > 0.5) _this2.setLeaf(_this2.currentLeaf);else _this2.setLeaf(_this2.currentLeaf + 1);
+	        }
+	      });
+	    }
+	  }]);
+	
+	  return Printer;
+	}();
+	
+	var transition = function transition(pct, a, b) {
+	  return a + pct * (b - a);
+	};
+	var clamp = function clamp(val, min, max) {
+	  return val <= min ? min : val >= max ? max : val;
+	};
+	var progress = function progress(val, a, b) {
+	  return (val - a) / (b - a);
+	};
+	var progress01 = function progress01(val, a, b) {
+	  return clamp(progress(val, a, b), 0, 1);
+	};
+	var coords = function coords(e) {
+	  return e = e.touches && e.touches[0] || e, { x: e.pageX, y: e.pageY };
+	};
+	
+	exports.default = Printer;
+
+/***/ },
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _controls = __webpack_require__(16);
+	var _controls = __webpack_require__(18);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
-	var _hyperscript = __webpack_require__(10);
+	var _hyperscript = __webpack_require__(9);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
@@ -1700,13 +1735,13 @@ var Bindery =
 	module.exports = Controls;
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(17);
+	var content = __webpack_require__(19);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1726,7 +1761,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1740,7 +1775,7 @@ var Bindery =
 
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1749,7 +1784,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _spread = __webpack_require__(19);
+	var _spread = __webpack_require__(21);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
@@ -1782,13 +1817,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(20);
+	var content = __webpack_require__(22);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1808,7 +1843,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1816,13 +1851,13 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "[bindery-side=\"left\"].bindery-spread [bindery-content] {\n  width: 200%;\n  position: absolute;\n  left: 0;\n}\n[bindery-side=\"right\"].bindery-spread [bindery-content] {\n  width: 200%;\n  position: absolute;\n  right: 0;\n}\n", ""]);
+	exports.push([module.id, "[bindery-side=\"left\"].bindery-spread .bindery-content {\n  width: 200%;\n  position: absolute;\n  left: 0;\n}\n[bindery-side=\"right\"].bindery-spread .bindery-content {\n  width: 200%;\n  position: absolute;\n  right: 0;\n}\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1831,7 +1866,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _fullPage = __webpack_require__(22);
+	var _fullPage = __webpack_require__(24);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
@@ -1854,13 +1889,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(23);
+	var content = __webpack_require__(25);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1880,7 +1915,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1894,7 +1929,7 @@ var Bindery =
 
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1903,7 +1938,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _hyperscript = __webpack_require__(10);
+	var _hyperscript = __webpack_require__(9);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
