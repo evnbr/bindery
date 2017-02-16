@@ -1,5 +1,5 @@
 let binder = new Bindery({
-  source: document.querySelector(".content"),
+  source: ".content",
 });
 
 document.getElementById("makeBook").addEventListener("click", function(e) {
@@ -20,16 +20,16 @@ binder.defineRule({
   },
 });
 
-binder.defineRule({
-  selector: "p",
-  beforeAdd: (elmt, state) => {
-    let pg = state.currentPage;
-    let n = pg.footer.querySelectorAll(".footnote").length;
-    let fn = Bindery.h(".footnote", {}, `${n} ${elmt.textContent.substr(0,28)}`);
-    pg.footer.appendChild(fn);
-    elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
-  },
-});
+// binder.defineRule({
+//   selector: "p",
+//   beforeAdd: (elmt, state) => {
+//     let pg = state.currentPage;
+//     let n = pg.footer.querySelectorAll(".footnote").length;
+//     let fn = h(".footnote", {}, `${n} ${elmt.textContent.substr(0,28)}`);
+//     pg.footer.appendChild(fn);
+//     elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
+//   },
+// });
 
 binder.addRules(
   { selector: "a",           rule: Bindery.rule.footnote },

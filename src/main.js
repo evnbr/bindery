@@ -16,17 +16,22 @@ import footnote from "./Footnote/footnote";
 
 class Binder {
   constructor(opts) {
-    this.source = opts.source;
+
+    if (typeof opts.source == "string") {
+      this.source = document.querySelector(opts.source)
+    }
+    else if (opts.source instanceof HTMLElement) {
+      this.source = opts.source;
+    }
+    else {
+      console.error(`Bindery: Source should be an element or selector`);
+    }
+
     this.target = opts.target;
 
 
-    this.book = new Book();
     this.rules = [];
 
-    this.viewer = new Viewer({
-      book: this.book,
-      target: this.target,
-    });
     this.controls = new Controls({
       binder: this,
       viewer: this.viewer,
@@ -35,15 +40,7 @@ class Binder {
   }
   cancel() {
     this.viewer.cancel();
-    this.book = new Book();
     this.source.style.display = "";
-    this.viewer = new Viewer({
-      book: this.book,
-      target: this.target,
-    });
-  }
-  static get h() {
-    return h;
   }
 
   static get rule() {
@@ -74,6 +71,12 @@ class Binder {
     return pg;
   }
   bind(doneBinding) {
+
+    this.book = new Book();
+    this.viewer = new Viewer({
+      book: this.book,
+      target: this.target,
+    });
 
     let state = {
       elPath: new ElementPath(),

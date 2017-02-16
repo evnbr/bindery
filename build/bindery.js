@@ -103,16 +103,18 @@ var Bindery =
 	  function Binder(opts) {
 	    _classCallCheck(this, Binder);
 	
-	    this.source = opts.source;
+	    if (typeof opts.source == "string") {
+	      this.source = document.querySelector(opts.source);
+	    } else if (opts.source instanceof HTMLElement) {
+	      this.source = opts.source;
+	    } else {
+	      console.error("Bindery: Source should be an element or selector");
+	    }
+	
 	    this.target = opts.target;
 	
-	    this.book = new _book2.default();
 	    this.rules = [];
 	
-	    this.viewer = new _viewer2.default({
-	      book: this.book,
-	      target: this.target
-	    });
 	    this.controls = new _controls2.default({
 	      binder: this,
 	      viewer: this.viewer
@@ -123,12 +125,7 @@ var Bindery =
 	    key: "cancel",
 	    value: function cancel() {
 	      this.viewer.cancel();
-	      this.book = new _book2.default();
 	      this.source.style.display = "";
-	      this.viewer = new _viewer2.default({
-	        book: this.book,
-	        target: this.target
-	      });
 	    }
 	  }, {
 	    key: "defineRule",
@@ -163,6 +160,12 @@ var Bindery =
 	    key: "bind",
 	    value: function bind(doneBinding) {
 	      var _this2 = this;
+	
+	      this.book = new _book2.default();
+	      this.viewer = new _viewer2.default({
+	        book: this.book,
+	        target: this.target
+	      });
 	
 	      var state = {
 	        elPath: new _ElementPath2.default(),
@@ -430,11 +433,6 @@ var Bindery =
 	      });
 	    }
 	  }], [{
-	    key: "h",
-	    get: function get() {
-	      return _hyperscript2.default;
-	    }
-	  }, {
 	    key: "rule",
 	    get: function get() {
 	      return {
