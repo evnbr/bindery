@@ -6,7 +6,7 @@ import elementName from "./ElementName"
 import Book from "./book";
 import Page from "./page";
 import Printer from "./printer";
-import Controls from "./controls";
+import Controls from "./Controls/controls";
 import h from "hyperscript";
 
 
