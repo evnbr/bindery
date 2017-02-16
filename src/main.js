@@ -33,12 +33,11 @@ class Binder {
 
     this.controls = new Controls({
       binder: this,
-      viewer: this.viewer,
     });
 
-    if (opts.rules) {
-      this.addRules(...opts.rules);
-    }
+    if (opts.rules) this.addRules(...opts.rules);
+    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
+
 
   }
   cancel() {
@@ -99,7 +98,7 @@ class Binder {
     this.measureArea = h(".measureArea");
     document.body.appendChild(this.measureArea);
 
-    const DELAY = 0; // ms
+    const DELAY = this.debugDelay; // ms
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();

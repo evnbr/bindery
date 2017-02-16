@@ -119,13 +119,11 @@ var Bindery =
 	    this.rules = [];
 	
 	    this.controls = new _controls2.default({
-	      binder: this,
-	      viewer: this.viewer
+	      binder: this
 	    });
 	
-	    if (opts.rules) {
-	      this.addRules.apply(this, _toConsumableArray(opts.rules));
-	    }
+	    if (opts.rules) this.addRules.apply(this, _toConsumableArray(opts.rules));
+	    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 	  }
 	
 	  _createClass(Binder, [{
@@ -201,7 +199,7 @@ var Bindery =
 	      this.measureArea = (0, _hyperscript2.default)(".measureArea");
 	      document.body.appendChild(this.measureArea);
 	
-	      var DELAY = 0; // ms
+	      var DELAY = this.debugDelay; // ms
 	      var throttle = function throttle(func) {
 	        if (DELAY > 0) setTimeout(func, DELAY);else func();
 	      };
@@ -1734,7 +1732,6 @@ var Bindery =
 	    document.body.appendChild(this.holder);
 	
 	    this.binder = opts.binder;
-	    var viewer = opts.viewer;
 	
 	    var start = function start() {
 	      _this.setState("working");
@@ -1745,16 +1742,16 @@ var Bindery =
 	      _this.setState("start");
 	    };
 	    var guides = function guides() {
-	      viewer.toggleGuides();
+	      opts.binder.viewer.toggleGuides();
 	    };
 	    var interactive = function interactive() {
-	      viewer.toggleInteractive();
+	      opts.binder.viewer.toggleInteractive();
 	    };
 	    var double = function double() {
-	      viewer.toggleDouble();
+	      opts.binder.viewer.toggleDouble();
 	    };
 	    var print = function print() {
-	      viewer.setGrid();
+	      opts.binder.viewer.setGrid();
 	      window.print();
 	    };
 	

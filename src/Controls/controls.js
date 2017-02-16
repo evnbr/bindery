@@ -17,7 +17,6 @@ class Controls {
     document.body.appendChild(this.holder);
 
     this.binder = opts.binder;
-    let viewer = opts.viewer
 
     const start = () => {
       this.setState("working");
@@ -28,16 +27,16 @@ class Controls {
       this.setState("start");
     };
     const guides = () => {
-      viewer.toggleGuides();
+      opts.binder.viewer.toggleGuides();
     };
     const interactive = () => {
-      viewer.toggleInteractive();
+      opts.binder.viewer.toggleInteractive();
     };
     const double = () => {
-      viewer.toggleDouble();
+      opts.binder.viewer.toggleDouble();
     };
     const print = () =>  {
-      viewer.setGrid();
+      opts.binder.viewer.setGrid();
       window.print();
     }
 
