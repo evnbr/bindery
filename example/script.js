@@ -1,20 +1,13 @@
+let getLink = (n, elmt) => `${n} Link to <a href='#'>${elmt.href}</a>`;
+let getSample = (n, elmt) => `${n} ${elmt.textContent.substr(0,28)}`;
+
 let binder = new Bindery({
   source: ".content",
   rules: [
-    { selector: "h2",          rule: Bindery.rule.breakBefore },
-    { selector: "a",           rule: Bindery.rule.footnote },
-    { selector: ".med-figure", rule: Bindery.rule.fullPage },
-    { selector: ".big-figure", rule: Bindery.rule.spread }
+    { selector: "h2",           rule: Bindery.rule.breakBefore },
+    { selector: "a",            rule: Bindery.rule.footnote(getLink) },
+    { selector: "p",            rule: Bindery.rule.footnote(getSample) },
+    { selector: ".med-figure",  rule: Bindery.rule.fullPage },
+    { selector: ".big-figure",  rule: Bindery.rule.spread }
   ],
 });
-
-// binder.defineRule({
-//   selector: "p",
-//   beforeAdd: (elmt, state) => {
-//     let pg = state.currentPage;
-//     let n = pg.footer.querySelectorAll(".footnote").length;
-//     let fn = h(".footnote", {}, `${n} ${elmt.textContent.substr(0,28)}`);
-//     pg.footer.appendChild(fn);
-//     elmt.insertAdjacentHTML("beforeend", `<sup>${n}</sup>`);
-//   },
-// });

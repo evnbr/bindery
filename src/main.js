@@ -9,9 +9,9 @@ import Viewer from "./Viewer/viewer";
 import Controls from "./Controls/controls";
 import h from "hyperscript";
 
-import spread from "./Spread/spread";
-import fullPage from "./FullPage/fullPage";
-import footnote from "./Footnote/footnote";
+import spread from "./Rules/Spread/spread";
+import fullPage from "./Rules/FullPage/fullPage";
+import footnote from "./Rules/Footnote/footnote";
 import breakBefore from "./Rules/breakBefore";
 
 

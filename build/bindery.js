@@ -1880,8 +1880,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./spread.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./spread.css");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./spread.css", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./spread.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -1952,8 +1952,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./fullPage.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./fullPage.css");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./fullPage.css", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./fullPage.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -1986,21 +1986,23 @@ var Bindery =
 	  value: true
 	});
 	
+	exports.default = function (textGetter) {
+	  return {
+	    beforeAdd: function beforeAdd(elmt, state) {
+	      var fn = (0, _hyperscript2.default)(".footnote");
+	      var n = state.currentPage.footer.querySelectorAll(".footnote").length;
+	      fn.innerHTML = textGetter(n, elmt);
+	      state.currentPage.footer.appendChild(fn);
+	      elmt.insertAdjacentHTML("beforeend", "<sup>" + n + "</sup>");
+	    }
+	  };
+	};
+	
 	var _hyperscript = __webpack_require__(9);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
-	
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.default = {
-	  beforeAdd: function beforeAdd(elmt, state) {
-	    var fn = (0, _hyperscript2.default)(".footnote");
-	    var n = state.currentPage.footer.querySelectorAll(".footnote").length;
-	    fn.innerHTML = n + " Link to <a href='#'>" + elmt.href + "</a>";
-	    state.currentPage.footer.appendChild(fn);
-	    elmt.insertAdjacentHTML("beforeend", "<sup>" + n + "</sup>");
-	  }
-	};
 
 /***/ },
 /* 29 */
