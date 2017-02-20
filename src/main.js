@@ -7,12 +7,10 @@ import Book from "./book";
 import Page from "./Page/page";
 import Viewer from "./Viewer/viewer";
 import Controls from "./Controls/controls";
-import h from "hyperscript";
 
-import spread from "./Rules/Spread/spread";
-import fullPage from "./Rules/FullPage/fullPage";
-import footnote from "./Rules/Footnote/footnote";
-import breakBefore from "./Rules/breakBefore";
+import Rules from "./Rules/";
+
+import h from "hyperscript";
 
 
 class Binder {
@@ -46,12 +44,8 @@ class Binder {
   }
 
   static get rule() {
-    return {
-      spread: spread,
-      fullPage: fullPage,
-      footnote: footnote,
-      breakBefore: breakBefore,
-    }
+    console.log(Rules);
+    return Rules;
   }
 
   defineRule(rule) {

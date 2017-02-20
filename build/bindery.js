@@ -77,25 +77,13 @@ var Bindery =
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
+	var _Rules = __webpack_require__(22);
+	
+	var _Rules2 = _interopRequireDefault(_Rules);
+	
 	var _hyperscript = __webpack_require__(9);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
-	
-	var _spread = __webpack_require__(22);
-	
-	var _spread2 = _interopRequireDefault(_spread);
-	
-	var _fullPage = __webpack_require__(25);
-	
-	var _fullPage2 = _interopRequireDefault(_fullPage);
-	
-	var _footnote = __webpack_require__(28);
-	
-	var _footnote2 = _interopRequireDefault(_footnote);
-	
-	var _breakBefore = __webpack_require__(29);
-	
-	var _breakBefore2 = _interopRequireDefault(_breakBefore);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -440,12 +428,8 @@ var Bindery =
 	  }], [{
 	    key: "rule",
 	    get: function get() {
-	      return {
-	        spread: _spread2.default,
-	        fullPage: _fullPage2.default,
-	        footnote: _footnote2.default,
-	        breakBefore: _breakBefore2.default
-	      };
+	      console.log(_Rules2.default);
+	      return _Rules2.default;
 	    }
 	  }]);
 	
@@ -1836,6 +1820,41 @@ var Bindery =
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
+	var _fullPage = __webpack_require__(26);
+	
+	var _fullPage2 = _interopRequireDefault(_fullPage);
+	
+	var _footnote = __webpack_require__(29);
+	
+	var _footnote2 = _interopRequireDefault(_footnote);
+	
+	var _breakBefore = __webpack_require__(30);
+	
+	var _breakBefore2 = _interopRequireDefault(_breakBefore);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	  spread: _spread2.default,
+	  fullPage: _fullPage2.default,
+	  footnote: _footnote2.default,
+	  breakBefore: _breakBefore2.default
+	};
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _spread = __webpack_require__(24);
+	
+	var _spread2 = _interopRequireDefault(_spread);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
@@ -1865,13 +1884,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(24);
+	var content = __webpack_require__(25);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1891,7 +1910,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1905,7 +1924,7 @@ var Bindery =
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1914,7 +1933,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _fullPage = __webpack_require__(26);
+	var _fullPage = __webpack_require__(27);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
@@ -1937,13 +1956,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(27);
+	var content = __webpack_require__(28);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1963,7 +1982,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1977,7 +1996,7 @@ var Bindery =
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2005,7 +2024,7 @@ var Bindery =
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports) {
 
 	"use strict";
