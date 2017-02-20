@@ -1,13 +1,14 @@
 class Book {
   constructor(opts) {
-
-    this.pageNum = 1;
     this.pages = [];
   }
   addPage(page) {
-    page.setNumber(this.pageNum);
-    this.pageNum++;
     this.pages.push(page);
+  }
+  number() {
+    this.pages.forEach((pg, i) => {
+      pg.pageNumber.textContent = (i + 1);
+    });
   }
 }
 

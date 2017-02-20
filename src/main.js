@@ -54,7 +54,7 @@ class Binder {
       this.rules.push(rules[selector]);
     }
   }
-  
+
   addPage() {
     let pg = new Page();
     this.measureArea.appendChild(pg.element);
@@ -315,6 +315,7 @@ class Binder {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);
 
+      this.book.number();
       this.controls.setState("done");
       this.viewer.update();
 

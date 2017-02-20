@@ -407,6 +407,7 @@ var Bindery =
 	        console.log("wow we're done!");
 	        document.body.removeChild(_this.measureArea);
 	
+	        _this.book.number();
 	        _this.controls.setState("done");
 	        _this.viewer.update();
 	
@@ -868,16 +869,20 @@ var Bindery =
 	  function Book(opts) {
 	    _classCallCheck(this, Book);
 	
-	    this.pageNum = 1;
 	    this.pages = [];
 	  }
 	
 	  _createClass(Book, [{
 	    key: "addPage",
 	    value: function addPage(page) {
-	      page.setNumber(this.pageNum);
-	      this.pageNum++;
 	      this.pages.push(page);
+	    }
+	  }, {
+	    key: "number",
+	    value: function number() {
+	      this.pages.forEach(function (pg, i) {
+	        pg.pageNumber.textContent = i + 1;
+	      });
 	    }
 	  }]);
 	
@@ -892,8 +897,6 @@ var Bindery =
 
 	"use strict";
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
 	var _hyperscript = __webpack_require__(9);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
@@ -906,26 +909,15 @@ var Bindery =
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Page = function () {
-	  function Page(template) {
-	    _classCallCheck(this, Page);
+	var Page = function Page(template) {
+	  _classCallCheck(this, Page);
 	
-	    this.element = (0, _hyperscript2.default)(".bindery-page", (0, _hyperscript2.default)(".bindery-flowbox", (0, _hyperscript2.default)(".bindery-content")), (0, _hyperscript2.default)(".bindery-num"), (0, _hyperscript2.default)(".bindery-footer"));
-	    this.flowBox = this.element.querySelector(".bindery-flowbox");
-	    this.flowContent = this.element.querySelector(".bindery-content");
-	    this.footer = this.element.querySelector(".bindery-footer");
-	  }
-	
-	  _createClass(Page, [{
-	    key: "setNumber",
-	    value: function setNumber(n) {
-	      var num = this.element.querySelector(".bindery-num");
-	      num.textContent = n;
-	    }
-	  }]);
-	
-	  return Page;
-	}();
+	  this.element = (0, _hyperscript2.default)(".bindery-page", (0, _hyperscript2.default)(".bindery-flowbox", (0, _hyperscript2.default)(".bindery-content")), (0, _hyperscript2.default)(".bindery-num"), (0, _hyperscript2.default)(".bindery-footer"));
+	  this.flowBox = this.element.querySelector(".bindery-flowbox");
+	  this.flowContent = this.element.querySelector(".bindery-content");
+	  this.footer = this.element.querySelector(".bindery-footer");
+	  this.pageNumber = this.element.querySelector(".bindery-num");
+	};
 	
 	module.exports = Page;
 
