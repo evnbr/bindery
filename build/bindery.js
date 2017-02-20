@@ -110,7 +110,14 @@ var Bindery =
 	      binder: this
 	    });
 	
-	    if (opts.rules) this.addRules.apply(this, _toConsumableArray(opts.rules));
+	    // if (opts.rules) this.addRules(...opts.rules);
+	    if (opts.rules) {
+	      for (var selector in opts.rules) {
+	        var rule = opts.rules[selector];
+	        rule.selector = selector;
+	        this.rules.push(rule);
+	      }
+	    }
 	    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 	  }
 	
@@ -2010,7 +2017,7 @@ var Bindery =
 	    beforeAdd: function beforeAdd(elmt, state) {
 	      var fn = (0, _hyperscript2.default)(".footnote");
 	      var n = state.currentPage.footer.querySelectorAll(".footnote").length;
-	      fn.innerHTML = textGetter(n, elmt);
+	      fn.innerHTML = n + " " + textGetter(elmt);
 	      state.currentPage.footer.appendChild(fn);
 	      elmt.insertAdjacentHTML("beforeend", "<sup>" + n + "</sup>");
 	    }

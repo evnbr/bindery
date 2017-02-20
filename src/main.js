@@ -33,7 +33,14 @@ class Binder {
       binder: this,
     });
 
-    if (opts.rules) this.addRules(...opts.rules);
+    // if (opts.rules) this.addRules(...opts.rules);
+    if (opts.rules) {
+      for (let selector in opts.rules) {
+        let rule = opts.rules[selector];
+        rule.selector = selector;
+        this.rules.push(rule);
+      }
+    }
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
 

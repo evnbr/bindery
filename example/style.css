@@ -50,15 +50,14 @@ figcaption {
   margin: 1rem 0;
 }
 
-
 #makeBook {
-  /*position: fixed;*/
-  /*bottom: 1em;*/
-  /*right: 1em;*/
   display: inline-block;
   background: black;
   color: white;
   font-family: sans-serif;
   padding: 1em 1.5em;
   cursor: pointer;
+}
+#makeBook:hover {
+  background: navy;
 }
