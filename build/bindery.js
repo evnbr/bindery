@@ -111,13 +111,7 @@ var Bindery =
 	    });
 	
 	    // if (opts.rules) this.addRules(...opts.rules);
-	    if (opts.rules) {
-	      for (var selector in opts.rules) {
-	        var rule = opts.rules[selector];
-	        rule.selector = selector;
-	        this.rules.push(rule);
-	      }
-	    }
+	    if (opts.rules) this.addRules(opts.rules);
 	    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 	  }
 	
@@ -128,25 +122,12 @@ var Bindery =
 	      this.source.style.display = "";
 	    }
 	  }, {
-	    key: "defineRule",
-	    value: function defineRule(rule) {
-	      this.rules.push(rule);
-	    }
-	  }, {
-	    key: "addRule",
-	    value: function addRule(opt) {
-	      opt.rule.selector = opt.selector;
-	      this.rules.push(opt.rule);
-	    }
-	  }, {
 	    key: "addRules",
-	    value: function addRules() {
-	      var _this = this;
-	
-	      [].concat(Array.prototype.slice.call(arguments)).forEach(function (opt) {
-	        opt.rule.selector = opt.selector;
-	        _this.rules.push(opt.rule);
-	      });
+	    value: function addRules(rules) {
+	      for (var selector in rules) {
+	        rules[selector].selector = selector;
+	        this.rules.push(rules[selector]);
+	      }
 	    }
 	  }, {
 	    key: "addPage",
@@ -159,7 +140,7 @@ var Bindery =
 	  }, {
 	    key: "bind",
 	    value: function bind(doneBinding) {
-	      var _this2 = this;
+	      var _this = this;
 	
 	      this.book = new _book2.default();
 	      this.viewer = new _viewer2.default({
@@ -200,7 +181,7 @@ var Bindery =
 	      };
 	
 	      var beforeAddRules = function beforeAddRules(elmt) {
-	        _this2.rules.forEach(function (rule) {
+	        _this.rules.forEach(function (rule) {
 	          if (elmt.matches(rule.selector)) {
 	            if (rule.beforeAdd) {
 	
@@ -210,7 +191,7 @@ var Bindery =
 	
 	              if (hasOverflowed()) {
 	                // restore from backup
-	                _this2.measureArea.replaceChild(backupPg, state.currentPage.element);
+	                _this.measureArea.replaceChild(backupPg, state.currentPage.element);
 	                elmt.innerHTML = backupElmt.innerHTML; // TODO: fix this
 	                state.currentPage.element = backupPg;
 	
@@ -224,7 +205,7 @@ var Bindery =
 	        });
 	      };
 	      var afterAddRules = function afterAddRules(elmt) {
-	        _this2.rules.forEach(function (rule) {
+	        _this.rules.forEach(function (rule) {
 	          if (elmt.matches(rule.selector)) {
 	            if (rule.afterAdd) {
 	              rule.afterAdd(elmt, state);
@@ -240,14 +221,14 @@ var Bindery =
 	      };
 	
 	      var finishPage = function finishPage(pg) {
-	        _this2.measureArea.removeChild(pg.element);
+	        _this.measureArea.removeChild(pg.element);
 	      };
 	
 	      // Creates clones for ever level of tag
 	      // we were in when we overflowed the last page
 	      var makeContinuation = function makeContinuation() {
 	        state.elPath = state.elPath.clone();
-	        var newPage = _this2.addPage();
+	        var newPage = _this.addPage();
 	        newPage.flowContent.appendChild(state.elPath.root);
 	        return newPage;
 	      };
@@ -424,18 +405,17 @@ var Bindery =
 	      this.source.style.display = "none";
 	      addElementNode(content, function () {
 	        console.log("wow we're done!");
-	        document.body.removeChild(_this2.measureArea);
+	        document.body.removeChild(_this.measureArea);
 	
-	        _this2.controls.setState("done");
-	        _this2.viewer.update();
+	        _this.controls.setState("done");
+	        _this.viewer.update();
 	
-	        if (doneBinding) doneBinding(_this2.book);
+	        if (doneBinding) doneBinding(_this.book);
 	      });
 	    }
 	  }], [{
 	    key: "rule",
 	    get: function get() {
-	      console.log(_Rules2.default);
 	      return _Rules2.default;
 	    }
 	  }]);

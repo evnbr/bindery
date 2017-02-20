@@ -34,13 +34,7 @@ class Binder {
     });
 
     // if (opts.rules) this.addRules(...opts.rules);
-    if (opts.rules) {
-      for (let selector in opts.rules) {
-        let rule = opts.rules[selector];
-        rule.selector = selector;
-        this.rules.push(rule);
-      }
-    }
+    if (opts.rules) this.addRules(opts.rules);
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
 
@@ -51,23 +45,16 @@ class Binder {
   }
 
   static get rule() {
-    console.log(Rules);
     return Rules;
   }
 
-  defineRule(rule) {
-    this.rules.push(rule);
+  addRules(rules) {
+    for (let selector in rules) {
+      rules[selector].selector = selector;
+      this.rules.push(rules[selector]);
+    }
   }
-  addRule(opt) {
-    opt.rule.selector = opt.selector;
-    this.rules.push(opt.rule);
-  }
-  addRules() {
-    [...arguments].forEach((opt) => {
-      opt.rule.selector = opt.selector;
-      this.rules.push(opt.rule);
-    });
-  }
+  
   addPage() {
     let pg = new Page();
     this.measureArea.appendChild(pg.element);
