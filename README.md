@@ -3,24 +3,22 @@
 ## Intro
 
 bindery.js is a questionably useful library for producing book layouts in the
-browser. The core library flows text content over several pages. It included modules for common layout tasks, including numbering, running headers, out-of-flow spreads, and more.
+browser. The core library flows text content over multiple pages. It also includes modules for common book elements, including numbering, running headers, out-of-flow spreads, and more. The modules can be applied in order to map web conventions to print conventions,
+like displaying hyperlink destinations as footnotes.
 
 ## Background
 
-bindery.js was originally written for [for/with/in](http://htmloutput.risd.gd/),
-a publication from the members of "HTML Output" at RISD in Spring 2014. It consisted mostly of a series of hacks written in jQuery on top of a CSS
-Regions polyfill.
+bindery.js was originally written in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
+a publication from participants in "HTML Output" at RISD. It consisted mostly of a series of hacks written in jQuery on top of [Remy Francois's CSS
+Regions polyfill](https://github.com/FremyCompany/css-regions-polyfill), but it was enough
+to publish a book without touching inDesign.
 
 In 2016, Catherine and Lukas adapted the code into an easy-to-use [Jekyll](https://jekyllrb.com/) theme for
 the Design Office, under the name [Baby Bindery](https://github.com/thedesignoffice/babybindery).
 
-As of February 2017, it is being rewritten as a usable, modular library (and without
-a dependency on jQuery or a polyfill for the [much-maligned CSS Regions spec](https://alistapart.com/blog/post/css-regions-considered-harmful)).
+As of February 2017, it is in the process of being rewritten as a usable, modular library (and without a dependency on jQuery or a polyfill for the [much-maligned CSS Regions spec](https://alistapart.com/blog/post/css-regions-considered-harmful)).
 
 ## Getting started
-
-Bindery takes HTML content and applies a series of rules to map web conventions
-(like links) into print conventions (like footnotes).
 
 ```
 <html>
@@ -51,10 +49,11 @@ Bindery takes HTML content and applies a series of rules to map web conventions
 
 TK
 
-## Future
+## Future Plans
 
 - Page Number references (Tables of Contents, Indexes)
-- More control over spreads
+- More control over spreads and ordering
 - Customizable page sizing
-- Examples for use with blogging platforms and virtual-DOM libraries.
-- Documentation
+- Examples for use with blogging platforms
+- Wrappers for React/virtualDOM libraries.
+- More Documentation

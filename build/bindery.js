@@ -358,54 +358,51 @@ var Bindery =
 	          }
 	          var child = childNodes[index];
 	          index += 1;
+	          switch (child.nodeType) {
+	            case Node.TEXT_NODE:
+	              var cancel = function cancel() {
+	                var lastEl = state.elPath.pop();
+	                if (state.elPath.items.length < 1) {
+	                  // console.log(lastEl);
+	                  // console.log(child);
+	                  console.error("Bindery: Failed to add textNode \"" + child.nodeValue + "\" to " + (0, _ElementName2.default)(lastEl) + ". Page might be too small?");
+	                  return;
+	                }
 	
-	          (function () {
-	            switch (child.nodeType) {
-	              case Node.TEXT_NODE:
-	                var cancel = function cancel() {
-	                  var lastEl = state.elPath.pop();
-	                  if (state.elPath.items.length < 1) {
-	                    // console.log(lastEl);
-	                    // console.log(child);
-	                    console.error("Bindery: Failed to add textNode \"" + child.nodeValue + "\" to " + (0, _ElementName2.default)(lastEl) + ". Page might be too small?");
-	                    return;
-	                  }
+	                var fn = state.currentPage.footer.lastChild; // <--
 	
-	                  var fn = state.currentPage.footer.lastChild; // <--
+	                finishPage(state.currentPage);
+	                state.currentPage = makeContinuation();
 	
-	                  finishPage(state.currentPage);
-	                  state.currentPage = makeContinuation();
+	                if (fn) state.currentPage.footer.appendChild(fn); // <--
 	
-	                  if (fn) state.currentPage.footer.appendChild(fn); // <--
-	
-	                  state.elPath.last.appendChild(node);
-	                  state.elPath.push(node);
-	                  addTextNode(child, addNextChild, cancel);
-	                };
+	                state.elPath.last.appendChild(node);
+	                state.elPath.push(node);
 	                addTextNode(child, addNextChild, cancel);
-	                break;
-	              case Node.ELEMENT_NODE:
-	                {
-	                  if (child.tagName == "SCRIPT") {
-	                    addNextChild(); // skip
-	                    break;
-	                  }
-	
-	                  beforeAddRules(child);
-	
-	                  throttle(function () {
-	                    addElementNode(child, function () {
-	                      state.elPath.pop();
-	                      afterAddRules(child);
-	                      addNextChild();
-	                    });
-	                  });
+	              };
+	              addTextNode(child, addNextChild, cancel);
+	              break;
+	            case Node.ELEMENT_NODE:
+	              {
+	                if (child.tagName == "SCRIPT") {
+	                  addNextChild(); // skip
 	                  break;
 	                }
-	              default:
-	                console.log("Bindery: Unknown node type: " + child.nodeType);
-	            }
-	          })();
+	
+	                beforeAddRules(child);
+	
+	                throttle(function () {
+	                  addElementNode(child, function () {
+	                    state.elPath.pop();
+	                    afterAddRules(child);
+	                    addNextChild();
+	                  });
+	                });
+	                break;
+	              }
+	            default:
+	              console.log("Bindery: Unknown node type: " + child.nodeType);
+	          }
 	        };
 	
 	        // kick it off
@@ -455,8 +452,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js!./bindery.css", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js!./bindery.css");
+			module.hot.accept("!!../node_modules/css-loader/index.js!./bindery.css", function() {
+				var newContent = require("!!../node_modules/css-loader/index.js!./bindery.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -1346,8 +1343,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./page.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./page.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./page.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./page.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -1636,8 +1633,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./viewer.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./viewer.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./viewer.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./viewer.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -1766,8 +1763,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./controls.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./controls.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./controls.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./controls.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -1900,8 +1897,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./fullPage.css", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./fullPage.css");
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./fullPage.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./fullPage.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -1985,8 +1982,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./spread.css", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./spread.css");
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./spread.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./spread.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -2085,8 +2082,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./pageNumber.css", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./pageNumber.css");
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./pageNumber.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./pageNumber.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -2159,8 +2156,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./runningHeader.css", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./runningHeader.css");
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./runningHeader.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./runningHeader.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
