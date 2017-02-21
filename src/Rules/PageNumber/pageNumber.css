@@ -1,0 +1,19 @@
+@media screen {
+  .bindery-show-guides .bindery-num {
+    outline: 1px solid cyan;
+  }
+}
+
+.bindery-num {
+  position: absolute;
+  text-align: center;
+  bottom: 20px;
+  /*font-size: 0.66em;*/
+}
+
+[bindery-side="left"] .bindery-num {
+  left: 20px;
+}
+[bindery-side="right"] .bindery-num {
+  right: 20px;
+}

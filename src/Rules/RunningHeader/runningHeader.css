@@ -1,0 +1,21 @@
+@media screen {
+  .bindery-show-guides .bindery-running-header {
+    outline: 1px solid cyan;
+  }
+}
+
+.bindery-running-header {
+  position: absolute;
+  text-align: center;
+  top: 20px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  font-size: 0.66em;
+}
+[bindery-side="left"] .bindery-running-header {
+  /*right: 40px;*/
+}
+[bindery-side="right"] .bindery-running-header {
+  /*left: 40px;*/
+}

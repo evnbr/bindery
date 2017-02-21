@@ -1,0 +1,64 @@
+* {
+  font: inherit;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: sans-serif;
+}
+
+.content, .intro {
+  font-family: Georgia;
+  font-size: 16px;
+  margin: 20px auto;
+  max-width: 900px;
+  padding: 20px;
+}
+
+h2 {
+  font-size: 3em;
+  margin-bottom: 1rem;
+}
+
+p {
+  text-indent: 1rem;
+}
+
+sup {
+  font-size: 0.66em;
+}
+
+figure {
+  width: 100%;
+  background: gray;
+  /*padding-bottom: 400px;*/
+  padding-bottom: 70%;
+  position: relative;
+}
+
+figcaption {
+  position: absolute;
+  bottom: 0;
+  padding: 2em;
+}
+
+.aside {
+  background: #ffffcc;
+  border: 1px solid black;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+#makeBook {
+  display: inline-block;
+  background: black;
+  color: white;
+  font-family: sans-serif;
+  padding: 1em 1.5em;
+  cursor: pointer;
+}
+#makeBook:hover {
+  background: navy;
+}

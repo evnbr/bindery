@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+	<title>Bindery Example</title>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+
+	<section class="intro">
+		<h2>Bindery.js</h2>
+		<div id="makeBook" onclick="binder.bind();">Make Book</div>
+	</section>
+
+  <section class="content">
+    <h2 bindery-break="before">
+      Section 1 and maybe the ok <a href="#">something longer</a>
+    </h2>
+
+    <script>
+      for (var i = 0; i < 10; i++) {
+        document.write(`<p>This is paragraph 1:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
+      }
+    </script>
+
+		<figure class="big-figure">
+      <figcaption>This is the caption. Just imagine its a really great explanation of everything you'd want to know about this.</figcaption>
+    </figure>
+
+    <div class="aside" id="test" bindery-break="avoid">
+      <script>
+        for (var i = 0; i < 10; i++) {
+          document.write(`<p>This is aside 1:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
+        }
+      </script>
+    </div>
+
+    <h2 bindery-break="before">Section 2</h2>
+
+    <figure bindery-break="avoid">
+      <figcaption>This is the caption. Just imagine its a really great explanation of everything you'd want to know about this.</figcaption>
+    </figure>
+
+    <script>
+      for (var i = 0; i < 10; i++) {
+        document.write(`<p>This is paragraph 2:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
+      }
+    </script>
+
+		<figure class="med-figure">
+      <figcaption>This is the caption. Just imagine its a really great explanation of everything you'd want to know about this.</figcaption>
+    </figure>
+
+		<figure class="med-figure bleed">
+      <figcaption>This is the caption. Just imagine its a really great explanation of everything you'd want to know about this.</figcaption>
+    </figure>
+
+		<script>
+    for (var i = 0; i < 20; i++) {
+      document.write(`<p>This is paragraph 2.1:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
+    }
+    </script>
+		<h2 bindery-break="before">Section 3</h2>
+
+		<script>
+    for (var i = 0; i < 20; i++) {
+      document.write(`<p>This is paragraph 3:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
+    }
+    </script>
+		<h2 bindery-break="before">Section 4</h2>
+
+		<script>
+    for (var i = 0; i < 20; i++) {
+      document.write(`<p>This is paragraph 4:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
+    }
+    </script>
+		<h2 bindery-break="before">Section 5</h2>
+
+		<script>
+    for (var i = 0; i < 20; i++) {
+      document.write(`<p>This is paragraph 5:${i}. ${(new Array(parseInt(Math.random()*50))).join(" Blah ")} End.</p>`)
+    }
+    </script>
+  </section>
+
+
+	<script type="text/javascript" src="../build/bindery.js"></script>
+	<script type="text/javascript" src="script.js"></script>
+</body>
+</html>
