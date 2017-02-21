@@ -1,12 +1,12 @@
-import spread from "./Spread/spread";
+import Spread from "./Spread/spread";
 import fullPage from "./FullPage/fullPage";
-import footnote from "./Footnote/footnote";
+import Footnote from "./Footnote";
 import breakBefore from "./breakBefore";
 
 
 export default {
-  spread: spread,
-  fullPage: fullPage,
-  footnote: footnote,
-  breakBefore: breakBefore,
+  Spread: Spread,
+  FullPage: fullPage,
+  Footnote: Footnote,
+  BreakBefore: breakBefore,
 }

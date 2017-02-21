@@ -125,6 +125,7 @@ var Bindery =
 	    key: "addRules",
 	    value: function addRules(rules) {
 	      for (var selector in rules) {
+	        console.log(selector);
 	        rules[selector].selector = selector;
 	        this.rules.push(rules[selector]);
 	      }
@@ -414,15 +415,14 @@ var Bindery =
 	        if (doneBinding) doneBinding(_this.book);
 	      });
 	    }
-	  }], [{
-	    key: "rule",
-	    get: function get() {
-	      return _Rules2.default;
-	    }
 	  }]);
 	
 	  return Binder;
 	}();
+	
+	for (var rule in _Rules2.default) {
+	  Binder[rule] = _Rules2.default[rule];
+	}
 	
 	module.exports = Binder;
 
@@ -1803,9 +1803,9 @@ var Bindery =
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
-	var _footnote = __webpack_require__(29);
+	var _Footnote = __webpack_require__(29);
 	
-	var _footnote2 = _interopRequireDefault(_footnote);
+	var _Footnote2 = _interopRequireDefault(_Footnote);
 	
 	var _breakBefore = __webpack_require__(30);
 	
@@ -1814,10 +1814,10 @@ var Bindery =
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
-	  spread: _spread2.default,
-	  fullPage: _fullPage2.default,
-	  footnote: _footnote2.default,
-	  breakBefore: _breakBefore2.default
+	  Spread: _spread2.default,
+	  FullPage: _fullPage2.default,
+	  Footnote: _Footnote2.default,
+	  BreakBefore: _breakBefore2.default
 	};
 
 /***/ },

@@ -44,10 +44,6 @@ class Binder {
     this.source.style.display = "";
   }
 
-  static get rule() {
-    return Rules;
-  }
-
   addRules(rules) {
     for (let selector in rules) {
       rules[selector].selector = selector;
@@ -322,6 +318,10 @@ class Binder {
       if (doneBinding) doneBinding(this.book);
     });
   }
+}
+
+for (let rule in Rules) {
+  Binder[rule] = Rules[rule];
 }
 
 
