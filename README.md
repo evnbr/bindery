@@ -1,6 +1,6 @@
-# 📖 Bindery.js
+# Bindery.js
 
-## Intro
+## About
 
 bindery.js is a questionably useful library for producing book layouts in the
 browser. The core library flows text content over multiple pages. It also includes modules for common book elements, including numbering, running headers, out-of-flow spreads, and more. The modules can be applied in order to map web conventions to print conventions,
@@ -39,7 +39,7 @@ As of February 2017, it is in the process of being rewritten as a usable, modula
       },
     });
 
-    binder.bind();
+    binder.makeBook();
   </script>
 </html>
 

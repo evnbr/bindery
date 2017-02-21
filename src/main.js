@@ -51,7 +51,7 @@ class Binder {
     }
   }
 
-  bind(doneBinding) {
+  makeBook(doneBinding) {
 
     this.book = new Book();
     this.viewer = new Viewer({

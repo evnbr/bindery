@@ -130,8 +130,8 @@ var Bindery =
 	      }
 	    }
 	  }, {
-	    key: "bind",
-	    value: function bind(doneBinding) {
+	    key: "makeBook",
+	    value: function makeBook(doneBinding) {
 	      var _this = this;
 	
 	      this.book = new _book2.default();
