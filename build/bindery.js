@@ -125,18 +125,9 @@ var Bindery =
 	    key: "addRules",
 	    value: function addRules(rules) {
 	      for (var selector in rules) {
-	        console.log(selector);
 	        rules[selector].selector = selector;
 	        this.rules.push(rules[selector]);
 	      }
-	    }
-	  }, {
-	    key: "addPage",
-	    value: function addPage() {
-	      var pg = new _page2.default();
-	      this.measureArea.appendChild(pg.element);
-	      this.book.addPage(pg);
-	      return pg;
 	    }
 	  }, {
 	    key: "bind",
@@ -181,6 +172,15 @@ var Bindery =
 	        if (DELAY > 0) setTimeout(func, DELAY);else func();
 	      };
 	
+	      this.addPage = function () {
+	        var pg = new _page2.default();
+	        newPageRules(pg);
+	
+	        _this.measureArea.appendChild(pg.element);
+	        _this.book.addPage(pg);
+	        return pg;
+	      };
+	
 	      var beforeAddRules = function beforeAddRules(elmt) {
 	        _this.rules.forEach(function (rule) {
 	          if (elmt.matches(rule.selector)) {
@@ -208,9 +208,21 @@ var Bindery =
 	      var afterAddRules = function afterAddRules(elmt) {
 	        _this.rules.forEach(function (rule) {
 	          if (elmt.matches(rule.selector)) {
-	            if (rule.afterAdd) {
-	              rule.afterAdd(elmt, state);
-	            }
+	            if (rule.afterAdd) rule.afterAdd(elmt, state);
+	          }
+	        });
+	      };
+	      var newPageRules = function newPageRules(pg) {
+	        _this.rules.forEach(function (rule) {
+	          if (rule.newPage) rule.newPage(pg, state);
+	        });
+	      };
+	      var afterBindRules = function afterBindRules(book) {
+	        _this.rules.forEach(function (rule) {
+	          if (rule.afterBind) {
+	            book.pages.forEach(function (pg, i) {
+	              rule.afterBind(pg, i);
+	            });
 	          }
 	        });
 	      };
@@ -408,7 +420,8 @@ var Bindery =
 	        console.log("wow we're done!");
 	        document.body.removeChild(_this.measureArea);
 	
-	        _this.book.number();
+	        afterBindRules(_this.book);
+	
 	        _this.controls.setState("done");
 	        _this.viewer.update();
 	
@@ -877,13 +890,6 @@ var Bindery =
 	    value: function addPage(page) {
 	      this.pages.push(page);
 	    }
-	  }, {
-	    key: "number",
-	    value: function number() {
-	      this.pages.forEach(function (pg, i) {
-	        pg.pageNumber.textContent = i + 1;
-	      });
-	    }
 	  }]);
 	
 	  return Book;
@@ -912,11 +918,10 @@ var Bindery =
 	var Page = function Page(template) {
 	  _classCallCheck(this, Page);
 	
-	  this.element = (0, _hyperscript2.default)(".bindery-page", (0, _hyperscript2.default)(".bindery-flowbox", (0, _hyperscript2.default)(".bindery-content")), (0, _hyperscript2.default)(".bindery-num"), (0, _hyperscript2.default)(".bindery-footer"));
+	  this.element = (0, _hyperscript2.default)(".bindery-page", (0, _hyperscript2.default)(".bindery-flowbox", (0, _hyperscript2.default)(".bindery-content")), (0, _hyperscript2.default)(".bindery-footer"));
 	  this.flowBox = this.element.querySelector(".bindery-flowbox");
 	  this.flowContent = this.element.querySelector(".bindery-content");
 	  this.footer = this.element.querySelector(".bindery-footer");
-	  this.pageNumber = this.element.querySelector(".bindery-num");
 	};
 	
 	module.exports = Page;
@@ -1360,7 +1365,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides .bindery-num {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n\n.bindery-num {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] .bindery-num {\n  left: 20px;\n}\n[bindery-side=\"right\"] .bindery-num {\n  right: 20px;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n  .bindery-show-guides .bindery-num {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
 	
 	// exports
 
@@ -1795,21 +1800,25 @@ var Bindery =
 	  value: true
 	});
 	
-	var _spread = __webpack_require__(23);
+	var _breakBefore = __webpack_require__(23);
 	
-	var _spread2 = _interopRequireDefault(_spread);
+	var _breakBefore2 = _interopRequireDefault(_breakBefore);
 	
-	var _fullPage = __webpack_require__(26);
+	var _fullPage = __webpack_require__(24);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
-	var _Footnote = __webpack_require__(29);
+	var _spread = __webpack_require__(27);
+	
+	var _spread2 = _interopRequireDefault(_spread);
+	
+	var _Footnote = __webpack_require__(30);
 	
 	var _Footnote2 = _interopRequireDefault(_Footnote);
 	
-	var _breakBefore = __webpack_require__(30);
+	var _pageNumber = __webpack_require__(31);
 	
-	var _breakBefore2 = _interopRequireDefault(_breakBefore);
+	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -1817,48 +1826,24 @@ var Bindery =
 	  Spread: _spread2.default,
 	  FullPage: _fullPage2.default,
 	  Footnote: _Footnote2.default,
-	  BreakBefore: _breakBefore2.default
+	  BreakBefore: _breakBefore2.default,
+	  PageNumber: _pageNumber2.default
 	};
 
 /***/ },
 /* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	
-	var _spread = __webpack_require__(24);
-	
-	var _spread2 = _interopRequireDefault(_spread);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
 	exports.default = {
 	  beforeAdd: function beforeAdd(elmt, state) {
-	    state.prevPage = state.currentPage;
-	    state.prevElementPath = state.elPath;
-	
-	    state.currentPage = state.getNewPage();
-	  },
-	  afterAdd: function afterAdd(elmt, state) {
-	    var dupedContent = state.currentPage.flowContent.cloneNode(true);
-	    var rightPage = state.getNewPage();
-	    rightPage.flowBox.innerHTML = "";
-	    rightPage.flowBox.appendChild(dupedContent);
-	    rightPage.flowContent = dupedContent;
-	
-	    state.currentPage.element.classList.add("bindery-spread");
-	    rightPage.element.classList.add("bindery-spread");
-	    state.currentPage.element.classList.add("bleed");
-	    rightPage.element.classList.add("bleed");
-	
-	    state.finishPage(state.currentPage);
-	
-	    state.currentPage = state.prevPage;
-	    state.elPath = state.prevElementPath;
+	    if (state.currentPage.flowContent.innerText !== "") {
+	      state.nextPage();
+	    }
 	  }
 	};
 
@@ -1866,53 +1851,13 @@ var Bindery =
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(25);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(4)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./spread.css", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./spread.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(3)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "[bindery-side=\"left\"].bindery-spread .bindery-content {\n  width: 200%;\n  position: absolute;\n  left: 0;\n}\n[bindery-side=\"right\"].bindery-spread .bindery-content {\n  width: 200%;\n  position: absolute;\n  right: 0;\n}\n", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	
-	var _fullPage = __webpack_require__(27);
+	var _fullPage = __webpack_require__(25);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
@@ -1935,13 +1880,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 27 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(28);
+	var content = __webpack_require__(26);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1961,7 +1906,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 28 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1975,7 +1920,92 @@ var Bindery =
 
 
 /***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _spread = __webpack_require__(28);
+	
+	var _spread2 = _interopRequireDefault(_spread);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var prevPage = void 0,
+	    prevElementPath = void 0;
+	
+	exports.default = {
+	  beforeAdd: function beforeAdd(elmt, state) {
+	    prevPage = state.currentPage;
+	    prevElementPath = state.elPath;
+	
+	    state.currentPage = state.getNewPage();
+	  },
+	  afterAdd: function afterAdd(elmt, state) {
+	    var dupedContent = state.currentPage.flowContent.cloneNode(true);
+	    var rightPage = state.getNewPage();
+	    rightPage.flowBox.innerHTML = "";
+	    rightPage.flowBox.appendChild(dupedContent);
+	    rightPage.flowContent = dupedContent;
+	
+	    state.currentPage.element.classList.add("bindery-spread");
+	    rightPage.element.classList.add("bindery-spread");
+	    state.currentPage.element.classList.add("bleed");
+	    rightPage.element.classList.add("bleed");
+	
+	    state.finishPage(state.currentPage);
+	
+	    state.currentPage = prevPage;
+	    state.elPath = prevElementPath;
+	  }
+	};
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(29);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./spread.css", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./spread.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
 /* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "[bindery-side=\"left\"].bindery-spread .bindery-content {\n  width: 200%;\n  position: absolute;\n  left: 0;\n}\n[bindery-side=\"right\"].bindery-spread .bindery-content {\n  width: 200%;\n  position: absolute;\n  right: 0;\n}\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1986,6 +2016,7 @@ var Bindery =
 	
 	exports.default = function (textGetter) {
 	  return {
+	    newPage: function newPage(pg) {},
 	    beforeAdd: function beforeAdd(elmt, state) {
 	      var fn = (0, _hyperscript2.default)(".footnote");
 	      var n = state.currentPage.footer.querySelectorAll(".footnote").length;
@@ -2003,21 +2034,76 @@ var Bindery =
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ },
-/* 30 */
-/***/ function(module, exports) {
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	
+	var _hyperscript = __webpack_require__(9);
+	
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
+	
+	var _pageNumber = __webpack_require__(32);
+	
+	var _pageNumber2 = _interopRequireDefault(_pageNumber);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	exports.default = {
-	  beforeAdd: function beforeAdd(elmt, state) {
-	    if (state.currentPage.flowContent.innerText !== "") {
-	      state.nextPage();
-	    }
+	  newPage: function newPage(pg, state) {
+	    var num = (0, _hyperscript2.default)(".bindery-num");
+	    pg.pageNumber = num;
+	    pg.element.appendChild(num);
+	  },
+	  afterBind: function afterBind(pg, i) {
+	
+	    pg.pageNumber.textContent = i + 1;
 	  }
 	};
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(33);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./pageNumber.css", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./pageNumber.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".bindery-num {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] .bindery-num {\n  left: 20px;\n}\n[bindery-side=\"right\"] .bindery-num {\n  right: 20px;\n}\n", ""]);
+	
+	// exports
+
 
 /***/ }
 /******/ ]);

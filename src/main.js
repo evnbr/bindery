@@ -51,12 +51,6 @@ class Binder {
     }
   }
 
-  addPage() {
-    let pg = new Page();
-    this.measureArea.appendChild(pg.element);
-    this.book.addPage(pg);
-    return pg;
-  }
   bind(doneBinding) {
 
     this.book = new Book();
@@ -88,6 +82,14 @@ class Binder {
       else func();
     }
 
+    this.addPage = () => {
+      let pg = new Page();
+      newPageRules(pg);
+
+      this.measureArea.appendChild(pg.element);
+      this.book.addPage(pg);
+      return pg;
+    }
 
     let beforeAddRules = (elmt) => {
       this.rules.forEach( (rule) => {
@@ -116,9 +118,21 @@ class Binder {
     let afterAddRules = (elmt) => {
       this.rules.forEach( (rule) => {
         if (elmt.matches(rule.selector)) {
-          if (rule.afterAdd) {
-            rule.afterAdd(elmt, state);
-          }
+          if (rule.afterAdd) rule.afterAdd(elmt, state);
+        }
+      });
+    }
+    let newPageRules = (pg) => {
+      this.rules.forEach( (rule) => {
+        if (rule.newPage) rule.newPage(pg, state);
+      });
+    }
+    let afterBindRules = (book) => {
+      this.rules.forEach( (rule) => {
+        if (rule.afterBind) {
+          book.pages.forEach((pg, i) => {
+            rule.afterBind(pg, i);
+          });
         }
       });
     }
@@ -311,7 +325,8 @@ class Binder {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);
 
-      this.book.number();
+      afterBindRules(this.book);
+
       this.controls.setState("done");
       this.viewer.update();
 

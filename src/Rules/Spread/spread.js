@@ -1,9 +1,11 @@
 import css from "style!css!./spread.css";
 
+let prevPage, prevElementPath;
+
 export default {
   beforeAdd: (elmt, state) => {
-    state.prevPage = state.currentPage;
-    state.prevElementPath = state.elPath;
+    prevPage = state.currentPage;
+    prevElementPath = state.elPath;
 
     state.currentPage = state.getNewPage();
 
@@ -22,7 +24,7 @@ export default {
 
     state.finishPage(state.currentPage);
 
-    state.currentPage = state.prevPage;
-    state.elPath = state.prevElementPath;
+    state.currentPage = prevPage;
+    state.elPath = prevElementPath;
   },
 }

@@ -2,6 +2,9 @@ import h from "hyperscript";
 
 export default function(textGetter) {
   return {
+    newPage: (pg) => {
+
+    },
     beforeAdd: (elmt, state) => {
       let fn = h(".footnote");
       let n = state.currentPage.footer.querySelectorAll(".footnote").length;

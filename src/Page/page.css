@@ -74,15 +74,3 @@
   left: 0;
   right: -20px;
 }
-
-.bindery-num {
-  position: absolute;
-  text-align: center;
-  bottom: 20px;
-}
-[bindery-side="left"] .bindery-num {
-  left: 20px;
-}
-[bindery-side="right"] .bindery-num {
-  right: 20px;
-}
