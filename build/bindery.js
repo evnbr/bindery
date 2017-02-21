@@ -195,6 +195,7 @@ var Bindery =
 	                _this.measureArea.replaceChild(backupPg, state.currentPage.element);
 	                elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
 	                state.currentPage.element = backupPg;
+	                state.currentPage.number = backupPg.querySelector(".bindery-num"); // TODO
 	
 	                finishPage(state.currentPage);
 	                state.currentPage = makeContinuation();
@@ -1654,7 +1655,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  [bindery-export], .measureArea {\n    background: #f1f1f1;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n  }\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not([bindery-export]) {\n    display: none !important;\n  }\n\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not([bindery-export]) {\n  display: none !important;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  [bindery-export], .measureArea {\n    background: #f1f1f1;\n    padding: 50px 20px;\n    z-index: 99;\n    position: relative;\n  }\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not([bindery-export]) {\n    display: none !important;\n  }\n\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not([bindery-export]) {\n  display: none !important;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n", ""]);
 	
 	// exports
 
@@ -2059,7 +2060,7 @@ var Bindery =
 	
 	exports.default = {
 	  newPage: function newPage(pg, state) {
-	    var el = (0, _hyperscript2.default)(".bindery-num");
+	    var el = (0, _hyperscript2.default)(".bindery-num", "#");
 	    pg.number = el;
 	    pg.element.appendChild(el);
 	  },

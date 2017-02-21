@@ -105,6 +105,7 @@ class Binder {
               this.measureArea.replaceChild(backupPg, state.currentPage.element);
               elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
               state.currentPage.element = backupPg;
+              state.currentPage.number = backupPg.querySelector(".bindery-num"); // TODO
 
               finishPage(state.currentPage);
               state.currentPage = makeContinuation();

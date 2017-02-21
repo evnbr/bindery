@@ -4,7 +4,7 @@
   }
   [bindery-export], .measureArea {
     background: #f1f1f1;
-    padding: 20px;
+    padding: 50px 20px;
     z-index: 99;
     position: relative;
   }

@@ -4,7 +4,7 @@ import css from "style!css!./pageNumber.css";
 
 export default {
   newPage: (pg, state) => {
-    let el = h(".bindery-num");
+    let el = h(".bindery-num", "#");
     pg.number = el;
     pg.element.appendChild(el);
   },
