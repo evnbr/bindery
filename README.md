@@ -6,6 +6,8 @@ bindery.js is a questionably useful library for producing book layouts in the
 browser. The core library flows text content over multiple pages. It also includes modules for common book elements, including numbering, running headers, out-of-flow spreads, and more. The modules can be applied in order to map web conventions to print conventions,
 like displaying hyperlink destinations as footnotes.
 
+The resulting book is previewable in-browser, and can open the system ⌘P dialog to send to a printer or to PDF
+
 ## Background
 
 bindery.js was originally written in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
@@ -33,9 +35,8 @@ As of February 2017, it is in the process of being rewritten as a usable, modula
       rules: {
         "h1": Bindery.BreakBefore,
         "h2": Bindery.RunningHeader,
-        "a": Bindery.Footnote((el) => `Link to <a href='#'>${el.href}</a>`),
+        "a": Bindery.Footnote((el) => `Link to ${el.href}`),
         ".figure": Bindery.Spread,
-        ".content": Bindery.PageNumber,
       },
     });
 
