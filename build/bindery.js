@@ -164,7 +164,7 @@ var Bindery =
 	        }
 	      };
 	
-	      this.measureArea = (0, _hyperscript2.default)(".measureArea");
+	      this.measureArea = (0, _hyperscript2.default)(".bindery-measure-area");
 	      document.body.appendChild(this.measureArea);
 	
 	      var DELAY = this.debugDelay; // ms
@@ -193,7 +193,7 @@ var Bindery =
 	              if (hasOverflowed()) {
 	                // restore from backup
 	                _this.measureArea.replaceChild(backupPg, state.currentPage.element);
-	                elmt.innerHTML = backupElmt.innerHTML; // TODO: fix this
+	                elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
 	                state.currentPage.element = backupPg;
 	
 	                finishPage(state.currentPage);
@@ -364,8 +364,8 @@ var Bindery =
 	                var cancel = function cancel() {
 	                  var lastEl = state.elPath.pop();
 	                  if (state.elPath.items.length < 1) {
-	                    console.log(lastEl);
-	                    console.log(child);
+	                    // console.log(lastEl);
+	                    // console.log(child);
 	                    console.error("Bindery: Failed to add textNode \"" + child.nodeValue + "\" to " + (0, _ElementName2.default)(lastEl) + ". Page might be too small?");
 	                    return;
 	                  }
@@ -424,7 +424,6 @@ var Bindery =
 	
 	        _this.controls.setState("done");
 	        _this.viewer.update();
-	
 	        if (doneBinding) doneBinding(_this.book);
 	      });
 	    }
@@ -474,7 +473,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, ".measureArea {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.measureArea * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.measureArea .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
+	exports.push([module.id, ".bindery-measure-area {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.bindery-measure-area * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.bindery-measure-area .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
 	
 	// exports
 
@@ -1820,6 +1819,10 @@ var Bindery =
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
+	var _runningHeader = __webpack_require__(34);
+	
+	var _runningHeader2 = _interopRequireDefault(_runningHeader);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
@@ -1827,7 +1830,8 @@ var Bindery =
 	  FullPage: _fullPage2.default,
 	  Footnote: _Footnote2.default,
 	  BreakBefore: _breakBefore2.default,
-	  PageNumber: _pageNumber2.default
+	  PageNumber: _pageNumber2.default,
+	  RunningHeader: _runningHeader2.default
 	};
 
 /***/ },
@@ -2055,13 +2059,12 @@ var Bindery =
 	
 	exports.default = {
 	  newPage: function newPage(pg, state) {
-	    var num = (0, _hyperscript2.default)(".bindery-num");
-	    pg.pageNumber = num;
-	    pg.element.appendChild(num);
+	    var el = (0, _hyperscript2.default)(".bindery-num");
+	    pg.number = el;
+	    pg.element.appendChild(el);
 	  },
 	  afterBind: function afterBind(pg, i) {
-	
-	    pg.pageNumber.textContent = i + 1;
+	    pg.number.textContent = i + 1;
 	  }
 	};
 
@@ -2101,6 +2104,83 @@ var Bindery =
 	
 	// module
 	exports.push([module.id, ".bindery-num {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] .bindery-num {\n  left: 20px;\n}\n[bindery-side=\"right\"] .bindery-num {\n  right: 20px;\n}\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _hyperscript = __webpack_require__(9);
+	
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
+	
+	var _runningHeader = __webpack_require__(35);
+	
+	var _runningHeader2 = _interopRequireDefault(_runningHeader);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var headerContent = "";
+	exports.default = {
+	  afterAdd: function afterAdd(elmt, state) {
+	    headerContent = elmt.textContent;
+	    state.currentPage.runningHeader.textContent = headerContent;
+	  },
+	  newPage: function newPage(pg, state) {
+	    var el = (0, _hyperscript2.default)(".bindery-running-header");
+	    pg.runningHeader = el;
+	    pg.element.appendChild(el);
+	    pg.runningHeader.textContent = headerContent;
+	  },
+	  afterBind: function afterBind(pg, i) {
+	    // pg.runningHeader.textContent = headerContent;
+	  }
+	};
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(36);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./runningHeader.css", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./runningHeader.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".bindery-running-header {\n  position: absolute;\n  text-align: left;\n  bottom: 20px;\n}\n[bindery-side=\"left\"] .bindery-running-header {\n  right: 20px;\n}\n[bindery-side=\"right\"] .bindery-running-header {\n  left: 20px;\n}\n", ""]);
 	
 	// exports
 

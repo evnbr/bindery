@@ -1,0 +1,11 @@
+.bindery-running-header {
+  position: absolute;
+  text-align: left;
+  bottom: 20px;
+}
+[bindery-side="left"] .bindery-running-header {
+  right: 20px;
+}
+[bindery-side="right"] .bindery-running-header {
+  left: 20px;
+}

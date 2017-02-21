@@ -3,6 +3,7 @@ import fullPage from "./FullPage/fullPage";
 import Spread from "./Spread/spread";
 import Footnote from "./Footnote";
 import PageNumber from "./PageNumber/pageNumber";
+import RunningHeader from "./RunningHeader/runningHeader";
 
 export default {
   Spread: Spread,
@@ -10,4 +11,5 @@ export default {
   Footnote: Footnote,
   BreakBefore: breakBefore,
   PageNumber: PageNumber,
+  RunningHeader: RunningHeader,
 }

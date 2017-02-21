@@ -1,4 +1,4 @@
-.measureArea {
+.bindery-measure-area {
   outline: 1px solid cyan;
   position: absolute;
   top: 0;
@@ -6,13 +6,13 @@
   right: 0;
   bottom: 0;
 }
-.measureArea * {
+.bindery-measure-area * {
   outline: 1px solid gray;
   color: gray;
   background: transparent;
 }
 
-.measureArea .bindery-page {
+.bindery-measure-area .bindery-page {
   background: transparent;
   box-shadow: none;
 }

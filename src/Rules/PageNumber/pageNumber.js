@@ -2,14 +2,13 @@ import h from "hyperscript";
 import css from "style!css!./pageNumber.css";
 
 
-export default  {
+export default {
   newPage: (pg, state) => {
-    let num = h(".bindery-num");
-    pg.pageNumber = num;
-    pg.element.appendChild(num);
+    let el = h(".bindery-num");
+    pg.number = el;
+    pg.element.appendChild(el);
   },
   afterBind: (pg, i) => {
-
-    pg.pageNumber.textContent = (i + 1);
+    pg.number.textContent = (i + 1);
   }
 }

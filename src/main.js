@@ -73,7 +73,7 @@ class Binder {
       }
     }
 
-    this.measureArea = h(".measureArea");
+    this.measureArea = h(".bindery-measure-area");
     document.body.appendChild(this.measureArea);
 
     const DELAY = this.debugDelay; // ms
@@ -103,7 +103,7 @@ class Binder {
             if (hasOverflowed()) {
               // restore from backup
               this.measureArea.replaceChild(backupPg, state.currentPage.element);
-              elmt.innerHTML = backupElmt.innerHTML; // TODO: fix this
+              elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
               state.currentPage.element = backupPg;
 
               finishPage(state.currentPage);
@@ -271,8 +271,8 @@ class Binder {
             let cancel = () => {
               let lastEl = state.elPath.pop();
               if (state.elPath.items.length < 1) {
-                console.log(lastEl);
-                console.log(child);
+                // console.log(lastEl);
+                // console.log(child);
                 console.error(`Bindery: Failed to add textNode "${child.nodeValue}" to ${elementName(lastEl)}. Page might be too small?`);
                 return;
               }
@@ -329,7 +329,6 @@ class Binder {
 
       this.controls.setState("done");
       this.viewer.update();
-
       if (doneBinding) doneBinding(this.book);
     });
   }
