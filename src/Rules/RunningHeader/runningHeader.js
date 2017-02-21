@@ -6,7 +6,7 @@ let headerContent = "";
 export default {
   afterAdd: (elmt, state) => {
     headerContent = elmt.textContent;
-    state.currentPage.runningHeader.textContent = headerContent;
+    state.currentPage.runningHeader.textContent = "";
   },
   newPage: (pg, state) => {
     let el = h(".bindery-running-header");

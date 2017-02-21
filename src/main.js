@@ -59,6 +59,15 @@ class Binder {
       target: this.target,
     });
 
+    this.addPage = () => {
+      let pg = new Page();
+      newPageRules(pg);
+
+      this.measureArea.appendChild(pg.element);
+      this.book.addPage(pg);
+      return pg;
+    }
+
     let state = {
       elPath: new ElementPath(),
       nextPage: () => {
@@ -80,15 +89,6 @@ class Binder {
     let throttle = (func) => {
       if (DELAY > 0) setTimeout(func, DELAY);
       else func();
-    }
-
-    this.addPage = () => {
-      let pg = new Page();
-      newPageRules(pg);
-
-      this.measureArea.appendChild(pg.element);
-      this.book.addPage(pg);
-      return pg;
     }
 
     let beforeAddRules = (elmt) => {

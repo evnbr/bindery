@@ -31,9 +31,6 @@
   .bindery-show-guides .bindery-content {
     outline: 1px solid lime;
   }
-  .bindery-show-guides .bindery-num {
-    outline: 1px solid cyan;
-  }
 }
 
 .bindery-page {
@@ -47,14 +44,14 @@
 }
 
 .bindery-flowbox {
-  margin: 40px;
+  margin: 60px 40px;
   margin-bottom: 0;
   flex: 1 1 auto;
   min-height: 0;
 }
 
 .bindery-footer {
-  margin: 40px;
+  margin: 60px 40px;
   margin-top: 4px;
   flex: 0 1 auto;
   font-size: 0.66em;

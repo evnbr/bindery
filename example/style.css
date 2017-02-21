@@ -33,7 +33,8 @@ sup {
 figure {
   width: 100%;
   background: gray;
-  padding-bottom: 400px;
+  /*padding-bottom: 400px;*/
+  padding-bottom: 70%;
   position: relative;
 }
 
