@@ -33,6 +33,10 @@ class Binder {
       binder: this,
     });
 
+    if (opts.pageSize) {
+      Page.setSize(opts.pageSize);
+    }
+
     // if (opts.rules) this.addRules(...opts.rules);
     if (opts.rules) this.addRules(opts.rules);
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;

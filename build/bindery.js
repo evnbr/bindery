@@ -110,6 +110,10 @@ var Bindery =
 	      binder: this
 	    });
 	
+	    if (opts.pageSize) {
+	      _page2.default.setSize(opts.pageSize);
+	    }
+	
 	    // if (opts.rules) this.addRules(...opts.rules);
 	    if (opts.rules) this.addRules(opts.rules);
 	    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
@@ -900,6 +904,8 @@ var Bindery =
 
 	"use strict";
 	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
 	var _hyperscript = __webpack_require__(9);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
@@ -912,14 +918,32 @@ var Bindery =
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Page = function Page(template) {
-	  _classCallCheck(this, Page);
+	var Page = function () {
+	  function Page() {
+	    _classCallCheck(this, Page);
 	
-	  this.element = (0, _hyperscript2.default)(".bindery-page", (0, _hyperscript2.default)(".bindery-flowbox", (0, _hyperscript2.default)(".bindery-content")), (0, _hyperscript2.default)(".bindery-footer"));
-	  this.flowBox = this.element.querySelector(".bindery-flowbox");
-	  this.flowContent = this.element.querySelector(".bindery-content");
-	  this.footer = this.element.querySelector(".bindery-footer");
-	};
+	    this.element = (0, _hyperscript2.default)(".bindery-page", { style: "height:" + Page.H + "px; width:" + Page.W + "px" }, (0, _hyperscript2.default)(".bindery-flowbox", (0, _hyperscript2.default)(".bindery-content")), (0, _hyperscript2.default)(".bindery-footer"));
+	    this.flowBox = this.element.querySelector(".bindery-flowbox");
+	    this.flowContent = this.element.querySelector(".bindery-content");
+	    this.footer = this.element.querySelector(".bindery-footer");
+	  }
+	
+	  _createClass(Page, null, [{
+	    key: "setSize",
+	    value: function setSize(size) {
+	      Page.W = size.width;
+	      Page.H = size.height;
+	    }
+	  }]);
+	
+	  return Page;
+	}();
+	
+	// default page size
+	
+	
+	Page.H = 400;
+	Page.W = 300;
 	
 	module.exports = Page;
 
@@ -1362,7 +1386,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n}\n\n.bindery-page {\n  width: 400px;\n  height: 600px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
 	
 	// exports
 
@@ -1409,7 +1433,9 @@ var Bindery =
 	    }
 	    this.target.setAttribute("bindery-export", true);
 	
-	    this.printWrapper = (0, _hyperscript2.default)("div.bindery-print-wrapper");
+	    this.printWrapper = (0, _hyperscript2.default)("div.bindery-print-wrapper", {
+	      style: "height:" + _page2.default.H + "px; width:" + _page2.default.W * 2 + "px"
+	    });
 	
 	    this.doubleSided = true;
 	    this.currentLeaf = 0;
@@ -1528,9 +1554,12 @@ var Bindery =
 	      for (var i = 1; i < pages.length - 1; i += this.doubleSided ? 2 : 1) {
 	        leafIndex++;
 	        var li = leafIndex;
-	        var flap = (0, _hyperscript2.default)("div.bindery-page3d", { onclick: function onclick() {
+	        var flap = (0, _hyperscript2.default)("div.bindery-page3d", {
+	          style: "height:" + _page2.default.H + "px; width:" + _page2.default.W + "px",
+	          onclick: function onclick() {
 	            // this.setLeaf(li-1);
-	          } });
+	          }
+	        });
 	        this.makeDraggable(flap);
 	        this.target.classList.add("bindery-stage3d");
 	        this.flaps.push(flap);

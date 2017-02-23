@@ -9,4 +9,8 @@ let binder = new Bindery({
     ".content h2": Bindery.RunningHeader,
     ".content": Bindery.PageNumber,
   },
+  pageSize: {
+    height: 500,
+    width: 300,
+  }
 });

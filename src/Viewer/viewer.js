@@ -16,7 +16,9 @@ class Printer {
     }
     this.target.setAttribute("bindery-export", true);
 
-    this.printWrapper = h("div.bindery-print-wrapper");
+    this.printWrapper = h("div.bindery-print-wrapper", {
+      style: `height:${Page.H}px; width:${Page.W * 2}px`,
+    });
 
     this.doubleSided = true;
     this.currentLeaf = 0;
@@ -120,9 +122,12 @@ class Printer {
     for (let i = 1; i < pages.length - 1; i += (this.doubleSided ? 2 : 1)) {
       leafIndex++;
       let li = leafIndex;
-      let flap = h("div.bindery-page3d", {onclick: () => {
+      let flap = h("div.bindery-page3d", {
+        style: `height:${Page.H}px; width:${Page.W}px`,
+        onclick: () => {
         // this.setLeaf(li-1);
-      }});
+        },
+      });
       this.makeDraggable(flap);
       this.target.classList.add("bindery-stage3d");
       this.flaps.push(flap);

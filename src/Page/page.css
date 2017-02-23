@@ -34,8 +34,10 @@
 }
 
 .bindery-page {
-  width: 400px;
-  height: 600px;
+  /*width: 400px;*/
+  /*height: 600px;*/
+  width: 200px;
+  height: 300px;
   position: relative;
   display: flex;
   flex-direction: column;
