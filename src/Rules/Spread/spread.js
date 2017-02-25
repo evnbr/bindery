@@ -22,8 +22,6 @@ export default {
     state.currentPage.element.classList.add("bleed");
     rightPage.element.classList.add("bleed");
 
-    state.finishPage(state.currentPage);
-
     state.currentPage = prevPage;
     state.elPath = prevElementPath;
   },

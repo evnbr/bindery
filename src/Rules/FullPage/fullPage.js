@@ -10,7 +10,6 @@ export default {
     }
   },
   afterAdd: (elmt, state) => {
-    state.finishPage(state.currentPage);
     state.currentPage = state.prevPage;
     state.elPath = state.prevElementPath;
   },

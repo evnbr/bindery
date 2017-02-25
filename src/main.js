@@ -56,32 +56,22 @@ class Binder {
 
   makeBook(doneBinding) {
 
-    this.addPage = () => {
+    let addPage = () => {
       let pg = new Page();
-      newPageRules(pg);
 
-      this.measureArea.appendChild(pg.element);
+      newPageRules(pg);
       state.pages.push(pg);
+
       return pg;
     }
 
     let state = {
       elPath: new ElementPath(),
       pages: [],
-      nextPage: () => {
-        finishPage(state.currentPage);
-        state.currentPage = makeContinuation();
-      },
-      finishPage: (pg) => {
-        finishPage(pg);
-      },
       getNewPage: () => {
         return makeContinuation();
       }
     }
-
-    this.measureArea = h(".bindery-measure-area");
-    document.body.appendChild(this.measureArea);
 
     const DELAY = this.debugDelay; // ms
     let throttle = (func) => {
@@ -98,14 +88,12 @@ class Binder {
             let backupElmt = elmt.cloneNode(true);
             rule.beforeAdd(elmt, state);
 
-            if (hasOverflowed()) {
+            if (state.currentPage.hasOverflowed()) {
               // restore from backup
-              this.measureArea.replaceChild(backupPg, state.currentPage.element);
               elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
               state.currentPage.element = backupPg;
               state.currentPage.number = backupPg.querySelector(".bindery-num"); // TODO
 
-              finishPage(state.currentPage);
               state.currentPage = makeContinuation();
 
               rule.beforeAdd(elmt, state);
@@ -136,21 +124,11 @@ class Binder {
       });
     }
 
-    let hasOverflowed = () => {
-      let contentH = state.currentPage.flowContent.getBoundingClientRect().height;
-      let boxH = state.currentPage.flowBox.getBoundingClientRect().height;
-      return contentH >= boxH;
-    }
-
-    let finishPage = (pg) => {
-      this.measureArea.removeChild(pg.element);
-    }
-
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
     let makeContinuation = () => {
       state.elPath = state.elPath.clone();
-      let newPage = this.addPage();
+      let newPage = addPage();
       newPage.flowContent.appendChild(state.elPath.root);
       return newPage;
     };
@@ -200,24 +178,23 @@ class Binder {
           pos = 0;
 
           // Start on new page
-          finishPage(state.currentPage);
           state.currentPage = makeContinuation();
           textNode = document.createTextNode(origText);
           state.elPath.last.appendChild(textNode);
 
           // If the remainder fits there, we're done
-          if (!hasOverflowed()) {
+          if (!state.currentPage.hasOverflowed()) {
             throttle(doneCallback);
             return;
           }
         }
         // Search backward
-        if (hasOverflowed()) throttle(() => { step(pos - dist/2); });
+        if (state.currentPage.hasOverflowed()) throttle(() => { step(pos - dist/2); });
         // Search forward
         else throttle(() => { step(pos + dist/2); });
       }
 
-      if (hasOverflowed()) step(origText.length/2); // find breakpoint
+      if (state.currentPage.hasOverflowed()) step(origText.length/2); // find breakpoint
       else throttle(doneCallback); // add in one go
     }
 
@@ -238,12 +215,11 @@ class Binder {
       //   return;
       // }
 
-      if (hasOverflowed() && node.getAttribute("bindery-break") == "avoid")  {
+      if (state.currentPage.hasOverflowed() && node.getAttribute("bindery-break") == "avoid")  {
         let nodeH = node.getBoundingClientRect().height;
         let flowH = state.currentPage.flowBox.getBoundingClientRect().height;
         if (nodeH < flowH) {
           state.elPath.pop();
-          finishPage(state.currentPage);
           state.currentPage = makeContinuation();
           addElementNode(node, doneCallback);
           return;
@@ -278,7 +254,6 @@ class Binder {
 
               let fn = state.currentPage.footer.lastChild; // <--
 
-              finishPage(state.currentPage);
               state.currentPage = makeContinuation();
 
               if (fn) state.currentPage.footer.appendChild(fn); // <--
@@ -315,14 +290,15 @@ class Binder {
       addNextChild();
     }
 
-    state.currentPage = this.addPage();
+    state.currentPage = addPage();
     let content = this.source.cloneNode(true);
     content.style.margin = 0; // TODO: make this clearer
     content.style.padding = 0; // TODO: make this clearer
     this.source.style.display = "none";
     addElementNode(content, () => {
       console.log("wow we're done!");
-      document.body.removeChild(this.measureArea);
+      let measureArea = document.querySelector(".bindery-measure-area");
+      document.body.removeChild(measureArea);
 
       afterBindRules(state.pages);
 

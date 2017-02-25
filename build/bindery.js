@@ -49,9 +49,6 @@ var Bindery =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	// import Book from "./book";
-	
-	
 	var _bindery = __webpack_require__(1);
 	
 	var _bindery2 = _interopRequireDefault(_bindery);
@@ -137,43 +134,22 @@ var Bindery =
 	    value: function makeBook(doneBinding) {
 	      var _this = this;
 	
-	      this.addPage = function () {
+	      var addPage = function addPage() {
 	        var pg = new _page2.default();
-	        newPageRules(pg);
 	
-	        _this.measureArea.appendChild(pg.element);
+	        newPageRules(pg);
 	        state.pages.push(pg);
-	        // this.book.addPage(pg);
+	
 	        return pg;
 	      };
 	
 	      var state = {
 	        elPath: new _ElementPath2.default(),
 	        pages: [],
-	        nextPage: function nextPage() {
-	          finishPage(state.currentPage);
-	          state.currentPage = makeContinuation();
-	        },
-	        finishPage: function (_finishPage) {
-	          function finishPage(_x) {
-	            return _finishPage.apply(this, arguments);
-	          }
-	
-	          finishPage.toString = function () {
-	            return _finishPage.toString();
-	          };
-	
-	          return finishPage;
-	        }(function (pg) {
-	          finishPage(pg);
-	        }),
 	        getNewPage: function getNewPage() {
 	          return makeContinuation();
 	        }
 	      };
-	
-	      this.measureArea = (0, _hyperscript2.default)(".bindery-measure-area");
-	      document.body.appendChild(this.measureArea);
 	
 	      var DELAY = this.debugDelay; // ms
 	      var throttle = function throttle(func) {
@@ -189,14 +165,12 @@ var Bindery =
 	              var backupElmt = elmt.cloneNode(true);
 	              rule.beforeAdd(elmt, state);
 	
-	              if (hasOverflowed()) {
+	              if (state.currentPage.hasOverflowed()) {
 	                // restore from backup
-	                _this.measureArea.replaceChild(backupPg, state.currentPage.element);
 	                elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
 	                state.currentPage.element = backupPg;
 	                state.currentPage.number = backupPg.querySelector(".bindery-num"); // TODO
 	
-	                finishPage(state.currentPage);
 	                state.currentPage = makeContinuation();
 	
 	                rule.beforeAdd(elmt, state);
@@ -227,21 +201,11 @@ var Bindery =
 	        });
 	      };
 	
-	      var hasOverflowed = function hasOverflowed() {
-	        var contentH = state.currentPage.flowContent.getBoundingClientRect().height;
-	        var boxH = state.currentPage.flowBox.getBoundingClientRect().height;
-	        return contentH >= boxH;
-	      };
-	
-	      var finishPage = function finishPage(pg) {
-	        _this.measureArea.removeChild(pg.element);
-	      };
-	
 	      // Creates clones for ever level of tag
 	      // we were in when we overflowed the last page
 	      var makeContinuation = function makeContinuation() {
 	        state.elPath = state.elPath.clone();
-	        var newPage = _this.addPage();
+	        var newPage = addPage();
 	        newPage.flowContent.appendChild(state.elPath.root);
 	        return newPage;
 	      };
@@ -291,19 +255,18 @@ var Bindery =
 	            pos = 0;
 	
 	            // Start on new page
-	            finishPage(state.currentPage);
 	            state.currentPage = makeContinuation();
 	            textNode = document.createTextNode(origText);
 	            state.elPath.last.appendChild(textNode);
 	
 	            // If the remainder fits there, we're done
-	            if (!hasOverflowed()) {
+	            if (!state.currentPage.hasOverflowed()) {
 	              throttle(doneCallback);
 	              return;
 	            }
 	          }
 	          // Search backward
-	          if (hasOverflowed()) throttle(function () {
+	          if (state.currentPage.hasOverflowed()) throttle(function () {
 	            step(pos - dist / 2);
 	          });
 	          // Search forward
@@ -312,7 +275,7 @@ var Bindery =
 	            });
 	        };
 	
-	        if (hasOverflowed()) step(origText.length / 2); // find breakpoint
+	        if (state.currentPage.hasOverflowed()) step(origText.length / 2); // find breakpoint
 	        else throttle(doneCallback); // add in one go
 	      };
 	
@@ -331,12 +294,11 @@ var Bindery =
 	        //   return;
 	        // }
 	
-	        if (hasOverflowed() && node.getAttribute("bindery-break") == "avoid") {
+	        if (state.currentPage.hasOverflowed() && node.getAttribute("bindery-break") == "avoid") {
 	          var nodeH = node.getBoundingClientRect().height;
 	          var flowH = state.currentPage.flowBox.getBoundingClientRect().height;
 	          if (nodeH < flowH) {
 	            state.elPath.pop();
-	            finishPage(state.currentPage);
 	            state.currentPage = makeContinuation();
 	            addElementNode(node, doneCallback);
 	            return;
@@ -370,7 +332,6 @@ var Bindery =
 	
 	                var fn = state.currentPage.footer.lastChild; // <--
 	
-	                finishPage(state.currentPage);
 	                state.currentPage = makeContinuation();
 	
 	                if (fn) state.currentPage.footer.appendChild(fn); // <--
@@ -408,14 +369,15 @@ var Bindery =
 	        addNextChild();
 	      };
 	
-	      state.currentPage = this.addPage();
+	      state.currentPage = addPage();
 	      var content = this.source.cloneNode(true);
 	      content.style.margin = 0; // TODO: make this clearer
 	      content.style.padding = 0; // TODO: make this clearer
 	      this.source.style.display = "none";
 	      addElementNode(content, function () {
 	        console.log("wow we're done!");
-	        document.body.removeChild(_this.measureArea);
+	        var measureArea = document.querySelector(".bindery-measure-area");
+	        document.body.removeChild(measureArea);
 	
 	        afterBindRules(state.pages);
 	
@@ -427,7 +389,7 @@ var Bindery =
 	        _this.viewer.update();
 	        _this.controls.setState("done");
 	
-	        if (doneBinding) doneBinding(_this.book);
+	        if (doneBinding) doneBinding();
 	      });
 	    }
 	  }]);
@@ -900,7 +862,22 @@ var Bindery =
 	    this.footer = this.element.querySelector(".bindery-footer");
 	  }
 	
-	  _createClass(Page, null, [{
+	  _createClass(Page, [{
+	    key: "hasOverflowed",
+	    value: function hasOverflowed() {
+	      var measureArea = document.querySelector(".bindery-measure-area");
+	      if (!measureArea) document.body.appendChild((0, _hyperscript2.default)(".bindery-measure-area"));
+	
+	      if (this.element.parentNode !== measureArea) {
+	        measureArea.innerHTML = '';
+	        measureArea.appendChild(this.element);
+	      }
+	
+	      var contentH = this.flowContent.getBoundingClientRect().height;
+	      var boxH = this.flowBox.getBoundingClientRect().height;
+	      return contentH >= boxH;
+	    }
+	  }], [{
 	    key: "setSize",
 	    value: function setSize(size) {
 	      Page.W = size.width;
@@ -1470,7 +1447,6 @@ var Bindery =
 	      if (this.doubleSided) {
 	        if (this.pages.length % 2 !== 0) {
 	          var pg = new _page2.default();
-	          // this.book.addPage(pg);
 	          pages.push(pg);
 	        }
 	        var spacerPage = new _page2.default();
@@ -1845,7 +1821,7 @@ var Bindery =
 	exports.default = {
 	  beforeAdd: function beforeAdd(elmt, state) {
 	    if (state.currentPage.flowContent.innerText !== "") {
-	      state.nextPage();
+	      state.currentPage = state.getNewPage();
 	    }
 	  }
 	};
@@ -1876,7 +1852,6 @@ var Bindery =
 	    }
 	  },
 	  afterAdd: function afterAdd(elmt, state) {
-	    state.finishPage(state.currentPage);
 	    state.currentPage = state.prevPage;
 	    state.elPath = state.prevElementPath;
 	  }
@@ -1959,8 +1934,6 @@ var Bindery =
 	    rightPage.element.classList.add("bindery-spread");
 	    state.currentPage.element.classList.add("bleed");
 	    rightPage.element.classList.add("bleed");
-	
-	    state.finishPage(state.currentPage);
 	
 	    state.currentPage = prevPage;
 	    state.elPath = prevElementPath;

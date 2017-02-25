@@ -18,6 +18,20 @@ class Page {
     Page.W = size.width;
     Page.H = size.height;
   }
+  hasOverflowed() {
+    let measureArea = document.querySelector(".bindery-measure-area");
+    if (!measureArea) document.body.appendChild(h(".bindery-measure-area"));
+
+    if (this.element.parentNode !== measureArea) {
+      measureArea.innerHTML = '';
+      measureArea.appendChild(this.element);
+    }
+
+    let contentH = this.flowContent.getBoundingClientRect().height;
+    let boxH = this.flowBox.getBoundingClientRect().height;
+    return contentH >= boxH;
+  }
+
 }
 
 // default page size
