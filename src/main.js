@@ -56,20 +56,16 @@ class Binder {
 
   makeBook(doneBinding) {
 
-    let addPage = () => {
-      let pg = new Page();
-
-      newPageRules(pg);
-      state.pages.push(pg);
-
-      return pg;
-    }
+    // let addPage = () => {
+    //
+    //   return pg;
+    // }
 
     let state = {
       elPath: new ElementPath(),
       pages: [],
       getNewPage: () => {
-        return makeContinuation();
+        return makeNextPage();
       }
     }
 
@@ -84,17 +80,17 @@ class Binder {
         if (elmt.matches(rule.selector)) {
           if (rule.beforeAdd) {
 
-            let backupPg = state.currentPage.element.cloneNode(true); // backup page
+            let backupPgElmnt = state.currentPage.element.cloneNode(true); // backup page
             let backupElmt = elmt.cloneNode(true);
             rule.beforeAdd(elmt, state);
 
             if (state.currentPage.hasOverflowed()) {
               // restore from backup
               elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
-              state.currentPage.element = backupPg;
-              state.currentPage.number = backupPg.querySelector(".bindery-num"); // TODO
+              state.currentPage.element = backupPgElmnt;
+              state.currentPage.number = backupPgElmnt.querySelector(".bindery-num"); // TODO
 
-              state.currentPage = makeContinuation();
+              state.currentPage = makeNextPage();
 
               rule.beforeAdd(elmt, state);
             }
@@ -126,10 +122,14 @@ class Binder {
 
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
-    let makeContinuation = () => {
+    let makeNextPage = () => {
       state.elPath = state.elPath.clone();
-      let newPage = addPage();
-      newPage.flowContent.appendChild(state.elPath.root);
+      let newPage = new Page();
+      newPageRules(newPage);
+      state.pages.push(newPage);
+      if (state.elPath.root) {
+        newPage.flowContent.appendChild(state.elPath.root);
+      }
       return newPage;
     };
 
@@ -178,7 +178,7 @@ class Binder {
           pos = 0;
 
           // Start on new page
-          state.currentPage = makeContinuation();
+          state.currentPage = makeNextPage();
           textNode = document.createTextNode(origText);
           state.elPath.last.appendChild(textNode);
 
@@ -220,7 +220,7 @@ class Binder {
         let flowH = state.currentPage.flowBox.getBoundingClientRect().height;
         if (nodeH < flowH) {
           state.elPath.pop();
-          state.currentPage = makeContinuation();
+          state.currentPage = makeNextPage();
           addElementNode(node, doneCallback);
           return;
         }
@@ -254,7 +254,7 @@ class Binder {
 
               let fn = state.currentPage.footer.lastChild; // <--
 
-              state.currentPage = makeContinuation();
+              state.currentPage = makeNextPage();
 
               if (fn) state.currentPage.footer.appendChild(fn); // <--
 
@@ -290,7 +290,7 @@ class Binder {
       addNextChild();
     }
 
-    state.currentPage = addPage();
+    state.currentPage = makeNextPage();
     let content = this.source.cloneNode(true);
     content.style.margin = 0; // TODO: make this clearer
     content.style.padding = 0; // TODO: make this clearer
