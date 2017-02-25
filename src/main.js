@@ -3,7 +3,6 @@ import css from "style!css!./bindery.css";
 import ElementPath from "./ElementPath"
 import elementName from "./ElementName"
 
-import Book from "./book";
 import Page from "./Page/page";
 import Viewer from "./Viewer/viewer";
 import Controls from "./Controls/controls";
@@ -57,23 +56,18 @@ class Binder {
 
   makeBook(doneBinding) {
 
-    this.book = new Book();
-    this.viewer = new Viewer({
-      book: this.book,
-      target: this.target,
-    });
-
     this.addPage = () => {
       let pg = new Page();
       newPageRules(pg);
 
       this.measureArea.appendChild(pg.element);
-      this.book.addPage(pg);
+      state.pages.push(pg);
       return pg;
     }
 
     let state = {
       elPath: new ElementPath(),
+      pages: [],
       nextPage: () => {
         finishPage(state.currentPage);
         state.currentPage = makeContinuation();
@@ -132,10 +126,10 @@ class Binder {
         if (rule.newPage) rule.newPage(pg, state);
       });
     }
-    let afterBindRules = (book) => {
+    let afterBindRules = (pages) => {
       this.rules.forEach( (rule) => {
         if (rule.afterBind) {
-          book.pages.forEach((pg, i) => {
+          pages.forEach((pg, i) => {
             rule.afterBind(pg, i);
           });
         }
@@ -330,11 +324,18 @@ class Binder {
       console.log("wow we're done!");
       document.body.removeChild(this.measureArea);
 
-      afterBindRules(this.book);
+      afterBindRules(state.pages);
 
-      this.controls.setState("done");
+
+      this.viewer = new Viewer({
+        pages: state.pages,
+        target: this.target,
+      });
+
       this.viewer.update();
-      if (doneBinding) doneBinding(this.book);
+      this.controls.setState("done");
+
+      if (doneBinding) doneBinding();
     });
   }
 }

@@ -5,7 +5,7 @@ import h from "hyperscript";
 
 class Printer {
   constructor(opts) {
-    this.book = opts.book;
+    this.pages = opts.pages;
 
     if (opts.target) {
       this.target = opts.target;
@@ -61,12 +61,11 @@ class Printer {
     this.target.style.display = "block";
     this.target.innerHTML = "";
 
-    let pages = this.book.pages.slice();
+    let pages = this.pages.slice();
 
     if (this.doubleSided) {
-      if (this.book.pages.length % 2 !== 0) {
+      if (this.pages.length % 2 !== 0) {
         let pg = new Page();
-        this.book.addPage(pg);
         pages.push(pg);
       }
       let spacerPage = new Page();
@@ -103,10 +102,10 @@ class Printer {
     this.target.innerHTML = "";
     this.flaps = [];
 
-    let pages = this.book.pages.slice();
+    let pages = this.pages.slice();
 
     if (this.doubleSided) {
-      if (this.book.pages.length % 2 !== 0) {
+      if (this.pages.length % 2 !== 0) {
         let pg = new Page();
         this.book.addPage(pg);
       }
@@ -145,7 +144,7 @@ class Printer {
         let r = h(".bindery-page.bindery-page3d-back")
         flap.appendChild(r);
       }
-      // flap.style.zIndex = `${this.book.pages.length - i}`;
+      // flap.style.zIndex = `${this.pages.length - i}`;
       // flap.style.top = `${i * 4}px`;
       flap.style.left = `${i * 4}px`;
       this.target.appendChild(flap);

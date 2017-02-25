@@ -49,6 +49,9 @@ var Bindery =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	// import Book from "./book";
+	
+	
 	var _bindery = __webpack_require__(1);
 	
 	var _bindery2 = _interopRequireDefault(_bindery);
@@ -61,27 +64,23 @@ var Bindery =
 	
 	var _ElementName2 = _interopRequireDefault(_ElementName);
 	
-	var _book = __webpack_require__(7);
-	
-	var _book2 = _interopRequireDefault(_book);
-	
-	var _page = __webpack_require__(8);
+	var _page = __webpack_require__(7);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _viewer = __webpack_require__(16);
+	var _viewer = __webpack_require__(15);
 	
 	var _viewer2 = _interopRequireDefault(_viewer);
 	
-	var _controls = __webpack_require__(19);
+	var _controls = __webpack_require__(18);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
-	var _Rules = __webpack_require__(22);
+	var _Rules = __webpack_require__(21);
 	
 	var _Rules2 = _interopRequireDefault(_Rules);
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
@@ -138,23 +137,19 @@ var Bindery =
 	    value: function makeBook(doneBinding) {
 	      var _this = this;
 	
-	      this.book = new _book2.default();
-	      this.viewer = new _viewer2.default({
-	        book: this.book,
-	        target: this.target
-	      });
-	
 	      this.addPage = function () {
 	        var pg = new _page2.default();
 	        newPageRules(pg);
 	
 	        _this.measureArea.appendChild(pg.element);
-	        _this.book.addPage(pg);
+	        state.pages.push(pg);
+	        // this.book.addPage(pg);
 	        return pg;
 	      };
 	
 	      var state = {
 	        elPath: new _ElementPath2.default(),
+	        pages: [],
 	        nextPage: function nextPage() {
 	          finishPage(state.currentPage);
 	          state.currentPage = makeContinuation();
@@ -222,10 +217,10 @@ var Bindery =
 	          if (rule.newPage) rule.newPage(pg, state);
 	        });
 	      };
-	      var afterBindRules = function afterBindRules(book) {
+	      var afterBindRules = function afterBindRules(pages) {
 	        _this.rules.forEach(function (rule) {
 	          if (rule.afterBind) {
-	            book.pages.forEach(function (pg, i) {
+	            pages.forEach(function (pg, i) {
 	              rule.afterBind(pg, i);
 	            });
 	          }
@@ -422,10 +417,16 @@ var Bindery =
 	        console.log("wow we're done!");
 	        document.body.removeChild(_this.measureArea);
 	
-	        afterBindRules(_this.book);
+	        afterBindRules(state.pages);
 	
-	        _this.controls.setState("done");
+	        _this.viewer = new _viewer2.default({
+	          pages: state.pages,
+	          target: _this.target
+	        });
+	
 	        _this.viewer.update();
+	        _this.controls.setState("done");
+	
 	        if (doneBinding) doneBinding(_this.book);
 	      });
 	    }
@@ -871,46 +872,17 @@ var Bindery =
 
 /***/ },
 /* 7 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Book = function () {
-	  function Book(opts) {
-	    _classCallCheck(this, Book);
-	
-	    this.pages = [];
-	  }
-	
-	  _createClass(Book, [{
-	    key: "addPage",
-	    value: function addPage(page) {
-	      this.pages.push(page);
-	    }
-	  }]);
-	
-	  return Book;
-	}();
-	
-	module.exports = Book;
-
-/***/ },
-/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _page = __webpack_require__(14);
+	var _page = __webpack_require__(13);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
@@ -948,13 +920,13 @@ var Bindery =
 	module.exports = Page;
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var split = __webpack_require__(10)
-	var ClassList = __webpack_require__(11)
+	var split = __webpack_require__(9)
+	var ClassList = __webpack_require__(10)
 	
-	var w = typeof window === 'undefined' ? __webpack_require__(13) : window
+	var w = typeof window === 'undefined' ? __webpack_require__(12) : window
 	var document = w.document
 	var Text = w.Text
 	
@@ -1114,7 +1086,7 @@ var Bindery =
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports) {
 
 	/*!
@@ -1226,11 +1198,11 @@ var Bindery =
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// contains, add, remove, toggle
-	var indexof = __webpack_require__(12)
+	var indexof = __webpack_require__(11)
 	
 	module.exports = ClassList
 	
@@ -1331,7 +1303,7 @@ var Bindery =
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports) {
 
 	
@@ -1346,19 +1318,19 @@ var Bindery =
 	};
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(15);
+	var content = __webpack_require__(14);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1378,7 +1350,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1392,7 +1364,7 @@ var Bindery =
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1403,15 +1375,15 @@ var Bindery =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _viewer = __webpack_require__(17);
+	var _viewer = __webpack_require__(16);
 	
 	var _viewer2 = _interopRequireDefault(_viewer);
 	
-	var _page = __webpack_require__(8);
+	var _page = __webpack_require__(7);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
@@ -1423,7 +1395,7 @@ var Bindery =
 	  function Printer(opts) {
 	    _classCallCheck(this, Printer);
 	
-	    this.book = opts.book;
+	    this.pages = opts.pages;
 	
 	    if (opts.target) {
 	      this.target = opts.target;
@@ -1493,12 +1465,12 @@ var Bindery =
 	      this.target.style.display = "block";
 	      this.target.innerHTML = "";
 	
-	      var pages = this.book.pages.slice();
+	      var pages = this.pages.slice();
 	
 	      if (this.doubleSided) {
-	        if (this.book.pages.length % 2 !== 0) {
+	        if (this.pages.length % 2 !== 0) {
 	          var pg = new _page2.default();
-	          this.book.addPage(pg);
+	          // this.book.addPage(pg);
 	          pages.push(pg);
 	        }
 	        var spacerPage = new _page2.default();
@@ -1535,10 +1507,10 @@ var Bindery =
 	      this.target.innerHTML = "";
 	      this.flaps = [];
 	
-	      var pages = this.book.pages.slice();
+	      var pages = this.pages.slice();
 	
 	      if (this.doubleSided) {
-	        if (this.book.pages.length % 2 !== 0) {
+	        if (this.pages.length % 2 !== 0) {
 	          var pg = new _page2.default();
 	          this.book.addPage(pg);
 	        }
@@ -1576,7 +1548,7 @@ var Bindery =
 	          var _r = (0, _hyperscript2.default)(".bindery-page.bindery-page3d-back");
 	          flap.appendChild(_r);
 	        }
-	        // flap.style.zIndex = `${this.book.pages.length - i}`;
+	        // flap.style.zIndex = `${this.pages.length - i}`;
 	        // flap.style.top = `${i * 4}px`;
 	        flap.style.left = i * 4 + "px";
 	        this.target.appendChild(flap);
@@ -1647,13 +1619,13 @@ var Bindery =
 	exports.default = Printer;
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(18);
+	var content = __webpack_require__(17);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1673,7 +1645,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1687,18 +1659,18 @@ var Bindery =
 
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _controls = __webpack_require__(20);
+	var _controls = __webpack_require__(19);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
@@ -1777,13 +1749,13 @@ var Bindery =
 	module.exports = Controls;
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(21);
+	var content = __webpack_require__(20);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1803,7 +1775,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1817,7 +1789,7 @@ var Bindery =
 
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1826,27 +1798,27 @@ var Bindery =
 	  value: true
 	});
 	
-	var _breakBefore = __webpack_require__(23);
+	var _breakBefore = __webpack_require__(22);
 	
 	var _breakBefore2 = _interopRequireDefault(_breakBefore);
 	
-	var _fullPage = __webpack_require__(24);
+	var _fullPage = __webpack_require__(23);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
-	var _spread = __webpack_require__(27);
+	var _spread = __webpack_require__(26);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
-	var _Footnote = __webpack_require__(30);
+	var _Footnote = __webpack_require__(29);
 	
 	var _Footnote2 = _interopRequireDefault(_Footnote);
 	
-	var _pageNumber = __webpack_require__(31);
+	var _pageNumber = __webpack_require__(30);
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
-	var _runningHeader = __webpack_require__(34);
+	var _runningHeader = __webpack_require__(33);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
@@ -1862,7 +1834,7 @@ var Bindery =
 	};
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1879,7 +1851,7 @@ var Bindery =
 	};
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1888,7 +1860,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _fullPage = __webpack_require__(25);
+	var _fullPage = __webpack_require__(24);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
@@ -1911,13 +1883,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(26);
+	var content = __webpack_require__(25);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1937,7 +1909,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1951,7 +1923,7 @@ var Bindery =
 
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1960,7 +1932,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _spread = __webpack_require__(28);
+	var _spread = __webpack_require__(27);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
@@ -1996,13 +1968,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 28 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(29);
+	var content = __webpack_require__(28);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2022,7 +1994,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2036,7 +2008,7 @@ var Bindery =
 
 
 /***/ },
-/* 30 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2058,14 +2030,14 @@ var Bindery =
 	  };
 	};
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ },
-/* 31 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2074,11 +2046,11 @@ var Bindery =
 	  value: true
 	});
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _pageNumber = __webpack_require__(32);
+	var _pageNumber = __webpack_require__(31);
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
@@ -2096,13 +2068,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(33);
+	var content = __webpack_require__(32);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2122,7 +2094,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2136,7 +2108,7 @@ var Bindery =
 
 
 /***/ },
-/* 34 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2145,11 +2117,11 @@ var Bindery =
 	  value: true
 	});
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _runningHeader = __webpack_require__(35);
+	var _runningHeader = __webpack_require__(34);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
@@ -2170,13 +2142,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 35 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(36);
+	var content = __webpack_require__(35);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2196,7 +2168,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 36 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
