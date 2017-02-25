@@ -25,7 +25,6 @@ class Binder {
       console.error(`Bindery: Source should be an element or selector`);
     }
 
-    this.target = opts.target;
     this.rules = [];
 
     this.controls = new Controls({
@@ -36,10 +35,8 @@ class Binder {
       Page.setSize(opts.pageSize);
     }
 
-    // if (opts.rules) this.addRules(...opts.rules);
     if (opts.rules) this.addRules(opts.rules);
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
-
 
   }
   cancel() {
@@ -56,13 +53,8 @@ class Binder {
 
   makeBook(doneBinding) {
 
-    // let addPage = () => {
-    //
-    //   return pg;
-    // }
-
     let state = {
-      elPath: new ElementPath(),
+      path: new ElementPath(),
       pages: [],
       getNewPage: () => {
         return makeNextPage();
@@ -77,31 +69,29 @@ class Binder {
 
     let beforeAddRules = (elmt) => {
       this.rules.forEach( (rule) => {
-        if (elmt.matches(rule.selector)) {
-          if (rule.beforeAdd) {
+        if (elmt.matches(rule.selector) && rule.beforeAdd) {
 
-            let backupPgElmnt = state.currentPage.element.cloneNode(true); // backup page
-            let backupElmt = elmt.cloneNode(true);
+          let backupPgElmnt = state.currentPage.element.cloneNode(true);
+          let backupElmt = elmt.cloneNode(true);
+          rule.beforeAdd(elmt, state);
+
+          if (state.currentPage.hasOverflowed()) {
+            // restore from backup
+            elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
+            state.currentPage.element = backupPgElmnt;
+            state.currentPage.number = backupPgElmnt.querySelector(".bindery-num"); // TODO
+
+            state.currentPage = makeNextPage();
+
             rule.beforeAdd(elmt, state);
-
-            if (state.currentPage.hasOverflowed()) {
-              // restore from backup
-              elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
-              state.currentPage.element = backupPgElmnt;
-              state.currentPage.number = backupPgElmnt.querySelector(".bindery-num"); // TODO
-
-              state.currentPage = makeNextPage();
-
-              rule.beforeAdd(elmt, state);
-            }
           }
         }
       });
     }
     let afterAddRules = (elmt) => {
       this.rules.forEach( (rule) => {
-        if (elmt.matches(rule.selector)) {
-          if (rule.afterAdd) rule.afterAdd(elmt, state);
+        if (elmt.matches(rule.selector) && rule.afterAdd) {
+          rule.afterAdd(elmt, state);
         }
       });
     }
@@ -123,22 +113,22 @@ class Binder {
     // Creates clones for ever level of tag
     // we were in when we overflowed the last page
     let makeNextPage = () => {
-      state.elPath = state.elPath.clone();
+      state.path = state.path.clone();
       let newPage = new Page();
       newPageRules(newPage);
       state.pages.push(newPage);
-      if (state.elPath.root) {
-        newPage.flowContent.appendChild(state.elPath.root);
+      if (state.path.root) {
+        newPage.flowContent.appendChild(state.path.root);
       }
       return newPage;
     };
 
 
-    // Adds an text node by adding each word one by one
-    // until it overflows
+    // Adds an text node by binary searching amount of
+    // words until it just barely doesnt overflow
     let addTextNode = (node, doneCallback, abortCallback) => {
 
-      state.elPath.last.appendChild(node);
+      state.path.last.appendChild(node);
 
       let textNode = node;
       let origText = textNode.nodeValue;
@@ -180,7 +170,7 @@ class Binder {
           // Start on new page
           state.currentPage = makeNextPage();
           textNode = document.createTextNode(origText);
-          state.elPath.last.appendChild(textNode);
+          state.path.last.appendChild(textNode);
 
           // If the remainder fits there, we're done
           if (!state.currentPage.hasOverflowed()) {
@@ -204,9 +194,9 @@ class Binder {
     let addElementNode = (node, doneCallback) => {
 
       // Add this node to the current page or context
-      if (state.elPath.items.length == 0) state.currentPage.flowContent.appendChild(node);
-      else state.elPath.last.appendChild(node);
-      state.elPath.push(node);
+      if (state.path.items.length == 0) state.currentPage.flowContent.appendChild(node);
+      else state.path.last.appendChild(node);
+      state.path.push(node);
 
       // This can be added instantly without searching for the overflow point
       // but won't apply rules to this node's children
@@ -219,7 +209,7 @@ class Binder {
         let nodeH = node.getBoundingClientRect().height;
         let flowH = state.currentPage.flowBox.getBoundingClientRect().height;
         if (nodeH < flowH) {
-          state.elPath.pop();
+          state.path.pop();
           state.currentPage = makeNextPage();
           addElementNode(node, doneCallback);
           return;
@@ -244,10 +234,8 @@ class Binder {
         switch (child.nodeType) {
           case Node.TEXT_NODE:
             let cancel = () => {
-              let lastEl = state.elPath.pop();
-              if (state.elPath.items.length < 1) {
-                // console.log(lastEl);
-                // console.log(child);
+              let lastEl = state.path.pop();
+              if (state.path.items.length < 1) {
                 console.error(`Bindery: Failed to add textNode "${child.nodeValue}" to ${elementName(lastEl)}. Page might be too small?`);
                 return;
               }
@@ -258,8 +246,8 @@ class Binder {
 
               if (fn) state.currentPage.footer.appendChild(fn); // <--
 
-              state.elPath.last.appendChild(node);
-              state.elPath.push(node);
+              state.path.last.appendChild(node);
+              state.path.push(node);
               addTextNode(child, addNextChild, cancel);
             }
             addTextNode(child, addNextChild, cancel);
@@ -274,7 +262,7 @@ class Binder {
 
             throttle(() => {
               addElementNode(child, () => {
-                state.elPath.pop();
+                state.path.pop();
                 afterAddRules(child);
                 addNextChild();
               })
@@ -292,8 +280,9 @@ class Binder {
 
     state.currentPage = makeNextPage();
     let content = this.source.cloneNode(true);
-    content.style.margin = 0; // TODO: make this clearer
-    content.style.padding = 0; // TODO: make this clearer
+    content.style.margin = 0;
+    content.style.padding = 0;
+
     this.source.style.display = "none";
     addElementNode(content, () => {
       console.log("wow we're done!");
@@ -302,10 +291,8 @@ class Binder {
 
       afterBindRules(state.pages);
 
-
       this.viewer = new Viewer({
         pages: state.pages,
-        target: this.target,
       });
 
       this.viewer.update();
@@ -319,6 +306,5 @@ class Binder {
 for (let rule in Rules) {
   Binder[rule] = Rules[rule];
 }
-
 
 module.exports = Binder;

@@ -3,7 +3,7 @@ import css from "style!css!./viewer.css";
 import Page from "../Page/page";
 import h from "hyperscript";
 
-class Printer {
+class Viewer {
   constructor(opts) {
     this.pages = opts.pages;
 
@@ -15,10 +15,6 @@ class Printer {
       document.body.appendChild(this.target);
     }
     this.target.setAttribute("bindery-export", true);
-
-    this.printWrapper = h("div.bindery-print-wrapper", {
-      style: `height:${Page.H}px; width:${Page.W * 2}px`,
-    });
 
     this.doubleSided = true;
     this.currentLeaf = 0;
@@ -78,22 +74,27 @@ class Printer {
 
 
     for (var i = 0; i < pages.length; i += (this.doubleSided ? 2 : 1)) {
-      let wrap = this.printWrapper.cloneNode(false);
+
 
       if (this.doubleSided) {
         let l = pages[i].element;
         let r = pages[i+1].element;
         l.setAttribute("bindery-side", "left");
         r.setAttribute("bindery-side", "right");
-        wrap.appendChild(l);
-        wrap.appendChild(r);
+        let wrap = h("div.bindery-print-wrapper", {
+          style: `height:${Page.H}px; width:${Page.W * 2}px`,
+        }, l, r);
+
+        this.target.appendChild(wrap);
       }
       else {
         let pg = pages[i].element;
         pg.setAttribute("bindery-side", "right");
-        wrap.appendChild(pg);
+        let wrap = h("div.bindery-print-wrapper", {
+          style: `height:${Page.H}px; width:${Page.W}px`,
+        }, pg);
+        this.target.appendChild(wrap);
       }
-      this.target.appendChild(wrap);
     }
   }
   renderPreview() {
@@ -107,7 +108,7 @@ class Printer {
     if (this.doubleSided) {
       if (this.pages.length % 2 !== 0) {
         let pg = new Page();
-        this.book.addPage(pg);
+        pages.push(pg);
       }
     }
     let spacerPage = new Page();
@@ -195,4 +196,4 @@ let coords = (e) => {
 }
 
 
-export default Printer;
+export default Viewer;

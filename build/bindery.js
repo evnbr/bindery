@@ -99,7 +99,6 @@ var Bindery =
 	      console.error("Bindery: Source should be an element or selector");
 	    }
 	
-	    this.target = opts.target;
 	    this.rules = [];
 	
 	    this.controls = new _controls2.default({
@@ -110,7 +109,6 @@ var Bindery =
 	      _page2.default.setSize(opts.pageSize);
 	    }
 	
-	    // if (opts.rules) this.addRules(...opts.rules);
 	    if (opts.rules) this.addRules(opts.rules);
 	    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 	  }
@@ -134,13 +132,8 @@ var Bindery =
 	    value: function makeBook(doneBinding) {
 	      var _this = this;
 	
-	      // let addPage = () => {
-	      //
-	      //   return pg;
-	      // }
-	
 	      var state = {
-	        elPath: new _ElementPath2.default(),
+	        path: new _ElementPath2.default(),
 	        pages: [],
 	        getNewPage: function getNewPage() {
 	          return makeNextPage();
@@ -154,31 +147,29 @@ var Bindery =
 	
 	      var beforeAddRules = function beforeAddRules(elmt) {
 	        _this.rules.forEach(function (rule) {
-	          if (elmt.matches(rule.selector)) {
-	            if (rule.beforeAdd) {
+	          if (elmt.matches(rule.selector) && rule.beforeAdd) {
 	
-	              var backupPgElmnt = state.currentPage.element.cloneNode(true); // backup page
-	              var backupElmt = elmt.cloneNode(true);
+	            var backupPgElmnt = state.currentPage.element.cloneNode(true);
+	            var backupElmt = elmt.cloneNode(true);
+	            rule.beforeAdd(elmt, state);
+	
+	            if (state.currentPage.hasOverflowed()) {
+	              // restore from backup
+	              elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
+	              state.currentPage.element = backupPgElmnt;
+	              state.currentPage.number = backupPgElmnt.querySelector(".bindery-num"); // TODO
+	
+	              state.currentPage = makeNextPage();
+	
 	              rule.beforeAdd(elmt, state);
-	
-	              if (state.currentPage.hasOverflowed()) {
-	                // restore from backup
-	                elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
-	                state.currentPage.element = backupPgElmnt;
-	                state.currentPage.number = backupPgElmnt.querySelector(".bindery-num"); // TODO
-	
-	                state.currentPage = makeNextPage();
-	
-	                rule.beforeAdd(elmt, state);
-	              }
 	            }
 	          }
 	        });
 	      };
 	      var afterAddRules = function afterAddRules(elmt) {
 	        _this.rules.forEach(function (rule) {
-	          if (elmt.matches(rule.selector)) {
-	            if (rule.afterAdd) rule.afterAdd(elmt, state);
+	          if (elmt.matches(rule.selector) && rule.afterAdd) {
+	            rule.afterAdd(elmt, state);
 	          }
 	        });
 	      };
@@ -200,21 +191,21 @@ var Bindery =
 	      // Creates clones for ever level of tag
 	      // we were in when we overflowed the last page
 	      var makeNextPage = function makeNextPage() {
-	        state.elPath = state.elPath.clone();
+	        state.path = state.path.clone();
 	        var newPage = new _page2.default();
 	        newPageRules(newPage);
 	        state.pages.push(newPage);
-	        if (state.elPath.root) {
-	          newPage.flowContent.appendChild(state.elPath.root);
+	        if (state.path.root) {
+	          newPage.flowContent.appendChild(state.path.root);
 	        }
 	        return newPage;
 	      };
 	
-	      // Adds an text node by adding each word one by one
-	      // until it overflows
+	      // Adds an text node by binary searching amount of
+	      // words until it just barely doesnt overflow
 	      var addTextNode = function addTextNode(node, doneCallback, abortCallback) {
 	
-	        state.elPath.last.appendChild(node);
+	        state.path.last.appendChild(node);
 	
 	        var textNode = node;
 	        var origText = textNode.nodeValue;
@@ -257,7 +248,7 @@ var Bindery =
 	            // Start on new page
 	            state.currentPage = makeNextPage();
 	            textNode = document.createTextNode(origText);
-	            state.elPath.last.appendChild(textNode);
+	            state.path.last.appendChild(textNode);
 	
 	            // If the remainder fits there, we're done
 	            if (!state.currentPage.hasOverflowed()) {
@@ -284,8 +275,8 @@ var Bindery =
 	      var addElementNode = function addElementNode(node, doneCallback) {
 	
 	        // Add this node to the current page or context
-	        if (state.elPath.items.length == 0) state.currentPage.flowContent.appendChild(node);else state.elPath.last.appendChild(node);
-	        state.elPath.push(node);
+	        if (state.path.items.length == 0) state.currentPage.flowContent.appendChild(node);else state.path.last.appendChild(node);
+	        state.path.push(node);
 	
 	        // This can be added instantly without searching for the overflow point
 	        // but won't apply rules to this node's children
@@ -298,7 +289,7 @@ var Bindery =
 	          var nodeH = node.getBoundingClientRect().height;
 	          var flowH = state.currentPage.flowBox.getBoundingClientRect().height;
 	          if (nodeH < flowH) {
-	            state.elPath.pop();
+	            state.path.pop();
 	            state.currentPage = makeNextPage();
 	            addElementNode(node, doneCallback);
 	            return;
@@ -322,10 +313,8 @@ var Bindery =
 	          switch (child.nodeType) {
 	            case Node.TEXT_NODE:
 	              var cancel = function cancel() {
-	                var lastEl = state.elPath.pop();
-	                if (state.elPath.items.length < 1) {
-	                  // console.log(lastEl);
-	                  // console.log(child);
+	                var lastEl = state.path.pop();
+	                if (state.path.items.length < 1) {
 	                  console.error("Bindery: Failed to add textNode \"" + child.nodeValue + "\" to " + (0, _ElementName2.default)(lastEl) + ". Page might be too small?");
 	                  return;
 	                }
@@ -336,8 +325,8 @@ var Bindery =
 	
 	                if (fn) state.currentPage.footer.appendChild(fn); // <--
 	
-	                state.elPath.last.appendChild(node);
-	                state.elPath.push(node);
+	                state.path.last.appendChild(node);
+	                state.path.push(node);
 	                addTextNode(child, addNextChild, cancel);
 	              };
 	              addTextNode(child, addNextChild, cancel);
@@ -353,7 +342,7 @@ var Bindery =
 	
 	                throttle(function () {
 	                  addElementNode(child, function () {
-	                    state.elPath.pop();
+	                    state.path.pop();
 	                    afterAddRules(child);
 	                    addNextChild();
 	                  });
@@ -371,8 +360,9 @@ var Bindery =
 	
 	      state.currentPage = makeNextPage();
 	      var content = this.source.cloneNode(true);
-	      content.style.margin = 0; // TODO: make this clearer
-	      content.style.padding = 0; // TODO: make this clearer
+	      content.style.margin = 0;
+	      content.style.padding = 0;
+	
 	      this.source.style.display = "none";
 	      addElementNode(content, function () {
 	        console.log("wow we're done!");
@@ -382,8 +372,7 @@ var Bindery =
 	        afterBindRules(state.pages);
 	
 	        _this.viewer = new _viewer2.default({
-	          pages: state.pages,
-	          target: _this.target
+	          pages: state.pages
 	        });
 	
 	        _this.viewer.update();
@@ -1368,9 +1357,9 @@ var Bindery =
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Printer = function () {
-	  function Printer(opts) {
-	    _classCallCheck(this, Printer);
+	var Viewer = function () {
+	  function Viewer(opts) {
+	    _classCallCheck(this, Viewer);
 	
 	    this.pages = opts.pages;
 	
@@ -1382,15 +1371,11 @@ var Bindery =
 	    }
 	    this.target.setAttribute("bindery-export", true);
 	
-	    this.printWrapper = (0, _hyperscript2.default)("div.bindery-print-wrapper", {
-	      style: "height:" + _page2.default.H + "px; width:" + _page2.default.W * 2 + "px"
-	    });
-	
 	    this.doubleSided = true;
 	    this.currentLeaf = 0;
 	  }
 	
-	  _createClass(Printer, [{
+	  _createClass(Viewer, [{
 	    key: "cancel",
 	    value: function cancel() {
 	      // TODO this doesn't work if the target is an existing node
@@ -1458,21 +1443,25 @@ var Bindery =
 	      }
 	
 	      for (var i = 0; i < pages.length; i += this.doubleSided ? 2 : 1) {
-	        var wrap = this.printWrapper.cloneNode(false);
 	
 	        if (this.doubleSided) {
 	          var l = pages[i].element;
 	          var r = pages[i + 1].element;
 	          l.setAttribute("bindery-side", "left");
 	          r.setAttribute("bindery-side", "right");
-	          wrap.appendChild(l);
-	          wrap.appendChild(r);
+	          var wrap = (0, _hyperscript2.default)("div.bindery-print-wrapper", {
+	            style: "height:" + _page2.default.H + "px; width:" + _page2.default.W * 2 + "px"
+	          }, l, r);
+	
+	          this.target.appendChild(wrap);
 	        } else {
 	          var _pg = pages[i].element;
 	          _pg.setAttribute("bindery-side", "right");
-	          wrap.appendChild(_pg);
+	          var _wrap = (0, _hyperscript2.default)("div.bindery-print-wrapper", {
+	            style: "height:" + _page2.default.H + "px; width:" + _page2.default.W + "px"
+	          }, _pg);
+	          this.target.appendChild(_wrap);
 	        }
-	        this.target.appendChild(wrap);
 	      }
 	    }
 	  }, {
@@ -1488,7 +1477,7 @@ var Bindery =
 	      if (this.doubleSided) {
 	        if (this.pages.length % 2 !== 0) {
 	          var pg = new _page2.default();
-	          this.book.addPage(pg);
+	          pages.push(pg);
 	        }
 	      }
 	      var spacerPage = new _page2.default();
@@ -1573,7 +1562,7 @@ var Bindery =
 	    }
 	  }]);
 	
-	  return Printer;
+	  return Viewer;
 	}();
 	
 	var transition = function transition(pct, a, b) {
@@ -1592,7 +1581,7 @@ var Bindery =
 	  return e = e.touches && e.touches[0] || e, { x: e.pageX, y: e.pageY };
 	};
 	
-	exports.default = Printer;
+	exports.default = Viewer;
 
 /***/ },
 /* 16 */
@@ -1629,7 +1618,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  [bindery-export], .measureArea {\n    background: #f1f1f1;\n    padding: 50px 20px;\n    z-index: 99;\n    position: relative;\n  }\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not([bindery-export]) {\n    display: none !important;\n  }\n\n  .bindery-print-wrapper {\n    border: 1px dashed black;\n    margin: 20px;\n  }\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not([bindery-export]) {\n  display: none !important;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  display: flex;\n  width: 800px;\n  margin: 20px auto;\n}\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  [bindery-export], .measureArea {\n    background: #f1f1f1;\n    padding: 50px 20px;\n    z-index: 99;\n    position: relative;\n  }\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not([bindery-export]) {\n    display: none !important;\n  }\n\n  .bindery-print-wrapper {\n    margin: 20px;\n  }\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not([bindery-export]) {\n  display: none !important;\n}\n\n.bindery-print-wrapper {\n  page-break-after: always;\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 50px auto;\n}\n\n.bindery-print-wrapper:before {\n\tcontent: \"\";\n\tdisplay: block;\n\tposition: absolute;\n\ttop: -20px;\n\tleft: -20px;\n\twidth: 100%;\n\theight: 100%;\n  -webkit-border-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowMjAwMjQwRUNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDowMjAwMjQwRkNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkJFRjE1REVCQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkJFRjE1REVDQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+OTmWYwAAA3VJREFUeNrs2MGKgzAUhtH+pXt9/6esT3An3RWEQWidScw5EFpchZvwgaaqbswnyevn/fDT610Yaa+c624EgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgA/+ZhBFNb7ZWRpKpMYcaDT3bPer0LI+0Vr4QAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFgAAv0tbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFgAAH0lbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWwN97GMHUlrf/m73Su1SVKcx48Mnrp0a4CyPtFa+EAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABV/UjwADn4TtZkBC9rAAAAABJRU5ErkJggg==) 140 fill stretch round;\n\tborder-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowMjAwMjQwRUNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDowMjAwMjQwRkNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkJFRjE1REVCQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkJFRjE1REVDQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+OTmWYwAAA3VJREFUeNrs2MGKgzAUhtH+pXt9/6esT3An3RWEQWidScw5EFpchZvwgaaqbswnyevn/fDT610Yaa+c624EgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgA/+ZhBFNb7ZWRpKpMYcaDT3bPer0LI+0Vr4QAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFgAAv0tbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFgAAH0lbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWwN97GMHUlrf/m73Su1SVKcx48Mnrp0a4CyPtFa+EAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABV/UjwADn4TtZkBC9rAAAAABJRU5ErkJggg==) 140 fill stretch round;\n\tborder-image-slice: 140;\n\tborder-image-repeat: stretch round;\n\tborder-width: 20px;\n\tbox-sizing: content-box;\n  border-style: solid;\n  z-index: 999;\n}\n\n\n.bindery-stage3d {\n  perspective: 2000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: all 0.8s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: -380px;\n}\n\n.bindery-page3d:hover {\n  outline: 1px solid red;\n  /*transform: translate3d(20px, 0, 0);*/\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n", ""]);
 	
 	// exports
 
