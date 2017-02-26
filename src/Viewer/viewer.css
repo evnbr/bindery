@@ -36,6 +36,7 @@
 
 .bindery-print-wrapper:before {
 	content: "";
+  pointer-events: none;
 	display: block;
 	position: absolute;
 	top: -20px;

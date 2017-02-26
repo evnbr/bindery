@@ -7,6 +7,10 @@ export default {
     prevPage = state.currentPage;
     prevElementPath = state.path;
     state.currentPage = state.getNewPage();
+
+    //TODO: Rather than just add padding,
+    // put full-bleed content on a separate
+    // out-of-flow background layer
     if (elmt.classList.contains("bleed")) {
       state.currentPage.element.classList.add("bleed");
     }

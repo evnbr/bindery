@@ -65,15 +65,15 @@ var Bindery =
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _viewer = __webpack_require__(15);
+	var _viewer = __webpack_require__(17);
 	
 	var _viewer2 = _interopRequireDefault(_viewer);
 	
-	var _controls = __webpack_require__(18);
+	var _controls = __webpack_require__(20);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
-	var _Rules = __webpack_require__(21);
+	var _Rules = __webpack_require__(23);
 	
 	var _Rules2 = _interopRequireDefault(_Rules);
 	
@@ -105,9 +105,8 @@ var Bindery =
 	      binder: this
 	    });
 	
-	    if (opts.pageSize) {
-	      _page2.default.setSize(opts.pageSize);
-	    }
+	    if (opts.pageSize) _page2.default.setSize(opts.pageSize);
+	    if (opts.margin) _page2.default.setMargin(opts.margin);
 	
 	    if (opts.rules) this.addRules(opts.rules);
 	    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
@@ -427,7 +426,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, ".bindery-measure-area {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.bindery-measure-area * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.bindery-measure-area .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n", ""]);
+	exports.push([module.id, "/* Nothing */\n", ""]);
 	
 	// exports
 
@@ -837,6 +836,10 @@ var Bindery =
 	
 	var _page2 = _interopRequireDefault(_page);
 	
+	var _measureArea = __webpack_require__(15);
+	
+	var _measureArea2 = _interopRequireDefault(_measureArea);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -871,6 +874,13 @@ var Bindery =
 	    value: function setSize(size) {
 	      Page.W = size.width;
 	      Page.H = size.height;
+	    }
+	  }, {
+	    key: "setMargin",
+	    value: function setMargin(margin) {
+	      var sheet = document.createElement('style');
+	      sheet.innerHTML = "\n      [bindery-side=\"left\"] .bindery-flowbox,\n      [bindery-side=\"left\"] .bindery-footer {\n        margin-left: " + margin.outer + "px;\n        margin-right: " + margin.inner + "px;\n      }\n      [bindery-side=\"right\"] .bindery-flowbox,\n      [bindery-side=\"right\"] .bindery-footer {\n        margin-left: " + margin.inner + "px;\n        margin-right: " + margin.outer + "px;\n      }\n      .bindery-flowbox { margin-top: " + margin.top + "px; }\n      .bindery-footer { margin-bottom: " + margin.bottom + "px; }\n    ";
+	      document.body.appendChild(sheet);
 	    }
 	  }]);
 	
@@ -1324,13 +1334,53 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
 	
 	// exports
 
 
 /***/ },
 /* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(16);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./measureArea.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./measureArea.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".bindery-measure-area {\n  outline: 1px solid cyan;\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.bindery-measure-area * {\n  outline: 1px solid gray;\n  color: gray;\n  background: transparent;\n}\n\n.bindery-measure-area .bindery-page {\n  background: transparent;\n  box-shadow: none;\n}\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1341,7 +1391,7 @@ var Bindery =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _viewer = __webpack_require__(16);
+	var _viewer = __webpack_require__(18);
 	
 	var _viewer2 = _interopRequireDefault(_viewer);
 	
@@ -1584,13 +1634,13 @@ var Bindery =
 	exports.default = Viewer;
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(17);
+	var content = __webpack_require__(19);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1610,7 +1660,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1624,14 +1674,14 @@ var Bindery =
 
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _controls = __webpack_require__(19);
+	var _controls = __webpack_require__(21);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
@@ -1714,13 +1764,13 @@ var Bindery =
 	module.exports = Controls;
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(20);
+	var content = __webpack_require__(22);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1740,7 +1790,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1754,7 +1804,7 @@ var Bindery =
 
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1763,27 +1813,27 @@ var Bindery =
 	  value: true
 	});
 	
-	var _breakBefore = __webpack_require__(22);
+	var _breakBefore = __webpack_require__(24);
 	
 	var _breakBefore2 = _interopRequireDefault(_breakBefore);
 	
-	var _fullPage = __webpack_require__(23);
+	var _fullPage = __webpack_require__(25);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
-	var _spread = __webpack_require__(26);
+	var _spread = __webpack_require__(28);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
-	var _Footnote = __webpack_require__(29);
+	var _Footnote = __webpack_require__(31);
 	
 	var _Footnote2 = _interopRequireDefault(_Footnote);
 	
-	var _pageNumber = __webpack_require__(30);
+	var _pageNumber = __webpack_require__(32);
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
-	var _runningHeader = __webpack_require__(33);
+	var _runningHeader = __webpack_require__(35);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
@@ -1799,7 +1849,7 @@ var Bindery =
 	};
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1816,7 +1866,7 @@ var Bindery =
 	};
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1825,7 +1875,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _fullPage = __webpack_require__(24);
+	var _fullPage = __webpack_require__(26);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
@@ -1850,13 +1900,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(25);
+	var content = __webpack_require__(27);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1876,7 +1926,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1890,7 +1940,7 @@ var Bindery =
 
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1899,7 +1949,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _spread = __webpack_require__(27);
+	var _spread = __webpack_require__(29);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
@@ -1933,13 +1983,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(28);
+	var content = __webpack_require__(30);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1959,7 +2009,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1973,7 +2023,7 @@ var Bindery =
 
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2002,7 +2052,7 @@ var Bindery =
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2015,7 +2065,7 @@ var Bindery =
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _pageNumber = __webpack_require__(31);
+	var _pageNumber = __webpack_require__(33);
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
@@ -2033,13 +2083,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(32);
+	var content = __webpack_require__(34);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2059,7 +2109,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2073,7 +2123,7 @@ var Bindery =
 
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2086,7 +2136,7 @@ var Bindery =
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _runningHeader = __webpack_require__(34);
+	var _runningHeader = __webpack_require__(36);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
@@ -2107,13 +2157,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(35);
+	var content = __webpack_require__(37);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2133,7 +2183,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();

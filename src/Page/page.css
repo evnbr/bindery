@@ -59,7 +59,11 @@
   font-size: 0.66em;
 }
 
-.bleed .bindery-flowbox {
+[bindery-continuation] {
+  text-indent: 0 !important;
+}
+
+.bindery-page.bleed .bindery-flowbox {
   margin: 0;
   position: absolute;
   top: -20px;

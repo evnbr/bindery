@@ -1,5 +1,6 @@
 import h from "hyperscript";
 import css from "style!css!./page.css";
+import _ from "style!css!./measureArea.css";
 
 class Page {
   constructor() {
@@ -17,6 +18,24 @@ class Page {
   static setSize(size) {
     Page.W = size.width;
     Page.H = size.height;
+  }
+  static setMargin(margin) {
+    var sheet = document.createElement('style')
+    sheet.innerHTML = `
+      [bindery-side="left"] .bindery-flowbox,
+      [bindery-side="left"] .bindery-footer {
+        margin-left: ${margin.outer}px;
+        margin-right: ${margin.inner}px;
+      }
+      [bindery-side="right"] .bindery-flowbox,
+      [bindery-side="right"] .bindery-footer {
+        margin-left: ${margin.inner}px;
+        margin-right: ${margin.outer}px;
+      }
+      .bindery-flowbox { margin-top: ${margin.top}px; }
+      .bindery-footer { margin-bottom: ${margin.bottom}px; }
+    `;
+    document.body.appendChild(sheet);
   }
   hasOverflowed() {
     let measureArea = document.querySelector(".bindery-measure-area");
