@@ -50,6 +50,10 @@ class Page {
     let boxH = this.flowBox.getBoundingClientRect().height;
     return contentH >= boxH;
   }
+  setPreference(dir) {
+    if (dir == "left") this.alwaysLeft = true;
+    if (dir == "right") this.alwaysRight = true;
+  }
 
 }
 

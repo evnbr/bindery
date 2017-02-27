@@ -77,21 +77,33 @@ class Viewer {
 
 
       if (this.doubleSided) {
-        let l = pages[i].element;
-        let r = pages[i+1].element;
-        l.setAttribute("bindery-side", "left");
-        r.setAttribute("bindery-side", "right");
-        let wrap = h("div.bindery-print-wrapper", {
-          style: `height:${Page.H}px; width:${Page.W * 2}px`,
-        }, l, r);
+        let left  = pages[i];
+        let right = pages[i+1];
+
+        let leftPage = left.element;
+        let rightPage = right.element;
+
+
+        leftPage.setAttribute("bindery-side", "left");
+        rightPage.setAttribute("bindery-side", "right");
+
+        let wrap = h(".bindery-print-wrapper", {
+          style: {
+            height: `${Page.H}px`,
+            width: `${Page.W * 2}px`,
+          }
+        }, leftPage, rightPage);
 
         this.target.appendChild(wrap);
       }
       else {
         let pg = pages[i].element;
         pg.setAttribute("bindery-side", "right");
-        let wrap = h("div.bindery-print-wrapper", {
-          style: `height:${Page.H}px; width:${Page.W}px`,
+        let wrap = h(".bindery-print-wrapper", {
+          style: {
+            height: `${Page.H}px`,
+            width: `${Page.W}px`,
+          }
         }, pg);
         this.target.appendChild(wrap);
       }

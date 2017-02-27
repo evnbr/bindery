@@ -45,6 +45,10 @@ class Binder {
 
   addRules(rules) {
     for (let selector in rules) {
+      if (!rules[selector] ) {
+        console.warn(`Bindery: Unknown rule for "${selector}"`);
+        continue;
+      }
       rules[selector].selector = selector;
       this.rules.push(rules[selector]);
     }
@@ -288,6 +292,8 @@ class Binder {
       let measureArea = document.querySelector(".bindery-measure-area");
       document.body.removeChild(measureArea);
 
+      reorderPages(state.pages);
+
       afterBindRules(state.pages);
 
       this.viewer = new Viewer({
@@ -301,6 +307,32 @@ class Binder {
     });
   }
 }
+
+// TODO: only do this if not double sided?
+let reorderPages = (pages) => {
+  // TODO: this ignores the cover page, assuming its on the right
+  for (var i = 1; i < pages.length - 1; i += 2) {
+    let left  = pages[i];
+    let right = pages[i+1];
+
+    // TODO: Check more than once
+    if (left.alwaysRight) {
+      pages[i] = pages[i+1];
+      pages[i+1] = left;
+      left = pages[i];
+      right = pages[i+1];
+    }
+    if (right.alwaysLeft) {
+      // TODO: don't overflow, assumes that
+      // there are not multiple spreads in a row
+      pages[i+1] = pages[i+3];
+      pages[i+3] = right;
+      right = pages[i+1];
+    }
+  }
+}
+
+
 
 for (let rule in Rules) {
   Binder[rule] = Rules[rule];

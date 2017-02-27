@@ -11,16 +11,20 @@ export default {
 
   },
   afterAdd: (elmt, state) => {
-    let dupedContent = state.currentPage.flowContent.cloneNode(true);
+    let leftPage = state.currentPage;
+    let dupedContent = leftPage.flowContent.cloneNode(true);
     let rightPage = state.getNewPage();
     rightPage.flowBox.innerHTML = "";
     rightPage.flowBox.appendChild(dupedContent);
     rightPage.flowContent = dupedContent;
 
-    state.currentPage.element.classList.add("bindery-spread");
+    leftPage.element.classList.add("bindery-spread");
     rightPage.element.classList.add("bindery-spread");
-    state.currentPage.element.classList.add("bleed");
+    leftPage.element.classList.add("bleed");
     rightPage.element.classList.add("bleed");
+
+    leftPage.setPreference("left");
+    rightPage.setPreference("right");
 
     state.currentPage = prevPage;
     state.elPath = prevElementPath;
