@@ -122,6 +122,10 @@ var Bindery =
 	    key: "addRules",
 	    value: function addRules(rules) {
 	      for (var selector in rules) {
+	        if (!rules[selector]) {
+	          console.warn("Bindery: Unknown rule for \"" + selector + "\"");
+	          continue;
+	        }
 	        rules[selector].selector = selector;
 	        this.rules.push(rules[selector]);
 	      }
@@ -368,6 +372,8 @@ var Bindery =
 	        var measureArea = document.querySelector(".bindery-measure-area");
 	        document.body.removeChild(measureArea);
 	
+	        reorderPages(state.pages);
+	
 	        afterBindRules(state.pages);
 	
 	        _this.viewer = new _viewer2.default({
@@ -384,6 +390,32 @@ var Bindery =
 	
 	  return Binder;
 	}();
+	
+	// TODO: only do this if not double sided?
+	
+	
+	var reorderPages = function reorderPages(pages) {
+	  // TODO: this ignores the cover page, assuming its on the right
+	  for (var i = 1; i < pages.length - 1; i += 2) {
+	    var left = pages[i];
+	    var right = pages[i + 1];
+	
+	    // TODO: Check more than once
+	    if (left.alwaysRight) {
+	      pages[i] = pages[i + 1];
+	      pages[i + 1] = left;
+	      left = pages[i];
+	      right = pages[i + 1];
+	    }
+	    if (right.alwaysLeft) {
+	      // TODO: don't overflow, assumes that
+	      // there are not multiple spreads in a row
+	      pages[i + 1] = pages[i + 3];
+	      pages[i + 3] = right;
+	      right = pages[i + 1];
+	    }
+	  }
+	};
 	
 	for (var rule in _Rules2.default) {
 	  Binder[rule] = _Rules2.default[rule];
@@ -868,6 +900,12 @@ var Bindery =
 	      var contentH = this.flowContent.getBoundingClientRect().height;
 	      var boxH = this.flowBox.getBoundingClientRect().height;
 	      return contentH >= boxH;
+	    }
+	  }, {
+	    key: "setPreference",
+	    value: function setPreference(dir) {
+	      if (dir == "left") this.alwaysLeft = true;
+	      if (dir == "right") this.alwaysRight = true;
 	    }
 	  }], [{
 	    key: "setSize",
@@ -1495,20 +1533,31 @@ var Bindery =
 	      for (var i = 0; i < pages.length; i += this.doubleSided ? 2 : 1) {
 	
 	        if (this.doubleSided) {
-	          var l = pages[i].element;
-	          var r = pages[i + 1].element;
-	          l.setAttribute("bindery-side", "left");
-	          r.setAttribute("bindery-side", "right");
-	          var wrap = (0, _hyperscript2.default)("div.bindery-print-wrapper", {
-	            style: "height:" + _page2.default.H + "px; width:" + _page2.default.W * 2 + "px"
-	          }, l, r);
+	          var left = pages[i];
+	          var right = pages[i + 1];
+	
+	          var leftPage = left.element;
+	          var rightPage = right.element;
+	
+	          leftPage.setAttribute("bindery-side", "left");
+	          rightPage.setAttribute("bindery-side", "right");
+	
+	          var wrap = (0, _hyperscript2.default)(".bindery-print-wrapper", {
+	            style: {
+	              height: _page2.default.H + "px",
+	              width: _page2.default.W * 2 + "px"
+	            }
+	          }, leftPage, rightPage);
 	
 	          this.target.appendChild(wrap);
 	        } else {
 	          var _pg = pages[i].element;
 	          _pg.setAttribute("bindery-side", "right");
-	          var _wrap = (0, _hyperscript2.default)("div.bindery-print-wrapper", {
-	            style: "height:" + _page2.default.H + "px; width:" + _page2.default.W + "px"
+	          var _wrap = (0, _hyperscript2.default)(".bindery-print-wrapper", {
+	            style: {
+	              height: _page2.default.H + "px",
+	              width: _page2.default.W + "px"
+	            }
 	          }, _pg);
 	          this.target.appendChild(_wrap);
 	        }
@@ -1829,11 +1878,15 @@ var Bindery =
 	
 	var _Footnote2 = _interopRequireDefault(_Footnote);
 	
-	var _pageNumber = __webpack_require__(32);
+	var _PageReference = __webpack_require__(32);
+	
+	var _PageReference2 = _interopRequireDefault(_PageReference);
+	
+	var _pageNumber = __webpack_require__(33);
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
-	var _runningHeader = __webpack_require__(35);
+	var _runningHeader = __webpack_require__(36);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
@@ -1845,7 +1898,8 @@ var Bindery =
 	  Footnote: _Footnote2.default,
 	  BreakBefore: _breakBefore2.default,
 	  PageNumber: _pageNumber2.default,
-	  RunningHeader: _runningHeader2.default
+	  RunningHeader: _runningHeader2.default,
+	  PageReference: _PageReference2.default
 	};
 
 /***/ },
@@ -1889,6 +1943,10 @@ var Bindery =
 	    prevPage = state.currentPage;
 	    prevElementPath = state.path;
 	    state.currentPage = state.getNewPage();
+	
+	    //TODO: Rather than just add padding,
+	    // put full-bleed content on a separate
+	    // out-of-flow background layer
 	    if (elmt.classList.contains("bleed")) {
 	      state.currentPage.element.classList.add("bleed");
 	    }
@@ -1966,16 +2024,20 @@ var Bindery =
 	    state.currentPage = state.getNewPage();
 	  },
 	  afterAdd: function afterAdd(elmt, state) {
-	    var dupedContent = state.currentPage.flowContent.cloneNode(true);
+	    var leftPage = state.currentPage;
+	    var dupedContent = leftPage.flowContent.cloneNode(true);
 	    var rightPage = state.getNewPage();
 	    rightPage.flowBox.innerHTML = "";
 	    rightPage.flowBox.appendChild(dupedContent);
 	    rightPage.flowContent = dupedContent;
 	
-	    state.currentPage.element.classList.add("bindery-spread");
+	    leftPage.element.classList.add("bindery-spread");
 	    rightPage.element.classList.add("bindery-spread");
-	    state.currentPage.element.classList.add("bleed");
+	    leftPage.element.classList.add("bleed");
 	    rightPage.element.classList.add("bleed");
+	
+	    leftPage.setPreference("left");
+	    rightPage.setPreference("right");
 	
 	    state.currentPage = prevPage;
 	    state.elPath = prevElementPath;
@@ -2053,6 +2115,31 @@ var Bindery =
 
 /***/ },
 /* 32 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var references = {};
+	
+	exports.default = {
+	  afterAdd: function afterAdd(elmt, state) {
+	    references[elmt.getAttribute("href")] = elmt;
+	    elmt.removeAttribute("href");
+	  },
+	  afterBind: function afterBind(pg, i) {
+	    for (var ref in references) {
+	      if (pg.element.querySelector(ref)) {
+	        references[ref].insertAdjacentHTML("afterend", ": " + pg.number.textContent);
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2065,7 +2152,7 @@ var Bindery =
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _pageNumber = __webpack_require__(33);
+	var _pageNumber = __webpack_require__(34);
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
@@ -2083,13 +2170,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(34);
+	var content = __webpack_require__(35);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2109,7 +2196,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2123,7 +2210,7 @@ var Bindery =
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2136,7 +2223,7 @@ var Bindery =
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _runningHeader = __webpack_require__(36);
+	var _runningHeader = __webpack_require__(37);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
@@ -2157,13 +2244,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(37);
+	var content = __webpack_require__(38);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2183,7 +2270,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
