@@ -22,6 +22,11 @@ h2 {
   margin-bottom: 1rem;
 }
 
+h3 {
+  font-size: 2em;
+  margin-bottom: 1rem;
+}
+
 p {
   text-indent: 1rem;
 }
@@ -49,6 +54,10 @@ figcaption {
   border: 1px solid black;
   padding: 1rem;
   margin: 1rem 0;
+}
+
+.toc {
+  list-style: none;
 }
 
 #makeBook {

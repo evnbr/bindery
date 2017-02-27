@@ -2,6 +2,7 @@ import breakBefore from "./breakBefore";
 import fullPage from "./FullPage/fullPage";
 import Spread from "./Spread/spread";
 import Footnote from "./Footnote";
+import PageReference from "./PageReference";
 import PageNumber from "./PageNumber/pageNumber";
 import RunningHeader from "./RunningHeader/runningHeader";
 
@@ -12,4 +13,5 @@ export default {
   BreakBefore: breakBefore,
   PageNumber: PageNumber,
   RunningHeader: RunningHeader,
+  PageReference: PageReference,
 }
