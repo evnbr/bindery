@@ -314,8 +314,6 @@ let reorderPages = (pages) => {
   // TODO: this ignores the cover page, assuming its on the right
   for (var i = 1; i < pages.length - 1; i += 2) {
     let left  = pages[i];
-    console.log("left:");
-    console.log(left.element)
 
     // TODO: Check more than once
     if (left.alwaysRight) {
@@ -324,7 +322,6 @@ let reorderPages = (pages) => {
         pages[i+1] = left;
       }
       else {
-        console.log("inserting");
         pages.splice(i, 0, new Page());
       }
     }
@@ -339,7 +336,6 @@ let reorderPages = (pages) => {
         pages[i+3] = right;
       }
       else {
-        console.log("inserting");
         pages.splice(i+1, 0, new Page());
       }
     }

@@ -399,8 +399,6 @@ var Bindery =
 	  // TODO: this ignores the cover page, assuming its on the right
 	  for (var i = 1; i < pages.length - 1; i += 2) {
 	    var left = pages[i];
-	    console.log("left:");
-	    console.log(left.element);
 	
 	    // TODO: Check more than once
 	    if (left.alwaysRight) {
@@ -408,7 +406,6 @@ var Bindery =
 	        pages[i] = pages[i + 1];
 	        pages[i + 1] = left;
 	      } else {
-	        console.log("inserting");
 	        pages.splice(i, 0, new _page2.default());
 	      }
 	    }
@@ -422,7 +419,6 @@ var Bindery =
 	        pages[i + 1] = pages[i + 3];
 	        pages[i + 3] = right;
 	      } else {
-	        console.log("inserting");
 	        pages.splice(i + 1, 0, new _page2.default());
 	      }
 	    }
@@ -2037,7 +2033,7 @@ var Bindery =
 	exports.default = {
 	  beforeAdd: function beforeAdd(elmt, state) {
 	    prevPage = state.currentPage;
-	    prevElementPath = state.elPath;
+	    prevElementPath = state.path;
 	
 	    state.currentPage = state.getNewPage();
 	  },
@@ -2060,7 +2056,7 @@ var Bindery =
 	    rightPage.setOutOfFlow(true);
 	
 	    state.currentPage = prevPage;
-	    state.elPath = prevElementPath;
+	    state.path = prevElementPath;
 	  }
 	};
 

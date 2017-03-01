@@ -5,7 +5,7 @@ let prevPage, prevElementPath;
 export default {
   beforeAdd: (elmt, state) => {
     prevPage = state.currentPage;
-    prevElementPath = state.elPath;
+    prevElementPath = state.path;
 
     state.currentPage = state.getNewPage();
 
@@ -29,6 +29,6 @@ export default {
     rightPage.setOutOfFlow(true);
 
     state.currentPage = prevPage;
-    state.elPath = prevElementPath;
+    state.path = prevElementPath;
   },
 }
