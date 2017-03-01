@@ -25,6 +25,8 @@ export default {
 
     leftPage.setPreference("left");
     rightPage.setPreference("right");
+    leftPage.setOutOfFlow(true);
+    rightPage.setOutOfFlow(true);
 
     state.currentPage = prevPage;
     state.elPath = prevElementPath;

@@ -198,6 +198,7 @@ var Bindery =
 	        var newPage = new _page2.default();
 	        newPageRules(newPage);
 	        state.pages.push(newPage);
+	        state.currentPage = newPage; // TODO redundant
 	        if (state.path.root) {
 	          newPage.flowContent.appendChild(state.path.root);
 	        }
@@ -398,21 +399,32 @@ var Bindery =
 	  // TODO: this ignores the cover page, assuming its on the right
 	  for (var i = 1; i < pages.length - 1; i += 2) {
 	    var left = pages[i];
-	    var right = pages[i + 1];
+	    console.log("left:");
+	    console.log(left.element);
 	
 	    // TODO: Check more than once
 	    if (left.alwaysRight) {
-	      pages[i] = pages[i + 1];
-	      pages[i + 1] = left;
-	      left = pages[i];
-	      right = pages[i + 1];
+	      if (left.outOfFlow) {
+	        pages[i] = pages[i + 1];
+	        pages[i + 1] = left;
+	      } else {
+	        console.log("inserting");
+	        pages.splice(i, 0, new _page2.default());
+	      }
 	    }
+	
+	    var right = pages[i + 1];
+	
 	    if (right.alwaysLeft) {
-	      // TODO: don't overflow, assumes that
-	      // there are not multiple spreads in a row
-	      pages[i + 1] = pages[i + 3];
-	      pages[i + 3] = right;
-	      right = pages[i + 1];
+	      if (right.outOfFlow) {
+	        // TODO: don't overflow, assumes that
+	        // there are not multiple spreads in a row
+	        pages[i + 1] = pages[i + 3];
+	        pages[i + 3] = right;
+	      } else {
+	        console.log("inserting");
+	        pages.splice(i + 1, 0, new _page2.default());
+	      }
 	    }
 	  }
 	};
@@ -906,6 +918,11 @@ var Bindery =
 	    value: function setPreference(dir) {
 	      if (dir == "left") this.alwaysLeft = true;
 	      if (dir == "right") this.alwaysRight = true;
+	    }
+	  }, {
+	    key: "setOutOfFlow",
+	    value: function setOutOfFlow(bool) {
+	      this.outOfFlow = bool;
 	    }
 	  }], [{
 	    key: "setSize",
@@ -1915,6 +1932,7 @@ var Bindery =
 	  beforeAdd: function beforeAdd(elmt, state) {
 	    if (state.currentPage.flowContent.innerText !== "") {
 	      state.currentPage = state.getNewPage();
+	      state.currentPage.setPreference("right");
 	    }
 	  }
 	};
@@ -2038,6 +2056,8 @@ var Bindery =
 	
 	    leftPage.setPreference("left");
 	    rightPage.setPreference("right");
+	    leftPage.setOutOfFlow(true);
+	    rightPage.setOutOfFlow(true);
 	
 	    state.currentPage = prevPage;
 	    state.elPath = prevElementPath;
@@ -2160,11 +2180,14 @@ var Bindery =
 	
 	exports.default = {
 	  newPage: function newPage(pg, state) {
+	    // let el = h(".bindery-num", "#");
+	    // pg.number = el;
+	    // pg.element.appendChild(el);
+	  },
+	  afterBind: function afterBind(pg, i) {
 	    var el = (0, _hyperscript2.default)(".bindery-num", "#");
 	    pg.number = el;
 	    pg.element.appendChild(el);
-	  },
-	  afterBind: function afterBind(pg, i) {
 	    pg.number.textContent = i + 1;
 	  }
 	};

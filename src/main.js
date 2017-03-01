@@ -120,6 +120,7 @@ class Binder {
       let newPage = new Page();
       newPageRules(newPage);
       state.pages.push(newPage);
+      state.currentPage = newPage; // TODO redundant
       if (state.path.root) {
         newPage.flowContent.appendChild(state.path.root);
       }
@@ -313,21 +314,34 @@ let reorderPages = (pages) => {
   // TODO: this ignores the cover page, assuming its on the right
   for (var i = 1; i < pages.length - 1; i += 2) {
     let left  = pages[i];
-    let right = pages[i+1];
+    console.log("left:");
+    console.log(left.element)
 
     // TODO: Check more than once
     if (left.alwaysRight) {
-      pages[i] = pages[i+1];
-      pages[i+1] = left;
-      left = pages[i];
-      right = pages[i+1];
+      if (left.outOfFlow) {
+        pages[i] = pages[i+1];
+        pages[i+1] = left;
+      }
+      else {
+        console.log("inserting");
+        pages.splice(i, 0, new Page());
+      }
     }
+
+    let right = pages[i+1];
+
     if (right.alwaysLeft) {
-      // TODO: don't overflow, assumes that
-      // there are not multiple spreads in a row
-      pages[i+1] = pages[i+3];
-      pages[i+3] = right;
-      right = pages[i+1];
+      if (right.outOfFlow) {
+        // TODO: don't overflow, assumes that
+        // there are not multiple spreads in a row
+        pages[i+1] = pages[i+3];
+        pages[i+3] = right;
+      }
+      else {
+        console.log("inserting");
+        pages.splice(i+1, 0, new Page());
+      }
     }
   }
 }

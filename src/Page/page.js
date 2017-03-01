@@ -54,6 +54,9 @@ class Page {
     if (dir == "left") this.alwaysLeft = true;
     if (dir == "right") this.alwaysRight = true;
   }
+  setOutOfFlow(bool) {
+    this.outOfFlow = bool;
+  }
 
 }
 
