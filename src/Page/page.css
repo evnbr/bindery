@@ -61,6 +61,7 @@
 
 [bindery-continuation] {
   text-indent: 0 !important;
+  margin-top: 0 !important;
 }
 
 .bindery-page.bleed .bindery-flowbox {

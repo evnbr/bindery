@@ -127,6 +127,16 @@ class Binder {
       return newPage;
     };
 
+    let moveNodeToNextPage = (nodeToMove) => {
+      state.path.pop();
+
+      let fn = state.currentPage.footer.lastChild; // <--
+      state.currentPage = makeNextPage();
+      if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
+
+      state.path.last.appendChild(nodeToMove);
+      state.path.push(nodeToMove);
+    }
 
     // Adds an text node by binary searching amount of
     // words until it just barely doesnt overflow
@@ -137,17 +147,12 @@ class Binder {
       let textNode = node;
       let origText = textNode.nodeValue;
 
-      let pos = 0;
-      let lastPos = pos;
-      let addWordIterations = 0;
+      let lastPos = 0;
+      let pos = origText.length/2;;
 
-      let step = (rawPos) => {
-        addWordIterations++;
+      let step = () => {
 
-        lastPos = pos;
-        pos = parseInt(rawPos);
         let dist = Math.abs(lastPos - pos);
-
 
         if (pos > origText.length - 1) {
           throttle(doneCallback);
@@ -159,7 +164,6 @@ class Binder {
 
           // Back out to word boundary
           while(origText.charAt(pos) !== " " && pos > -1) pos--;
-          textNode.nodeValue = origText.substr(0, pos);
 
           if (pos < 1 && origText.trim().length > 0) {
             // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
@@ -167,6 +171,8 @@ class Binder {
             abortCallback();
             return;
           }
+
+          textNode.nodeValue = origText.substr(0, pos);
 
           origText = origText.substr(pos);
           pos = 0;
@@ -182,13 +188,17 @@ class Binder {
             return;
           }
         }
-        // Search backward
-        if (state.currentPage.hasOverflowed()) throttle(() => { step(pos - dist/2); });
-        // Search forward
-        else throttle(() => { step(pos + dist/2); });
+        lastPos = pos;
+
+        let hasOverflowed = state.currentPage.hasOverflowed();
+        pos = pos + (hasOverflowed ? -dist : dist) / 2;
+
+        throttle(step);
       }
 
-      if (state.currentPage.hasOverflowed()) step(origText.length/2); // find breakpoint
+      if (state.currentPage.hasOverflowed()) {
+        step(); // find breakpoint
+      }
       else throttle(doneCallback); // add in one go
     }
 
@@ -198,30 +208,13 @@ class Binder {
     let addElementNode = (node, doneCallback) => {
 
       // Add this node to the current page or context
-      if (state.path.items.length == 0) state.currentPage.flowContent.appendChild(node);
-      else state.path.last.appendChild(node);
-      state.path.push(node);
-
-      // This can be added instantly without searching for the overflow point
-      // but won't apply rules to this node's children
-      // if (!hasOverflowed()) {
-      //   throttle(doneCallback);
-      //   return;
-      // }
-
-      if (state.currentPage.hasOverflowed() && node.getAttribute("bindery-break") == "avoid")  {
-        let nodeH = node.getBoundingClientRect().height;
-        let flowH = state.currentPage.flowBox.getBoundingClientRect().height;
-        if (nodeH < flowH) {
-          state.path.pop();
-          state.currentPage = makeNextPage();
-          addElementNode(node, doneCallback);
-          return;
-        }
-        else {
-          console.warn(`Bindery: Cannot avoid breaking ${elementName(node)}, it's taller than the flow box.`);
-        }
+      if (state.path.items.length == 0) {
+        state.currentPage.flowContent.appendChild(node);
       }
+      else {
+        state.path.last.appendChild(node);
+      }
+      state.path.push(node);
 
       // Clear this node, before re-adding its children
       let childNodes = [...node.childNodes];
@@ -238,20 +231,7 @@ class Binder {
         switch (child.nodeType) {
           case Node.TEXT_NODE:
             let cancel = () => {
-              let lastEl = state.path.pop();
-              if (state.path.items.length < 1) {
-                console.error(`Bindery: Failed to add textNode "${child.nodeValue}" to ${elementName(lastEl)}. Page might be too small?`);
-                return;
-              }
-
-              let fn = state.currentPage.footer.lastChild; // <--
-
-              state.currentPage = makeNextPage();
-
-              if (fn) state.currentPage.footer.appendChild(fn); // <--
-
-              state.path.last.appendChild(node);
-              state.path.push(node);
+              moveNodeToNextPage(node);
               addTextNode(child, addNextChild, cancel);
             }
             addTextNode(child, addNextChild, cancel);
@@ -293,7 +273,7 @@ class Binder {
       let measureArea = document.querySelector(".bindery-measure-area");
       document.body.removeChild(measureArea);
 
-      reorderPages(state.pages);
+      state.pages = reorderPages(state.pages);
 
       afterBindRules(state.pages);
 
@@ -340,6 +320,8 @@ let reorderPages = (pages) => {
       }
     }
   }
+
+  return pages;
 }
 
 

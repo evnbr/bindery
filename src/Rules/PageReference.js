@@ -8,7 +8,9 @@ export default {
   afterBind: (pg, i) => {
     for (let ref in references) {
       if (pg.element.querySelector(ref)) {
-        references[ref].insertAdjacentHTML("afterend", `: ${pg.number.textContent}`);
+        references[ref].insertAdjacentHTML(
+          "afterend",
+          `: <span style="float:right;">${pg.number.textContent}</span>`);
       }
     }
   }

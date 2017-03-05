@@ -214,15 +214,11 @@ var Bindery =
 	        var textNode = node;
 	        var origText = textNode.nodeValue;
 	
-	        var pos = 0;
-	        var lastPos = pos;
-	        var addWordIterations = 0;
+	        var lastPos = 0;
+	        var pos = origText.length / 2;;
 	
-	        var step = function step(rawPos) {
-	          addWordIterations++;
+	        var step = function step() {
 	
-	          lastPos = pos;
-	          pos = parseInt(rawPos);
 	          var dist = Math.abs(lastPos - pos);
 	
 	          if (pos > origText.length - 1) {
@@ -237,14 +233,14 @@ var Bindery =
 	            // Back out to word boundary
 	            while (origText.charAt(pos) !== " " && pos > -1) {
 	              pos--;
-	            }textNode.nodeValue = origText.substr(0, pos);
-	
-	            if (pos < 1 && origText.trim().length > 0) {
+	            }if (pos < 1 && origText.trim().length > 0) {
 	              // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}"`);
 	              textNode.nodeValue = origText;
 	              abortCallback();
 	              return;
 	            }
+	
+	            textNode.nodeValue = origText.substr(0, pos);
 	
 	            origText = origText.substr(pos);
 	            pos = 0;
@@ -260,18 +256,17 @@ var Bindery =
 	              return;
 	            }
 	          }
-	          // Search backward
-	          if (state.currentPage.hasOverflowed()) throttle(function () {
-	            step(pos - dist / 2);
-	          });
-	          // Search forward
-	          else throttle(function () {
-	              step(pos + dist / 2);
-	            });
+	          lastPos = pos;
+	
+	          var hasOverflowed = state.currentPage.hasOverflowed();
+	          pos = pos + (hasOverflowed ? -dist : dist) / 2;
+	
+	          throttle(step);
 	        };
 	
-	        if (state.currentPage.hasOverflowed()) step(origText.length / 2); // find breakpoint
-	        else throttle(doneCallback); // add in one go
+	        if (state.currentPage.hasOverflowed()) {
+	          step(); // find breakpoint
+	        } else throttle(doneCallback); // add in one go
 	      };
 	
 	      // Adds an element node by clearing its childNodes, then inserting them
@@ -279,28 +274,12 @@ var Bindery =
 	      var addElementNode = function addElementNode(node, doneCallback) {
 	
 	        // Add this node to the current page or context
-	        if (state.path.items.length == 0) state.currentPage.flowContent.appendChild(node);else state.path.last.appendChild(node);
-	        state.path.push(node);
-	
-	        // This can be added instantly without searching for the overflow point
-	        // but won't apply rules to this node's children
-	        // if (!hasOverflowed()) {
-	        //   throttle(doneCallback);
-	        //   return;
-	        // }
-	
-	        if (state.currentPage.hasOverflowed() && node.getAttribute("bindery-break") == "avoid") {
-	          var nodeH = node.getBoundingClientRect().height;
-	          var flowH = state.currentPage.flowBox.getBoundingClientRect().height;
-	          if (nodeH < flowH) {
-	            state.path.pop();
-	            state.currentPage = makeNextPage();
-	            addElementNode(node, doneCallback);
-	            return;
-	          } else {
-	            console.warn("Bindery: Cannot avoid breaking " + (0, _ElementName2.default)(node) + ", it's taller than the flow box.");
-	          }
+	        if (state.path.items.length == 0) {
+	          state.currentPage.flowContent.appendChild(node);
+	        } else {
+	          state.path.last.appendChild(node);
 	        }
+	        state.path.push(node);
 	
 	        // Clear this node, before re-adding its children
 	        var childNodes = [].concat(_toConsumableArray(node.childNodes));
@@ -316,21 +295,19 @@ var Bindery =
 	          index += 1;
 	          switch (child.nodeType) {
 	            case Node.TEXT_NODE:
-	              var cancel = function cancel() {
-	                var lastEl = state.path.pop();
-	                if (state.path.items.length < 1) {
-	                  console.error("Bindery: Failed to add textNode \"" + child.nodeValue + "\" to " + (0, _ElementName2.default)(lastEl) + ". Page might be too small?");
-	                  return;
-	                }
+	              var continueNode = function continueNode(nodeToMove) {
+	                console.log("cancel");
+	                state.path.pop();
 	
 	                var fn = state.currentPage.footer.lastChild; // <--
-	
 	                state.currentPage = makeNextPage();
+	                if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
 	
-	                if (fn) state.currentPage.footer.appendChild(fn); // <--
-	
-	                state.path.last.appendChild(node);
-	                state.path.push(node);
+	                state.path.last.appendChild(nodeToMove);
+	                state.path.push(nodeToMove);
+	              };
+	              var cancel = function cancel() {
+	                continueNode(node);
 	                addTextNode(child, addNextChild, cancel);
 	              };
 	              addTextNode(child, addNextChild, cancel);
@@ -373,7 +350,7 @@ var Bindery =
 	        var measureArea = document.querySelector(".bindery-measure-area");
 	        document.body.removeChild(measureArea);
 	
-	        reorderPages(state.pages);
+	        state.pages = reorderPages(state.pages);
 	
 	        afterBindRules(state.pages);
 	
@@ -423,6 +400,8 @@ var Bindery =
 	      }
 	    }
 	  }
+	
+	  return pages;
 	};
 	
 	for (var rule in _Rules2.default) {
@@ -800,27 +779,17 @@ var Bindery =
 	    _classCallCheck(this, ElementPath);
 	
 	    this.items = [];
-	    this.update();
 	  }
 	
 	  _createClass(ElementPath, [{
 	    key: "push",
 	    value: function push(item) {
 	      this.items.push(item);
-	      this.update();
 	    }
 	  }, {
 	    key: "pop",
 	    value: function pop() {
-	      var i = this.items.pop();
-	      this.update();
-	      return i;
-	    }
-	  }, {
-	    key: "update",
-	    value: function update() {
-	      this.root = this.items[0];
-	      this.last = this.items[this.items.length - 1];
+	      return this.items.pop();
 	    }
 	  }, {
 	    key: "clone",
@@ -836,8 +805,17 @@ var Bindery =
 	        if (i < this.items.length - 1) clone.appendChild(newPath.items[i + 1]);
 	        newPath.items[i] = clone;
 	      }
-	      newPath.update();
 	      return newPath;
+	    }
+	  }, {
+	    key: "root",
+	    get: function get() {
+	      return this.items[0];
+	    }
+	  }, {
+	    key: "last",
+	    get: function get() {
+	      return this.items[this.items.length - 1];
 	    }
 	  }]);
 	
@@ -1385,7 +1363,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n}\n\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    outline: 1px solid rgba(0,0,0,0.1);\n    background: white;\n    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-guides .bindery-page {\n    overflow: visible;\n  }\n  .bindery-show-guides .bindery-page::after {\n    content: \"\";\n    outline: 1px solid magenta;\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  .bindery-print-wrapper {\n    /*box-shadow: 2px 2px 0 rgba(0,0,0,0.8);*/\n  }\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    outline: 1px solid lime;\n  }\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n  margin-top: 0 !important;\n}\n\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
 	
 	// exports
 
@@ -2148,7 +2126,7 @@ var Bindery =
 	  afterBind: function afterBind(pg, i) {
 	    for (var ref in references) {
 	      if (pg.element.querySelector(ref)) {
-	        references[ref].insertAdjacentHTML("afterend", ": " + pg.number.textContent);
+	        references[ref].insertAdjacentHTML("afterend", ": <span style=\"float:right;\">" + pg.number.textContent + "</span>");
 	      }
 	    }
 	  }

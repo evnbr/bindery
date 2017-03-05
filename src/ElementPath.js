@@ -3,20 +3,18 @@ import elementName from "./ElementName"
 class ElementPath {
   constructor() {
     this.items = [];
-    this.update();
   }
   push(item) {
     this.items.push(item);
-    this.update();
   }
   pop() {
-    const i = this.items.pop();
-    this.update();
-    return i;
+    return this.items.pop();
   }
-  update() {
-    this.root = this.items[0];
-    this.last = this.items[this.items.length-1];
+  get root() {
+    return this.items[0];
+  }
+  get last(){
+    return this.items[this.items.length-1];
   }
   clone() {
     let newPath = new ElementPath();
@@ -30,7 +28,6 @@ class ElementPath {
       if (i < this.items.length - 1) clone.appendChild(newPath.items[i+1]);
       newPath.items[i] = clone;
     }
-    newPath.update();
     return newPath;
   }
 }
