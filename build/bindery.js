@@ -57,23 +57,23 @@ var Bindery =
 	
 	var _makePages2 = _interopRequireDefault(_makePages);
 	
-	var _page = __webpack_require__(8);
+	var _page = __webpack_require__(7);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _viewer = __webpack_require__(18);
+	var _viewer = __webpack_require__(17);
 	
 	var _viewer2 = _interopRequireDefault(_viewer);
 	
-	var _controls = __webpack_require__(21);
+	var _controls = __webpack_require__(20);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
-	var _Rules = __webpack_require__(24);
+	var _Rules = __webpack_require__(23);
 	
 	var _Rules2 = _interopRequireDefault(_Rules);
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
@@ -129,6 +129,7 @@ var Bindery =
 	
 	      var content = this.source.cloneNode(true);
 	      this.source.style.display = "none";
+	
 	      (0, _makePages2.default)(content, this.rules, function (pages) {
 	        _this.viewer = new _viewer2.default({
 	          pages: pages
@@ -507,17 +508,16 @@ var Bindery =
 	  value: true
 	});
 	
-	exports.default = function (content, rules, done, delay) {
+	exports.default = function (content, rules, done, DELAY) {
 	
 	  var state = {
-	    path: new _ElementPath2.default(),
+	    path: [],
 	    pages: [],
 	    getNewPage: function getNewPage() {
 	      return makeNextPage();
 	    }
 	  };
 	
-	  var DELAY = delay; // ms
 	  var throttle = function throttle(func) {
 	    if (DELAY > 0) setTimeout(func, DELAY);else func();
 	  };
@@ -568,13 +568,13 @@ var Bindery =
 	  // Creates clones for ever level of tag
 	  // we were in when we overflowed the last page
 	  var makeNextPage = function makeNextPage() {
-	    state.path = state.path.clone();
+	    state.path = clonePath(state.path);
 	    var newPage = new _page2.default();
 	    newPageRules(newPage);
 	    state.pages.push(newPage);
 	    state.currentPage = newPage; // TODO redundant
-	    if (state.path.root) {
-	      newPage.flowContent.appendChild(state.path.root);
+	    if (state.path[0]) {
+	      newPage.flowContent.appendChild(state.path[0]);
 	    }
 	    return newPage;
 	  };
@@ -586,7 +586,7 @@ var Bindery =
 	    state.currentPage = makeNextPage();
 	    if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
 	
-	    state.path.last.appendChild(nodeToMove);
+	    last(state.path).appendChild(nodeToMove);
 	    state.path.push(nodeToMove);
 	  };
 	
@@ -594,7 +594,7 @@ var Bindery =
 	  // words until it just barely doesnt overflow
 	  var addTextNode = function addTextNode(node, doneCallback, abortCallback) {
 	
-	    state.path.last.appendChild(node);
+	    last(state.path).appendChild(node);
 	
 	    var textNode = node;
 	    var origText = textNode.nodeValue;
@@ -633,7 +633,7 @@ var Bindery =
 	        // Start on new page
 	        state.currentPage = makeNextPage();
 	        textNode = document.createTextNode(origText);
-	        state.path.last.appendChild(textNode);
+	        last(state.path).appendChild(textNode);
 	
 	        // If the remainder fits there, we're done
 	        if (!state.currentPage.hasOverflowed()) {
@@ -659,10 +659,10 @@ var Bindery =
 	  var addElementNode = function addElementNode(node, doneCallback) {
 	
 	    // Add this node to the current page or context
-	    if (state.path.items.length == 0) {
+	    if (state.path.length == 0) {
 	      state.currentPage.flowContent.appendChild(node);
 	    } else {
-	      state.path.last.appendChild(node);
+	      last(state.path).appendChild(node);
 	    }
 	    state.path.push(node);
 	
@@ -718,33 +718,48 @@ var Bindery =
 	  content.style.padding = 0;
 	
 	  addElementNode(content, function () {
-	    console.log("wow we're done!");
+	    console.log("Bindery: Pages created in " + 2 + "ms");
 	    var measureArea = document.querySelector(".bindery-measure-area");
 	    document.body.removeChild(measureArea);
 	
-	    state.pages = reorderPages(state.pages);
+	    var orderedPage = reorderPages(state.pages);
 	
-	    afterBindRules(state.pages);
+	    afterBindRules(orderedPage);
 	
-	    done(state.pages);
+	    done(orderedPage);
 	  });
 	};
 	
-	var _ElementPath = __webpack_require__(6);
-	
-	var _ElementPath2 = _interopRequireDefault(_ElementPath);
-	
-	var _ElementName = __webpack_require__(7);
+	var _ElementName = __webpack_require__(6);
 	
 	var _ElementName2 = _interopRequireDefault(_ElementName);
 	
-	var _page = __webpack_require__(8);
+	var _page = __webpack_require__(7);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	
+	var last = function last(arr) {
+	  return arr[arr.length - 1];
+	};
+	
+	var clonePath = function clonePath(origPath) {
+	  var newPath = [];
+	  for (var i = origPath.length - 1; i >= 0; i--) {
+	    var clone = origPath[i].cloneNode(false);
+	    clone.innerHTML = '';
+	    clone.setAttribute("bindery-continuation", true);
+	    if (clone.id) {
+	      console.warn("Bindery: Added a break to " + (0, _ElementName2.default)(clone) + ", so \"" + clone.id + "\" is no longer a unique ID.");
+	    }
+	    if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
+	    newPath[i] = clone;
+	  }
+	  return newPath;
+	};
 	
 	// TODO: only do this if not double sided?
 	var reorderPages = function reorderPages(pages) {
@@ -781,72 +796,6 @@ var Bindery =
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _ElementName = __webpack_require__(7);
-	
-	var _ElementName2 = _interopRequireDefault(_ElementName);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var ElementPath = function () {
-	  function ElementPath() {
-	    _classCallCheck(this, ElementPath);
-	
-	    this.items = [];
-	  }
-	
-	  _createClass(ElementPath, [{
-	    key: "push",
-	    value: function push(item) {
-	      this.items.push(item);
-	    }
-	  }, {
-	    key: "pop",
-	    value: function pop() {
-	      return this.items.pop();
-	    }
-	  }, {
-	    key: "clone",
-	    value: function clone() {
-	      var newPath = new ElementPath();
-	      for (var i = this.items.length - 1; i >= 0; i--) {
-	        var clone = this.items[i].cloneNode(false);
-	        clone.innerHTML = '';
-	        clone.setAttribute("bindery-continuation", true);
-	        if (clone.id) {
-	          console.warn("Bindery: Added a break to " + (0, _ElementName2.default)(clone) + ", so \"" + clone.id + "\" is no longer a unique ID.");
-	        }
-	        if (i < this.items.length - 1) clone.appendChild(newPath.items[i + 1]);
-	        newPath.items[i] = clone;
-	      }
-	      return newPath;
-	    }
-	  }, {
-	    key: "root",
-	    get: function get() {
-	      return this.items[0];
-	    }
-	  }, {
-	    key: "last",
-	    get: function get() {
-	      return this.items[this.items.length - 1];
-	    }
-	  }]);
-	
-	  return ElementPath;
-	}();
-	
-	module.exports = ElementPath;
-
-/***/ },
-/* 7 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -860,22 +809,22 @@ var Bindery =
 	module.exports = prettyName;
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _page = __webpack_require__(14);
+	var _page = __webpack_require__(13);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _measureArea = __webpack_require__(16);
+	var _measureArea = __webpack_require__(15);
 	
 	var _measureArea2 = _interopRequireDefault(_measureArea);
 	
@@ -946,13 +895,13 @@ var Bindery =
 	module.exports = Page;
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var split = __webpack_require__(10)
-	var ClassList = __webpack_require__(11)
+	var split = __webpack_require__(9)
+	var ClassList = __webpack_require__(10)
 	
-	var w = typeof window === 'undefined' ? __webpack_require__(13) : window
+	var w = typeof window === 'undefined' ? __webpack_require__(12) : window
 	var document = w.document
 	var Text = w.Text
 	
@@ -1112,7 +1061,7 @@ var Bindery =
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports) {
 
 	/*!
@@ -1224,11 +1173,11 @@ var Bindery =
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// contains, add, remove, toggle
-	var indexof = __webpack_require__(12)
+	var indexof = __webpack_require__(11)
 	
 	module.exports = ClassList
 	
@@ -1329,7 +1278,7 @@ var Bindery =
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports) {
 
 	
@@ -1344,19 +1293,19 @@ var Bindery =
 	};
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(15);
+	var content = __webpack_require__(14);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1376,7 +1325,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1390,13 +1339,13 @@ var Bindery =
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(17);
+	var content = __webpack_require__(16);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1416,7 +1365,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1430,7 +1379,7 @@ var Bindery =
 
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1441,15 +1390,15 @@ var Bindery =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _viewer = __webpack_require__(19);
+	var _viewer = __webpack_require__(18);
 	
 	var _viewer2 = _interopRequireDefault(_viewer);
 	
-	var _page = __webpack_require__(8);
+	var _page = __webpack_require__(7);
 	
 	var _page2 = _interopRequireDefault(_page);
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
@@ -1695,13 +1644,13 @@ var Bindery =
 	exports.default = Viewer;
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(20);
+	var content = __webpack_require__(19);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1721,7 +1670,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1735,18 +1684,18 @@ var Bindery =
 
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _controls = __webpack_require__(22);
+	var _controls = __webpack_require__(21);
 	
 	var _controls2 = _interopRequireDefault(_controls);
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
@@ -1825,13 +1774,13 @@ var Bindery =
 	module.exports = Controls;
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(23);
+	var content = __webpack_require__(22);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1851,7 +1800,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -1865,7 +1814,7 @@ var Bindery =
 
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1874,31 +1823,31 @@ var Bindery =
 	  value: true
 	});
 	
-	var _breakBefore = __webpack_require__(25);
+	var _breakBefore = __webpack_require__(24);
 	
 	var _breakBefore2 = _interopRequireDefault(_breakBefore);
 	
-	var _fullPage = __webpack_require__(26);
+	var _fullPage = __webpack_require__(25);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
-	var _spread = __webpack_require__(29);
+	var _spread = __webpack_require__(28);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
-	var _Footnote = __webpack_require__(32);
+	var _Footnote = __webpack_require__(31);
 	
 	var _Footnote2 = _interopRequireDefault(_Footnote);
 	
-	var _PageReference = __webpack_require__(33);
+	var _PageReference = __webpack_require__(32);
 	
 	var _PageReference2 = _interopRequireDefault(_PageReference);
 	
-	var _pageNumber = __webpack_require__(34);
+	var _pageNumber = __webpack_require__(33);
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
-	var _runningHeader = __webpack_require__(37);
+	var _runningHeader = __webpack_require__(36);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
@@ -1915,7 +1864,7 @@ var Bindery =
 	};
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1933,7 +1882,7 @@ var Bindery =
 	};
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1942,7 +1891,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _fullPage = __webpack_require__(27);
+	var _fullPage = __webpack_require__(26);
 	
 	var _fullPage2 = _interopRequireDefault(_fullPage);
 	
@@ -1971,13 +1920,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(28);
+	var content = __webpack_require__(27);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -1997,7 +1946,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 28 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2011,7 +1960,7 @@ var Bindery =
 
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2020,7 +1969,7 @@ var Bindery =
 	  value: true
 	});
 	
-	var _spread = __webpack_require__(30);
+	var _spread = __webpack_require__(29);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
@@ -2060,13 +2009,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 30 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(31);
+	var content = __webpack_require__(30);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2086,7 +2035,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 31 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2100,7 +2049,7 @@ var Bindery =
 
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2122,14 +2071,14 @@ var Bindery =
 	  };
 	};
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2154,7 +2103,7 @@ var Bindery =
 	};
 
 /***/ },
-/* 34 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2163,11 +2112,11 @@ var Bindery =
 	  value: true
 	});
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _pageNumber = __webpack_require__(35);
+	var _pageNumber = __webpack_require__(34);
 	
 	var _pageNumber2 = _interopRequireDefault(_pageNumber);
 	
@@ -2188,13 +2137,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 35 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(36);
+	var content = __webpack_require__(35);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2214,7 +2163,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 36 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2228,7 +2177,7 @@ var Bindery =
 
 
 /***/ },
-/* 37 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2237,11 +2186,11 @@ var Bindery =
 	  value: true
 	});
 	
-	var _hyperscript = __webpack_require__(9);
+	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _runningHeader = __webpack_require__(38);
+	var _runningHeader = __webpack_require__(37);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
@@ -2262,13 +2211,13 @@ var Bindery =
 	};
 
 /***/ },
-/* 38 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(39);
+	var content = __webpack_require__(38);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2288,7 +2237,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 39 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();

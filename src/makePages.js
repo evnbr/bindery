@@ -1,18 +1,16 @@
-import ElementPath from "./ElementPath"
 import elementName from "./ElementName"
 import Page from "./Page/page";
 
-export default function(content, rules, done, delay) {
+export default function(content, rules, done, DELAY) {
 
   let state = {
-    path: new ElementPath(),
+    path: [],
     pages: [],
     getNewPage: () => {
       return makeNextPage();
     }
   }
 
-  const DELAY = delay; // ms
   let throttle = (func) => {
     if (DELAY > 0) setTimeout(func, DELAY);
     else func();
@@ -64,13 +62,13 @@ export default function(content, rules, done, delay) {
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   let makeNextPage = () => {
-    state.path = state.path.clone();
+    state.path = clonePath(state.path);
     let newPage = new Page();
     newPageRules(newPage);
     state.pages.push(newPage);
     state.currentPage = newPage; // TODO redundant
-    if (state.path.root) {
-      newPage.flowContent.appendChild(state.path.root);
+    if (state.path[0]) {
+      newPage.flowContent.appendChild(state.path[0]);
     }
     return newPage;
   };
@@ -82,7 +80,7 @@ export default function(content, rules, done, delay) {
     state.currentPage = makeNextPage();
     if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
 
-    state.path.last.appendChild(nodeToMove);
+    last(state.path).appendChild(nodeToMove);
     state.path.push(nodeToMove);
   }
 
@@ -90,7 +88,7 @@ export default function(content, rules, done, delay) {
   // words until it just barely doesnt overflow
   let addTextNode = (node, doneCallback, abortCallback) => {
 
-    state.path.last.appendChild(node);
+    last(state.path).appendChild(node);
 
     let textNode = node;
     let origText = textNode.nodeValue;
@@ -128,7 +126,7 @@ export default function(content, rules, done, delay) {
         // Start on new page
         state.currentPage = makeNextPage();
         textNode = document.createTextNode(origText);
-        state.path.last.appendChild(textNode);
+        last(state.path).appendChild(textNode);
 
         // If the remainder fits there, we're done
         if (!state.currentPage.hasOverflowed()) {
@@ -156,11 +154,11 @@ export default function(content, rules, done, delay) {
   let addElementNode = (node, doneCallback) => {
 
     // Add this node to the current page or context
-    if (state.path.items.length == 0) {
+    if (state.path.length == 0) {
       state.currentPage.flowContent.appendChild(node);
     }
     else {
-      state.path.last.appendChild(node);
+      last(state.path).appendChild(node);
     }
     state.path.push(node);
 
@@ -215,19 +213,34 @@ export default function(content, rules, done, delay) {
   content.style.padding = 0;
 
   addElementNode(content, () => {
-    console.log("wow we're done!");
+    console.log(`Bindery: Pages created in ${2}ms`);
     let measureArea = document.querySelector(".bindery-measure-area");
     document.body.removeChild(measureArea);
 
-    state.pages = reorderPages(state.pages);
+    let orderedPage = reorderPages(state.pages);
 
-    afterBindRules(state.pages);
+    afterBindRules(orderedPage);
 
-    done(state.pages);
+    done(orderedPage);
   });
 }
 
+let last = (arr) => arr[arr.length-1];
 
+let clonePath = (origPath) => {
+  let newPath = [];
+  for (var i = origPath.length - 1; i >= 0; i--) {
+    let clone = origPath[i].cloneNode(false);
+    clone.innerHTML = '';
+    clone.setAttribute("bindery-continuation", true);
+    if (clone.id) {
+      console.warn(`Bindery: Added a break to ${elementName(clone)}, so "${clone.id}" is no longer a unique ID.`);
+    }
+    if (i < origPath.length - 1) clone.appendChild(newPath[i+1]);
+    newPath[i] = clone;
+  }
+  return newPath;
+}
 
 // TODO: only do this if not double sided?
 let reorderPages = (pages) => {

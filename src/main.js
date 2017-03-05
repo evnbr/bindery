@@ -34,6 +34,7 @@ class Binder {
 
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
   }
+
   cancel() {
     this.viewer.cancel();
     this.source.style.display = "";
@@ -53,6 +54,7 @@ class Binder {
   makeBook(doneBinding) {
     let content = this.source.cloneNode(true);
     this.source.style.display = "none";
+
     makePages(content, this.rules, (pages) => {
       this.viewer = new Viewer({
         pages: pages,
@@ -60,6 +62,7 @@ class Binder {
 
       this.viewer.update();
       this.controls.setState("done");
+
     }, this.debugDelay);
   }
 
