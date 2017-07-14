@@ -19,13 +19,13 @@ export default {
     rightPage.flowContent = dupedContent;
 
     leftPage.element.classList.add("bindery-spread");
-    rightPage.element.classList.add("bindery-spread");
     leftPage.element.classList.add("bleed");
-    rightPage.element.classList.add("bleed");
-
     leftPage.setPreference("left");
-    rightPage.setPreference("right");
     leftPage.setOutOfFlow(true);
+
+    rightPage.element.classList.add("bindery-spread");
+    rightPage.element.classList.add("bleed");
+    rightPage.setPreference("right");
     rightPage.setOutOfFlow(true);
 
     state.currentPage = prevPage;

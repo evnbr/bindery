@@ -8,6 +8,7 @@
   position: absolute;
   text-align: center;
   bottom: 20px;
+  -webkit-user-select: none;
   /*font-size: 0.66em;*/
 }
 

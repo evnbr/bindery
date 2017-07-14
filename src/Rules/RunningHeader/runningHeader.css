@@ -12,7 +12,9 @@
   right: 0;
   margin: auto;
   font-size: 0.66em;
+  -webkit-user-select: none;
 }
+
 [bindery-side="left"] .bindery-running-header {
   /*right: 40px;*/
 }

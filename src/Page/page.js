@@ -15,6 +15,35 @@ class Page {
     this.flowContent = this.element.querySelector(".bindery-content");
     this.footer = this.element.querySelector(".bindery-footer");
   }
+  hasOverflowed() {
+    let measureArea = document.querySelector(".bindery-measure-area");
+    if (!measureArea) document.body.appendChild(h(".bindery-measure-area"));
+
+    if (this.element.parentNode !== measureArea) {
+      measureArea.innerHTML = '';
+      measureArea.appendChild(this.element);
+    }
+
+    let contentH = this.flowContent.getBoundingClientRect().height;
+    let boxH = this.flowBox.getBoundingClientRect().height;
+    return contentH >= boxH;
+  }
+  setPreference(dir) {
+    if (dir == "left") this.alwaysLeft = true;
+    if (dir == "right") this.alwaysRight = true;
+  }
+  setOutOfFlow(bool) {
+    this.outOfFlow = bool;
+  }
+
+  clone() {
+    let newPage = new Page();
+    newPage.flowContent.innerHTML = this.flowContent.cloneNode(true).innerHTML;
+    newPage.footer.innerHTML      = this.footer.cloneNode(true).innerHTML;
+    newPage.flowContent.insertAdjacentHTML("beforeend", "RESTORED");
+    return newPage;
+  }
+
   static setSize(size) {
     Page.W = size.width;
     Page.H = size.height;
@@ -37,27 +66,6 @@ class Page {
     `;
     document.body.appendChild(sheet);
   }
-  hasOverflowed() {
-    let measureArea = document.querySelector(".bindery-measure-area");
-    if (!measureArea) document.body.appendChild(h(".bindery-measure-area"));
-
-    if (this.element.parentNode !== measureArea) {
-      measureArea.innerHTML = '';
-      measureArea.appendChild(this.element);
-    }
-
-    let contentH = this.flowContent.getBoundingClientRect().height;
-    let boxH = this.flowBox.getBoundingClientRect().height;
-    return contentH >= boxH;
-  }
-  setPreference(dir) {
-    if (dir == "left") this.alwaysLeft = true;
-    if (dir == "right") this.alwaysRight = true;
-  }
-  setOutOfFlow(bool) {
-    this.outOfFlow = bool;
-  }
-
 }
 
 // default page size

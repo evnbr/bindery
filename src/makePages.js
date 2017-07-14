@@ -4,9 +4,9 @@ import Page from "./Page/page";
 export default function(content, rules, done, DELAY) {
 
   let state = {
-    path: [],
+    path: [], // Stack representing which element we're currently inside
     pages: [],
-    getNewPage: () => {
+    getNewPage: () => { // Gross hack to allow rules to advance to next page
       return makeNextPage();
     }
   }
@@ -20,15 +20,17 @@ export default function(content, rules, done, DELAY) {
     rules.forEach( (rule) => {
       if (elmt.matches(rule.selector) && rule.beforeAdd) {
 
-        let backupPgElmnt = state.currentPage.element.cloneNode(true);
+        let backupPg = state.currentPage.clone();
         let backupElmt = elmt.cloneNode(true);
         rule.beforeAdd(elmt, state);
 
         if (state.currentPage.hasOverflowed()) {
           // restore from backup
           elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
-          state.currentPage.element = backupPgElmnt;
-          state.currentPage.number = backupPgElmnt.querySelector(".bindery-num"); // TODO
+
+          let idx = state.pages.indexOf(state.currentPage);
+          state.pages[idx] = backupPg;
+          state.currentPage = backupPg;
 
           state.currentPage = makeNextPage();
 
@@ -192,8 +194,8 @@ export default function(content, rules, done, DELAY) {
 
           throttle(() => {
             addElementNode(child, () => {
-              state.path.pop();
-              afterAddRules(child);
+              let addedChild = state.path.pop();
+              afterAddRules(addedChild);  // TODO: AfterAdd rules may want to access original child, not split second half
               addNextChild();
             })
           });

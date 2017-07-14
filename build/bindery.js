@@ -511,9 +511,10 @@ var Bindery =
 	exports.default = function (content, rules, done, DELAY) {
 	
 	  var state = {
-	    path: [],
+	    path: [], // Stack representing which element we're currently inside
 	    pages: [],
 	    getNewPage: function getNewPage() {
+	      // Gross hack to allow rules to advance to next page
 	      return makeNextPage();
 	    }
 	  };
@@ -526,15 +527,17 @@ var Bindery =
 	    rules.forEach(function (rule) {
 	      if (elmt.matches(rule.selector) && rule.beforeAdd) {
 	
-	        var backupPgElmnt = state.currentPage.element.cloneNode(true);
+	        var backupPg = state.currentPage.clone();
 	        var backupElmt = elmt.cloneNode(true);
 	        rule.beforeAdd(elmt, state);
 	
 	        if (state.currentPage.hasOverflowed()) {
 	          // restore from backup
 	          elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
-	          state.currentPage.element = backupPgElmnt;
-	          state.currentPage.number = backupPgElmnt.querySelector(".bindery-num"); // TODO
+	
+	          var idx = state.pages.indexOf(state.currentPage);
+	          state.pages[idx] = backupPg;
+	          state.currentPage = backupPg;
 	
 	          state.currentPage = makeNextPage();
 	
@@ -697,8 +700,8 @@ var Bindery =
 	
 	            throttle(function () {
 	              addElementNode(child, function () {
-	                state.path.pop();
-	                afterAddRules(child);
+	                var addedChild = state.path.pop();
+	                afterAddRules(addedChild); // TODO: AfterAdd rules may want to access original child, not split second half
 	                addNextChild();
 	              });
 	            });
@@ -867,6 +870,15 @@ var Bindery =
 	    key: "setOutOfFlow",
 	    value: function setOutOfFlow(bool) {
 	      this.outOfFlow = bool;
+	    }
+	  }, {
+	    key: "clone",
+	    value: function clone() {
+	      var newPage = new Page();
+	      newPage.flowContent.innerHTML = this.flowContent.cloneNode(true).innerHTML;
+	      newPage.footer.innerHTML = this.footer.cloneNode(true).innerHTML;
+	      newPage.flowContent.insertAdjacentHTML("beforeend", "RESTORED");
+	      return newPage;
 	    }
 	  }], [{
 	    key: "setSize",
@@ -1994,13 +2006,13 @@ var Bindery =
 	    rightPage.flowContent = dupedContent;
 	
 	    leftPage.element.classList.add("bindery-spread");
-	    rightPage.element.classList.add("bindery-spread");
 	    leftPage.element.classList.add("bleed");
-	    rightPage.element.classList.add("bleed");
-	
 	    leftPage.setPreference("left");
-	    rightPage.setPreference("right");
 	    leftPage.setOutOfFlow(true);
+	
+	    rightPage.element.classList.add("bindery-spread");
+	    rightPage.element.classList.add("bleed");
+	    rightPage.setPreference("right");
 	    rightPage.setOutOfFlow(true);
 	
 	    state.currentPage = prevPage;
@@ -2061,7 +2073,7 @@ var Bindery =
 	exports.default = function (textGetter) {
 	  return {
 	    newPage: function newPage(pg) {},
-	    beforeAdd: function beforeAdd(elmt, state) {
+	    afterAdd: function afterAdd(elmt, state) {
 	      var fn = (0, _hyperscript2.default)(".footnote");
 	      var n = state.currentPage.footer.querySelectorAll(".footnote").length;
 	      fn.innerHTML = n + " " + textGetter(elmt);
@@ -2096,7 +2108,7 @@ var Bindery =
 	  afterBind: function afterBind(pg, i) {
 	    for (var ref in references) {
 	      if (pg.element.querySelector(ref)) {
-	        references[ref].insertAdjacentHTML("afterend", ": <span style=\"float:right;\">" + pg.number.textContent + "</span>");
+	        references[ref].insertAdjacentHTML("afterend", "<span style=\"float:right;\">" + pg.number.textContent + "</span>");
 	      }
 	    }
 	  }
@@ -2171,7 +2183,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-show-guides .bindery-num {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-num {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n  /*font-size: 0.66em;*/\n}\n\n[bindery-side=\"left\"] .bindery-num {\n  left: 20px;\n}\n[bindery-side=\"right\"] .bindery-num {\n  right: 20px;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-show-guides .bindery-num {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-num {\n  position: absolute;\n  text-align: center;\n  bottom: 20px;\n  -webkit-user-select: none;\n  /*font-size: 0.66em;*/\n}\n\n[bindery-side=\"left\"] .bindery-num {\n  left: 20px;\n}\n[bindery-side=\"right\"] .bindery-num {\n  right: 20px;\n}\n", ""]);
 	
 	// exports
 
@@ -2245,7 +2257,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-show-guides .bindery-running-header {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 20px;\n  left: 0;\n  right: 0;\n  margin: auto;\n  font-size: 0.66em;\n}\n[bindery-side=\"left\"] .bindery-running-header {\n  /*right: 40px;*/\n}\n[bindery-side=\"right\"] .bindery-running-header {\n  /*left: 40px;*/\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-show-guides .bindery-running-header {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 20px;\n  left: 0;\n  right: 0;\n  margin: auto;\n  font-size: 0.66em;\n  -webkit-user-select: none;\n}\n\n[bindery-side=\"left\"] .bindery-running-header {\n  /*right: 40px;*/\n}\n[bindery-side=\"right\"] .bindery-running-header {\n  /*left: 40px;*/\n}\n", ""]);
 	
 	// exports
 

@@ -10,7 +10,7 @@ export default {
       if (pg.element.querySelector(ref)) {
         references[ref].insertAdjacentHTML(
           "afterend",
-          `: <span style="float:right;">${pg.number.textContent}</span>`);
+          `<span style="float:right;">${pg.number.textContent}</span>`);
       }
     }
   }

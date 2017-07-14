@@ -5,7 +5,7 @@ export default function(textGetter) {
     newPage: (pg) => {
 
     },
-    beforeAdd: (elmt, state) => {
+    afterAdd: (elmt, state) => {
       let fn = h(".footnote");
       let n = state.currentPage.footer.querySelectorAll(".footnote").length;
       fn.innerHTML = n + " " + textGetter(elmt);
