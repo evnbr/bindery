@@ -27,9 +27,30 @@ class Page {
     let contentH = this.flowContent.getBoundingClientRect().height;
     let boxH = this.flowBox.getBoundingClientRect().height;
 
-    // console.log(`contentH: ${contentH}, boxH: ${boxH}`);
+    if (boxH == 0) {
+      console.error(`Bindery: Trying to flow into a box of zero height.`)
+      return true;
+    }
+
     return contentH >= boxH;
   }
+
+  static isSizeValid() {
+    document.body.classList.remove("bindery-viewing");
+
+    let testPage = new Page()
+    let measureArea = document.querySelector(".bindery-measure-area");
+    if (!measureArea) measureArea = document.body.appendChild(h(".bindery-measure-area"));
+
+    measureArea.innerHTML = '';
+    measureArea.appendChild(testPage.element);
+    let boxH = testPage.flowBox.getBoundingClientRect().height;
+
+    measureArea.parentNode.removeChild(measureArea)
+
+    return boxH !== 0
+  }
+
   setPreference(dir) {
     if (dir == "left") this.alwaysLeft = true;
     if (dir == "right") this.alwaysRight = true;

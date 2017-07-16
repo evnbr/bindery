@@ -70,6 +70,10 @@ class Binder {
     Page.setMargin(margin);
   }
 
+  isSizeValid() {
+    return Page.isSizeValid();
+  }
+
   addRules(rules) {
     for (let selector in rules) {
       if (!rules[selector] ) {

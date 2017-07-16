@@ -72,10 +72,19 @@ class Controls {
 
 
     const sizeControl        = h(".bindery-val.bindery-size", h("div", "Width"), input.width, h("div", "Height"), input.height, )
-    const vMarginControl    = h(".bindery-val.bindery-size", h("div", "Top"), input.top, h("div", "Bottom"), input.bottom)
-    const hMarginControl  = h(".bindery-val.bindery-size", h("div", "Inner"), input.inner, h("div", "Outer"), input.outer)
+    const marginControl  = h(".bindery-val.bindery-margin",
+      h(".inner", input.inner),
+      h(".outer", input.outer),
+      h(".top", input.top),
+      h(".bottom", input.bottom),
+    );
 
     const updateBtn = btn({onclick: updateLayout}, "Rebuild Layout");
+    const validCheck = h("div", {style: {
+      "float": "right",
+      "display": "none",
+      "color": "#e2b200",
+    }}, "⚠️ Too Small")
 
     let updateDelay
     const throttledUpdate = () => {
@@ -105,7 +114,14 @@ class Controls {
       if (needsUpdate) {
         this.binder.setSize(newSize)
         this.binder.setMargin(newMargin)
-        this.binder.makeBook();
+        let isValid = this.binder.isSizeValid()
+        if (isValid) {
+          validCheck.style.display = "none"
+          this.binder.makeBook();
+        }
+        else {
+          validCheck.style.display = "block"
+        }
       }
     }
 
@@ -127,13 +143,10 @@ class Controls {
         guidesToggle,
         bleedToggle,
 
-        label("Page Setup"),
+        label(validCheck, "Page Setup"),
         facingToggle,
         sizeControl,
-
-        label("Margin"),
-        vMarginControl,
-        hMarginControl,
+        marginControl,
       )
     }
     this.state = ""

@@ -78,8 +78,13 @@ export default function(content, rules, done, DELAY) {
     // flow area, which will never be split and cause an infinite loop
     if (newPage.hasOverflowed()) {
       let suspect = last(state.path)
-      console.error(`Bindery: NextPage already overflowing, probably due to a style set on ${elementName(suspect)}. Since we aren't sure where to break ${elementName(suspect)}, it may be overflowing.`);
-      suspect.parentNode.removeChild(suspect);
+      if (suspect) {
+        console.error(`Bindery: NextPage already overflowing, probably due to a style set on ${elementName(suspect)}. It may not fit on the page.`);
+        suspect.parentNode.removeChild(suspect);
+      }
+      else {
+        console.error(`Bindery: NextPage already overflowing.`);
+      }
     }
 
     return newPage;

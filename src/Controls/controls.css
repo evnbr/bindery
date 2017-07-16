@@ -104,6 +104,60 @@
   width: 30%;
 }
 
+.bindery-margin {
+  height: 100px;
+  width: 100px;
+  border: 1px solid #ddd;
+  margin: 0 auto;
+}
+.bindery-margin::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  border: 1px solid cyan;
+  z-index: -1;
+}
+
+.bindery-margin input {
+  /*position: relative;
+  display: block;
+  width: 100px;
+  height: auto;*/
+  text-align: center;
+  padding-left: 20px;
+}
+
+.bindery-margin > div {
+  position: absolute;
+  width: 80px;
+  height: 24px;
+}
+
+.bindery-margin .top {
+  left: 0;
+  right: 0;
+  margin: auto;
+  top: 0;
+}
+.bindery-margin .bottom {
+  left: 0;
+  right: 0;
+  margin: auto;
+  bottom: 0;
+}
+.bindery-margin .inner {
+  left: -30px;
+  top: 40px;
+}
+.bindery-margin .outer {
+  right: -30px;
+  top: 40px;
+}
+
+
 .bindery-val input:focus {
     outline: none;
     background: rgba(0,0,0,0.04);
