@@ -46,6 +46,7 @@ class Controls {
     };
     const facing = () => {
       facingToggle.classList.toggle("selected")
+      layoutControl.classList.toggle("not-facing")
       opts.binder.viewer.toggleDouble();
     };
     const print = () => {
@@ -71,7 +72,11 @@ class Controls {
     }
 
 
-    const sizeControl        = h(".bindery-val.bindery-size", h("div", "Width"), input.width, h("div", "Height"), input.height, )
+    const sizeControl   = h(".bindery-val.bindery-size",
+      h("div", "W", input.width),
+      h("div", "H", input.height),
+    );
+
     const marginPreview = h(".preview");
     const marginControl = h(".bindery-val.bindery-margin",
       marginPreview,
@@ -80,6 +85,7 @@ class Controls {
       h(".top", input.top),
       h(".bottom", input.bottom),
     );
+    const layoutControl = h(".bindery-layout-control", sizeControl, marginControl)
 
     const updateBtn = btn({onclick: updateLayout}, "Rebuild Layout");
     const validCheck = h("div", {style: {
@@ -95,13 +101,13 @@ class Controls {
     }
 
     const updateLayoutPreview = (newSize, newMargin) => {
-      const BASE = 100;
+      const BASE = 90;
       let ratio = newSize.width / newSize.height;
       ratio = Math.max(ratio, 0.6);
       ratio = Math.min(ratio, 1.8);
 
       let w, h;
-      if (ratio > 1) {
+      if (ratio > 2) {
         w = BASE * ratio;
         h = BASE;
       }
@@ -114,8 +120,11 @@ class Controls {
       let o = (newMargin.outer / newSize.width) * w;
       let i = (newMargin.inner / newSize.width) * w;
 
+      sizeControl.style.width  = `${w}px`;
+      sizeControl.style.height = `${h}px`;
       marginControl.style.width  = `${w}px`;
       marginControl.style.height = `${h}px`;
+
       marginPreview.style.top    = `${t}px`;
       marginPreview.style.bottom = `${b}px`;
       marginPreview.style.left   = `${i}px`;
@@ -179,9 +188,8 @@ class Controls {
         bleedToggle,
 
         label(validCheck, "Page Setup"),
-        facingToggle,
-        sizeControl,
-        marginControl,
+        layoutControl,
+        facingToggle
       )
     }
     this.state = ""
