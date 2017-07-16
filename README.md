@@ -8,6 +8,16 @@ like displaying hyperlink destinations as footnotes.
 
 The resulting book is viewable in-browser, and can open the system ⌘P dialog to send to a printer or to PDF
 
+
+## Who is this for?
+
+The goal of bindery.js is to provide an approachable jumping-off point for HTML-to-Print
+exploration. Because of this, it works out of the box (without needing to run a dev server,
+set up a development environment, or use preprocessors).
+
+If you are interested in integrating it into a larger project, please feel free to reach out.
+
+
 ## Background
 
 bindery.js was originally written in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
@@ -45,14 +55,6 @@ As of February 2017, it is in the process of being rewritten as a usable, modula
 </html>
 
 ```
-
-## Who is this for?
-
-The goal of bindery.js is to provide an approachable jumping-off point for HTML-to-Print
-exploration, Because of this library works out of the box without needing to run a dev server,
-run a development environment, or use preprocessors or module bundlers.
-
-If you are interested in integrating it into a larger project, please feel free to reach out.
 
 ## Docs
 
