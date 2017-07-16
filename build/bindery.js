@@ -596,10 +596,6 @@ var Bindery =
 	    newPageRules(newPage);
 	    state.pages.push(newPage);
 	
-	    if (state.pages.length > 500) {
-	      console.error(state.pages.length);
-	    }
-	
 	    state.currentPage = newPage; // TODO redundant
 	    if (state.path[0]) {
 	      newPage.flowContent.appendChild(state.path[0]);
@@ -719,12 +715,6 @@ var Bindery =
 	      }
 	      var child = childNodes[index];
 	      index += 1;
-	
-	      // if (state.currentPage.hasOverflowed()) {
-	      //   console.error(`Bindery: The following node is too big to fit in the flow:`);
-	      //   console.log(child);
-	      // }
-	
 	
 	      switch (child.nodeType) {
 	        case Node.TEXT_NODE:
