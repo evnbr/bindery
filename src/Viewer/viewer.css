@@ -19,6 +19,15 @@
      padding-right: 240px;
      z-index: 99;
    }
+
+
+
+   .bindery-print-wrapper:before {
+     display: none;
+   }
+   .bindery-show-bleed .bindery-print-wrapper:before {
+     display: block;
+   }
 }
 
 @media print {
@@ -30,6 +39,11 @@
   .bindery-print-wrapper {
     margin: 20px;
   }
+
+  .bindery-print-wrapper:before {
+    display: block;
+  }
+
 }
 
 /* Don't print anything that hasn't been exported. This hides extra controls/ */
@@ -49,7 +63,6 @@
 .bindery-print-wrapper:before {
 	content: "";
   pointer-events: none;
-	display: block;
 	position: absolute;
 	top: -20px;
 	left: -20px;

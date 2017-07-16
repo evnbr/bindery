@@ -78,11 +78,6 @@
   margin-bottom: 8px;
 }
 
-.bindery-toggle:hover, .bindery-val:hover {
-  background: rgba(0,0,0,0.06);
-}
-
-
 .bindery-val input {
   width: 85px;
   padding: 4px 8px;
@@ -94,7 +89,19 @@
   right: 0;
   height: 100%;
   width: 100%;
-  color: navy;
+}
+
+.bindery-size {
+  padding-right: 0;
+}
+.bindery-size div {
+  display: inline-block;
+  width: 20%;
+}
+
+.bindery-size input {
+  position: relative;
+  width: 30%;
 }
 
 .bindery-val input:focus {

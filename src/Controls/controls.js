@@ -55,8 +55,8 @@ class Controls {
 
     let printBtn = btnMain({style: {float: "right"}, onclick: print}, "Print");
     let previewToggle = toggle({onclick: interactivePreview}, "Interactive Preview");
-    let guidesToggle = toggle({onclick: guides}, "Guides");
-    let bleedToggle = toggle({onclick: bleed}, "Bleed");
+    let guidesToggle = toggle({onclick: guides}, "Show Bounds");
+    let bleedToggle = toggle({onclick: bleed}, "Show Bleed");
     let facingToggle = toggle({onclick: facing}, "Facing Pages");
     facingToggle.classList.add("selected")
     let doneBtn = btn({onclick: done}, "Done");
@@ -71,12 +71,9 @@ class Controls {
     }
 
 
-    const heightControl       = h(".bindery-val", input.height, h("div", "Height"))
-    const widthControl        = h(".bindery-val", input.width, h("div", "Width"))
-    const topMarginControl    = h(".bindery-val", input.top, h("div", "Top"))
-    const innerMarginControl  = h(".bindery-val", input.inner, h("div", "Inner"))
-    const outerMarginControl  = h(".bindery-val", input.outer, h("div", "Outer"))
-    const bottomMarginControl = h(".bindery-val", input.bottom, h("div", "Bottom"))
+    const sizeControl        = h(".bindery-val.bindery-size", h("div", "Width"), input.width, h("div", "Height"), input.height, )
+    const vMarginControl    = h(".bindery-val.bindery-size", h("div", "Top"), input.top, h("div", "Bottom"), input.bottom)
+    const hMarginControl  = h(".bindery-val.bindery-size", h("div", "Inner"), input.inner, h("div", "Outer"), input.outer)
 
     const updateBtn = btn({onclick: updateLayout}, "Rebuild Layout");
 
@@ -132,14 +129,11 @@ class Controls {
 
         label("Page Setup"),
         facingToggle,
-        widthControl,
-        heightControl,
+        sizeControl,
 
         label("Margin"),
-        topMarginControl,
-        innerMarginControl,
-        outerMarginControl,
-        bottomMarginControl,
+        vMarginControl,
+        hMarginControl,
       )
     }
     this.state = ""

@@ -11,6 +11,10 @@
     outline: none;
     overflow: visible;
   }
+  .bindery-page3d .bindery-page {
+    overflow: hidden !important;
+  }
+
 
   .bindery-page::after {
     content: "";
