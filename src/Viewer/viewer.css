@@ -2,13 +2,23 @@
   .bindery-viewing {
     background: #f1f1f1 !important;
   }
-  [bindery-export], .measureArea {
+  [bindery-export] {
     background: #f1f1f1;
     padding: 50px 20px;
     z-index: 99;
     position: relative;
     padding-right: 240px;
   }
+
+   .bindery-measure-area {
+     position: fixed;
+     top: 0;
+     left: 0;
+     background: #f1f1f1;
+     padding: 50px 20px;
+     padding-right: 240px;
+     z-index: 99;
+   }
 }
 
 @media print {

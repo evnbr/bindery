@@ -18,6 +18,11 @@
   animation: fadeIn 0.4s;
 }
 
+.bindery-inProgress .bindery-controls {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0;

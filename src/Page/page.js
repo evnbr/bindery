@@ -50,6 +50,7 @@ class Page {
     Page.W = size.width;
     Page.H = size.height;
   }
+
   static setMargin(margin) {
     var sheet = document.createElement('style')
     sheet.innerHTML = `

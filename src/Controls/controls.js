@@ -55,39 +55,67 @@ class Controls {
 
     let printBtn = btnMain({style: {float: "right"}, onclick: print}, "Print");
     let previewToggle = toggle({onclick: interactivePreview}, "Interactive Preview");
-    let guidesToggle = toggle({onclick: guides}, "Show Guides");
-    let bleedToggle = toggle({onclick: bleed}, "Show Bleed");
+    let guidesToggle = toggle({onclick: guides}, "Guides");
+    let bleedToggle = toggle({onclick: bleed}, "Bleed");
     let facingToggle = toggle({onclick: facing}, "Facing Pages");
     facingToggle.classList.add("selected")
     let doneBtn = btn({onclick: done}, "Done");
 
+    const input = {
+      top:    h("input", { type: "number", value: this.binder.pageMargin.top }),
+      inner:  h("input", { type: "number", value: this.binder.pageMargin.inner }),
+      outer:  h("input", { type: "number", value: this.binder.pageMargin.outer }),
+      bottom: h("input", { type: "number", value: this.binder.pageMargin.bottom }),
+      width:  h("input", { type: "number", value: this.binder.pageSize.width }),
+      height: h("input", { type: "number", value: this.binder.pageSize.height })
+    }
 
-    const widthInput = h("input", { type: "number", value: this.binder.pageSize.width })
-    const heightInput = h("input", { type: "number", value: this.binder.pageSize.height })
+
+    const heightControl       = h(".bindery-val", input.height, h("div", "Height"))
+    const widthControl        = h(".bindery-val", input.width, h("div", "Width"))
+    const topMarginControl    = h(".bindery-val", input.top, h("div", "Top"))
+    const innerMarginControl  = h(".bindery-val", input.inner, h("div", "Inner"))
+    const outerMarginControl  = h(".bindery-val", input.outer, h("div", "Outer"))
+    const bottomMarginControl = h(".bindery-val", input.bottom, h("div", "Bottom"))
+
+    const updateBtn = btn({onclick: updateLayout}, "Rebuild Layout");
 
     let updateDelay
     const throttledUpdate = () => {
       clearTimeout(updateDelay)
-      updateDelay = setTimeout(updateLayout, 500)
+      updateDelay = setTimeout(updateLayout, 700)
     }
     const updateLayout = () => {
-      let newH = heightInput.value
-      let newW = widthInput.value
-      if (this.binder.pageSize.width !== newW || this.binder.pageSize.height !== newH) {
-        this.binder.setSize({height: newH, width: newW})
+      let newMargin = {
+        top:    input.top.value,
+        inner:  input.inner.value,
+        outer:  input.outer.value,
+        bottom: input.bottom.value,
+      }
+      let newSize = {
+        height: input.height.value,
+        width:  input.width.value
+      }
+
+      let needsUpdate = false
+      for (let k in newMargin) {
+        if (this.binder.pageMargin[k] !== newMargin[k]) { needsUpdate = true }
+      }
+      for (let k in newSize) {
+        if (this.binder.pageSize[k] !== newSize[k]) { needsUpdate = true }
+      }
+
+      if (needsUpdate) {
+        this.binder.setSize(newSize)
+        this.binder.setMargin(newMargin)
         this.binder.makeBook();
       }
     }
 
-    heightInput.addEventListener("change", throttledUpdate)
-    widthInput.addEventListener("change", throttledUpdate)
-    heightInput.addEventListener("keyup", throttledUpdate)
-    widthInput.addEventListener("keyup", throttledUpdate)
-
-    const heightControl = h(".bindery-val", heightInput, h("div", "Height"))
-    const widthControl = h(".bindery-val", widthInput, h("div", "Width"))
-
-    const updateBtn = btn({onclick: updateLayout}, "Rebuild Layout");
+    for (let k in input) {
+      input[k].addEventListener("change", throttledUpdate);
+      input[k].addEventListener("keyup", throttledUpdate);
+    }
 
 
     this.states = {
@@ -106,7 +134,12 @@ class Controls {
         facingToggle,
         widthControl,
         heightControl,
-        updateBtn,
+
+        label("Margin"),
+        topMarginControl,
+        innerMarginControl,
+        outerMarginControl,
+        bottomMarginControl,
       )
     }
     this.state = ""

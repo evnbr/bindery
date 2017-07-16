@@ -68,7 +68,6 @@ export default function(content, rules, done, DELAY) {
     let newPage = new Page();
     newPageRules(newPage);
     state.pages.push(newPage);
-
     state.currentPage = newPage; // TODO redundant
     if (state.path[0]) {
       newPage.flowContent.appendChild(state.path[0]);

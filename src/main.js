@@ -11,8 +11,16 @@ import Rules from "./Rules/";
 import h from "hyperscript";
 
 
-const DEFAULT_PAGE_SIZE = { width: 300, height: 400 }
-const DEFAULT_PAGE_MARGIN = { width: 300, height: 400 }
+const DEFAULT_PAGE_SIZE = {
+  width: 300,
+  height: 400
+}
+const DEFAULT_PAGE_MARGIN = {
+  inner: 30,
+  outer: 50,
+  bottom: 60,
+  top: 40
+}
 
 class Binder {
   constructor(opts) {
@@ -34,9 +42,9 @@ class Binder {
     }
 
     let pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE
-    let pageMargins = opts.margin ? opts.margin : DEFAULT_PAGE_MARGIN
+    let pageMargin = opts.margin ? opts.margin : DEFAULT_PAGE_MARGIN
     this.setSize(pageSize);
-    Page.setMargin(pageMargins);
+    this.setMargin(pageMargin);
 
     this.controls = new Controls({binder: this});
 
@@ -48,12 +56,18 @@ class Binder {
 
   cancel() {
     this.viewer.cancel();
+    document.body.classList.remove("bindery-viewing");
     this.source.style.display = "";
   }
 
   setSize(size) {
     this.pageSize = size
     Page.setSize(size);
+  }
+
+  setMargin(margin) {
+    this.pageMargin = margin
+    Page.setMargin(margin);
   }
 
   addRules(rules) {
@@ -72,8 +86,9 @@ class Binder {
     let content = this.source.cloneNode(true);
     this.source.style.display = "none";
 
-    // In case we're updating an existing layout 
+    // In case we're updating an existing layout
     document.body.classList.remove("bindery-viewing");
+    document.body.classList.add("bindery-inProgress");
 
     makePages(content, this.rules, (pages) => {
       if (!this.viewer) {
@@ -82,6 +97,7 @@ class Binder {
       this.viewer.pages = pages,
       this.viewer.update();
       this.controls.setState("done");
+      document.body.classList.remove("bindery-inProgress");
 
     }, this.debugDelay);
   }
