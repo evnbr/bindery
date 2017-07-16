@@ -961,7 +961,7 @@ var Bindery =
 	
 	      measureArea.parentNode.removeChild(measureArea);
 	
-	      return boxH !== 0;
+	      return boxH > 100; // TODO: Number is arbitrary
 	    }
 	  }, {
 	    key: "setSize",
@@ -1870,7 +1870,8 @@ var Bindery =
 	    };
 	
 	    var sizeControl = (0, _hyperscript2.default)(".bindery-val.bindery-size", (0, _hyperscript2.default)("div", "Width"), input.width, (0, _hyperscript2.default)("div", "Height"), input.height);
-	    var marginControl = (0, _hyperscript2.default)(".bindery-val.bindery-margin", (0, _hyperscript2.default)(".inner", input.inner), (0, _hyperscript2.default)(".outer", input.outer), (0, _hyperscript2.default)(".top", input.top), (0, _hyperscript2.default)(".bottom", input.bottom));
+	    var marginPreview = (0, _hyperscript2.default)(".preview");
+	    var marginControl = (0, _hyperscript2.default)(".bindery-val.bindery-margin", marginPreview, (0, _hyperscript2.default)(".inner", input.inner), (0, _hyperscript2.default)(".outer", input.outer), (0, _hyperscript2.default)(".top", input.top), (0, _hyperscript2.default)(".bottom", input.bottom));
 	
 	    var updateBtn = btn({ onclick: updateLayout }, "Rebuild Layout");
 	    var validCheck = (0, _hyperscript2.default)("div", { style: {
@@ -1884,6 +1885,36 @@ var Bindery =
 	      clearTimeout(updateDelay);
 	      updateDelay = setTimeout(updateLayout, 700);
 	    };
+	
+	    var updateLayoutPreview = function updateLayoutPreview(newSize, newMargin) {
+	      var BASE = 100;
+	      var ratio = newSize.width / newSize.height;
+	      ratio = Math.max(ratio, 0.6);
+	      ratio = Math.min(ratio, 1.8);
+	
+	      var w = void 0,
+	          h = void 0;
+	      if (ratio > 1) {
+	        w = BASE * ratio;
+	        h = BASE;
+	      } else {
+	        w = BASE;
+	        h = BASE * 1 / ratio;
+	      }
+	      var t = newMargin.top / newSize.height * h;
+	      var b = newMargin.bottom / newSize.height * h;
+	      var o = newMargin.outer / newSize.width * w;
+	      var i = newMargin.inner / newSize.width * w;
+	
+	      marginControl.style.width = w + "px";
+	      marginControl.style.height = h + "px";
+	      marginPreview.style.top = t + "px";
+	      marginPreview.style.bottom = b + "px";
+	      marginPreview.style.left = i + "px";
+	      marginPreview.style.right = o + "px";
+	    };
+	    updateLayoutPreview(this.binder.pageSize, this.binder.pageMargin);
+	
 	    var updateLayout = function updateLayout() {
 	      var newMargin = {
 	        top: input.top.value,
@@ -1909,6 +1940,8 @@ var Bindery =
 	      }
 	
 	      if (needsUpdate) {
+	        updateLayoutPreview(newSize, newMargin);
+	
 	        _this.binder.setSize(newSize);
 	        _this.binder.setMargin(newMargin);
 	        var isValid = _this.binder.isSizeValid();
@@ -1988,7 +2021,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls {\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.4s;\n}\n\n.bindery-inProgress .bindery-controls {\n  opacity: 0.5;\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: transparent;\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 12px;\n  width: auto;\n}\n\n.bindery-label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: #aaa;\n  letter-spacing: 0.01em;\n  padding: 12px 12px;\n  border-top: 1px solid #ddd;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 12px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n}\n\n.bindery-size {\n  padding-right: 0;\n}\n.bindery-size div {\n  display: inline-block;\n  width: 20%;\n}\n\n.bindery-size input {\n  position: relative;\n  width: 30%;\n}\n\n.bindery-margin {\n  height: 100px;\n  width: 100px;\n  border: 1px solid #ddd;\n  margin: 0 auto;\n}\n.bindery-margin::after {\n  content: \"\";\n  position: absolute;\n  top: 20px;\n  left: 20px;\n  right: 20px;\n  bottom: 20px;\n  border: 1px solid cyan;\n  z-index: -1;\n}\n\n.bindery-margin input {\n  /*position: relative;\n  display: block;\n  width: 100px;\n  height: auto;*/\n  text-align: center;\n  padding-left: 20px;\n}\n\n.bindery-margin > div {\n  position: absolute;\n  width: 80px;\n  height: 24px;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: -30px;\n  top: 40px;\n}\n.bindery-margin .outer {\n  right: -30px;\n  top: 40px;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n\n\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.06);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.8;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls {\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.4s;\n}\n\n.bindery-inProgress .bindery-controls {\n  opacity: 0.5;\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: transparent;\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 12px;\n  width: auto;\n}\n\n.bindery-label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: #aaa;\n  letter-spacing: 0.01em;\n  padding: 12px 12px;\n  border-top: 1px solid #ddd;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 12px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n}\n\n.bindery-size {\n  padding-right: 0;\n}\n.bindery-size div {\n  display: inline-block;\n  width: 20%;\n}\n\n.bindery-size input {\n  position: relative;\n  width: 30%;\n}\n\n.bindery-margin {\n  height: 100px;\n  width: 100px;\n  margin: 0 auto;\n  box-shadow: inset 5px 0 8px -4px rgba(0,0,0,0.1);\n  outline: 1px solid rgba(0,0,0,0.2);\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 20px;\n  left: 20px;\n  right: 20px;\n  bottom: 20px;\n  border: 1px solid cyan;\n  z-index: -1;\n  pointer-events: none;\n  height: auto;\n  width: auto;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding-left: 20px;\n}\n.bindery-margin input:focus {\n  text-decoration: underline;\n  background: none !important;\n}\n\n.bindery-margin > div {\n  position: absolute;\n  width: 80px;\n  height: 24px;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 4px;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 4px;\n}\n.bindery-margin .inner {\n  left: -12px;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: -12px;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n\n\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.06);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.8;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n", ""]);
 	
 	// exports
 

@@ -48,7 +48,7 @@ class Page {
 
     measureArea.parentNode.removeChild(measureArea)
 
-    return boxH !== 0
+    return boxH > 100 // TODO: Number is arbitrary
   }
 
   setPreference(dir) {

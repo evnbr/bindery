@@ -107,11 +107,11 @@
 .bindery-margin {
   height: 100px;
   width: 100px;
-  border: 1px solid #ddd;
   margin: 0 auto;
+  box-shadow: inset 5px 0 8px -4px rgba(0,0,0,0.1);
+  outline: 1px solid rgba(0,0,0,0.2);
 }
-.bindery-margin::after {
-  content: "";
+.bindery-margin .preview {
   position: absolute;
   top: 20px;
   left: 20px;
@@ -119,15 +119,18 @@
   bottom: 20px;
   border: 1px solid cyan;
   z-index: -1;
+  pointer-events: none;
+  height: auto;
+  width: auto;
 }
 
 .bindery-margin input {
-  /*position: relative;
-  display: block;
-  width: 100px;
-  height: auto;*/
   text-align: center;
   padding-left: 20px;
+}
+.bindery-margin input:focus {
+  text-decoration: underline;
+  background: none !important;
 }
 
 .bindery-margin > div {
@@ -140,21 +143,30 @@
   left: 0;
   right: 0;
   margin: auto;
-  top: 0;
+  top: 4px;
 }
 .bindery-margin .bottom {
   left: 0;
   right: 0;
   margin: auto;
-  bottom: 0;
+  bottom: 4px;
 }
 .bindery-margin .inner {
-  left: -30px;
-  top: 40px;
+  left: -12px;
+  text-align: left;
+  top: calc(50% - 12px);
 }
+.bindery-margin .inner input {
+  text-align: left;
+}
+
 .bindery-margin .outer {
-  right: -30px;
-  top: 40px;
+  right: -12px;
+  text-align: right;
+  top: calc(50% - 12px);
+}
+.bindery-margin .outer input {
+  text-align: right;
 }
 
 

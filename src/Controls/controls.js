@@ -72,7 +72,9 @@ class Controls {
 
 
     const sizeControl        = h(".bindery-val.bindery-size", h("div", "Width"), input.width, h("div", "Height"), input.height, )
-    const marginControl  = h(".bindery-val.bindery-margin",
+    const marginPreview = h(".preview");
+    const marginControl = h(".bindery-val.bindery-margin",
+      marginPreview,
       h(".inner", input.inner),
       h(".outer", input.outer),
       h(".top", input.top),
@@ -91,6 +93,37 @@ class Controls {
       clearTimeout(updateDelay)
       updateDelay = setTimeout(updateLayout, 700)
     }
+
+    const updateLayoutPreview = (newSize, newMargin) => {
+      const BASE = 100;
+      let ratio = newSize.width / newSize.height;
+      ratio = Math.max(ratio, 0.6);
+      ratio = Math.min(ratio, 1.8);
+
+      let w, h;
+      if (ratio > 1) {
+        w = BASE * ratio;
+        h = BASE;
+      }
+      else {
+        w = BASE;
+        h = BASE * 1 / ratio;
+      }
+      let t = (newMargin.top / newSize.height) * h;
+      let b = (newMargin.bottom / newSize.height) * h;
+      let o = (newMargin.outer / newSize.width) * w;
+      let i = (newMargin.inner / newSize.width) * w;
+
+      marginControl.style.width  = `${w}px`;
+      marginControl.style.height = `${h}px`;
+      marginPreview.style.top    = `${t}px`;
+      marginPreview.style.bottom = `${b}px`;
+      marginPreview.style.left   = `${i}px`;
+      marginPreview.style.right  = `${o}px`;
+
+    }
+    updateLayoutPreview(this.binder.pageSize, this.binder.pageMargin);
+
     const updateLayout = () => {
       let newMargin = {
         top:    input.top.value,
@@ -112,6 +145,8 @@ class Controls {
       }
 
       if (needsUpdate) {
+        updateLayoutPreview(newSize, newMargin)
+
         this.binder.setSize(newSize)
         this.binder.setMargin(newMargin)
         let isValid = this.binder.isSizeValid()
@@ -159,6 +194,7 @@ class Controls {
       this.state = newState;
       this.holder.innerHTML = "";
       this.holder.appendChild(this.states[newState]);
+
     }
   }
 }
