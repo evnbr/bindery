@@ -17,7 +17,7 @@ class Page {
   }
   hasOverflowed() {
     let measureArea = document.querySelector(".bindery-measure-area");
-    if (!measureArea) document.body.appendChild(h(".bindery-measure-area"));
+    if (!measureArea) measureArea = document.body.appendChild(h(".bindery-measure-area"));
 
     if (this.element.parentNode !== measureArea) {
       measureArea.innerHTML = '';
@@ -26,6 +26,8 @@ class Page {
 
     let contentH = this.flowContent.getBoundingClientRect().height;
     let boxH = this.flowBox.getBoundingClientRect().height;
+
+    // console.log(`contentH: ${contentH}, boxH: ${boxH}`);
     return contentH >= boxH;
   }
   setPreference(dir) {
@@ -67,9 +69,5 @@ class Page {
     document.body.appendChild(sheet);
   }
 }
-
-// default page size
-Page.H = 400;
-Page.W = 300;
 
 module.exports = Page;

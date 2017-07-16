@@ -5,27 +5,25 @@ import h from "hyperscript";
 
 class Viewer {
   constructor(opts) {
-    this.pages = opts.pages;
-
-    if (opts.target) {
-      this.target = opts.target;
-    }
-    else {
-      this.target = h("div");
-      document.body.appendChild(this.target);
-    }
-    this.target.setAttribute("bindery-export", true);
-
+    this.pages = [];
     this.doubleSided = true;
     this.currentLeaf = 0;
+
+    this.target = h("div");
+    this.target.setAttribute("bindery-export", true);
+
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
-    document.body.classList.remove("bindery-viewing");
-    this.target.parentNode.removeChild(this.target);
+    if (this.target.parentNode) {
+      this.target.parentNode.removeChild(this.target);
+    }
   }
   toggleGuides() {
     this.target.classList.toggle("bindery-show-guides");
+  }
+  toggleBleed() {
+    this.target.classList.toggle("bindery-show-bleed");
   }
   toggleDouble() {
     this.doubleSided = !this.doubleSided;
@@ -40,6 +38,10 @@ class Viewer {
     this.update();
   }
   update() {
+    if (!this.target.parentNode) {
+      document.body.appendChild(this.target);
+    }
+
     document.body.classList.add("bindery-viewing");
     switch (this.mode) {
       case "grid":

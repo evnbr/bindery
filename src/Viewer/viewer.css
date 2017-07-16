@@ -7,6 +7,7 @@
     padding: 50px 20px;
     z-index: 99;
     position: relative;
+    padding-right: 240px;
   }
 }
 
@@ -34,6 +35,7 @@
   margin: 50px auto;
 }
 
+/* Crop Marks */
 .bindery-print-wrapper:before {
 	content: "";
   pointer-events: none;
@@ -70,7 +72,7 @@
   transform-origin: left;
   position: absolute;
   left: 0;
-  right: -380px;
+  right: -10%;
 }
 
 .bindery-page3d:hover {

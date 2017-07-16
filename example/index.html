@@ -10,15 +10,16 @@
 
 <body>
 
-	<section class="intro">
-		<h2>Bindery.js</h2>
-		<div id="makeBook" onclick="binder.makeBook();">Make Book</div>
-	</section>
+	<div id="makeBook" onclick="binder.makeBook();">Make Book</div>
 
   <section class="content">
-		<h3 bindery-break="before">
+		<h2>
+			Bindery.js
+		</h2>
+
+		<h2>
 			Table of Contents
-		</h3>
+		</h2>
 		<ul class="toc">
 			<li>
 				<a href="#section1">Section 1</a>
@@ -123,7 +124,7 @@
 		let binder = new Bindery({
 		  source: ".content",
 		  rules: {
-		    "h2": Bindery.BreakBefore,
+				"h2": Bindery.BreakBefore,
 		    "p > a": Bindery.Footnote((elmt) => `Link to <a href='#'>${elmt.href}</a>`),
 		    "p": Bindery.Footnote((elmt) => elmt.textContent.substr(0,28)),
 		    ".med-figure": Bindery.FullPage,

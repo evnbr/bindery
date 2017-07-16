@@ -11,23 +11,34 @@ import Rules from "./Rules/";
 import h from "hyperscript";
 
 
+const DEFAULT_PAGE_SIZE = { width: 300, height: 400 }
+const DEFAULT_PAGE_MARGIN = { width: 300, height: 400 }
+
 class Binder {
   constructor(opts) {
-
-    if (typeof opts.source == "string") {
+    if (!opts.source) {
+      console.error(`Bindery: You must include a source element or selector`);
+    }
+    else if (typeof opts.source == "string") {
       this.source = document.querySelector(opts.source)
+      if (!(this.source instanceof HTMLElement)) {
+        console.error(`Bindery: Could not find element that matches selector "${opts.source}"`);
+        return
+      }
     }
     else if (opts.source instanceof HTMLElement) {
       this.source = opts.source;
     }
     else {
-      console.error(`Bindery: Source should be an element or selector`);
+      console.error(`Bindery: Source must be an element or selector`);
     }
 
-    this.controls = new Controls({binder: this});
+    let pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE
+    let pageMargins = opts.margin ? opts.margin : DEFAULT_PAGE_MARGIN
+    this.setSize(pageSize);
+    Page.setMargin(pageMargins);
 
-    if (opts.pageSize) Page.setSize(opts.pageSize);
-    if (opts.margin) Page.setMargin(opts.margin);
+    this.controls = new Controls({binder: this});
 
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
@@ -38,6 +49,11 @@ class Binder {
   cancel() {
     this.viewer.cancel();
     this.source.style.display = "";
+  }
+
+  setSize(size) {
+    this.pageSize = size
+    Page.setSize(size);
   }
 
   addRules(rules) {
@@ -52,14 +68,18 @@ class Binder {
   }
 
   makeBook(doneBinding) {
+    this.source.style.display = "";
     let content = this.source.cloneNode(true);
     this.source.style.display = "none";
 
-    makePages(content, this.rules, (pages) => {
-      this.viewer = new Viewer({
-        pages: pages,
-      });
+    // In case we're updating an existing layout 
+    document.body.classList.remove("bindery-viewing");
 
+    makePages(content, this.rules, (pages) => {
+      if (!this.viewer) {
+        this.viewer = new Viewer()
+      }
+      this.viewer.pages = pages,
       this.viewer.update();
       this.controls.setState("done");
 
