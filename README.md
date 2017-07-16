@@ -62,9 +62,9 @@ TK
 
 ## To Do
 
-- [ X ] Page Number references (Tables of Contents, Indexes)
+- [x] Page Number references (Tables of Contents, Indexes)
 - [ ] More control over spreads, ordering, booklet printing
-- [ X ] Customizable page sizing
+- [x] Customizable page sizing
 - [ ] Examples for use with blogging platforms
 - [ ] Wrapper for use with React.
 - [ ] Approachable API for writing custom rules
