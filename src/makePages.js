@@ -68,10 +68,21 @@ export default function(content, rules, done, DELAY) {
     let newPage = new Page();
     newPageRules(newPage);
     state.pages.push(newPage);
+
     state.currentPage = newPage; // TODO redundant
     if (state.path[0]) {
       newPage.flowContent.appendChild(state.path[0]);
     }
+
+    // make sure the cloned page is valid.
+    // this catches elements with an explicitly set height greater than the
+    // flow area, which will never be split and cause an infinite loop
+    if (newPage.hasOverflowed()) {
+      let suspect = last(state.path)
+      console.error(`Bindery: NextPage already overflowing, probably due to a style set on ${elementName(suspect)}. Since we aren't sure where to break ${elementName(suspect)}, it may be overflowing.`);
+      suspect.parentNode.removeChild(suspect);
+    }
+
     return newPage;
   };
 
@@ -127,6 +138,7 @@ export default function(content, rules, done, DELAY) {
 
         // Start on new page
         state.currentPage = makeNextPage();
+
         textNode = document.createTextNode(origText);
         last(state.path).appendChild(textNode);
 
@@ -164,10 +176,13 @@ export default function(content, rules, done, DELAY) {
     }
     state.path.push(node);
 
-    // Clear this node, before re-adding its children
+    // 1. Cache the children
     let childNodes = [...node.childNodes];
+    // 2. Clear this node
     node.innerHTML = '';
 
+
+    // 3. Try adding each child one by one
     let index = 0;
     let addNextChild = () => {
       if (!(index < childNodes.length)) {
@@ -176,6 +191,7 @@ export default function(content, rules, done, DELAY) {
       }
       let child = childNodes[index];
       index += 1;
+
       switch (child.nodeType) {
         case Node.TEXT_NODE:
           let cancel = () => {
