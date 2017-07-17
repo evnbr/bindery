@@ -5,19 +5,18 @@
     <desc>Created with Sketch.</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="icon-sheet">
-            <g id="Group-3-Copy-3" transform="translate(1.000000, 2.000000)">
-                <rect id="Rectangle-2-Copy" stroke="#000000" x="7.5" y="0.5" width="19" height="9"></rect>
-                <path d="M26.5,24.5 L32,24.5 C32.8284271,24.5 33.5,23.8284271 33.5,23 L33.5,11 C33.5,10.1715729 32.8284271,9.5 32,9.5 L2,9.5 C1.17157288,9.5 0.5,10.1715729 0.5,11 L0.5,23 C0.5,23.8284271 1.17157288,24.5 2,24.5 L7.5,24.5 L7.5,17.5 L26.5,17.5 L26.5,24.5 Z" id="Combined-Shape" stroke="#000000"></path>
-                <rect id="Rectangle-2-Copy" stroke="#000000" x="7.5" y="17.5" width="19" height="13"></rect>
-                <circle id="Oval" fill="#000000" cx="29" cy="14" r="1"></circle>
-            </g>
-            <g id="Group-8" transform="translate(11.000000, 25.000000)" stroke="#000000" stroke-linecap="square">
-                <path d="M2.50019092,1.5 L0.499775543,1.5" id="Line-Copy-4"></path>
-                <path d="M13.5001909,1.47003395 L11.4997755,1.47003395" id="Line-Copy-5"></path>
-                <path d="M2.5,1.5 L2.5,3.5" id="Line-Copy-3"></path>
-                <path d="M11.5,2.5 L11.5,3.5" id="Line-Copy-6"></path>
-            </g>
+        <g id="icon-sheet" stroke="#000000">
+            <rect id="Rectangle-2-Copy" x="1.5" y="4.5" width="32" height="26"></rect>
+            <path d="M17.5,7.5 L17.5,9.5" id="Line-2-Copy" stroke-linecap="square"></path>
+            <path d="M8.5,7.5 L8.5,9.5" id="Line-2-Copy-2" stroke-linecap="square"></path>
+            <path d="M26.5,7.5 L26.5,9.5" id="Line-2-Copy-3" stroke-linecap="square"></path>
+            <path d="M4.5,11.5 L6.5,11.5" id="Line-3" stroke-linecap="square"></path>
+            <path d="M28.5,11.5 L30.5,11.5" id="Line-3-Copy" stroke-linecap="square"></path>
+            <path d="M17.5,24.5 L17.5,26.5" id="Line-2-Copy-4" stroke-linecap="square" transform="translate(17.500000, 25.500000) scale(1, -1) translate(-17.500000, -25.500000) "></path>
+            <path d="M8.5,24.5 L8.5,26.5" id="Line-2-Copy-5" stroke-linecap="square" transform="translate(8.500000, 25.500000) scale(1, -1) translate(-8.500000, -25.500000) "></path>
+            <path d="M26.5,23.5 L26.5,26.5" id="Line-2-Copy-6" stroke-linecap="square" transform="translate(27.000000, 25.000000) scale(1, -1) translate(-27.000000, -25.000000) "></path>
+            <path d="M4.5,22.5 L6.5,22.5" id="Line-3-Copy-2" stroke-linecap="square" transform="translate(5.500000, 22.500000) scale(1, -1) translate(-5.500000, -22.500000) "></path>
+            <path d="M26.5,21.5 L30.5,21.5" id="Line-3-Copy-3" stroke-linecap="square" transform="translate(28.500000, 22.000000) scale(1, -1) translate(-28.500000, -22.000000) "></path>
         </g>
     </g>
 </svg>

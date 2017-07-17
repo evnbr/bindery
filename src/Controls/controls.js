@@ -131,7 +131,7 @@ class Controls {
     }
     const gridMode = h(".bindery-viewmode.grid.selected", { onclick: setGrid }, h(".icon"), "Grid");
     const interactMode = h(".bindery-viewmode.interactive",  { onclick: setInteractive },  h(".icon"), "Bound");
-    const printMode = h(".bindery-viewmode.print",  { onclick: setPrint }, h(".icon"), "Preview");
+    const printMode = h(".bindery-viewmode.print",  { onclick: setPrint }, h(".icon"), "Sheet");
     const viewSwitcher = h(".bindery-viewswitcher",
       gridMode, interactMode, printMode,
     );
