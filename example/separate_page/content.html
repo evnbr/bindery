@@ -3,14 +3,11 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-	<title>Bindery Example</title>
+	<title>My Website</title>
   <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
-
-	<div id="makeBook" onclick="binder.makeBook();">Make Book</div>
 
   <section class="content">
 		<h2>
@@ -117,34 +114,5 @@
     }
     </script>
   </section>
-
-
-	<script type="text/javascript" src="../build/bindery.js"></script>
-	<script>
-		let binder = new Bindery({
-		  source: ".content",
-		  rules: {
-				"h2": Bindery.BreakBefore,
-		    "p > a": Bindery.Footnote((elmt) => `Link to <a href='#'>${elmt.href}</a>`),
-		    "p": Bindery.Footnote((elmt) => elmt.textContent.substr(0,28)),
-		    ".med-figure": Bindery.FullPage,
-		    ".big-figure": Bindery.Spread,
-		    ".content h2": Bindery.RunningHeader,
-		    ".content": Bindery.PageNumber,
-				".toc a": Bindery.PageReference,
-		  },
-		  pageSize: {
-		    height: 500,
-		    width: 350,
-		  },
-			margin: {
-				inner: 30,
-				outer: 50,
-				bottom: 60,
-				top: 40
-			},
-			debugDelay: 0,
-		});
-	</script>
 </body>
 </html>
