@@ -1,0 +1,87 @@
+* {
+  font: inherit;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: sans-serif;
+}
+
+.content, .intro {
+  font-family: Georgia;
+  font-size: 16px;
+  margin: 20px auto;
+  max-width: 900px;
+  padding: 20px;
+}
+
+h2 {
+  font-size: 3em;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  font-size: 2em;
+  margin-bottom: 1rem;
+}
+
+p {
+  text-indent: 1rem;
+}
+
+sup {
+  font-size: 0.66em;
+}
+
+figure {
+  width: 100%;
+  background: gray;
+  /*padding-bottom: 400px;*/
+  padding-bottom: 70%;
+  position: relative;
+}
+
+figcaption {
+  position: absolute;
+  bottom: 0;
+  padding: 2em;
+}
+
+.aside {
+  background: #ffffcc;
+  border: 1px solid black;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.toc {
+  list-style: none;
+}
+
+#makeBook {
+  display: inline-block;
+  background: navy;
+  color: white;
+  font-family: sans-serif;
+  padding: 1em 1.5em;
+  cursor: pointer;
+  position: fixed;
+  top: 2em;
+  right: 2em;
+  border-radius: 2px;
+  animation: rotateColor 5s;
+  animation-iteration-count: infinite;
+}
+#makeBook:hover {
+  background: black;
+  animation: none;
+}
+
+@keyframes rotateColor {
+  0%   { background-color: blue; }
+  33%  { background-color: green; }
+  67%  { background-color: maroon; }
+  100% { background-color: blue; }
+}

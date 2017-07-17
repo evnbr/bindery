@@ -8,8 +8,6 @@ import Controls from "./Controls/controls";
 
 import Rules from "./Rules/";
 
-import h from "hyperscript";
-
 
 const DEFAULT_PAGE_SIZE = {
   width: 300,
@@ -42,7 +40,7 @@ class Binder {
     }
 
     let pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE
-    let pageMargin = opts.margin ? opts.margin : DEFAULT_PAGE_MARGIN
+    let pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN
     this.setSize(pageSize);
     this.setMargin(pageMargin);
 
@@ -52,6 +50,11 @@ class Binder {
     if (opts.rules) this.addRules(opts.rules);
 
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
+
+    if (opts.runImmeditately) {
+      this.runImmeditately = true;
+      this.makeBook();
+    }
   }
 
   cancel() {
@@ -74,15 +77,16 @@ class Binder {
     return Page.isSizeValid();
   }
 
-  addRules(rules) {
-    for (let selector in rules) {
-      if (!rules[selector] ) {
-        console.warn(`Bindery: Unknown rule for "${selector}"`);
-        continue;
+  addRules(newRules) {
+    newRules.forEach((rule) => {
+      if (rule instanceof Rules.BinderyRule) {
+        this.rules.push(rule);
       }
-      rules[selector].selector = selector;
-      this.rules.push(rules[selector]);
-    }
+      else {
+        console.warn("Bindery: The following is not an instance of BinderyRule and will be ignored:");
+        console.warn(rule);
+      }
+    })
   }
 
   makeBook(doneBinding) {

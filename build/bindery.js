@@ -73,10 +73,6 @@ var Bindery =
 	
 	var _Rules2 = _interopRequireDefault(_Rules);
 	
-	var _hyperscript = __webpack_require__(8);
-	
-	var _hyperscript2 = _interopRequireDefault(_hyperscript);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -111,7 +107,7 @@ var Bindery =
 	    }
 	
 	    var pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
-	    var pageMargin = opts.margin ? opts.margin : DEFAULT_PAGE_MARGIN;
+	    var pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
 	    this.setSize(pageSize);
 	    this.setMargin(pageMargin);
 	
@@ -121,6 +117,11 @@ var Bindery =
 	    if (opts.rules) this.addRules(opts.rules);
 	
 	    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
+	
+	    if (opts.runImmeditately) {
+	      this.runImmeditately = true;
+	      this.makeBook();
+	    }
 	  }
 	
 	  _createClass(Binder, [{
@@ -149,20 +150,22 @@ var Bindery =
 	    }
 	  }, {
 	    key: "addRules",
-	    value: function addRules(rules) {
-	      for (var selector in rules) {
-	        if (!rules[selector]) {
-	          console.warn("Bindery: Unknown rule for \"" + selector + "\"");
-	          continue;
+	    value: function addRules(newRules) {
+	      var _this = this;
+	
+	      newRules.forEach(function (rule) {
+	        if (rule instanceof _Rules2.default.BinderyRule) {
+	          _this.rules.push(rule);
+	        } else {
+	          console.warn("Bindery: The following is not an instance of BinderyRule and will be ignored:");
+	          console.warn(rule);
 	        }
-	        rules[selector].selector = selector;
-	        this.rules.push(rules[selector]);
-	      }
+	      });
 	    }
 	  }, {
 	    key: "makeBook",
 	    value: function makeBook(doneBinding) {
-	      var _this = this;
+	      var _this2 = this;
 	
 	      this.source.style.display = "";
 	      var content = this.source.cloneNode(true);
@@ -173,11 +176,11 @@ var Bindery =
 	      document.body.classList.add("bindery-inProgress");
 	
 	      (0, _makePages2.default)(content, this.rules, function (pages) {
-	        if (!_this.viewer) {
-	          _this.viewer = new _viewer2.default();
+	        if (!_this2.viewer) {
+	          _this2.viewer = new _viewer2.default();
 	        }
-	        _this.viewer.pages = pages, _this.viewer.update();
-	        _this.controls.setState("done");
+	        _this2.viewer.pages = pages, _this2.viewer.update();
+	        _this2.controls.setState("done");
 	        document.body.classList.remove("bindery-inProgress");
 	      }, this.debugDelay);
 	    }
@@ -1422,7 +1425,7 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0,0,0,0.1);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible;\n  }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important;\n  }\n\n\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n  }\n\n  /*.bindery-show-bleed .bindery-page::after {\n    outline: 1px solid rgba(0,0,0,0.2);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.3);\n  }*/\n\n  .bindery-show-guides .bindery-page::after {\n    outline: 1px solid magenta;\n  }\n\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue;\n  }\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n  margin-top: 0 !important;\n}\n\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
+	exports.push([module.id, "@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0,0,0,0.1);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible;\n  }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important;\n  }\n\n\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    pointer-events: none;\n  }\n\n  /*.bindery-show-bleed .bindery-page::after {\n    outline: 1px solid rgba(0,0,0,0.2);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.3);\n  }*/\n\n  .bindery-show-guides .bindery-page::after {\n    outline: 1px solid magenta;\n  }\n\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue;\n  }\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 4px;\n  flex: 0 1 auto;\n  font-size: 0.66em;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n  margin-top: 0 !important;\n}\n\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n[bindery-side=\"left\"].bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n[bindery-side=\"right\"].bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n", ""]);
 	
 	// exports
 
@@ -1860,7 +1863,10 @@ var Bindery =
 	    var facingToggle = toggle({ onclick: facing }, "Facing Pages");
 	    facingToggle.classList.add("selected");
 	
-	    var doneBtn = btn({ onclick: done }, "Done");
+	    var doneBtn = "";
+	    if (!this.binder.runImmeditately) {
+	      doneBtn = btn({ onclick: done }, "Done");
+	    }
 	
 	    var input = {
 	      top: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.top }),
@@ -2109,44 +2115,100 @@ var Bindery =
 	
 	var _breakBefore2 = _interopRequireDefault(_breakBefore);
 	
-	var _fullPage = __webpack_require__(28);
+	var _FullPage = __webpack_require__(29);
 	
-	var _fullPage2 = _interopRequireDefault(_fullPage);
+	var _FullPage2 = _interopRequireDefault(_FullPage);
 	
-	var _spread = __webpack_require__(31);
+	var _Spread = __webpack_require__(30);
 	
-	var _spread2 = _interopRequireDefault(_spread);
+	var _Spread2 = _interopRequireDefault(_Spread);
 	
-	var _Footnote = __webpack_require__(34);
+	var _Footnote = __webpack_require__(33);
 	
 	var _Footnote2 = _interopRequireDefault(_Footnote);
 	
-	var _PageReference = __webpack_require__(35);
+	var _PageReference = __webpack_require__(34);
 	
 	var _PageReference2 = _interopRequireDefault(_PageReference);
 	
-	var _pageNumber = __webpack_require__(36);
+	var _PageNumber = __webpack_require__(35);
 	
-	var _pageNumber2 = _interopRequireDefault(_pageNumber);
+	var _PageNumber2 = _interopRequireDefault(_PageNumber);
 	
-	var _runningHeader = __webpack_require__(39);
+	var _RunningHeader = __webpack_require__(38);
 	
-	var _runningHeader2 = _interopRequireDefault(_runningHeader);
+	var _RunningHeader2 = _interopRequireDefault(_RunningHeader);
+	
+	var _BinderyRule = __webpack_require__(28);
+	
+	var _BinderyRule2 = _interopRequireDefault(_BinderyRule);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
-	  Spread: _spread2.default,
-	  FullPage: _fullPage2.default,
+	  Spread: _Spread2.default,
+	  FullPage: _FullPage2.default,
 	  Footnote: _Footnote2.default,
 	  BreakBefore: _breakBefore2.default,
-	  PageNumber: _pageNumber2.default,
-	  RunningHeader: _runningHeader2.default,
-	  PageReference: _PageReference2.default
+	  PageNumber: _PageNumber2.default,
+	  RunningHeader: _RunningHeader2.default,
+	  PageReference: _PageReference2.default,
+	  BinderyRule: _BinderyRule2.default
 	};
 
 /***/ },
 /* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	exports.default = function (userOptions) {
+	  return new BreakBefore(userOptions);
+	};
+	
+	var _BinderyRule2 = __webpack_require__(28);
+	
+	var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var BreakBefore = function (_BinderyRule) {
+	  _inherits(BreakBefore, _BinderyRule);
+	
+	  function BreakBefore(options) {
+	    _classCallCheck(this, BreakBefore);
+	
+	    options.name = "Break Before";
+	    return _possibleConstructorReturn(this, (BreakBefore.__proto__ || Object.getPrototypeOf(BreakBefore)).call(this, options));
+	  }
+	
+	  _createClass(BreakBefore, [{
+	    key: "beforeAdd",
+	    value: function beforeAdd(elmt, state) {
+	      if (state.currentPage.flowContent.innerText !== "") {
+	        state.currentPage = state.getNewPage();
+	        state.currentPage.setPreference("right");
+	      }
+	    }
+	  }]);
+
+	  return BreakBefore;
+	}(_BinderyRule3.default);
+
+/***/ },
+/* 28 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2154,95 +2216,92 @@ var Bindery =
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.default = {
-	  beforeAdd: function beforeAdd(elmt, state) {
-	    if (state.currentPage.flowContent.innerText !== "") {
-	      state.currentPage = state.getNewPage();
-	      state.currentPage.setPreference("right");
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var BinderyRule = function BinderyRule(options) {
+	  _classCallCheck(this, BinderyRule);
+	
+	  this.name = options.name ? options.name : "Unnamed Bindery Rule";
+	  this.selector = "";
+	
+	  for (var key in options) {
+	    if (key in this) {
+	      this[key] = options[key];
 	    }
 	  }
 	};
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
 	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _fullPage = __webpack_require__(29);
-	
-	var _fullPage2 = _interopRequireDefault(_fullPage);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var prevPage = void 0,
-	    prevElementPath = void 0;
-	
-	exports.default = {
-	  beforeAdd: function beforeAdd(elmt, state) {
-	    prevPage = state.currentPage;
-	    prevElementPath = state.path;
-	    state.currentPage = state.getNewPage();
-	
-	    //TODO: Rather than just add padding,
-	    // put full-bleed content on a separate
-	    // out-of-flow background layer
-	    if (elmt.classList.contains("bleed")) {
-	      state.currentPage.element.classList.add("bleed");
-	    }
-	  },
-	  afterAdd: function afterAdd(elmt, state) {
-	    state.currentPage = prevPage;
-	    state.path = prevElementPath;
-	  }
-	};
+	exports.default = BinderyRule;
 
 /***/ },
 /* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// style-loader: Adds some css to the DOM by adding a <style> tag
+	"use strict";
 	
-	// load the styles
-	var content = __webpack_require__(30);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(4)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!../../../node_modules/css-loader/index.js!./fullPage.css", function() {
-				var newContent = require("!!../../../node_modules/css-loader/index.js!./fullPage.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	exports.default = function (userOptions) {
+	  return new FullPage(userOptions);
+	};
+	
+	var _BinderyRule2 = __webpack_require__(28);
+	
+	var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var prevPage = void 0,
+	    prevElementPath = void 0;
+	
+	var FullPage = function (_BinderyRule) {
+	  _inherits(FullPage, _BinderyRule);
+	
+	  function FullPage(options) {
+	    _classCallCheck(this, FullPage);
+	
+	    options.name = "Full Page Spread";
+	    return _possibleConstructorReturn(this, (FullPage.__proto__ || Object.getPrototypeOf(FullPage)).call(this, options));
+	  }
+	
+	  _createClass(FullPage, [{
+	    key: "beforeAdd",
+	    value: function beforeAdd(elmt, state) {
+	      prevPage = state.currentPage;
+	      prevElementPath = state.path;
+	      state.currentPage = state.getNewPage();
+	
+	      //TODO: Rather than just add padding,
+	      // put full-bleed content on a separate
+	      // out-of-flow background layer
+	      if (elmt.classList.contains("bleed")) {
+	        state.currentPage.element.classList.add("bleed");
+	      }
+	    }
+	  }, {
+	    key: "afterAdd",
+	    value: function afterAdd(elmt, state) {
+	      state.currentPage = prevPage;
+	      state.path = prevElementPath;
+	    }
+	  }]);
+
+	  return FullPage;
+	}(_BinderyRule3.default);
 
 /***/ },
 /* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(3)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "/* TODO */\n", ""]);
-	
-	// exports
-
-
-/***/ },
-/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2251,53 +2310,87 @@ var Bindery =
 	  value: true
 	});
 	
-	var _spread = __webpack_require__(32);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	exports.default = function (userOptions) {
+	  return new Spread(userOptions);
+	};
+	
+	var _spread = __webpack_require__(31);
 	
 	var _spread2 = _interopRequireDefault(_spread);
 	
+	var _BinderyRule2 = __webpack_require__(28);
+	
+	var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var prevPage = void 0,
-	    prevElementPath = void 0;
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	exports.default = {
-	  beforeAdd: function beforeAdd(elmt, state) {
-	    prevPage = state.currentPage;
-	    prevElementPath = state.path;
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	    state.currentPage = state.getNewPage();
-	  },
-	  afterAdd: function afterAdd(elmt, state) {
-	    var leftPage = state.currentPage;
-	    var dupedContent = leftPage.flowContent.cloneNode(true);
-	    var rightPage = state.getNewPage();
-	    rightPage.flowBox.innerHTML = "";
-	    rightPage.flowBox.appendChild(dupedContent);
-	    rightPage.flowContent = dupedContent;
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	    leftPage.element.classList.add("bindery-spread");
-	    leftPage.element.classList.add("bleed");
-	    leftPage.setPreference("left");
-	    leftPage.setOutOfFlow(true);
+	var Spread = function (_BinderyRule) {
+	  _inherits(Spread, _BinderyRule);
 	
-	    rightPage.element.classList.add("bindery-spread");
-	    rightPage.element.classList.add("bleed");
-	    rightPage.setPreference("right");
-	    rightPage.setOutOfFlow(true);
+	  function Spread(options) {
+	    _classCallCheck(this, Spread);
 	
-	    state.currentPage = prevPage;
-	    state.path = prevElementPath;
+	    options.name = "Spread";
+	
+	    var _this = _possibleConstructorReturn(this, (Spread.__proto__ || Object.getPrototypeOf(Spread)).call(this, options));
+	
+	    _this.prevPage = null;
+	    _this.prevElementPath = null;
+	    return _this;
 	  }
-	};
+	
+	  _createClass(Spread, [{
+	    key: "beforeAdd",
+	    value: function beforeAdd(elmt, state) {
+	      this.prevPage = state.currentPage;
+	      this.prevElementPath = state.path;
+	
+	      state.currentPage = state.getNewPage();
+	    }
+	  }, {
+	    key: "afterAdd",
+	    value: function afterAdd(elmt, state) {
+	      var leftPage = state.currentPage;
+	      var dupedContent = leftPage.flowContent.cloneNode(true);
+	      var rightPage = state.getNewPage();
+	      rightPage.flowBox.innerHTML = "";
+	      rightPage.flowBox.appendChild(dupedContent);
+	      rightPage.flowContent = dupedContent;
+	
+	      leftPage.element.classList.add("bindery-spread");
+	      leftPage.element.classList.add("bleed");
+	      leftPage.setPreference("left");
+	      leftPage.setOutOfFlow(true);
+	
+	      rightPage.element.classList.add("bindery-spread");
+	      rightPage.element.classList.add("bleed");
+	      rightPage.setPreference("right");
+	      rightPage.setOutOfFlow(true);
+	
+	      state.currentPage = this.prevPage;
+	      state.path = this.prevElementPath;
+	    }
+	  }]);
+
+	  return Spread;
+	}(_BinderyRule3.default);
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(33);
+	var content = __webpack_require__(32);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2306,8 +2399,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!../../../node_modules/css-loader/index.js!./spread.css", function() {
-				var newContent = require("!!../../../node_modules/css-loader/index.js!./spread.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./spread.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./spread.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -2317,7 +2410,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2325,10 +2418,78 @@ var Bindery =
 	
 	
 	// module
-	exports.push([module.id, "[bindery-side=\"left\"].bindery-spread .bindery-content {\n  width: 200%;\n  position: absolute;\n  left: 0;\n}\n[bindery-side=\"right\"].bindery-spread .bindery-content {\n  width: 200%;\n  position: absolute;\n  right: 0;\n}\n", ""]);
+	exports.push([module.id, ".bindery-spread[bindery-side=\"left\"] .bindery-content {\n  /*width: 200%;*/\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: -100%;\n  bottom: 0;\n}\n.bindery-spread[bindery-side=\"right\"] .bindery-content {\n  position: absolute;\n  top: 0;\n  left: -100%;\n  right: 0;\n  bottom: 0;\n}\n", ""]);
 	
 	// exports
 
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	exports.default = function (userOptions) {
+	  return new Footnote(userOptions);
+	};
+	
+	var _BinderyRule2 = __webpack_require__(28);
+	
+	var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
+	
+	var _hyperscript = __webpack_require__(8);
+	
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Footnote = function (_BinderyRule) {
+	  _inherits(Footnote, _BinderyRule);
+	
+	  function Footnote(options) {
+	    _classCallCheck(this, Footnote);
+	
+	    options.name = "Footnote";
+	    return _possibleConstructorReturn(this, (Footnote.__proto__ || Object.getPrototypeOf(Footnote)).call(this, options));
+	  }
+	
+	  _createClass(Footnote, [{
+	    key: "afterAdd",
+	    value: function afterAdd(elmt, state) {
+	      var number = state.currentPage.footer.querySelectorAll(".footnote").length;
+	
+	      this.updateReference(elmt, number);
+	
+	      var fn = (0, _hyperscript2.default)(".footnote");
+	      fn.innerHTML = this.content(elmt, number);
+	      state.currentPage.footer.appendChild(fn);
+	    }
+	  }, {
+	    key: "updateReference",
+	    value: function updateReference(elmt, number) {
+	      elmt.insertAdjacentHTML("beforeEnd", "<sup>" + number + "</sup>");
+	    }
+	  }, {
+	    key: "content",
+	    value: function content(elmt, number) {
+	      return number + ": Default footnote for \"" + elmt.textContent.substr(0, 24) + "\"";
+	    }
+	  }]);
+
+	  return Footnote;
+	}(_BinderyRule3.default);
 
 /***/ },
 /* 34 */
@@ -2340,92 +2501,141 @@ var Bindery =
 	  value: true
 	});
 	
-	exports.default = function (textGetter) {
-	  return {
-	    newPage: function newPage(pg) {},
-	    afterAdd: function afterAdd(elmt, state) {
-	      var fn = (0, _hyperscript2.default)(".footnote");
-	      var n = state.currentPage.footer.querySelectorAll(".footnote").length;
-	      fn.innerHTML = n + " " + textGetter(elmt);
-	      state.currentPage.footer.appendChild(fn);
-	      elmt.insertAdjacentHTML("beforeend", "<sup>" + n + "</sup>");
-	    }
-	  };
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	exports.default = function (options) {
+	  return new PageReference(options);
 	};
 	
-	var _hyperscript = __webpack_require__(8);
+	var _BinderyRule2 = __webpack_require__(28);
 	
-	var _hyperscript2 = _interopRequireDefault(_hyperscript);
-
+	var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var PageReference = function (_BinderyRule) {
+	  _inherits(PageReference, _BinderyRule);
+	
+	  function PageReference(options) {
+	    _classCallCheck(this, PageReference);
+	
+	    options.name = "Page Reference";
+	
+	    var _this = _possibleConstructorReturn(this, (PageReference.__proto__ || Object.getPrototypeOf(PageReference)).call(this, options));
+	
+	    _this.references = {};
+	    return _this;
+	  }
+	
+	  _createClass(PageReference, [{
+	    key: "afterAdd",
+	    value: function afterAdd(elmt, state) {
+	      this.references[elmt.getAttribute("href")] = elmt;
+	      elmt.removeAttribute("href");
+	    }
+	  }, {
+	    key: "afterBind",
+	    value: function afterBind(pg, i) {
+	      for (var ref in this.references) {
+	        if (pg.element.querySelector(ref)) {
+	          this.updateReference(this.references[ref], pg.number);
+	        }
+	      }
+	    }
+	  }, {
+	    key: "updateReference",
+	    value: function updateReference(element, number) {
+	      element.insertAdjacentHTML("afterend", " (Reference to page " + number + ")");
+	    }
+	  }]);
+
+	  return PageReference;
+	}(_BinderyRule3.default);
 
 /***/ },
 /* 35 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var references = {};
 	
-	exports.default = {
-	  afterAdd: function afterAdd(elmt, state) {
-	    references[elmt.getAttribute("href")] = elmt;
-	    elmt.removeAttribute("href");
-	  },
-	  afterBind: function afterBind(pg, i) {
-	    for (var ref in references) {
-	      if (pg.element.querySelector(ref)) {
-	        references[ref].insertAdjacentHTML("afterend", "<span style=\"float:right;\">" + pg.number.textContent + "</span>");
-	      }
-	    }
-	  }
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	exports.default = function (options) {
+	  return new PageNumber(options);
 	};
+	
+	var _hyperscript = __webpack_require__(8);
+	
+	var _hyperscript2 = _interopRequireDefault(_hyperscript);
+	
+	var _pageNumber = __webpack_require__(36);
+	
+	var _pageNumber2 = _interopRequireDefault(_pageNumber);
+	
+	var _BinderyRule2 = __webpack_require__(28);
+	
+	var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var PageNumber = function (_BinderyRule) {
+	  _inherits(PageNumber, _BinderyRule);
+	
+	  function PageNumber(options) {
+	    _classCallCheck(this, PageNumber);
+	
+	    if (!options) options = {};
+	    options.name = "Page Number";
+	
+	    var _this = _possibleConstructorReturn(this, (PageNumber.__proto__ || Object.getPrototypeOf(PageNumber)).call(this, options));
+	
+	    _this.selector = ".content";
+	    _this.customClass = options.customClass;
+	    return _this;
+	  }
+	
+	  _createClass(PageNumber, [{
+	    key: "newPage",
+	    value: function newPage(pg, state) {}
+	  }, {
+	    key: "afterBind",
+	    value: function afterBind(pg, i) {
+	      pg.number = i + 1;
+	      var el = (0, _hyperscript2.default)(".bindery-num", "" + pg.number);
+	      if (this.customClass) {
+	        el.classList.add(this.customClass);
+	      }
+	      pg.element.appendChild(el);
+	    }
+	  }]);
+
+	  return PageNumber;
+	}(_BinderyRule3.default);
 
 /***/ },
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _hyperscript = __webpack_require__(8);
-	
-	var _hyperscript2 = _interopRequireDefault(_hyperscript);
-	
-	var _pageNumber = __webpack_require__(37);
-	
-	var _pageNumber2 = _interopRequireDefault(_pageNumber);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.default = {
-	  newPage: function newPage(pg, state) {
-	    // let el = h(".bindery-num", "#");
-	    // pg.number = el;
-	    // pg.element.appendChild(el);
-	  },
-	  afterBind: function afterBind(pg, i) {
-	    var el = (0, _hyperscript2.default)(".bindery-num", "#");
-	    pg.number = el;
-	    pg.element.appendChild(el);
-	    pg.number.textContent = i + 1;
-	  }
-	};
-
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
-
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(38);
+	var content = __webpack_require__(37);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2434,8 +2644,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!../../../node_modules/css-loader/index.js!./pageNumber.css", function() {
-				var newContent = require("!!../../../node_modules/css-loader/index.js!./pageNumber.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./pageNumber.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./pageNumber.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -2445,7 +2655,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 38 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();
@@ -2459,7 +2669,7 @@ var Bindery =
 
 
 /***/ },
-/* 39 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2468,38 +2678,82 @@ var Bindery =
 	  value: true
 	});
 	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	exports.default = function (userOptions) {
+	  return new RunningHeader(userOptions);
+	};
+	
+	var _BinderyRule2 = __webpack_require__(28);
+	
+	var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
+	
 	var _hyperscript = __webpack_require__(8);
 	
 	var _hyperscript2 = _interopRequireDefault(_hyperscript);
 	
-	var _runningHeader = __webpack_require__(40);
+	var _runningHeader = __webpack_require__(39);
 	
 	var _runningHeader2 = _interopRequireDefault(_runningHeader);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var headerContent = "";
-	exports.default = {
-	  afterAdd: function afterAdd(elmt, state) {
-	    headerContent = elmt.textContent;
-	    state.currentPage.runningHeader.textContent = "";
-	  },
-	  newPage: function newPage(pg, state) {
-	    var el = (0, _hyperscript2.default)(".bindery-running-header");
-	    pg.runningHeader = el;
-	    pg.element.appendChild(el);
-	    pg.runningHeader.textContent = headerContent;
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var RunningHeader = function (_BinderyRule) {
+	  _inherits(RunningHeader, _BinderyRule);
+	
+	  function RunningHeader(options) {
+	    _classCallCheck(this, RunningHeader);
+	
+	    options.name = "Running Header";
+	
+	    var _this = _possibleConstructorReturn(this, (RunningHeader.__proto__ || Object.getPrototypeOf(RunningHeader)).call(this, options));
+	
+	    _this.customClass = options.customClass;
+	    _this.currentHeaderContent = "";
+	    return _this;
 	  }
-	};
+	
+	  _createClass(RunningHeader, [{
+	    key: "infoGetter",
+	    value: function infoGetter(elmt) {
+	      return { text: elmt.textContent };
+	    }
+	  }, {
+	    key: "afterAdd",
+	    value: function afterAdd(elmt, state) {
+	      this.currentHeaderContent = elmt.textContent;
+	      state.currentPage.runningHeader.textContent = "";
+	    }
+	  }, {
+	    key: "newPage",
+	    value: function newPage(pg, state) {
+	      var el = (0, _hyperscript2.default)(".bindery-running-header");
+	      if (this.customClass) {
+	        el.classList.add(this.customClass);
+	      }
+	      pg.runningHeader = el;
+	      pg.element.appendChild(el);
+	      pg.runningHeader.textContent = this.currentHeaderContent;
+	    }
+	  }]);
+
+	  return RunningHeader;
+	}(_BinderyRule3.default);
 
 /***/ },
-/* 40 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(41);
+	var content = __webpack_require__(40);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -2508,8 +2762,8 @@ var Bindery =
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!../../../node_modules/css-loader/index.js!./runningHeader.css", function() {
-				var newContent = require("!!../../../node_modules/css-loader/index.js!./runningHeader.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./runningHeader.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./runningHeader.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -2519,7 +2773,7 @@ var Bindery =
 	}
 
 /***/ },
-/* 41 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(3)();

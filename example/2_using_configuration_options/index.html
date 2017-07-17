@@ -3,12 +3,12 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>My Website</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+	<title>Bindery - Single Page</title>
   <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
-
   <section class="content">
 		<h2>
 			Bindery.js
@@ -41,7 +41,13 @@
 
     <script>
 			var blahs = function() {
-				return (new Array(parseInt(Math.random()*50))).join(" Blah ");
+				let p1 = (new Array(parseInt(Math.random()*10))).join(" Blah ");
+				let a = "";
+				if ( Math.random() > 0.8 ) {
+					a = ". Read more <a href='https://en.wikipedia.org/wiki/Lorem_ipsum'>on Wikipedia</a>."
+				}
+				let p2 = (new Array(parseInt(Math.random()*20))).join(" Blah ");
+				return p1 + a + p2;
 			}
       for (var i = 0; i < 10; i++) {
         document.write(`<p>This is paragraph 1:${i}. ${blahs()} End.</p>`)
@@ -114,5 +120,41 @@
     }
     </script>
   </section>
+
+
+	<script type="text/javascript" src="../../build/bindery.js"></script>
+	<script>
+		let binder = new Bindery({
+		  source: ".content",
+			pageSize: { height: 500, width: 350,},
+			pageMargin: { top: 40, inner: 30, outer: 50, bottom: 60 },
+			debugDelay: 0,
+		  rules: [
+				Bindery.BreakBefore({ selector: "h2" }),
+				Bindery.Footnote({
+					selector: "p > a",
+					content: (elmt, number) => `${number}: Link to <a href='#'>${elmt.href}</a>`,
+				}),
+				Bindery.Footnote({ selector: "p" }),
+				Bindery.FullPage({ selector: ".med-figure" }),
+				Bindery.Spread({ selector: ".big-figure" }),
+				Bindery.RunningHeader({
+					selector: "h2",
+					customClass: "myPageHeader",
+				}),
+				Bindery.PageNumber({
+					customClass: "myPageNumber",
+				}),
+				Bindery.PageReference({
+					selector: ".toc a",
+					updateReference: (element, number) => {
+						element.insertAdjacentHTML("afterend", `<i style="float:right;">${number}</i>`);
+					}
+				}),
+		  ],
+		});
+	</script>
+
+	<div id="makeBook" onclick="binder.makeBook();">Make Book</div>
 </body>
 </html>

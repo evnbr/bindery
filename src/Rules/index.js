@@ -1,17 +1,19 @@
 import breakBefore from "./breakBefore";
-import fullPage from "./FullPage/fullPage";
-import Spread from "./Spread/spread";
+import FullPage from "./FullPage";
+import Spread from "./Spread";
 import Footnote from "./Footnote";
 import PageReference from "./PageReference";
-import PageNumber from "./PageNumber/pageNumber";
-import RunningHeader from "./RunningHeader/runningHeader";
+import PageNumber from "./PageNumber";
+import RunningHeader from "./RunningHeader";
+import BinderyRule from "./BinderyRule";
 
 export default {
   Spread: Spread,
-  FullPage: fullPage,
+  FullPage: FullPage,
   Footnote: Footnote,
   BreakBefore: breakBefore,
   PageNumber: PageNumber,
   RunningHeader: RunningHeader,
   PageReference: PageReference,
+  BinderyRule: BinderyRule
 }

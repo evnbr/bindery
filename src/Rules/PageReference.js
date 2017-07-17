@@ -1,17 +1,27 @@
-let references = {};
+import BinderyRule from "./BinderyRule";
 
-export default {
-  afterAdd: (elmt, state) => {
-    references[elmt.getAttribute("href")] = elmt;
+class PageReference extends BinderyRule {
+  constructor(options) {
+    options.name = "Page Reference";
+    super(options);
+    this.references = {};
+  }
+  afterAdd(elmt, state) {
+    this.references[elmt.getAttribute("href")] = elmt;
     elmt.removeAttribute("href");
-  },
-  afterBind: (pg, i) => {
-    for (let ref in references) {
+  }
+  afterBind(pg, i) {
+    for (let ref in this.references) {
       if (pg.element.querySelector(ref)) {
-        references[ref].insertAdjacentHTML(
-          "afterend",
-          `<span style="float:right;">${pg.number.textContent}</span>`);
+        this.updateReference(this.references[ref], pg.number);
       }
     }
   }
+  updateReference(element, number) {
+    element.insertAdjacentHTML("afterend", ` (Reference to page ${number})`);
+  }
+}
+
+export default function(options) {
+  return new PageReference(options);
 }

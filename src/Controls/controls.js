@@ -52,7 +52,10 @@ class Controls {
     let facingToggle  = toggle({onclick: facing}, "Facing Pages");
     facingToggle.classList.add("selected");
 
-    let doneBtn = btn({onclick: done}, "Done");
+    let doneBtn = "";
+    if (!this.binder.runImmeditately) {
+      doneBtn = btn({onclick: done}, "Done");
+    }
 
     const input = {
       top:    h("input", { type: "number", value: this.binder.pageMargin.top }),

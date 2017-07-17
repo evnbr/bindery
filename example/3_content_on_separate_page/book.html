@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>My Website - Book</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<link rel="stylesheet" type="text/css" href="book.css" />
+</head>
+
+<body>
+
+	<script type="text/javascript" src="../../build/bindery.js"></script>
+	<script>
+
+		fetch('content.html').then(function(response) {
+			return response.text();
+		}).then(function(fetchedContent) {
+
+			var wrapper = document.createElement('div');
+			wrapper.innerHTML = fetchedContent;
+			let content = wrapper.querySelector(".content");
+
+			let binder = new Bindery({
+			  source: content,
+				runImmeditately: true,
+				pageSize: { height: 500, width: 350,},
+				pageMargin: { top: 40, inner: 30, outer: 50, bottom: 60 },
+				debugDelay: 0,
+			  rules: [
+					Bindery.BreakBefore({ selector: "h2" }),
+					Bindery.Footnote({
+						selector: "p > a",
+						content: (elmt, number) => `${number}: Link to <a href='#'>${elmt.href}</a>`,
+					}),
+					Bindery.Spread({ selector: ".big-figure" }),
+					Bindery.RunningHeader({ selector: "h2" }),
+					Bindery.PageNumber(),
+					Bindery.PageReference({
+						selector: ".toc a",
+						updateReference: (element, number) => {
+							element.insertAdjacentHTML("afterend", `<i style="float:right;">${number}</i>`);
+						}
+					}),
+			  ],
+			});
+
+		}).catch(function(error) {
+			console.log(error);
+  		alert("Couldn't fetch content. Note that this demo must be hosted on a server.");
+		});
+
+	</script>
+</body>
+</html>

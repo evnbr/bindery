@@ -1,16 +1,22 @@
 import css from "style!css!./spread.css";
+import BinderyRule from "./BinderyRule"
 
-let prevPage, prevElementPath;
 
-export default {
-  beforeAdd: (elmt, state) => {
-    prevPage = state.currentPage;
-    prevElementPath = state.path;
+class Spread extends BinderyRule {
+  constructor(options) {
+    options.name = "Spread";
+    super(options);
+
+    this.prevPage = null;
+    this.prevElementPath = null;
+  }
+  beforeAdd(elmt, state) {
+    this.prevPage = state.currentPage;
+    this.prevElementPath = state.path;
 
     state.currentPage = state.getNewPage();
-
-  },
-  afterAdd: (elmt, state) => {
+  }
+  afterAdd(elmt, state) {
     let leftPage = state.currentPage;
     let dupedContent = leftPage.flowContent.cloneNode(true);
     let rightPage = state.getNewPage();
@@ -28,7 +34,11 @@ export default {
     rightPage.setPreference("right");
     rightPage.setOutOfFlow(true);
 
-    state.currentPage = prevPage;
-    state.path = prevElementPath;
-  },
+    state.currentPage = this.prevPage;
+    state.path = this.prevElementPath;
+  }
+}
+
+export default function(userOptions) {
+  return new Spread(userOptions);
 }

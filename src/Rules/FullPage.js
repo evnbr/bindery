@@ -1,9 +1,13 @@
-import css from "style!css!./fullPage.css";
+import BinderyRule from "./BinderyRule"
 
 let prevPage, prevElementPath;
 
-export default {
-  beforeAdd: (elmt, state) => {
+class FullPage extends BinderyRule {
+  constructor(options) {
+    options.name = "Full Page Spread"
+    super(options);
+  }
+  beforeAdd(elmt, state) {
     prevPage = state.currentPage;
     prevElementPath = state.path;
     state.currentPage = state.getNewPage();
@@ -14,9 +18,13 @@ export default {
     if (elmt.classList.contains("bleed")) {
       state.currentPage.element.classList.add("bleed");
     }
-  },
-  afterAdd: (elmt, state) => {
+  }
+  afterAdd(elmt, state) {
     state.currentPage = prevPage;
     state.path = prevElementPath;
-  },
+  }
+}
+
+export default function(userOptions) {
+  return new FullPage(userOptions);
 }
