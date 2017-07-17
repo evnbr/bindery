@@ -42,12 +42,12 @@ As of February 2017, it is in the process of being rewritten as a usable, modula
   <script>
     let binder = new Bindery({
       source: ".content",
-      rules: {
-        "h1": Bindery.BreakBefore,
-        "h2": Bindery.RunningHeader,
-        "a": Bindery.Footnote((el) => `Link to ${el.href}`),
-        ".figure": Bindery.Spread,
-      },
+      pageSize: { height: 500, width: 350 },
+      rules: [
+      	Bindery.BreakBefore({ selector: "h2" }),
+				Bindery.RunningHeader({ selector: "h2" }),
+				Bindery.PageNumber(),
+      ],
     });
 
     binder.makeBook();
