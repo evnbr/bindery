@@ -1,8 +1,7 @@
 @media screen {
   .bindery-page {
-    outline: 1px solid rgba(0,0,0,0.1);
     background: white;
-    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.2);*/
+    outline: 1px solid rgba(0,0,0,0.1);
     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
     overflow: hidden;
   }
@@ -25,10 +24,10 @@
     bottom: 0;
   }
 
-  .bindery-show-bleed .bindery-page::after {
+  /*.bindery-show-bleed .bindery-page::after {
     outline: 1px solid rgba(0,0,0,0.2);
     box-shadow: 0px 1px 3px rgba(0,0,0,0.3);
-  }
+  }*/
 
   .bindery-show-guides .bindery-page::after {
     outline: 1px solid magenta;

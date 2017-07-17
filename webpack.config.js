@@ -26,6 +26,12 @@ module.exports = {
           presets: ['es2015']
         }
       },
+      {
+          test: /\.svg/,
+          loader: 'svg-url-loader',
+          options: {}
+      }
+
     ]
   }
 }

@@ -44,11 +44,11 @@ class Page {
 
     measureArea.innerHTML = '';
     measureArea.appendChild(testPage.element);
-    let boxH = testPage.flowBox.getBoundingClientRect().height;
+    let box = testPage.flowBox.getBoundingClientRect();
 
     measureArea.parentNode.removeChild(measureArea)
 
-    return boxH > 100 // TODO: Number is arbitrary
+    return (box.height > 100) && (box.width > 100) // TODO: Number is arbitrary
   }
 
   setPreference(dir) {

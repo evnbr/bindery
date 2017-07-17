@@ -23,7 +23,7 @@ class Viewer {
     this.target.classList.toggle("bindery-show-guides");
   }
   toggleBleed() {
-    this.target.classList.toggle("bindery-show-bleed");
+    this.target.classList.add("bindery-show-bleed");
   }
   toggleDouble() {
     this.doubleSided = !this.doubleSided;
@@ -31,10 +31,17 @@ class Viewer {
   }
   setGrid() {
     this.mode = "grid";
+    this.target.classList.remove("bindery-show-bleed");
     this.update();
   }
-  toggleInteractive() {
-    this.mode = this.mode == "grid" ? "preview" : "grid";
+  setPrintPreview() {
+    this.mode = "grid";
+    this.target.classList.add("bindery-show-bleed");
+    this.update();
+  }
+  setInteractive() {
+    this.mode = "preview";
+    this.target.classList.remove("bindery-show-bleed");
     this.update();
   }
   update() {
@@ -89,24 +96,28 @@ class Viewer {
         leftPage.setAttribute("bindery-side", "left");
         rightPage.setAttribute("bindery-side", "right");
 
-        let wrap = h(".bindery-print-wrapper", {
-          style: {
-            height: `${Page.H}px`,
-            width: `${Page.W * 2}px`,
-          }
-        }, leftPage, rightPage);
+        let wrap = h(".bindery-print-page",
+          h(".bindery-print-wrapper", {
+            style: {
+              height: `${Page.H}px`,
+              width: `${Page.W * 2}px`,
+            }
+          }, leftPage, rightPage)
+        );
 
         this.target.appendChild(wrap);
       }
       else {
         let pg = pages[i].element;
         pg.setAttribute("bindery-side", "right");
-        let wrap = h(".bindery-print-wrapper", {
-          style: {
-            height: `${Page.H}px`,
-            width: `${Page.W}px`,
-          }
-        }, pg);
+        let wrap = h(".bindery-print-page",
+          h(".bindery-print-wrapper", {
+            style: {
+              height: `${Page.H}px`,
+              width: `${Page.W}px`,
+            }
+          }, pg),
+        );
         this.target.appendChild(wrap);
       }
     }

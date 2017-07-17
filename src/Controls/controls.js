@@ -36,14 +36,6 @@ class Controls {
       guidesToggle.classList.toggle("selected")
       opts.binder.viewer.toggleGuides();
     };
-    const bleed = () => {
-      bleedToggle.classList.toggle("selected")
-      opts.binder.viewer.toggleBleed();
-    };
-    const interactivePreview = () => {
-      previewToggle.classList.toggle("selected")
-      opts.binder.viewer.toggleInteractive();
-    };
     const facing = () => {
       facingToggle.classList.toggle("selected")
       layoutControl.classList.toggle("not-facing")
@@ -54,12 +46,12 @@ class Controls {
       window.print();
     }
 
-    let printBtn = btnMain({style: {float: "right"}, onclick: print}, "Print");
-    let previewToggle = toggle({onclick: interactivePreview}, "Interactive Preview");
-    let guidesToggle = toggle({onclick: guides}, "Show Bounds");
-    let bleedToggle = toggle({onclick: bleed}, "Show Bleed");
-    let facingToggle = toggle({onclick: facing}, "Facing Pages");
-    facingToggle.classList.add("selected")
+    let printBtn      = btnMain({onclick: print}, "Print");
+    let guidesToggle  = toggle({onclick: guides}, "Show Bounds");
+
+    let facingToggle  = toggle({onclick: facing}, "Facing Pages");
+    facingToggle.classList.add("selected");
+
     let doneBtn = btn({onclick: done}, "Done");
 
     const input = {
@@ -71,7 +63,6 @@ class Controls {
       height: h("input", { type: "number", value: this.binder.pageSize.height })
     }
 
-
     const sizeControl   = h(".bindery-val.bindery-size",
       h("div", "W", input.width),
       h("div", "H", input.height),
@@ -79,20 +70,36 @@ class Controls {
 
     const marginPreview = h(".preview");
     const marginControl = h(".bindery-val.bindery-margin",
-      marginPreview,
+      h(".top", input.top),
       h(".inner", input.inner),
       h(".outer", input.outer),
-      h(".top", input.top),
       h(".bottom", input.bottom),
+      marginPreview,
     );
-    const layoutControl = h(".bindery-layout-control", sizeControl, marginControl)
+
+    const layoutControl = h(".bindery-layout-control",
+      sizeControl,
+      marginControl
+    );
+
+    const paperSize = h(".bindery-toggle", "Paper Size", h("select",
+      h("option", "8.5 x 11"),
+      h("option", "8.5 x 14"),
+      h("option", "11 x 17"),
+      h("option", "A4"),
+    ))
+
+    const perSheet = h(".bindery-toggle", "Pages per Sheet", h("select",
+      h("option", "1"),
+      h("option", "2"),
+    ))
 
     const updateBtn = btn({onclick: updateLayout}, "Rebuild Layout");
     const validCheck = h("div", {style: {
       "float": "right",
       "display": "none",
       "color": "#e2b200",
-    }}, "⚠️ Too Small")
+    }}, "⚠️ Too Small");
 
     let updateDelay
     const throttledUpdate = () => {
@@ -100,8 +107,42 @@ class Controls {
       updateDelay = setTimeout(updateLayout, 700)
     }
 
+
+    const setGrid = () => {
+      gridMode.classList.add("selected");
+      interactMode.classList.remove("selected");
+      printMode.classList.remove("selected");
+
+      opts.binder.viewer.setGrid()
+    }
+    const setInteractive = () => {
+      gridMode.classList.remove("selected");
+      interactMode.classList.add("selected");
+      printMode.classList.remove("selected");
+
+      opts.binder.viewer.setInteractive();
+    }
+    const setPrint = () => {
+      gridMode.classList.remove("selected");
+      interactMode.classList.remove("selected");
+      printMode.classList.add("selected");
+
+      opts.binder.viewer.setPrintPreview();
+    }
+    const gridMode = h(".bindery-viewmode.grid.selected", { onclick: setGrid }, h(".icon"), "Grid");
+    const interactMode = h(".bindery-viewmode.interactive",  { onclick: setInteractive },  h(".icon"), "Bound");
+    const printMode = h(".bindery-viewmode.print",  { onclick: setPrint }, h(".icon"), "Preview");
+    const viewSwitcher = h(".bindery-viewswitcher",
+      gridMode, interactMode, printMode,
+    );
+
+    this.header = h("div", { style : {
+      "padding": "20px",
+      "font-size": "20px"
+    }}, "24 Pages");
+
     const updateLayoutPreview = (newSize, newMargin) => {
-      const BASE = 90;
+      const BASE = 80;
       let ratio = newSize.width / newSize.height;
       ratio = Math.max(ratio, 0.6);
       ratio = Math.min(ratio, 1.8);
@@ -118,7 +159,7 @@ class Controls {
       let t = (newMargin.top / newSize.height) * h;
       let b = (newMargin.bottom / newSize.height) * h;
       let o = (newMargin.outer / newSize.width) * w;
-      let i = (newMargin.inner / newSize.width) * w;
+      let i =  (newMargin.inner / newSize.width) * w;
 
       sizeControl.style.width  = `${w}px`;
       sizeControl.style.height = `${h}px`;
@@ -129,7 +170,6 @@ class Controls {
       marginPreview.style.bottom = `${b}px`;
       marginPreview.style.left   = `${i}px`;
       marginPreview.style.right  = `${o}px`;
-
     }
     updateLayoutPreview(this.binder.pageSize, this.binder.pageMargin);
 
@@ -179,17 +219,21 @@ class Controls {
       // start: , btn({ onclick: start}, "Get Started"),
       working: h("div.bindery-status", "Binding..."),
       done: h("div", {},
+        this.header,
         doneBtn,
         printBtn,
 
-        label("View"),
-        previewToggle,
-        guidesToggle,
-        bleedToggle,
-
-        label(validCheck, "Page Setup"),
+        label(validCheck, "Layout"),
         layoutControl,
-        facingToggle
+        facingToggle,
+
+        // guidesToggle,
+
+        label("Print"),
+        paperSize,
+        perSheet,
+
+        viewSwitcher,
       )
     }
     this.state = ""
@@ -197,6 +241,10 @@ class Controls {
   }
   setState(newState) {
     this.holder.style.display = (newState == "start") ? "none" : "block";
+
+    if (newState == "done") {
+      this.header.innerText = `${this.binder.viewer.pages.length} Pages`;
+    }
 
     if (newState !== this.state && this.states[newState]) {
       this.state = newState;
