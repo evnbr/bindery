@@ -1,6 +1,4 @@
-import css from "./bindery.css";
-
-import makePages from "./makePages";
+import paginate from "./paginate";
 
 import Page from "./Page/page";
 import Viewer from "./Viewer/viewer";
@@ -43,8 +41,6 @@ class Binder {
     let pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN
     this.setSize(pageSize);
     this.setMargin(pageMargin);
-
-    this.controls = new Controls({binder: this});
 
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
@@ -95,6 +91,7 @@ class Binder {
       console.error("Bindery: Cancelled pagination. Page is too small.");
       return;
     }
+    if (this.layoutChecker) clearInterval(this.layoutChecker);
 
     this.source.style.display = "";
     let content = this.source.cloneNode(true);
@@ -104,7 +101,11 @@ class Binder {
     document.body.classList.remove("bindery-viewing");
     document.body.classList.add("bindery-inProgress");
 
-    makePages(content, this.rules, (pages) => {
+    if (!this.controls) {
+      this.controls = new Controls({binder: this});
+    }
+
+    paginate(content, this.rules, (pages) => {
       if (!this.viewer) {
         this.viewer = new Viewer()
       }
@@ -113,9 +114,54 @@ class Binder {
       this.controls.setState("done");
       document.body.classList.remove("bindery-inProgress");
 
+      this.layoutChecker = setInterval(() => {
+        this.checkLayoutChange()
+      }, 500);
+
+
+      if (doneBinding) doneBinding();
+
     }, this.debugDelay);
   }
 
+  checkLayoutChange() {
+    if ( !this.pageOverflows) {
+      this.pageOverflows = this.getPageOverflows();
+      return;
+    }
+    else {
+      let newOverflows = this.getPageOverflows();
+      if (!arraysEqual(newOverflows, this.pageOverflows)) {
+        // console.info("Layout changed");
+        this.throttledUpdateBook()
+        this.pageOverflows = newOverflows;
+      }
+    }
+  }
+
+  throttledUpdateBook() {
+    if (this.makeBookTimer) clearTimeout(this.makeBookTimer);
+    this.makeBookTimer = setTimeout(() => {
+      this.makeBook()
+    }, 500)
+  }
+
+  getPageOverflows() {
+    return this.viewer.pages.map((page) => page.overflowAmount())
+  }
+
+}
+
+let arraysEqual = (a, b) => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 

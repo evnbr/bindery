@@ -25,6 +25,8 @@ export default function(content, rules, done, DELAY) {
         rule.beforeAdd(elmt, state);
 
         if (state.currentPage.hasOverflowed()) {
+
+          console.log("restoring from backup");
           // restore from backup
           elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
 
@@ -64,6 +66,12 @@ export default function(content, rules, done, DELAY) {
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   let makeNextPage = () => {
+    if (state.currentPage && state.currentPage.hasOverflowed()) {
+      console.error("Bindery: Moved to new page when last one is still overflowing");
+      console.log(state.currentPage.element);
+    }
+
+
     state.path = clonePath(state.path);
     let newPage = new Page();
     newPageRules(newPage);
@@ -93,9 +101,9 @@ export default function(content, rules, done, DELAY) {
   let moveNodeToNextPage = (nodeToMove) => {
     state.path.pop();
 
-    let fn = state.currentPage.footer.lastChild; // <--
+    // let fn = state.currentPage.footer.lastChild; // <--
     state.currentPage = makeNextPage();
-    if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
+    // if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
 
     last(state.path).appendChild(nodeToMove);
     state.path.push(nodeToMove);
@@ -103,11 +111,10 @@ export default function(content, rules, done, DELAY) {
 
   // Adds an text node by binary searching amount of
   // words until it just barely doesnt overflow
-  let addTextNode = (node, doneCallback, abortCallback) => {
+  let addTextNode = (textNode, doneCallback, abortCallback) => {
 
-    last(state.path).appendChild(node);
+    last(state.path).appendChild(textNode);
 
-    let textNode = node;
     let origText = textNode.nodeValue;
 
     let lastPos = 0;
@@ -171,6 +178,11 @@ export default function(content, rules, done, DELAY) {
   // one by one recursively until thet overflow the page
   let addElementNode = (node, doneCallback) => {
 
+    if (state.currentPage.hasOverflowed()) {
+      node.style.outline = "1px solid red";
+      console.error("Bindery: Trying to node to a page that's already overflowing");
+    }
+
     // Add this node to the current page or context
     if (state.path.length == 0) {
       state.currentPage.flowContent.appendChild(node);
@@ -185,7 +197,6 @@ export default function(content, rules, done, DELAY) {
     // 2. Clear this node
     node.innerHTML = '';
 
-
     // 3. Try adding each child one by one
     let index = 0;
     let addNextChild = () => {
@@ -198,11 +209,11 @@ export default function(content, rules, done, DELAY) {
 
       switch (child.nodeType) {
         case Node.TEXT_NODE:
-          let cancel = () => {
+          let abortCallback = () => {
             moveNodeToNextPage(node);
-            addTextNode(child, addNextChild, cancel);
+            addTextNode(child, addNextChild, abortCallback);
           }
-          addTextNode(child, addNextChild, cancel);
+          addTextNode(child, addNextChild, abortCallback);
           break;
         case Node.ELEMENT_NODE: {
           if (child.tagName == "SCRIPT") {
@@ -214,7 +225,8 @@ export default function(content, rules, done, DELAY) {
 
           throttle(() => {
             addElementNode(child, () => {
-              let addedChild = state.path.pop();
+              let addedChild = state.path.pop(); // WHYY
+              // let addedChild = last(state.path);
               afterAddRules(addedChild);  // TODO: AfterAdd rules may want to access original child, not split second half
               addNextChild();
             })

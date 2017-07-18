@@ -66,6 +66,7 @@
   color: white;
   /*border-color: black;*/
 }
+
 .bindery-btn:focus {
   /*outline: 1px solid blue;*/
   outline: none;
@@ -83,6 +84,17 @@
 .bindery-btn-main:active {
   background: black;
   opacity: 1;
+}
+.bindery-btn-mini {
+  color: #aaa;
+  background: transparent;
+  padding: 6px 8px;
+  margin: -6px -8px;
+  font: inherit;
+}
+.bindery-btn-mini:hover {
+  color: #aaa;
+  background: rgba(0,0,0,0.06);
 }
 
 

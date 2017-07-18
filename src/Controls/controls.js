@@ -4,6 +4,9 @@ import h from "hyperscript";
 const btn = function() {
   return h("button.bindery-btn", ...arguments);
 }
+const btnMini = function() {
+  return h("button.bindery-btn.bindery-btn-mini", ...arguments);
+}
 const btnMain = function() {
   return h("button.bindery-btn.bindery-btn-main", ...arguments);
 }
@@ -97,12 +100,28 @@ class Controls {
       h("option", "2"),
     ))
 
-    const updateBtn = btn({onclick: updateLayout}, "Rebuild Layout");
+    const orientation = h(".bindery-toggle", "Orientation", h("select",
+      h("option", "Landscape"),
+      h("option", "Portrait"),
+    ))
+
     const validCheck = h("div", {style: {
-      "float": "right",
       "display": "none",
       "color": "#e2b200",
-    }}, "⚠️ Too Small");
+    }}, "Too Small");
+    const forceRefresh = btnMini({onclick: () => {
+      inProgress.style.display = "block";
+      forceRefresh.style.display = "none";
+      setTimeout(() => {
+        this.binder.makeBook(() => {
+          inProgress.style.display = "none";
+          forceRefresh.style.display = "block";
+        }, 100);
+      });
+    }}, "Update");
+    const inProgress = h("div", {style: {
+      "display": "none",
+    }}, "Updating...");
 
     let updateDelay
     const throttledUpdate = () => {
@@ -203,11 +222,20 @@ class Controls {
         this.binder.setMargin(newMargin)
         let isValid = this.binder.isSizeValid()
         if (isValid) {
-          validCheck.style.display = "none"
-          this.binder.makeBook();
+          validCheck.style.display = "none";
+          inProgress.style.display = "block";
+          forceRefresh.style.display = "none";
+          setTimeout(() => {
+            this.binder.makeBook(() => {
+              inProgress.style.display = "none";
+              forceRefresh.style.display = "block";
+            }, 100);
+          })
         }
         else {
-          validCheck.style.display = "block"
+          validCheck.style.display = "block";
+          forceRefresh.style.display = "none";
+          inProgress.style.display = "none";
         }
       }
     }
@@ -217,6 +245,12 @@ class Controls {
       input[k].addEventListener("keyup", throttledUpdate);
     }
 
+    const layoutState = h("div",
+      {style: {"float": "right"}},
+      forceRefresh,
+      validCheck,
+      inProgress,
+    )
 
     this.states = {
       // start: , btn({ onclick: start}, "Get Started"),
@@ -226,7 +260,7 @@ class Controls {
         doneBtn,
         printBtn,
 
-        label(validCheck, "Layout"),
+        label(layoutState, "Pagination"),
         layoutControl,
         facingToggle,
 
@@ -235,6 +269,7 @@ class Controls {
         label("Print"),
         paperSize,
         perSheet,
+        orientation,
 
         viewSwitcher,
       )

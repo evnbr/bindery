@@ -66,6 +66,34 @@ var Bindery =
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var BinderyRule = function BinderyRule(options) {
+  _classCallCheck(this, BinderyRule);
+
+  this.name = options.name ? options.name : "Unnamed Bindery Rule";
+  this.selector = "";
+
+  for (var key in options) {
+    if (key in this) {
+      this[key] = options[key];
+    }
+  }
+};
+
+exports.default = BinderyRule;
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 /*
@@ -121,7 +149,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports) {
 
 /*
@@ -373,41 +401,13 @@ function updateLink(linkElement, obj) {
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var BinderyRule = function BinderyRule(options) {
-  _classCallCheck(this, BinderyRule);
-
-  this.name = options.name ? options.name : "Unnamed Bindery Rule";
-  this.selector = "";
-
-  for (var key in options) {
-    if (key in this) {
-      this[key] = options[key];
-    }
-  }
-};
-
-exports.default = BinderyRule;
-
-/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var split = __webpack_require__(10)
-var ClassList = __webpack_require__(11)
+var split = __webpack_require__(8)
+var ClassList = __webpack_require__(9)
 
-var w = typeof window === 'undefined' ? __webpack_require__(13) : window
+var w = typeof window === 'undefined' ? __webpack_require__(11) : window
 var document = w.document
 var Text = w.Text
 
@@ -583,11 +583,11 @@ var _hyperscript = __webpack_require__(3);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _page = __webpack_require__(14);
+var _page = __webpack_require__(12);
 
 var _page2 = _interopRequireDefault(_page);
 
-var _measureArea = __webpack_require__(16);
+var _measureArea = __webpack_require__(14);
 
 var _measureArea2 = _interopRequireDefault(_measureArea);
 
@@ -606,25 +606,31 @@ var Page = function () {
   }
 
   _createClass(Page, [{
-    key: "hasOverflowed",
-    value: function hasOverflowed() {
-      var measureArea = document.querySelector(".bindery-measure-area");
-      if (!measureArea) measureArea = document.body.appendChild((0, _hyperscript2.default)(".bindery-measure-area"));
+    key: "overflowAmount",
+    value: function overflowAmount() {
 
-      if (this.element.parentNode !== measureArea) {
-        measureArea.innerHTML = '';
-        measureArea.appendChild(this.element);
+      if (this.element.offsetParent === null) {
+        var measureArea = document.querySelector(".bindery-measure-area");
+        if (!measureArea) measureArea = document.body.appendChild((0, _hyperscript2.default)(".bindery-measure-area"));
+
+        if (this.element.parentNode !== measureArea) {
+          measureArea.innerHTML = '';
+          measureArea.appendChild(this.element);
+        }
       }
-
       var contentH = this.flowContent.getBoundingClientRect().height;
       var boxH = this.flowBox.getBoundingClientRect().height;
 
       if (boxH == 0) {
         console.error("Bindery: Trying to flow into a box of zero height.");
-        return true;
       }
 
-      return contentH >= boxH;
+      return contentH - boxH;
+    }
+  }, {
+    key: "hasOverflowed",
+    value: function hasOverflowed() {
+      return this.overflowAmount() > -5;
     }
   }, {
     key: "setPreference",
@@ -672,8 +678,15 @@ var Page = function () {
   }, {
     key: "setMargin",
     value: function setMargin(margin) {
-      var sheet = document.createElement('style');
-      sheet.innerHTML = "\n      [bindery-side=\"left\"] .bindery-flowbox,\n      [bindery-side=\"left\"] .bindery-footer {\n        margin-left: " + margin.outer + "px;\n        margin-right: " + margin.inner + "px;\n      }\n      [bindery-side=\"right\"] .bindery-flowbox,\n      [bindery-side=\"right\"] .bindery-footer {\n        margin-left: " + margin.inner + "px;\n        margin-right: " + margin.outer + "px;\n      }\n      .bindery-flowbox { margin-top: " + margin.top + "px; }\n      .bindery-footer { margin-bottom: " + margin.bottom + "px; }\n    ";
+      var sheet = void 0;
+      var existing = document.querySelector("#binderyMarginStyleSheet");
+      if (existing) {
+        sheet = existing;
+      } else {
+        sheet = document.createElement('style');
+        sheet.id = "binderyMarginStyleSheet";
+      }
+      sheet.innerHTML = "\n      .bindery-flowbox,\n      .bindery-footer {\n        margin-left: " + margin.outer + "px;\n        margin-right: " + margin.inner + "px;\n      }\n      [bindery-side=\"right\"] .bindery-flowbox,\n      [bindery-side=\"right\"] .bindery-footer {\n        margin-left: " + margin.inner + "px;\n        margin-right: " + margin.outer + "px;\n      }\n      .bindery-flowbox { margin-top: " + margin.top + "px; }\n      .bindery-footer { margin-bottom: " + margin.bottom + "px; }\n    ";
       document.body.appendChild(sheet);
     }
   }]);
@@ -692,27 +705,23 @@ exports.default = Page;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _bindery = __webpack_require__(6);
+var _paginate = __webpack_require__(6);
 
-var _bindery2 = _interopRequireDefault(_bindery);
-
-var _makePages = __webpack_require__(8);
-
-var _makePages2 = _interopRequireDefault(_makePages);
+var _paginate2 = _interopRequireDefault(_paginate);
 
 var _page = __webpack_require__(4);
 
 var _page2 = _interopRequireDefault(_page);
 
-var _viewer = __webpack_require__(18);
+var _viewer = __webpack_require__(16);
 
 var _viewer2 = _interopRequireDefault(_viewer);
 
-var _controls = __webpack_require__(21);
+var _controls = __webpack_require__(19);
 
 var _controls2 = _interopRequireDefault(_controls);
 
-var _Rules = __webpack_require__(27);
+var _Rules = __webpack_require__(25);
 
 var _Rules2 = _interopRequireDefault(_Rules);
 
@@ -753,8 +762,6 @@ var Binder = function () {
     var pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
     this.setSize(pageSize);
     this.setMargin(pageMargin);
-
-    this.controls = new _controls2.default({ binder: this });
 
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
@@ -814,6 +821,7 @@ var Binder = function () {
         console.error("Bindery: Cancelled pagination. Page is too small.");
         return;
       }
+      if (this.layoutChecker) clearInterval(this.layoutChecker);
 
       this.source.style.display = "";
       var content = this.source.cloneNode(true);
@@ -823,19 +831,73 @@ var Binder = function () {
       document.body.classList.remove("bindery-viewing");
       document.body.classList.add("bindery-inProgress");
 
-      (0, _makePages2.default)(content, this.rules, function (pages) {
+      if (!this.controls) {
+        this.controls = new _controls2.default({ binder: this });
+      }
+
+      (0, _paginate2.default)(content, this.rules, function (pages) {
         if (!_this2.viewer) {
           _this2.viewer = new _viewer2.default();
         }
         _this2.viewer.pages = pages, _this2.viewer.update();
         _this2.controls.setState("done");
         document.body.classList.remove("bindery-inProgress");
+
+        _this2.layoutChecker = setInterval(function () {
+          _this2.checkLayoutChange();
+        }, 500);
+
+        if (doneBinding) doneBinding();
       }, this.debugDelay);
+    }
+  }, {
+    key: "checkLayoutChange",
+    value: function checkLayoutChange() {
+      if (!this.pageOverflows) {
+        this.pageOverflows = this.getPageOverflows();
+        return;
+      } else {
+        var newOverflows = this.getPageOverflows();
+        if (!arraysEqual(newOverflows, this.pageOverflows)) {
+          // console.info("Layout changed");
+          this.throttledUpdateBook();
+          this.pageOverflows = newOverflows;
+        }
+      }
+    }
+  }, {
+    key: "throttledUpdateBook",
+    value: function throttledUpdateBook() {
+      var _this3 = this;
+
+      if (this.makeBookTimer) clearTimeout(this.makeBookTimer);
+      this.makeBookTimer = setTimeout(function () {
+        _this3.makeBook();
+      }, 500);
+    }
+  }, {
+    key: "getPageOverflows",
+    value: function getPageOverflows() {
+      return this.viewer.pages.map(function (page) {
+        return page.overflowAmount();
+      });
     }
   }]);
 
   return Binder;
 }();
+
+var arraysEqual = function arraysEqual(a, b) {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
+};
 
 for (var rule in _Rules2.default) {
   Binder[rule] = _Rules2.default[rule];
@@ -845,46 +907,6 @@ module.exports = Binder;
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(7);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// add the styles to the DOM
-var update = __webpack_require__(1)(content, {});
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!./bindery.css", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!./bindery.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(0)();
-// imports
-
-
-// module
-exports.push([module.i, "/* Nothing */\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -918,6 +940,8 @@ exports.default = function (content, rules, done, DELAY) {
         rule.beforeAdd(elmt, state);
 
         if (state.currentPage.hasOverflowed()) {
+
+          console.log("restoring from backup");
           // restore from backup
           elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
 
@@ -957,6 +981,11 @@ exports.default = function (content, rules, done, DELAY) {
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   var makeNextPage = function makeNextPage() {
+    if (state.currentPage && state.currentPage.hasOverflowed()) {
+      console.error("Bindery: Moved to new page when last one is still overflowing");
+      console.log(state.currentPage.element);
+    }
+
     state.path = clonePath(state.path);
     var newPage = new _page2.default();
     newPageRules(newPage);
@@ -985,9 +1014,9 @@ exports.default = function (content, rules, done, DELAY) {
   var moveNodeToNextPage = function moveNodeToNextPage(nodeToMove) {
     state.path.pop();
 
-    var fn = state.currentPage.footer.lastChild; // <--
+    // let fn = state.currentPage.footer.lastChild; // <--
     state.currentPage = makeNextPage();
-    if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
+    // if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
 
     last(state.path).appendChild(nodeToMove);
     state.path.push(nodeToMove);
@@ -995,11 +1024,10 @@ exports.default = function (content, rules, done, DELAY) {
 
   // Adds an text node by binary searching amount of
   // words until it just barely doesnt overflow
-  var addTextNode = function addTextNode(node, doneCallback, abortCallback) {
+  var addTextNode = function addTextNode(textNode, doneCallback, abortCallback) {
 
-    last(state.path).appendChild(node);
+    last(state.path).appendChild(textNode);
 
-    var textNode = node;
     var origText = textNode.nodeValue;
 
     var lastPos = 0;
@@ -1062,6 +1090,11 @@ exports.default = function (content, rules, done, DELAY) {
   // one by one recursively until thet overflow the page
   var addElementNode = function addElementNode(node, doneCallback) {
 
+    if (state.currentPage.hasOverflowed()) {
+      node.style.outline = "1px solid red";
+      console.error("Bindery: Trying to node to a page that's already overflowing");
+    }
+
     // Add this node to the current page or context
     if (state.path.length == 0) {
       state.currentPage.flowContent.appendChild(node);
@@ -1087,11 +1120,11 @@ exports.default = function (content, rules, done, DELAY) {
 
       switch (child.nodeType) {
         case Node.TEXT_NODE:
-          var cancel = function cancel() {
+          var abortCallback = function abortCallback() {
             moveNodeToNextPage(node);
-            addTextNode(child, addNextChild, cancel);
+            addTextNode(child, addNextChild, abortCallback);
           };
-          addTextNode(child, addNextChild, cancel);
+          addTextNode(child, addNextChild, abortCallback);
           break;
         case Node.ELEMENT_NODE:
           {
@@ -1104,7 +1137,8 @@ exports.default = function (content, rules, done, DELAY) {
 
             throttle(function () {
               addElementNode(child, function () {
-                var addedChild = state.path.pop();
+                var addedChild = state.path.pop(); // WHYY
+                // let addedChild = last(state.path);
                 afterAddRules(addedChild); // TODO: AfterAdd rules may want to access original child, not split second half
                 addNextChild();
               });
@@ -1137,7 +1171,7 @@ exports.default = function (content, rules, done, DELAY) {
   });
 };
 
-var _ElementName = __webpack_require__(9);
+var _ElementName = __webpack_require__(7);
 
 var _ElementName2 = _interopRequireDefault(_ElementName);
 
@@ -1202,7 +1236,7 @@ var reorderPages = function reorderPages(pages) {
 };
 
 /***/ }),
-/* 9 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1217,7 +1251,7 @@ var prettyName = function prettyName(node) {
 module.exports = prettyName;
 
 /***/ }),
-/* 10 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1329,11 +1363,11 @@ module.exports = (function split(undef) {
 
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // contains, add, remove, toggle
-var indexof = __webpack_require__(12)
+var indexof = __webpack_require__(10)
 
 module.exports = ClassList
 
@@ -1434,7 +1468,7 @@ function isTruthy(value) {
 
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ (function(module, exports) {
 
 
@@ -1449,22 +1483,22 @@ module.exports = function(arr, obj){
 };
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(15);
+var content = __webpack_require__(13);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(1)(content, {});
+var update = __webpack_require__(2)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -1481,10 +1515,10 @@ if(false) {
 }
 
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(0)();
+exports = module.exports = __webpack_require__(1)();
 // imports
 
 
@@ -1495,16 +1529,16 @@ exports.push([module.i, "@media screen {\n  .bindery-page {\n    background: whi
 
 
 /***/ }),
-/* 16 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(17);
+var content = __webpack_require__(15);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(1)(content, {});
+var update = __webpack_require__(2)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -1521,10 +1555,10 @@ if(false) {
 }
 
 /***/ }),
-/* 17 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(0)();
+exports = module.exports = __webpack_require__(1)();
 // imports
 
 
@@ -1535,7 +1569,7 @@ exports.push([module.i, ".bindery-measure-area {\n  outline: 1px solid cyan;\n  
 
 
 /***/ }),
-/* 18 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1547,7 +1581,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _viewer = __webpack_require__(19);
+var _viewer = __webpack_require__(17);
 
 var _viewer2 = _interopRequireDefault(_viewer);
 
@@ -1814,16 +1848,16 @@ var coords = function coords(e) {
 exports.default = Viewer;
 
 /***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(20);
+var content = __webpack_require__(18);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(1)(content, {});
+var update = __webpack_require__(2)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -1840,10 +1874,10 @@ if(false) {
 }
 
 /***/ }),
-/* 20 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(0)();
+exports = module.exports = __webpack_require__(1)();
 // imports
 
 
@@ -1854,7 +1888,7 @@ exports.push([module.i, "@media screen {\n  .bindery-viewing {\n    background: 
 
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1866,7 +1900,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _controls = __webpack_require__(22);
+var _controls = __webpack_require__(20);
 
 var _controls2 = _interopRequireDefault(_controls);
 
@@ -1880,6 +1914,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var btn = function btn() {
   return _hyperscript2.default.apply(undefined, ["button.bindery-btn"].concat(Array.prototype.slice.call(arguments)));
+};
+var btnMini = function btnMini() {
+  return _hyperscript2.default.apply(undefined, ["button.bindery-btn.bindery-btn-mini"].concat(Array.prototype.slice.call(arguments)));
 };
 var btnMain = function btnMain() {
   return _hyperscript2.default.apply(undefined, ["button.bindery-btn.bindery-btn-main"].concat(Array.prototype.slice.call(arguments)));
@@ -1958,12 +1995,25 @@ var Controls = function () {
 
     var perSheet = (0, _hyperscript2.default)(".bindery-toggle", "Pages per Sheet", (0, _hyperscript2.default)("select", (0, _hyperscript2.default)("option", "1"), (0, _hyperscript2.default)("option", "2")));
 
-    var updateBtn = btn({ onclick: updateLayout }, "Rebuild Layout");
+    var orientation = (0, _hyperscript2.default)(".bindery-toggle", "Orientation", (0, _hyperscript2.default)("select", (0, _hyperscript2.default)("option", "Landscape"), (0, _hyperscript2.default)("option", "Portrait")));
+
     var validCheck = (0, _hyperscript2.default)("div", { style: {
-        "float": "right",
         "display": "none",
         "color": "#e2b200"
-      } }, "⚠️ Too Small");
+      } }, "Too Small");
+    var forceRefresh = btnMini({ onclick: function onclick() {
+        inProgress.style.display = "block";
+        forceRefresh.style.display = "none";
+        setTimeout(function () {
+          _this.binder.makeBook(function () {
+            inProgress.style.display = "none";
+            forceRefresh.style.display = "block";
+          }, 100);
+        });
+      } }, "Update");
+    var inProgress = (0, _hyperscript2.default)("div", { style: {
+        "display": "none"
+      } }, "Updating...");
 
     var updateDelay = void 0;
     var throttledUpdate = function throttledUpdate() {
@@ -2066,9 +2116,18 @@ var Controls = function () {
         var isValid = _this.binder.isSizeValid();
         if (isValid) {
           validCheck.style.display = "none";
-          _this.binder.makeBook();
+          inProgress.style.display = "block";
+          forceRefresh.style.display = "none";
+          setTimeout(function () {
+            _this.binder.makeBook(function () {
+              inProgress.style.display = "none";
+              forceRefresh.style.display = "block";
+            }, 100);
+          });
         } else {
           validCheck.style.display = "block";
+          forceRefresh.style.display = "none";
+          inProgress.style.display = "none";
         }
       }
     };
@@ -2078,14 +2137,16 @@ var Controls = function () {
       input[k].addEventListener("keyup", throttledUpdate);
     }
 
+    var layoutState = (0, _hyperscript2.default)("div", { style: { "float": "right" } }, forceRefresh, validCheck, inProgress);
+
     this.states = {
       // start: , btn({ onclick: start}, "Get Started"),
       working: (0, _hyperscript2.default)("div.bindery-status", "Binding..."),
-      done: (0, _hyperscript2.default)("div", {}, this.header, doneBtn, printBtn, label(validCheck, "Layout"), layoutControl, facingToggle,
+      done: (0, _hyperscript2.default)("div", {}, this.header, doneBtn, printBtn, label(layoutState, "Pagination"), layoutControl, facingToggle,
 
       // guidesToggle,
 
-      label("Print"), paperSize, perSheet, viewSwitcher)
+      label("Print"), paperSize, perSheet, orientation, viewSwitcher)
     };
     this.state = "";
     this.setState("start");
@@ -2114,16 +2175,16 @@ var Controls = function () {
 exports.default = Controls;
 
 /***/ }),
-/* 22 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(23);
+var content = __webpack_require__(21);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(1)(content, {});
+var update = __webpack_require__(2)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -2140,39 +2201,39 @@ if(false) {
 }
 
 /***/ }),
-/* 23 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(0)();
+exports = module.exports = __webpack_require__(1)();
 // imports
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls {\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.3s;\n}\n\n\n.bindery-inProgress .bindery-controls {\n  opacity: 0.5;\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 0 0 16px 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n\n\n.bindery-label {\n  font-size: 11px;\n  text-transform: uppercase;\n  color: #aaa;\n  letter-spacing: 0.04em;\n  padding: 16px 20px;\n  border-top: 1px solid #ddd;\n}\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: white;\n  z-index: 99;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 64px;\n  width: 33%;\n  display: inline-block;\n  text-align: center;\n  font-size: 12px;\n  color: #aaa;\n  cursor: pointer;\n}\n.bindery-viewmode .icon {\n  height: 36px;\n  width: 36px;\n  background: currentColor;\n  margin: 0 auto 8px;\n}\n.bindery-viewmode:hover {\n  color: black;\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(24) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.interactive .icon {\n  -webkit-mask: url(" + __webpack_require__(25) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(26) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 0 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 20px;\n  left: 20px;\n  right: 20px;\n  bottom: 20px;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.top:hover ~ .preview {\n  border-color: #eee;\n  border-top-color: #a9a9ff;\n}\n.bottom:hover ~ .preview {\n  border-color: #eee;\n  border-bottom-color: #a9a9ff;\n}\n.inner:hover ~ .preview {\n  border-color: #eee;\n  border-left-color: #a9a9ff;\n}\n.outer:hover ~ .preview {\n  border-color: #eee;\n  border-right-color: #a9a9ff;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 0;\n  margin-right: -5px;\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  /*background: none !important;*/\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 40px;\n  height: 24px;\n  background: white;\n  z-index: 5;\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: -2px;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: -2px;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls {\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.3s;\n}\n\n\n.bindery-inProgress .bindery-controls {\n  opacity: 0.5;\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 0 0 16px 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n.bindery-btn-mini {\n  color: #aaa;\n  background: transparent;\n  padding: 6px 8px;\n  margin: -6px -8px;\n  font: inherit;\n}\n.bindery-btn-mini:hover {\n  color: #aaa;\n  background: rgba(0,0,0,0.06);\n}\n\n\n.bindery-label {\n  font-size: 11px;\n  text-transform: uppercase;\n  color: #aaa;\n  letter-spacing: 0.04em;\n  padding: 16px 20px;\n  border-top: 1px solid #ddd;\n}\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: white;\n  z-index: 99;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 64px;\n  width: 33%;\n  display: inline-block;\n  text-align: center;\n  font-size: 12px;\n  color: #aaa;\n  cursor: pointer;\n}\n.bindery-viewmode .icon {\n  height: 36px;\n  width: 36px;\n  background: currentColor;\n  margin: 0 auto 8px;\n}\n.bindery-viewmode:hover {\n  color: black;\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(22) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.interactive .icon {\n  -webkit-mask: url(" + __webpack_require__(23) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(24) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 0 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 20px;\n  left: 20px;\n  right: 20px;\n  bottom: 20px;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.top:hover ~ .preview {\n  border-color: #eee;\n  border-top-color: #a9a9ff;\n}\n.bottom:hover ~ .preview {\n  border-color: #eee;\n  border-bottom-color: #a9a9ff;\n}\n.inner:hover ~ .preview {\n  border-color: #eee;\n  border-left-color: #a9a9ff;\n}\n.outer:hover ~ .preview {\n  border-color: #eee;\n  border-right-color: #a9a9ff;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 0;\n  margin-right: -5px;\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  /*background: none !important;*/\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 40px;\n  height: 24px;\n  background: white;\n  z-index: 5;\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: -2px;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: -2px;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 24 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='UTF-8'?%3E %3Csvg width='36px' height='36px' viewBox='0 0 36 36' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3Eicon-grid%3C/title%3E %3Cdesc%3ECreated with Sketch.%3C/desc%3E %3Cdefs%3E%3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='icon-grid' stroke='%23000000'%3E %3Cg id='Group-4-Copy' transform='translate(6.000000, 1.000000)'%3E %3Crect id='Rectangle-2-Copy-4' x='0.5' y='18.5' width='10' height='15'%3E%3C/rect%3E %3Crect id='Rectangle-2-Copy-13' x='10.5' y='18.5' width='10' height='15'%3E%3C/rect%3E %3Crect id='Rectangle-2-Copy-13' x='10.5' y='0.5' width='10' height='15'%3E%3C/rect%3E %3Crect id='Rectangle-2-Copy-14' x='0.5' y='0.5' width='10' height='15'%3E%3C/rect%3E %3C/g%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 25 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='UTF-8'?%3E %3Csvg width='36px' height='36px' viewBox='0 0 36 36' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3Eicon-interactive%3C/title%3E %3Cdesc%3ECreated with Sketch.%3C/desc%3E %3Cdefs%3E%3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='icon-interactive' fill-rule='nonzero' fill='%23000000'%3E %3Cg id='Group-2-Copy-3' transform='translate(3.000000, 2.000000)'%3E %3Cpath d='M1,5 L1,26 L14,26 L14,5 L1,5 Z M0,4 L15,4 L15,27 L0,27 L0,4 Z' id='Rectangle-2-Copy-6'%3E%3C/path%3E %3Cpath d='M29,5 L28,4 L28,5 L29,5 Z M28,26 L29,26 L28,27 L28,26 Z M25.4092533,5 L25.4092533,4 L29,4 L29,27 L14,27 L14.4960545,26 L28,26 L28,5 L25.4092533,5 Z M29,26 L28,27 L28,26 L29,26 Z M28,4 L29,5 L28,5 L28,4 Z M28,5 L25.4092533,5 L25.4092533,4 L29,4 L29,27 L14,27 L14.4960545,26 L28,26 L28,5 Z' id='Rectangle-2-Copy-7'%3E%3C/path%3E %3Cpath d='M15,4.78817695 L15,25.6047192 L25,22.2118231 L25,1.39528082 L15,4.78817695 Z M14,4.07147535 L26,0 L26,22.9285247 L14,27 L14,4.07147535 Z' id='Rectangle-2-Copy-6'%3E%3C/path%3E %3C/g%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='UTF-8'?%3E %3Csvg width='36px' height='36px' viewBox='0 0 36 36' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3Eicon-sheet%3C/title%3E %3Cdesc%3ECreated with Sketch.%3C/desc%3E %3Cdefs%3E%3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='icon-sheet' stroke='%23000000'%3E %3Crect id='Rectangle-2-Copy' x='1.5' y='4.5' width='32' height='26'%3E%3C/rect%3E %3Cpath d='M17.5,7.5 L17.5,9.5' id='Line-2-Copy' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M8.5,7.5 L8.5,9.5' id='Line-2-Copy-2' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M26.5,7.5 L26.5,9.5' id='Line-2-Copy-3' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M4.5,11.5 L6.5,11.5' id='Line-3' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M28.5,11.5 L30.5,11.5' id='Line-3-Copy' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M17.5,24.5 L17.5,26.5' id='Line-2-Copy-4' stroke-linecap='square' transform='translate(17.500000, 25.500000) scale(1, -1) translate(-17.500000, -25.500000) '%3E%3C/path%3E %3Cpath d='M8.5,24.5 L8.5,26.5' id='Line-2-Copy-5' stroke-linecap='square' transform='translate(8.500000, 25.500000) scale(1, -1) translate(-8.500000, -25.500000) '%3E%3C/path%3E %3Cpath d='M26.5,23.5 L26.5,26.5' id='Line-2-Copy-6' stroke-linecap='square' transform='translate(27.000000, 25.000000) scale(1, -1) translate(-27.000000, -25.000000) '%3E%3C/path%3E %3Cpath d='M4.5,22.5 L6.5,22.5' id='Line-3-Copy-2' stroke-linecap='square' transform='translate(5.500000, 22.500000) scale(1, -1) translate(-5.500000, -22.500000) '%3E%3C/path%3E %3Cpath d='M26.5,21.5 L30.5,21.5' id='Line-3-Copy-3' stroke-linecap='square' transform='translate(28.500000, 22.000000) scale(1, -1) translate(-28.500000, -22.000000) '%3E%3C/path%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 27 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2182,35 +2243,35 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _breakBefore = __webpack_require__(28);
+var _breakBefore = __webpack_require__(26);
 
 var _breakBefore2 = _interopRequireDefault(_breakBefore);
 
-var _FullPage = __webpack_require__(29);
+var _FullPage = __webpack_require__(27);
 
 var _FullPage2 = _interopRequireDefault(_FullPage);
 
-var _Spread = __webpack_require__(30);
+var _Spread = __webpack_require__(28);
 
 var _Spread2 = _interopRequireDefault(_Spread);
 
-var _Footnote = __webpack_require__(33);
+var _Footnote = __webpack_require__(31);
 
 var _Footnote2 = _interopRequireDefault(_Footnote);
 
-var _PageReference = __webpack_require__(34);
+var _PageReference = __webpack_require__(32);
 
 var _PageReference2 = _interopRequireDefault(_PageReference);
 
-var _PageNumber = __webpack_require__(35);
+var _PageNumber = __webpack_require__(33);
 
 var _PageNumber2 = _interopRequireDefault(_PageNumber);
 
-var _RunningHeader = __webpack_require__(38);
+var _RunningHeader = __webpack_require__(36);
 
 var _RunningHeader2 = _interopRequireDefault(_RunningHeader);
 
-var _BinderyRule = __webpack_require__(2);
+var _BinderyRule = __webpack_require__(0);
 
 var _BinderyRule2 = _interopRequireDefault(_BinderyRule);
 
@@ -2228,7 +2289,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 28 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2244,7 +2305,7 @@ exports.default = function (userOptions) {
   return new BreakBefore(userOptions);
 };
 
-var _BinderyRule2 = __webpack_require__(2);
+var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
@@ -2280,7 +2341,7 @@ var BreakBefore = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 29 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2296,7 +2357,7 @@ exports.default = function (userOptions) {
   return new FullPage(userOptions);
 };
 
-var _BinderyRule2 = __webpack_require__(2);
+var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
@@ -2347,7 +2408,7 @@ var FullPage = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 30 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2363,11 +2424,11 @@ exports.default = function (userOptions) {
   return new Spread(userOptions);
 };
 
-var _spread = __webpack_require__(31);
+var _spread = __webpack_require__(29);
 
 var _spread2 = _interopRequireDefault(_spread);
 
-var _BinderyRule2 = __webpack_require__(2);
+var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
@@ -2431,16 +2492,16 @@ var Spread = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 31 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(32);
+var content = __webpack_require__(30);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(1)(content, {});
+var update = __webpack_require__(2)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -2457,10 +2518,10 @@ if(false) {
 }
 
 /***/ }),
-/* 32 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(0)();
+exports = module.exports = __webpack_require__(1)();
 // imports
 
 
@@ -2471,7 +2532,7 @@ exports.push([module.i, ".bindery-spread[bindery-side=\"left\"] .bindery-content
 
 
 /***/ }),
-/* 33 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2487,7 +2548,7 @@ exports.default = function (userOptions) {
   return new Footnote(userOptions);
 };
 
-var _BinderyRule2 = __webpack_require__(2);
+var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
@@ -2540,7 +2601,7 @@ var Footnote = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 34 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2556,7 +2617,7 @@ exports.default = function (options) {
   return new PageReference(options);
 };
 
-var _BinderyRule2 = __webpack_require__(2);
+var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
@@ -2608,7 +2669,7 @@ var PageReference = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 35 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2628,11 +2689,11 @@ var _hyperscript = __webpack_require__(3);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _pageNumber = __webpack_require__(36);
+var _pageNumber = __webpack_require__(34);
 
 var _pageNumber2 = _interopRequireDefault(_pageNumber);
 
-var _BinderyRule2 = __webpack_require__(2);
+var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
@@ -2679,16 +2740,16 @@ var PageNumber = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 36 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(37);
+var content = __webpack_require__(35);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(1)(content, {});
+var update = __webpack_require__(2)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -2705,10 +2766,10 @@ if(false) {
 }
 
 /***/ }),
-/* 37 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(0)();
+exports = module.exports = __webpack_require__(1)();
 // imports
 
 
@@ -2719,7 +2780,7 @@ exports.push([module.i, "@media screen {\n  .bindery-show-guides .bindery-num {\
 
 
 /***/ }),
-/* 38 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2735,7 +2796,7 @@ exports.default = function (userOptions) {
   return new RunningHeader(userOptions);
 };
 
-var _BinderyRule2 = __webpack_require__(2);
+var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
@@ -2743,7 +2804,7 @@ var _hyperscript = __webpack_require__(3);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _runningHeader = __webpack_require__(39);
+var _runningHeader = __webpack_require__(37);
 
 var _runningHeader2 = _interopRequireDefault(_runningHeader);
 
@@ -2798,16 +2859,16 @@ var RunningHeader = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 39 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(40);
+var content = __webpack_require__(38);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(1)(content, {});
+var update = __webpack_require__(2)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -2824,10 +2885,10 @@ if(false) {
 }
 
 /***/ }),
-/* 40 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(0)();
+exports = module.exports = __webpack_require__(1)();
 // imports
 
 

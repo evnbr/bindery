@@ -15,24 +15,29 @@ class Page {
     this.flowContent = this.element.querySelector(".bindery-content");
     this.footer = this.element.querySelector(".bindery-footer");
   }
-  hasOverflowed() {
-    let measureArea = document.querySelector(".bindery-measure-area");
-    if (!measureArea) measureArea = document.body.appendChild(h(".bindery-measure-area"));
+  overflowAmount() {
 
-    if (this.element.parentNode !== measureArea) {
-      measureArea.innerHTML = '';
-      measureArea.appendChild(this.element);
+    if (this.element.offsetParent === null) {
+      let measureArea = document.querySelector(".bindery-measure-area");
+      if (!measureArea) measureArea = document.body.appendChild(h(".bindery-measure-area"));
+
+      if (this.element.parentNode !== measureArea) {
+        measureArea.innerHTML = '';
+        measureArea.appendChild(this.element);
+      }
     }
-
     let contentH = this.flowContent.getBoundingClientRect().height;
     let boxH = this.flowBox.getBoundingClientRect().height;
 
     if (boxH == 0) {
       console.error(`Bindery: Trying to flow into a box of zero height.`)
-      return true;
     }
 
-    return contentH >= boxH;
+    return contentH - boxH;
+
+  }
+  hasOverflowed() {
+    return this.overflowAmount() > -5
   }
 
   static isSizeValid() {
@@ -73,10 +78,18 @@ class Page {
   }
 
   static setMargin(margin) {
-    var sheet = document.createElement('style')
+    let sheet;
+    let existing = document.querySelector("#binderyMarginStyleSheet");
+    if (existing) {
+      sheet = existing;
+    }
+    else {
+      sheet = document.createElement('style');
+      sheet.id = "binderyMarginStyleSheet";
+    }
     sheet.innerHTML = `
-      [bindery-side="left"] .bindery-flowbox,
-      [bindery-side="left"] .bindery-footer {
+      .bindery-flowbox,
+      .bindery-footer {
         margin-left: ${margin.outer}px;
         margin-right: ${margin.inner}px;
       }
