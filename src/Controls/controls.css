@@ -18,9 +18,7 @@
   animation: fadeIn 0.3s;
 }
 
-
 .bindery-inProgress .bindery-controls {
-  opacity: 0.5;
   pointer-events: none;
 }
 

@@ -91,7 +91,8 @@ class Binder {
       console.error("Bindery: Cancelled pagination. Page is too small.");
       return;
     }
-    if (this.layoutChecker) clearInterval(this.layoutChecker);
+
+    this.stopCheckingLayout();
 
     this.source.style.display = "";
     let content = this.source.cloneNode(true);
@@ -105,23 +106,39 @@ class Binder {
       this.controls = new Controls({binder: this});
     }
 
+    this.controls.setInProgress();
+
     paginate(content, this.rules, (pages) => {
       if (!this.viewer) {
         this.viewer = new Viewer()
       }
-      this.viewer.pages = pages,
-      this.viewer.update();
-      this.controls.setState("done");
-      document.body.classList.remove("bindery-inProgress");
 
-      this.layoutChecker = setInterval(() => {
-        this.checkLayoutChange()
-      }, 500);
+      setTimeout(() => {
+        this.viewer.pages = pages,
+        this.viewer.update();
+
+        this.controls.setDone();
+        if (doneBinding) doneBinding();
+        document.body.classList.remove("bindery-inProgress");
+        this.startCheckingLayout()
+
+      }, 100);
 
 
-      if (doneBinding) doneBinding();
 
     }, this.debugDelay);
+  }
+
+  startCheckingLayout() {
+    this.layoutChecker = setInterval(() => {
+      this.checkLayoutChange()
+    }, 500);
+  }
+  stopCheckingLayout() {
+    if (this.layoutChecker) {
+      clearInterval(this.layoutChecker);
+      this.pageOverflows = null;
+    }
   }
 
   checkLayoutChange() {

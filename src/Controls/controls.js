@@ -27,13 +27,8 @@ class Controls {
 
     this.binder = opts.binder;
 
-    const start = () => {
-      this.setState("working");
-      this.binder.bind();
-    };
     const done = () => {
       this.binder.cancel();
-      this.setState("start");
     };
     const guides = () => {
       guidesToggle.classList.toggle("selected")
@@ -158,7 +153,7 @@ class Controls {
       gridMode, interactMode, printMode,
     );
 
-    this.header = h("div", { style : {
+    const header = h("div", { style : {
       "padding": "20px",
       "font-size": "20px"
     }}, "24 Pages");
@@ -195,6 +190,25 @@ class Controls {
     }
     updateLayoutPreview(this.binder.pageSize, this.binder.pageMargin);
 
+    this.setInProgress = () => {
+      validCheck.style.display = "none";
+      inProgress.style.display = "block";
+      forceRefresh.style.display = "none";
+    }
+
+    this.setDone = () => {
+      header.innerText = `${this.binder.viewer.pages.length} Pages`;
+      inProgress.style.display = "none";
+      forceRefresh.style.display = "block";
+      validCheck.style.display = "none";
+    }
+
+    this.setInvalid = () => {
+      validCheck.style.display = "block";
+      forceRefresh.style.display = "none";
+      inProgress.style.display = "none";
+    }
+
     const updateLayout = () => {
       let newMargin = {
         top:    input.top.value,
@@ -216,26 +230,15 @@ class Controls {
       }
 
       if (needsUpdate) {
-        updateLayoutPreview(newSize, newMargin)
+        updateLayoutPreview(newSize, newMargin);
+        this.binder.setSize(newSize);
+        this.binder.setMargin(newMargin);
 
-        this.binder.setSize(newSize)
-        this.binder.setMargin(newMargin)
-        let isValid = this.binder.isSizeValid()
-        if (isValid) {
-          validCheck.style.display = "none";
-          inProgress.style.display = "block";
-          forceRefresh.style.display = "none";
-          setTimeout(() => {
-            this.binder.makeBook(() => {
-              inProgress.style.display = "none";
-              forceRefresh.style.display = "block";
-            }, 100);
-          })
+        if (this.binder.isSizeValid()) {
+          this.binder.makeBook();
         }
         else {
-          validCheck.style.display = "block";
-          forceRefresh.style.display = "none";
-          inProgress.style.display = "none";
+          setInvalid();
         }
       }
     }
@@ -252,19 +255,15 @@ class Controls {
       inProgress,
     )
 
-    this.states = {
-      // start: , btn({ onclick: start}, "Get Started"),
-      working: h("div.bindery-status", "Binding..."),
-      done: h("div", {},
-        this.header,
+    this.holder.appendChild(h("div", {},
+        header,
         doneBtn,
         printBtn,
 
         label(layoutState, "Pagination"),
         layoutControl,
         facingToggle,
-
-        // guidesToggle,
+        guidesToggle,
 
         label("Print"),
         paperSize,
@@ -273,24 +272,9 @@ class Controls {
 
         viewSwitcher,
       )
-    }
-    this.state = ""
-    this.setState("start");
+    );
   }
-  setState(newState) {
-    this.holder.style.display = (newState == "start") ? "none" : "block";
 
-    if (newState == "done") {
-      this.header.innerText = `${this.binder.viewer.pages.length} Pages`;
-    }
-
-    if (newState !== this.state && this.states[newState]) {
-      this.state = newState;
-      this.holder.innerHTML = "";
-      this.holder.appendChild(this.states[newState]);
-
-    }
-  }
 }
 
 export default Controls;

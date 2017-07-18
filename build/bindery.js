@@ -821,7 +821,8 @@ var Binder = function () {
         console.error("Bindery: Cancelled pagination. Page is too small.");
         return;
       }
-      if (this.layoutChecker) clearInterval(this.layoutChecker);
+
+      this.stopCheckingLayout();
 
       this.source.style.display = "";
       var content = this.source.cloneNode(true);
@@ -835,20 +836,39 @@ var Binder = function () {
         this.controls = new _controls2.default({ binder: this });
       }
 
+      this.controls.setInProgress();
+
       (0, _paginate2.default)(content, this.rules, function (pages) {
         if (!_this2.viewer) {
           _this2.viewer = new _viewer2.default();
         }
-        _this2.viewer.pages = pages, _this2.viewer.update();
-        _this2.controls.setState("done");
-        document.body.classList.remove("bindery-inProgress");
 
-        _this2.layoutChecker = setInterval(function () {
-          _this2.checkLayoutChange();
-        }, 500);
+        setTimeout(function () {
+          _this2.viewer.pages = pages, _this2.viewer.update();
 
-        if (doneBinding) doneBinding();
+          _this2.controls.setDone();
+          if (doneBinding) doneBinding();
+          document.body.classList.remove("bindery-inProgress");
+          _this2.startCheckingLayout();
+        }, 100);
       }, this.debugDelay);
+    }
+  }, {
+    key: "startCheckingLayout",
+    value: function startCheckingLayout() {
+      var _this3 = this;
+
+      this.layoutChecker = setInterval(function () {
+        _this3.checkLayoutChange();
+      }, 500);
+    }
+  }, {
+    key: "stopCheckingLayout",
+    value: function stopCheckingLayout() {
+      if (this.layoutChecker) {
+        clearInterval(this.layoutChecker);
+        this.pageOverflows = null;
+      }
     }
   }, {
     key: "checkLayoutChange",
@@ -868,11 +888,11 @@ var Binder = function () {
   }, {
     key: "throttledUpdateBook",
     value: function throttledUpdateBook() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (this.makeBookTimer) clearTimeout(this.makeBookTimer);
       this.makeBookTimer = setTimeout(function () {
-        _this3.makeBook();
+        _this4.makeBook();
       }, 500);
     }
   }, {
@@ -1898,8 +1918,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _controls = __webpack_require__(20);
 
 var _controls2 = _interopRequireDefault(_controls);
@@ -1931,246 +1949,218 @@ var label = function label() {
   return _hyperscript2.default.apply(undefined, [".bindery-label"].concat(Array.prototype.slice.call(arguments)));
 };
 
-var Controls = function () {
-  function Controls(opts) {
-    var _this = this;
+var Controls = function Controls(opts) {
+  var _this = this;
 
-    _classCallCheck(this, Controls);
+  _classCallCheck(this, Controls);
 
-    this.holder = (0, _hyperscript2.default)("div.bindery-controls");
-    document.body.appendChild(this.holder);
+  this.holder = (0, _hyperscript2.default)("div.bindery-controls");
+  document.body.appendChild(this.holder);
 
-    this.binder = opts.binder;
+  this.binder = opts.binder;
 
-    var start = function start() {
-      _this.setState("working");
-      _this.binder.bind();
-    };
-    var done = function done() {
-      _this.binder.cancel();
-      _this.setState("start");
-    };
-    var guides = function guides() {
-      guidesToggle.classList.toggle("selected");
-      opts.binder.viewer.toggleGuides();
-    };
-    var facing = function facing() {
-      facingToggle.classList.toggle("selected");
-      layoutControl.classList.toggle("not-facing");
-      opts.binder.viewer.toggleDouble();
-    };
-    var print = function print() {
-      opts.binder.viewer.setGrid();
-      window.print();
-    };
+  var done = function done() {
+    _this.binder.cancel();
+  };
+  var guides = function guides() {
+    guidesToggle.classList.toggle("selected");
+    opts.binder.viewer.toggleGuides();
+  };
+  var facing = function facing() {
+    facingToggle.classList.toggle("selected");
+    layoutControl.classList.toggle("not-facing");
+    opts.binder.viewer.toggleDouble();
+  };
+  var print = function print() {
+    opts.binder.viewer.setGrid();
+    window.print();
+  };
 
-    var printBtn = btnMain({ onclick: print }, "Print");
-    var guidesToggle = toggle({ onclick: guides }, "Show Bounds");
+  var printBtn = btnMain({ onclick: print }, "Print");
+  var guidesToggle = toggle({ onclick: guides }, "Show Bounds");
 
-    var facingToggle = toggle({ onclick: facing }, "Facing Pages");
-    facingToggle.classList.add("selected");
+  var facingToggle = toggle({ onclick: facing }, "Facing Pages");
+  facingToggle.classList.add("selected");
 
-    var doneBtn = "";
-    if (!this.binder.runImmeditately) {
-      doneBtn = btn({ onclick: done }, "Done");
-    }
-
-    var input = {
-      top: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.top }),
-      inner: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.inner }),
-      outer: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.outer }),
-      bottom: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.bottom }),
-      width: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageSize.width }),
-      height: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageSize.height })
-    };
-
-    var sizeControl = (0, _hyperscript2.default)(".bindery-val.bindery-size", (0, _hyperscript2.default)("div", "W", input.width), (0, _hyperscript2.default)("div", "H", input.height));
-
-    var marginPreview = (0, _hyperscript2.default)(".preview");
-    var marginControl = (0, _hyperscript2.default)(".bindery-val.bindery-margin", (0, _hyperscript2.default)(".top", input.top), (0, _hyperscript2.default)(".inner", input.inner), (0, _hyperscript2.default)(".outer", input.outer), (0, _hyperscript2.default)(".bottom", input.bottom), marginPreview);
-
-    var layoutControl = (0, _hyperscript2.default)(".bindery-layout-control", sizeControl, marginControl);
-
-    var paperSize = (0, _hyperscript2.default)(".bindery-toggle", "Paper Size", (0, _hyperscript2.default)("select", (0, _hyperscript2.default)("option", "8.5 x 11"), (0, _hyperscript2.default)("option", "8.5 x 14"), (0, _hyperscript2.default)("option", "11 x 17"), (0, _hyperscript2.default)("option", "A4")));
-
-    var perSheet = (0, _hyperscript2.default)(".bindery-toggle", "Pages per Sheet", (0, _hyperscript2.default)("select", (0, _hyperscript2.default)("option", "1"), (0, _hyperscript2.default)("option", "2")));
-
-    var orientation = (0, _hyperscript2.default)(".bindery-toggle", "Orientation", (0, _hyperscript2.default)("select", (0, _hyperscript2.default)("option", "Landscape"), (0, _hyperscript2.default)("option", "Portrait")));
-
-    var validCheck = (0, _hyperscript2.default)("div", { style: {
-        "display": "none",
-        "color": "#e2b200"
-      } }, "Too Small");
-    var forceRefresh = btnMini({ onclick: function onclick() {
-        inProgress.style.display = "block";
-        forceRefresh.style.display = "none";
-        setTimeout(function () {
-          _this.binder.makeBook(function () {
-            inProgress.style.display = "none";
-            forceRefresh.style.display = "block";
-          }, 100);
-        });
-      } }, "Update");
-    var inProgress = (0, _hyperscript2.default)("div", { style: {
-        "display": "none"
-      } }, "Updating...");
-
-    var updateDelay = void 0;
-    var throttledUpdate = function throttledUpdate() {
-      clearTimeout(updateDelay);
-      updateDelay = setTimeout(updateLayout, 700);
-    };
-
-    var setGrid = function setGrid() {
-      gridMode.classList.add("selected");
-      interactMode.classList.remove("selected");
-      printMode.classList.remove("selected");
-
-      opts.binder.viewer.setGrid();
-    };
-    var setInteractive = function setInteractive() {
-      gridMode.classList.remove("selected");
-      interactMode.classList.add("selected");
-      printMode.classList.remove("selected");
-
-      opts.binder.viewer.setInteractive();
-    };
-    var setPrint = function setPrint() {
-      gridMode.classList.remove("selected");
-      interactMode.classList.remove("selected");
-      printMode.classList.add("selected");
-
-      opts.binder.viewer.setPrintPreview();
-    };
-    var gridMode = (0, _hyperscript2.default)(".bindery-viewmode.grid.selected", { onclick: setGrid }, (0, _hyperscript2.default)(".icon"), "Grid");
-    var interactMode = (0, _hyperscript2.default)(".bindery-viewmode.interactive", { onclick: setInteractive }, (0, _hyperscript2.default)(".icon"), "Bound");
-    var printMode = (0, _hyperscript2.default)(".bindery-viewmode.print", { onclick: setPrint }, (0, _hyperscript2.default)(".icon"), "Sheet");
-    var viewSwitcher = (0, _hyperscript2.default)(".bindery-viewswitcher", gridMode, interactMode, printMode);
-
-    this.header = (0, _hyperscript2.default)("div", { style: {
-        "padding": "20px",
-        "font-size": "20px"
-      } }, "24 Pages");
-
-    var updateLayoutPreview = function updateLayoutPreview(newSize, newMargin) {
-      var BASE = 80;
-      var ratio = newSize.width / newSize.height;
-      ratio = Math.max(ratio, 0.6);
-      ratio = Math.min(ratio, 1.8);
-
-      var w = void 0,
-          h = void 0;
-      if (ratio > 2) {
-        w = BASE * ratio;
-        h = BASE;
-      } else {
-        w = BASE;
-        h = BASE * 1 / ratio;
-      }
-      var t = newMargin.top / newSize.height * h;
-      var b = newMargin.bottom / newSize.height * h;
-      var o = newMargin.outer / newSize.width * w;
-      var i = newMargin.inner / newSize.width * w;
-
-      sizeControl.style.width = w + "px";
-      sizeControl.style.height = h + "px";
-      marginControl.style.width = w + "px";
-      marginControl.style.height = h + "px";
-
-      marginPreview.style.top = t + "px";
-      marginPreview.style.bottom = b + "px";
-      marginPreview.style.left = i + "px";
-      marginPreview.style.right = o + "px";
-    };
-    updateLayoutPreview(this.binder.pageSize, this.binder.pageMargin);
-
-    var updateLayout = function updateLayout() {
-      var newMargin = {
-        top: input.top.value,
-        inner: input.inner.value,
-        outer: input.outer.value,
-        bottom: input.bottom.value
-      };
-      var newSize = {
-        height: input.height.value,
-        width: input.width.value
-      };
-
-      var needsUpdate = false;
-      for (var k in newMargin) {
-        if (_this.binder.pageMargin[k] !== newMargin[k]) {
-          needsUpdate = true;
-        }
-      }
-      for (var _k in newSize) {
-        if (_this.binder.pageSize[_k] !== newSize[_k]) {
-          needsUpdate = true;
-        }
-      }
-
-      if (needsUpdate) {
-        updateLayoutPreview(newSize, newMargin);
-
-        _this.binder.setSize(newSize);
-        _this.binder.setMargin(newMargin);
-        var isValid = _this.binder.isSizeValid();
-        if (isValid) {
-          validCheck.style.display = "none";
-          inProgress.style.display = "block";
-          forceRefresh.style.display = "none";
-          setTimeout(function () {
-            _this.binder.makeBook(function () {
-              inProgress.style.display = "none";
-              forceRefresh.style.display = "block";
-            }, 100);
-          });
-        } else {
-          validCheck.style.display = "block";
-          forceRefresh.style.display = "none";
-          inProgress.style.display = "none";
-        }
-      }
-    };
-
-    for (var k in input) {
-      input[k].addEventListener("change", throttledUpdate);
-      input[k].addEventListener("keyup", throttledUpdate);
-    }
-
-    var layoutState = (0, _hyperscript2.default)("div", { style: { "float": "right" } }, forceRefresh, validCheck, inProgress);
-
-    this.states = {
-      // start: , btn({ onclick: start}, "Get Started"),
-      working: (0, _hyperscript2.default)("div.bindery-status", "Binding..."),
-      done: (0, _hyperscript2.default)("div", {}, this.header, doneBtn, printBtn, label(layoutState, "Pagination"), layoutControl, facingToggle,
-
-      // guidesToggle,
-
-      label("Print"), paperSize, perSheet, orientation, viewSwitcher)
-    };
-    this.state = "";
-    this.setState("start");
+  var doneBtn = "";
+  if (!this.binder.runImmeditately) {
+    doneBtn = btn({ onclick: done }, "Done");
   }
 
-  _createClass(Controls, [{
-    key: "setState",
-    value: function setState(newState) {
-      this.holder.style.display = newState == "start" ? "none" : "block";
+  var input = {
+    top: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.top }),
+    inner: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.inner }),
+    outer: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.outer }),
+    bottom: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageMargin.bottom }),
+    width: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageSize.width }),
+    height: (0, _hyperscript2.default)("input", { type: "number", value: this.binder.pageSize.height })
+  };
 
-      if (newState == "done") {
-        this.header.innerText = this.binder.viewer.pages.length + " Pages";
-      }
+  var sizeControl = (0, _hyperscript2.default)(".bindery-val.bindery-size", (0, _hyperscript2.default)("div", "W", input.width), (0, _hyperscript2.default)("div", "H", input.height));
 
-      if (newState !== this.state && this.states[newState]) {
-        this.state = newState;
-        this.holder.innerHTML = "";
-        this.holder.appendChild(this.states[newState]);
+  var marginPreview = (0, _hyperscript2.default)(".preview");
+  var marginControl = (0, _hyperscript2.default)(".bindery-val.bindery-margin", (0, _hyperscript2.default)(".top", input.top), (0, _hyperscript2.default)(".inner", input.inner), (0, _hyperscript2.default)(".outer", input.outer), (0, _hyperscript2.default)(".bottom", input.bottom), marginPreview);
+
+  var layoutControl = (0, _hyperscript2.default)(".bindery-layout-control", sizeControl, marginControl);
+
+  var paperSize = (0, _hyperscript2.default)(".bindery-toggle", "Paper Size", (0, _hyperscript2.default)("select", (0, _hyperscript2.default)("option", "8.5 x 11"), (0, _hyperscript2.default)("option", "8.5 x 14"), (0, _hyperscript2.default)("option", "11 x 17"), (0, _hyperscript2.default)("option", "A4")));
+
+  var perSheet = (0, _hyperscript2.default)(".bindery-toggle", "Pages per Sheet", (0, _hyperscript2.default)("select", (0, _hyperscript2.default)("option", "1"), (0, _hyperscript2.default)("option", "2")));
+
+  var orientation = (0, _hyperscript2.default)(".bindery-toggle", "Orientation", (0, _hyperscript2.default)("select", (0, _hyperscript2.default)("option", "Landscape"), (0, _hyperscript2.default)("option", "Portrait")));
+
+  var validCheck = (0, _hyperscript2.default)("div", { style: {
+      "display": "none",
+      "color": "#e2b200"
+    } }, "Too Small");
+  var forceRefresh = btnMini({ onclick: function onclick() {
+      inProgress.style.display = "block";
+      forceRefresh.style.display = "none";
+      setTimeout(function () {
+        _this.binder.makeBook(function () {
+          inProgress.style.display = "none";
+          forceRefresh.style.display = "block";
+        }, 100);
+      });
+    } }, "Update");
+  var inProgress = (0, _hyperscript2.default)("div", { style: {
+      "display": "none"
+    } }, "Updating...");
+
+  var updateDelay = void 0;
+  var throttledUpdate = function throttledUpdate() {
+    clearTimeout(updateDelay);
+    updateDelay = setTimeout(updateLayout, 700);
+  };
+
+  var setGrid = function setGrid() {
+    gridMode.classList.add("selected");
+    interactMode.classList.remove("selected");
+    printMode.classList.remove("selected");
+
+    opts.binder.viewer.setGrid();
+  };
+  var setInteractive = function setInteractive() {
+    gridMode.classList.remove("selected");
+    interactMode.classList.add("selected");
+    printMode.classList.remove("selected");
+
+    opts.binder.viewer.setInteractive();
+  };
+  var setPrint = function setPrint() {
+    gridMode.classList.remove("selected");
+    interactMode.classList.remove("selected");
+    printMode.classList.add("selected");
+
+    opts.binder.viewer.setPrintPreview();
+  };
+  var gridMode = (0, _hyperscript2.default)(".bindery-viewmode.grid.selected", { onclick: setGrid }, (0, _hyperscript2.default)(".icon"), "Grid");
+  var interactMode = (0, _hyperscript2.default)(".bindery-viewmode.interactive", { onclick: setInteractive }, (0, _hyperscript2.default)(".icon"), "Bound");
+  var printMode = (0, _hyperscript2.default)(".bindery-viewmode.print", { onclick: setPrint }, (0, _hyperscript2.default)(".icon"), "Sheet");
+  var viewSwitcher = (0, _hyperscript2.default)(".bindery-viewswitcher", gridMode, interactMode, printMode);
+
+  var header = (0, _hyperscript2.default)("div", { style: {
+      "padding": "20px",
+      "font-size": "20px"
+    } }, "24 Pages");
+
+  var updateLayoutPreview = function updateLayoutPreview(newSize, newMargin) {
+    var BASE = 80;
+    var ratio = newSize.width / newSize.height;
+    ratio = Math.max(ratio, 0.6);
+    ratio = Math.min(ratio, 1.8);
+
+    var w = void 0,
+        h = void 0;
+    if (ratio > 2) {
+      w = BASE * ratio;
+      h = BASE;
+    } else {
+      w = BASE;
+      h = BASE * 1 / ratio;
+    }
+    var t = newMargin.top / newSize.height * h;
+    var b = newMargin.bottom / newSize.height * h;
+    var o = newMargin.outer / newSize.width * w;
+    var i = newMargin.inner / newSize.width * w;
+
+    sizeControl.style.width = w + "px";
+    sizeControl.style.height = h + "px";
+    marginControl.style.width = w + "px";
+    marginControl.style.height = h + "px";
+
+    marginPreview.style.top = t + "px";
+    marginPreview.style.bottom = b + "px";
+    marginPreview.style.left = i + "px";
+    marginPreview.style.right = o + "px";
+  };
+  updateLayoutPreview(this.binder.pageSize, this.binder.pageMargin);
+
+  this.setInProgress = function () {
+    validCheck.style.display = "none";
+    inProgress.style.display = "block";
+    forceRefresh.style.display = "none";
+  };
+
+  this.setDone = function () {
+    header.innerText = _this.binder.viewer.pages.length + " Pages";
+    inProgress.style.display = "none";
+    forceRefresh.style.display = "block";
+    validCheck.style.display = "none";
+  };
+
+  this.setInvalid = function () {
+    validCheck.style.display = "block";
+    forceRefresh.style.display = "none";
+    inProgress.style.display = "none";
+  };
+
+  var updateLayout = function updateLayout() {
+    var newMargin = {
+      top: input.top.value,
+      inner: input.inner.value,
+      outer: input.outer.value,
+      bottom: input.bottom.value
+    };
+    var newSize = {
+      height: input.height.value,
+      width: input.width.value
+    };
+
+    var needsUpdate = false;
+    for (var k in newMargin) {
+      if (_this.binder.pageMargin[k] !== newMargin[k]) {
+        needsUpdate = true;
       }
     }
-  }]);
+    for (var _k in newSize) {
+      if (_this.binder.pageSize[_k] !== newSize[_k]) {
+        needsUpdate = true;
+      }
+    }
 
-  return Controls;
-}();
+    if (needsUpdate) {
+      updateLayoutPreview(newSize, newMargin);
+      _this.binder.setSize(newSize);
+      _this.binder.setMargin(newMargin);
+
+      if (_this.binder.isSizeValid()) {
+        _this.binder.makeBook();
+      } else {
+        setInvalid();
+      }
+    }
+  };
+
+  for (var k in input) {
+    input[k].addEventListener("change", throttledUpdate);
+    input[k].addEventListener("keyup", throttledUpdate);
+  }
+
+  var layoutState = (0, _hyperscript2.default)("div", { style: { "float": "right" } }, forceRefresh, validCheck, inProgress);
+
+  this.holder.appendChild((0, _hyperscript2.default)("div", {}, header, doneBtn, printBtn, label(layoutState, "Pagination"), layoutControl, facingToggle, guidesToggle, label("Print"), paperSize, perSheet, orientation, viewSwitcher));
+};
 
 exports.default = Controls;
 
@@ -2209,7 +2199,7 @@ exports = module.exports = __webpack_require__(1)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls {\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.3s;\n}\n\n\n.bindery-inProgress .bindery-controls {\n  opacity: 0.5;\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 0 0 16px 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n.bindery-btn-mini {\n  color: #aaa;\n  background: transparent;\n  padding: 6px 8px;\n  margin: -6px -8px;\n  font: inherit;\n}\n.bindery-btn-mini:hover {\n  color: #aaa;\n  background: rgba(0,0,0,0.06);\n}\n\n\n.bindery-label {\n  font-size: 11px;\n  text-transform: uppercase;\n  color: #aaa;\n  letter-spacing: 0.04em;\n  padding: 16px 20px;\n  border-top: 1px solid #ddd;\n}\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: white;\n  z-index: 99;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 64px;\n  width: 33%;\n  display: inline-block;\n  text-align: center;\n  font-size: 12px;\n  color: #aaa;\n  cursor: pointer;\n}\n.bindery-viewmode .icon {\n  height: 36px;\n  width: 36px;\n  background: currentColor;\n  margin: 0 auto 8px;\n}\n.bindery-viewmode:hover {\n  color: black;\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(22) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.interactive .icon {\n  -webkit-mask: url(" + __webpack_require__(23) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(24) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 0 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 20px;\n  left: 20px;\n  right: 20px;\n  bottom: 20px;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.top:hover ~ .preview {\n  border-color: #eee;\n  border-top-color: #a9a9ff;\n}\n.bottom:hover ~ .preview {\n  border-color: #eee;\n  border-bottom-color: #a9a9ff;\n}\n.inner:hover ~ .preview {\n  border-color: #eee;\n  border-left-color: #a9a9ff;\n}\n.outer:hover ~ .preview {\n  border-color: #eee;\n  border-right-color: #a9a9ff;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 0;\n  margin-right: -5px;\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  /*background: none !important;*/\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 40px;\n  height: 24px;\n  background: white;\n  z-index: 5;\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: -2px;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: -2px;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls {\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.3s;\n}\n\n.bindery-inProgress .bindery-controls {\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 0 0 16px 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n.bindery-btn-mini {\n  color: #aaa;\n  background: transparent;\n  padding: 6px 8px;\n  margin: -6px -8px;\n  font: inherit;\n}\n.bindery-btn-mini:hover {\n  color: #aaa;\n  background: rgba(0,0,0,0.06);\n}\n\n\n.bindery-label {\n  font-size: 11px;\n  text-transform: uppercase;\n  color: #aaa;\n  letter-spacing: 0.04em;\n  padding: 16px 20px;\n  border-top: 1px solid #ddd;\n}\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: white;\n  z-index: 99;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 64px;\n  width: 33%;\n  display: inline-block;\n  text-align: center;\n  font-size: 12px;\n  color: #aaa;\n  cursor: pointer;\n}\n.bindery-viewmode .icon {\n  height: 36px;\n  width: 36px;\n  background: currentColor;\n  margin: 0 auto 8px;\n}\n.bindery-viewmode:hover {\n  color: black;\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(22) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.interactive .icon {\n  -webkit-mask: url(" + __webpack_require__(23) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(24) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 0 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 20px;\n  left: 20px;\n  right: 20px;\n  bottom: 20px;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.top:hover ~ .preview {\n  border-color: #eee;\n  border-top-color: #a9a9ff;\n}\n.bottom:hover ~ .preview {\n  border-color: #eee;\n  border-bottom-color: #a9a9ff;\n}\n.inner:hover ~ .preview {\n  border-color: #eee;\n  border-left-color: #a9a9ff;\n}\n.outer:hover ~ .preview {\n  border-color: #eee;\n  border-right-color: #a9a9ff;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 0;\n  margin-right: -5px;\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  /*background: none !important;*/\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 40px;\n  height: 24px;\n  background: white;\n  z-index: 5;\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: -2px;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: -2px;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
 
 // exports
 
