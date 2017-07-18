@@ -44,9 +44,9 @@ As of February 2017, it is in the process of being rewritten as a usable, modula
       source: ".content",
       pageSize: { height: 500, width: 350 },
       rules: [
-      	Bindery.BreakBefore({ selector: "h2" }),
-				Bindery.RunningHeader({ selector: "h2" }),
-				Bindery.PageNumber(),
+        Bindery.BreakBefore({ selector: "h2" }),
+        Bindery.RunningHeader({ selector: "h2" }),
+        Bindery.PageNumber(),
       ],
     });
 
