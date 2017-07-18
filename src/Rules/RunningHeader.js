@@ -1,6 +1,6 @@
 import BinderyRule from "./BinderyRule";
 import h from "hyperscript";
-import css from "style!css!./runningHeader.css";
+import css from "./runningHeader.css";
 
 class RunningHeader extends BinderyRule {
   constructor(options) {

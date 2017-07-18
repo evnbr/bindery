@@ -1,4 +1,4 @@
-import css from "style!css!./spread.css";
+import css from "./spread.css";
 import BinderyRule from "./BinderyRule"
 
 

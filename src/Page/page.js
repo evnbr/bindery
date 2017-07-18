@@ -1,6 +1,6 @@
 import h from "hyperscript";
-import css from "style!css!./page.css";
-import _ from "style!css!./measureArea.css";
+import css from "./page.css";
+import css2 from "./measureArea.css";
 
 class Page {
   constructor() {
@@ -92,4 +92,4 @@ class Page {
   }
 }
 
-module.exports = Page;
+export default Page;

@@ -1,4 +1,4 @@
-import css from "style!css!./viewer.css";
+import css from "./viewer.css";
 
 import Page from "../Page/page";
 import h from "hyperscript";

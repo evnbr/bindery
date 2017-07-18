@@ -1,4 +1,4 @@
-import css from "style!css!./bindery.css";
+import css from "./bindery.css";
 
 import makePages from "./makePages";
 
@@ -90,6 +90,12 @@ class Binder {
   }
 
   makeBook(doneBinding) {
+
+    if (!this.isSizeValid()) {
+      console.error("Bindery: Cancelled pagination. Page is too small.");
+      return;
+    }
+
     this.source.style.display = "";
     let content = this.source.cloneNode(true);
     this.source.style.display = "none";

@@ -1,5 +1,5 @@
 import h from "hyperscript";
-import css from "style!css!./pageNumber.css";
+import css from "./pageNumber.css";
 import BinderyRule from "./BinderyRule";
 
 class PageNumber extends BinderyRule {

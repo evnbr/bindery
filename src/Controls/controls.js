@@ -1,4 +1,4 @@
-import css from "style!css!./controls.css";
+import css from "./controls.css";
 import h from "hyperscript";
 
 const btn = function() {
@@ -258,4 +258,4 @@ class Controls {
   }
 }
 
-module.exports = Controls;
+export default Controls;

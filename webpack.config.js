@@ -8,22 +8,22 @@ module.exports = {
     filename: isProd ? 'bindery.min.js' : 'bindery.js',
     libraryTarget: "var",
     library: "Bindery",
-    path: "./build/",
+    path: __dirname + "/build/",
   },
-  loaders: [
-    {
-      test: /\.css$/,
-      loader: "style-loader!css-loader"
-    }
-  ],
   module: {
-    loaders: [
+    rules: [
+      {
+        test: /\.css$/,
+        use: [ 'style-loader', 'css-loader' ]
+      },
       {
         test: /\.js$/,
         exclude: /(node_modules)/,
         loader: 'babel-loader',
         query: {
-          presets: ['es2015']
+          presets: [
+            ["es2015"]
+          ]
         }
       },
       {
