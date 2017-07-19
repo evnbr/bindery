@@ -160,10 +160,10 @@ class Viewer {
       let flap = h("div.bindery-page3d", {
         style: `height:${Page.H}px; width:${Page.W}px`,
         onclick: () => {
-        // this.setLeaf(li-1);
+          this.setLeaf(li-1);
         },
       });
-      this.makeDraggable(flap);
+      // this.makeDraggable(flap);
       this.export.classList.add("bindery-stage3d");
       this.flaps.push(flap);
 

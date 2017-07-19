@@ -184,6 +184,7 @@ class Binder {
   }
 
   checkLayoutChange() {
+    if ( this.view.mode == "preview") return;
     if ( !this.pageOverflows) {
       this.pageOverflows = this.getPageOverflows();
       return;
