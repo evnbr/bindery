@@ -129,7 +129,7 @@ class Binder {
 
     if (!binder.source) {
       document.body.classList.add("bindery-viewing");
-      return;      
+      return;
     }
 
     if (!this.isSizeValid()) {
@@ -184,7 +184,7 @@ class Binder {
   }
 
   checkLayoutChange() {
-    if ( this.view.mode == "preview") return;
+    if ( this.viewer.mode == "preview") return;
     if ( !this.pageOverflows) {
       this.pageOverflows = this.getPageOverflows();
       return;
