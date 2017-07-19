@@ -2936,8 +2936,8 @@ var RunningHeader = function (_BinderyRule) {
       state.currentPage.runningHeader.textContent = "";
     }
   }, {
-    key: "newPage",
-    value: function newPage(pg, state) {
+    key: "afterPageCreated",
+    value: function afterPageCreated(pg, state) {
       var el = (0, _hyperscript2.default)(".bindery-running-header");
       if (this.customClass) {
         el.classList.add(this.customClass);

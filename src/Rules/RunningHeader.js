@@ -16,7 +16,7 @@ class RunningHeader extends BinderyRule {
     this.currentHeaderContent = elmt.textContent;
     state.currentPage.runningHeader.textContent = "";
   }
-  newPage(pg, state) {
+  afterPageCreated(pg, state) {
     let el = h(".bindery-running-header");
     if (this.customClass) {
       el.classList.add(this.customClass);
