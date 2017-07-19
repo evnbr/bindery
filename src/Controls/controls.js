@@ -238,7 +238,7 @@ class Controls {
           this.binder.makeBook();
         }
         else {
-          setInvalid();
+          this.setInvalid();
         }
       }
     }

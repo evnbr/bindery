@@ -12,26 +12,24 @@
 
 	<script type="text/javascript" src="../../build/bindery.js"></script>
 	<script>
-
-		fetch('content.html').then(function(response) {
-			return response.text();
-		}).then(function(fetchedContent) {
-
-			var wrapper = document.createElement('div');
-			wrapper.innerHTML = fetchedContent;
-			let content = wrapper.querySelector(".content");
-
 			let binder = new Bindery({
-			  source: content,
-				runImmeditately: true,
+			  source: {
+					url: 'content.html',
+					selector: ".content",
+				},
+				standalone: true,
 				pageSize: { height: 500, width: 350,},
-				pageMargin: { top: 40, inner: 30, outer: 50, bottom: 60 },
+				pageMargin: { top: 24, inner: 28, outer: 64, bottom: 36 },
 				debugDelay: 0,
 			  rules: [
+					Bindery.BreakBefore({ selector: "h1" }),
 					Bindery.BreakBefore({ selector: "h2" }),
 					Bindery.Footnote({
 						selector: "p > a",
-						content: (elmt, number) => `${number}: Link to <a href='#'>${elmt.href}</a>`,
+						customContent: (elmt, number) => {
+							let url = elmt.href.replace("https://", "");
+							return `${number}: <a href='#'>${url}</a>`
+						}
 					}),
 					Bindery.Spread({ selector: ".big-figure" }),
 					Bindery.RunningHeader({ selector: "h2" }),
@@ -39,16 +37,14 @@
 					Bindery.PageReference({
 						selector: ".toc a",
 						updateReference: (element, number) => {
-							element.insertAdjacentHTML("afterend", `<i style="float:right;">${number}</i>`);
+							element.insertAdjacentHTML(
+								"afterend",
+								`<i style="float:right;">${number}</i>`
+							);
 						}
 					}),
 			  ],
 			});
-
-		}).catch(function(error) {
-			console.log(error);
-  		alert("Couldn't fetch content. Note that this demo must be hosted on a server.");
-		});
 
 	</script>
 </body>

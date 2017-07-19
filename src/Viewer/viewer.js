@@ -9,21 +9,31 @@ class Viewer {
     this.doubleSided = true;
     this.currentLeaf = 0;
 
-    this.target = h("div");
-    this.target.setAttribute("bindery-export", true);
+    this.export = h(".bindery-export");
+    this.export.setAttribute("bindery-export", true);
 
+  }
+  displayError(title, text) {
+    if (!this.export.parentNode) {
+      document.body.appendChild(this.export);
+    }
+    this.export.appendChild(h(".bindery-error",
+      h(".bindery-error-title", title),
+      h(".bindery-error-text", text),
+      h(".bindery-error-footer", "Bindery.js v0.1 Alpha"),
+    ));
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
-    if (this.target.parentNode) {
-      this.target.parentNode.removeChild(this.target);
+    if (this.export.parentNode) {
+      this.export.parentNode.removeChild(this.export);
     }
   }
   toggleGuides() {
-    this.target.classList.toggle("bindery-show-guides");
+    this.export.classList.toggle("bindery-show-guides");
   }
   toggleBleed() {
-    this.target.classList.add("bindery-show-bleed");
+    this.export.classList.add("bindery-show-bleed");
   }
   toggleDouble() {
     this.doubleSided = !this.doubleSided;
@@ -31,22 +41,22 @@ class Viewer {
   }
   setGrid() {
     this.mode = "grid";
-    this.target.classList.remove("bindery-show-bleed");
+    this.export.classList.remove("bindery-show-bleed");
     this.update();
   }
   setPrintPreview() {
     this.mode = "grid";
-    this.target.classList.add("bindery-show-bleed");
+    this.export.classList.add("bindery-show-bleed");
     this.update();
   }
   setInteractive() {
     this.mode = "preview";
-    this.target.classList.remove("bindery-show-bleed");
+    this.export.classList.remove("bindery-show-bleed");
     this.update();
   }
   update() {
-    if (!this.target.parentNode) {
-      document.body.appendChild(this.target);
+    if (!this.export.parentNode) {
+      document.body.appendChild(this.export);
     }
 
     document.body.classList.add("bindery-viewing");
@@ -63,8 +73,8 @@ class Viewer {
   }
   renderGrid() {
     this.mode = "grid";
-    this.target.style.display = "block";
-    this.target.innerHTML = "";
+    this.export.style.display = "block";
+    this.export.innerHTML = "";
 
     let pages = this.pages.slice();
 
@@ -105,7 +115,7 @@ class Viewer {
           }, leftPage, rightPage)
         );
 
-        this.target.appendChild(wrap);
+        this.export.appendChild(wrap);
       }
       else {
         let pg = pages[i].element;
@@ -118,14 +128,14 @@ class Viewer {
             }
           }, pg),
         );
-        this.target.appendChild(wrap);
+        this.export.appendChild(wrap);
       }
     }
   }
   renderPreview() {
     this.mode = "preview";
-    this.target.style.display = "block";
-    this.target.innerHTML = "";
+    this.export.style.display = "block";
+    this.export.innerHTML = "";
     this.flaps = [];
 
     let pages = this.pages.slice();
@@ -154,7 +164,7 @@ class Viewer {
         },
       });
       this.makeDraggable(flap);
-      this.target.classList.add("bindery-stage3d");
+      this.export.classList.add("bindery-stage3d");
       this.flaps.push(flap);
 
       let l = pages[i].element;
@@ -173,7 +183,7 @@ class Viewer {
       // flap.style.zIndex = `${this.pages.length - i}`;
       // flap.style.top = `${i * 4}px`;
       flap.style.left = `${i * 4}px`;
-      this.target.appendChild(flap);
+      this.export.appendChild(flap);
     }
     this.setLeaf(0);
   }

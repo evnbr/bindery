@@ -12,13 +12,13 @@ class Footnote extends BinderyRule {
     this.updateReference(elmt, number);
 
     let fn = h(".footnote");
-    fn.innerHTML = this.content(elmt, number);
+    fn.innerHTML = this.customContent(elmt, number);
     state.currentPage.footer.appendChild(fn);
   }
   updateReference(elmt, number) {
     elmt.insertAdjacentHTML("beforeEnd", `<sup>${number}</sup>`);
   }
-  content(elmt, number) {
+  customContent(elmt, number) {
     return `${number}: Default footnote for "${elmt.textContent.substr(0,24)}"`
   }
 }

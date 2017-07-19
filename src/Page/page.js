@@ -79,13 +79,13 @@ class Page {
 
   static setMargin(margin) {
     let sheet;
-    let existing = document.querySelector("#binderyMarginStyleSheet");
+    let existing = document.querySelector("#bindery-margin-stylesheet");
     if (existing) {
       sheet = existing;
     }
     else {
       sheet = document.createElement('style');
-      sheet.id = "binderyMarginStyleSheet";
+      sheet.id = "bindery-margin-stylesheet";
     }
     sheet.innerHTML = `
       .bindery-flowbox,
@@ -101,7 +101,7 @@ class Page {
       .bindery-flowbox { margin-top: ${margin.top}px; }
       .bindery-footer { margin-bottom: ${margin.bottom}px; }
     `;
-    document.body.appendChild(sheet);
+    document.head.appendChild(sheet);
   }
 }
 

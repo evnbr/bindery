@@ -2,7 +2,7 @@
   .bindery-viewing {
     background: #f1f1f1 !important;
   }
-  [bindery-export] {
+  .bindery-export {
     transition: opacity 0.2s;
     opacity: 1;
     background: #f1f1f1;
@@ -11,6 +11,7 @@
     position: relative;
     padding-right: 240px;
     animation: fadeUp 0.3s;
+    min-height: 100vh;
   }
 
    .bindery-measure-area {
@@ -25,6 +26,32 @@
 
    .bindery-print-page {
      margin: 0 auto;
+   }
+
+   .bindery-error {
+     font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+     font-size: 16px;
+     margin: 15vh 15vw;
+     max-width: 500px;
+     background: url('./icon-error.svg') no-repeat 0% 0%;
+     background-size: 48px;
+     padding-top: 64px;
+   }
+
+   .bindery-error-title {
+     font-size: 1.5em;
+     margin-bottom: 16px;
+   }
+
+   .bindery-error-text {
+     margin-bottom: 16px;
+   }
+
+   .bindery-error-footer {
+     opacity: 0.5;
+     font-size: 0.66rem;
+     text-transform: uppercase;
+     letter-spacing: 0.02em;
    }
 
    .bindery-show-bleed .bindery-print-page {
@@ -58,7 +85,7 @@
 
 @media print {
   /* Don't print anything that hasn't been exported. This hides extra controls/ */
-  .bindery-viewing > :not([bindery-export]) {
+  .bindery-viewing > :not(.bindery-export) {
     display: none !important;
   }
 
@@ -74,7 +101,7 @@
 }
 
 /* Don't print anything that hasn't been exported. This hides extra controls/ */
-.bindery-viewing > :not([bindery-export]) {
+.bindery-viewing > :not(.bindery-export) {
   display: none !important;
 }
 
