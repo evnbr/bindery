@@ -84,6 +84,8 @@ class Viewer {
 
     document.body.classList.add("bindery-viewing");
 
+    this.setLeftRight()
+
     if      (this.mode == "grid")        { this.renderGrid(); }
     else if (this.mode == "interactive") { this.renderInteractive(); }
     else if (this.mode == "print")       { this.renderPrint(); }
@@ -141,7 +143,23 @@ class Viewer {
       }
     }
 
+  }
 
+  // TODO: this should happen before we get to viewer.
+  setLeftRight() {
+    if (this.doubleSided) {
+      this.pages.forEach((page, i) => {
+        page.element.setAttribute(
+          "bindery-side",
+          (i % 2 == 0) ? "right" : "left"
+        );
+      });
+    }
+    else {
+      this.pages.forEach((page, i) => {
+        page.element.setAttribute("bindery-side", "right");
+      });
+    }
   }
 
   renderGrid() {
@@ -177,9 +195,6 @@ class Viewer {
         let leftPage = left.element;
         let rightPage = right.element;
 
-
-        leftPage.setAttribute("bindery-side", "left");
-        rightPage.setAttribute("bindery-side", "right");
 
         let wrap = h(".bindery-spread-wrapper", {
             style: Page.spreadSizeStyle(),
@@ -257,10 +272,6 @@ class Viewer {
       // flap.style.zIndex = `${this.pages.length - i}`;
       // flap.style.top = `${i * 4}px`;
       flap.style.left = `${i * 4}px`;
-
-      leftPage.setAttribute("bindery-side", "left");
-      rightPage.setAttribute("bindery-side", "right");
-
 
       this.export.appendChild(flap);
     }
