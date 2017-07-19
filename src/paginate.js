@@ -235,6 +235,7 @@ export default function(content, rules, done, DELAY) {
         }
         default:
           console.log(`Bindery: Unknown node type: ${child.nodeType}`);
+          addNextChild(); // skip
       }
     }
 
