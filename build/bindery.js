@@ -921,7 +921,7 @@ var Binder = function () {
   }, {
     key: "checkLayoutChange",
     value: function checkLayoutChange() {
-      if (this.viewer.mode == "preview") return;
+      if (this.viewer.mode !== "grid") return;
       if (!this.pageOverflows) {
         this.pageOverflows = this.getPageOverflows();
         return;
@@ -1083,7 +1083,7 @@ exports.default = function (content, rules, done, DELAY) {
   };
 
   var moveNodeToNextPage = function moveNodeToNextPage(nodeToMove) {
-    nodeToMove.style.outline = "1px solid red";
+    // nodeToMove.style.outline = "1px solid red";
     // state.path.pop();
 
     var old = state.currentPage.creationOrder;
@@ -1717,7 +1717,7 @@ var Viewer = function () {
 
     this.pages = [];
     this.doubleSided = true;
-    this.currentLeaf = 0;
+    this.twoUp = false, this.currentLeaf = 0;
 
     this.export = (0, _hyperscript2.default)(".bindery-export");
     this.export.setAttribute("bindery-export", true);
@@ -1767,7 +1767,10 @@ var Viewer = function () {
         case "interactive":
         case "preview":
         case "3d":
-          this.mode = "preview";
+          this.mode = "interactive";
+          break;
+        case "print":
+          this.mode = "print";
           break;
         default:
           console.error("Bindery: Unknown view mode \"" + newMode + "\"");
@@ -1778,20 +1781,18 @@ var Viewer = function () {
     key: "setGrid",
     value: function setGrid() {
       this.mode = "grid";
-      this.export.classList.remove("bindery-show-bleed");
       this.update();
     }
   }, {
-    key: "setPrintPreview",
-    value: function setPrintPreview() {
-      this.mode = "grid";
-      this.export.classList.add("bindery-show-bleed");
+    key: "setPrint",
+    value: function setPrint() {
+      this.mode = "print";
       this.update();
     }
   }, {
     key: "setInteractive",
     value: function setInteractive() {
-      this.mode = "preview";
+      this.mode = "interactive";
       this.export.classList.remove("bindery-show-bleed");
       this.update();
     }
@@ -1803,15 +1804,68 @@ var Viewer = function () {
       }
 
       document.body.classList.add("bindery-viewing");
-      switch (this.mode) {
-        case "grid":
-          this.renderGrid();
-          break;
-        case "preview":
-          this.renderPreview();
-          break;
-        default:
-          this.renderGrid();
+
+      if (this.mode == "grid") {
+        this.renderGrid();
+      } else if (this.mode == "interactive") {
+        this.renderInteractive();
+      } else if (this.mode == "print") {
+        this.renderPrint();
+      } else {
+        this.renderGrid();
+      }
+    }
+  }, {
+    key: "renderPrint",
+    value: function renderPrint() {
+      this.mode = "print";
+      this.export.style.display = "block";
+      this.export.classList.add("bindery-show-bleed");
+
+      this.export.innerHTML = "";
+
+      var pages = this.pages.slice();
+
+      if (this.twoUp) {
+        if (this.pages.length % 2 !== 0) {
+          var pg = new _page2.default();
+          pages.push(pg);
+        }
+        var spacerPage = new _page2.default();
+        var spacerPage2 = new _page2.default();
+        spacerPage.element.style.visibility = "hidden";
+        spacerPage2.element.style.visibility = "hidden";
+        pages.unshift(spacerPage);
+        pages.push(spacerPage2);
+      }
+
+      for (var i = 0; i < pages.length; i += this.twoUp ? 2 : 1) {
+
+        if (this.twoUp) {
+          var left = pages[i];
+          var right = pages[i + 1];
+
+          var leftPage = left.element;
+          var rightPage = right.element;
+
+          var wrap = (0, _hyperscript2.default)(".bindery-print-page", (0, _hyperscript2.default)(".bindery-print-wrapper", {
+            style: {
+              height: _page2.default.H + "px",
+              width: _page2.default.W * 2 + "px"
+            }
+          }, leftPage, rightPage));
+
+          this.export.appendChild(wrap);
+        } else {
+          var _pg = pages[i].element;
+          var _wrap = (0, _hyperscript2.default)(".bindery-print-page", (0, _hyperscript2.default)(".bindery-print-wrapper", {
+            style: {
+              height: _page2.default.H + "px",
+              width: _page2.default.W + "px"
+            }
+          }, _pg));
+          this.export.appendChild(_wrap);
+        }
       }
     }
   }, {
@@ -1819,6 +1873,8 @@ var Viewer = function () {
     value: function renderGrid() {
       this.mode = "grid";
       this.export.style.display = "block";
+      this.export.classList.remove("bindery-show-bleed");
+
       this.export.innerHTML = "";
 
       var pages = this.pages.slice();
@@ -1848,36 +1904,37 @@ var Viewer = function () {
           leftPage.setAttribute("bindery-side", "left");
           rightPage.setAttribute("bindery-side", "right");
 
-          var wrap = (0, _hyperscript2.default)(".bindery-print-page", (0, _hyperscript2.default)(".bindery-print-wrapper", {
+          var wrap = (0, _hyperscript2.default)(".bindery-print-wrapper", {
             style: {
               height: _page2.default.H + "px",
               width: _page2.default.W * 2 + "px"
             }
-          }, leftPage, rightPage));
+          }, leftPage, rightPage);
 
           this.export.appendChild(wrap);
         } else {
-          var _pg = pages[i].element;
-          _pg.setAttribute("bindery-side", "right");
-          var _wrap = (0, _hyperscript2.default)(".bindery-print-page", (0, _hyperscript2.default)(".bindery-print-wrapper", {
+          var _pg2 = pages[i].element;
+          _pg2.setAttribute("bindery-side", "right");
+          var _wrap2 = (0, _hyperscript2.default)(".bindery-print-page", (0, _hyperscript2.default)(".bindery-print-wrapper", {
             style: {
               height: _page2.default.H + "px",
               width: _page2.default.W + "px"
             }
-          }, _pg));
-          this.export.appendChild(_wrap);
+          }, _pg2));
+          this.export.appendChild(_wrap2);
         }
       }
     }
   }, {
-    key: "renderPreview",
-    value: function renderPreview() {
+    key: "renderInteractive",
+    value: function renderInteractive() {
       var _this = this;
 
-      this.mode = "preview";
+      this.mode = "interactive";
       this.export.style.display = "block";
       this.export.innerHTML = "";
       this.flaps = [];
+      this.export.classList.remove("bindery-show-bleed");
 
       var pages = this.pages.slice();
 
@@ -2118,7 +2175,7 @@ var Controls = function Controls(opts) {
     opts.binder.viewer.toggleDouble();
   };
   var print = function print() {
-    opts.binder.viewer.setGrid();
+    opts.binder.viewer.setPrint();
     window.print();
   };
 
@@ -2198,7 +2255,7 @@ var Controls = function Controls(opts) {
     interactMode.classList.remove("selected");
     printMode.classList.add("selected");
 
-    opts.binder.viewer.setPrintPreview();
+    opts.binder.viewer.setPrint();
   };
   var gridMode = (0, _hyperscript2.default)(".bindery-viewmode.grid.selected", { onclick: setGrid }, (0, _hyperscript2.default)(".icon"), "Grid");
   var interactMode = (0, _hyperscript2.default)(".bindery-viewmode.interactive", { onclick: setInteractive }, (0, _hyperscript2.default)(".icon"), "Bound");

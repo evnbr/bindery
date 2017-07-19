@@ -101,7 +101,7 @@ export default function(content, rules, done, DELAY) {
   };
 
   let moveNodeToNextPage = (nodeToMove) => {
-    nodeToMove.style.outline = "1px solid red";
+    // nodeToMove.style.outline = "1px solid red";
     // state.path.pop();
 
     let old = state.currentPage.creationOrder;

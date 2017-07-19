@@ -189,7 +189,7 @@ class Binder {
   }
 
   checkLayoutChange() {
-    if ( this.viewer.mode == "preview") return;
+    if ( this.viewer.mode !== "grid") return;
     if ( !this.pageOverflows) {
       this.pageOverflows = this.getPageOverflows();
       return;

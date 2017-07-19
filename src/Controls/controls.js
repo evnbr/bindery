@@ -40,7 +40,7 @@ class Controls {
       opts.binder.viewer.toggleDouble();
     };
     const print = () => {
-      opts.binder.viewer.setGrid();
+      opts.binder.viewer.setPrint();
       window.print();
     }
 
@@ -144,7 +144,7 @@ class Controls {
       interactMode.classList.remove("selected");
       printMode.classList.add("selected");
 
-      opts.binder.viewer.setPrintPreview();
+      opts.binder.viewer.setPrint();
     }
     const gridMode = h(".bindery-viewmode.grid.selected", { onclick: setGrid }, h(".icon"), "Grid");
     const interactMode = h(".bindery-viewmode.interactive",  { onclick: setInteractive },  h(".icon"), "Bound");

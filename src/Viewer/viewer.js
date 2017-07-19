@@ -7,6 +7,7 @@ class Viewer {
   constructor(opts) {
     this.pages = [];
     this.doubleSided = true;
+    this.twoUp = false,
     this.currentLeaf = 0;
 
     this.export = h(".bindery-export");
@@ -49,7 +50,10 @@ class Viewer {
       case "interactive":
       case "preview":
       case "3d":
-        this.mode = "preview";
+        this.mode = "interactive";
+        break;
+      case "print":
+        this.mode = "print";
         break;
       default:
         console.error(`Bindery: Unknown view mode "${newMode}"`);
@@ -58,16 +62,14 @@ class Viewer {
   }
   setGrid() {
     this.mode = "grid";
-    this.export.classList.remove("bindery-show-bleed");
     this.update();
   }
-  setPrintPreview() {
-    this.mode = "grid";
-    this.export.classList.add("bindery-show-bleed");
+  setPrint() {
+    this.mode = "print";
     this.update();
   }
   setInteractive() {
-    this.mode = "preview";
+    this.mode = "interactive";
     this.export.classList.remove("bindery-show-bleed");
     this.update();
   }
@@ -77,21 +79,78 @@ class Viewer {
     }
 
     document.body.classList.add("bindery-viewing");
-    switch (this.mode) {
-      case "grid":
-        this.renderGrid();
-        break;
-      case "preview":
-        this.renderPreview();
-        break;
-      default:
-        this.renderGrid();
+
+    if      (this.mode == "grid")        { this.renderGrid(); }
+    else if (this.mode == "interactive") { this.renderInteractive(); }
+    else if (this.mode == "print")       { this.renderPrint(); }
+    else                                 { this.renderGrid(); }
+  }
+
+  renderPrint() {
+    this.mode = "print";
+    this.export.style.display = "block";
+    this.export.classList.add("bindery-show-bleed");
+
+    this.export.innerHTML = "";
+
+    let pages = this.pages.slice();
+
+    if (this.twoUp) {
+      if (this.pages.length % 2 !== 0) {
+        let pg = new Page();
+        pages.push(pg);
+      }
+      let spacerPage = new Page();
+      let spacerPage2 = new Page();
+      spacerPage.element.style.visibility = "hidden";
+      spacerPage2.element.style.visibility = "hidden";
+      pages.unshift(spacerPage);
+      pages.push(spacerPage2);
     }
+
+    for (var i = 0; i < pages.length; i += (this.twoUp ? 2 : 1)) {
+
+
+      if (this.twoUp) {
+        let left  = pages[i];
+        let right = pages[i+1];
+
+        let leftPage = left.element;
+        let rightPage = right.element;
+
+        let wrap = h(".bindery-print-page",
+          h(".bindery-print-wrapper", {
+            style: {
+              height: `${Page.H}px`,
+              width: `${Page.W * 2}px`,
+            }
+          }, leftPage, rightPage)
+        );
+
+        this.export.appendChild(wrap);
+      }
+      else {
+        let pg = pages[i].element;
+        let wrap = h(".bindery-print-page",
+          h(".bindery-print-wrapper", {
+            style: {
+              height: `${Page.H}px`,
+              width: `${Page.W}px`,
+            }
+          }, pg),
+        );
+        this.export.appendChild(wrap);
+      }
+    }
+
+
   }
 
   renderGrid() {
     this.mode = "grid";
     this.export.style.display = "block";
+    this.export.classList.remove("bindery-show-bleed");
+
     this.export.innerHTML = "";
 
     let pages = this.pages.slice();
@@ -124,13 +183,12 @@ class Viewer {
         leftPage.setAttribute("bindery-side", "left");
         rightPage.setAttribute("bindery-side", "right");
 
-        let wrap = h(".bindery-print-page",
-          h(".bindery-print-wrapper", {
+        let wrap = h(".bindery-print-wrapper", {
             style: {
               height: `${Page.H}px`,
               width: `${Page.W * 2}px`,
             }
-          }, leftPage, rightPage)
+          }, leftPage, rightPage
         );
 
         this.export.appendChild(wrap);
@@ -150,11 +208,12 @@ class Viewer {
       }
     }
   }
-  renderPreview() {
-    this.mode = "preview";
+  renderInteractive() {
+    this.mode = "interactive";
     this.export.style.display = "block";
     this.export.innerHTML = "";
     this.flaps = [];
+    this.export.classList.remove("bindery-show-bleed");
 
     let pages = this.pages.slice();
 
