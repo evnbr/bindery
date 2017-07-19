@@ -8,8 +8,8 @@ import Rules from "./Rules/";
 
 
 const DEFAULT_PAGE_SIZE = {
-  width: 300,
-  height: 400
+  width: 350,
+  height: 500
 }
 const DEFAULT_PAGE_MARGIN = {
   inner: 30,
@@ -27,10 +27,15 @@ class Binder {
     this.setMargin(pageMargin);
 
     this.viewer = new Viewer()
-    this.rules = [];
+    if (opts.startingViewMode) {
+      this.viewer.setMode(opts.startingViewMode);
+    }
 
+    this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
+
     if (opts.standalone) { this.runImmeditately = true; }
+
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
     if (!opts.source) {
