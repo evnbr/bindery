@@ -132,7 +132,7 @@ class Binder {
 
   makeBook(doneBinding) {
 
-    if (!binder.source) {
+    if (!this.source) {
       document.body.classList.add("bindery-viewing");
       return;
     }

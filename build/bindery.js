@@ -863,7 +863,7 @@ var Binder = function () {
     value: function makeBook(doneBinding) {
       var _this3 = this;
 
-      if (!binder.source) {
+      if (!this.source) {
         document.body.classList.add("bindery-viewing");
         return;
       }
