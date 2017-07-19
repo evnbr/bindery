@@ -101,7 +101,7 @@ export default function(content, rules, done, DELAY) {
   };
 
   let moveNodeToNextPage = (nodeToMove) => {
-    state.path.pop();
+    // state.path.pop();
 
     // let fn = state.currentPage.footer.lastChild; // <--
     state.currentPage = makeNextPage();
@@ -144,10 +144,15 @@ export default function(content, rules, done, DELAY) {
           return;
         }
 
-        textNode.nodeValue = origText.substr(0, pos);
+        let fittingText = origText.substr(0, pos);
+        let overflowingText = origText.substr(pos);
+        textNode.nodeValue = fittingText;
+        origText = overflowingText;
 
-        origText = origText.substr(pos);
-        pos = 0;
+        // pos = 0; // IS THIS THE PROBLEM?
+        lastPos = 0;
+        pos = origText.length / 2;
+
 
         // Start on new page
         state.currentPage = makeNextPage();
@@ -158,6 +163,10 @@ export default function(content, rules, done, DELAY) {
         // If the remainder fits there, we're done
         if (!state.currentPage.hasOverflowed()) {
           throttle(doneCallback);
+          return;
+        }
+        else {
+          throttle(step);
           return;
         }
       }
