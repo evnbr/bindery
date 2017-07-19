@@ -71,6 +71,7 @@ class Viewer {
         this.renderGrid();
     }
   }
+
   renderGrid() {
     this.mode = "grid";
     this.export.style.display = "block";
@@ -160,32 +161,45 @@ class Viewer {
       let flap = h("div.bindery-page3d", {
         style: `height:${Page.H}px; width:${Page.W}px`,
         onclick: () => {
-          this.setLeaf(li-1);
+          let newLeaf = li - 1;
+          if (newLeaf == this.currentLeaf) newLeaf++;
+          this.setLeaf(newLeaf);
         },
       });
       // this.makeDraggable(flap);
       this.export.classList.add("bindery-stage3d");
       this.flaps.push(flap);
 
-      let l = pages[i].element;
-      l.classList.add("bindery-page3d-front");
-      flap.appendChild(l);
+      let rightPage = pages[i].element;
+      let leftPage;
+      rightPage.classList.add("bindery-page3d-front");
+      flap.appendChild(rightPage);
       if (this.doubleSided) {
         flap.classList.add("bindery-doubleSided");
-        let r = pages[i+1].element;
-        r.classList.add("bindery-page3d-back");
-        flap.appendChild(r);
+        leftPage = pages[i+1].element;
+        leftPage.classList.add("bindery-page3d-back");
+        flap.appendChild(leftPage);
       }
       else {
-        let r = h(".bindery-page.bindery-page3d-back")
-        flap.appendChild(r);
+        leftPage = h(".bindery-page.bindery-page3d-back")
+        flap.appendChild(leftPage);
       }
       // flap.style.zIndex = `${this.pages.length - i}`;
       // flap.style.top = `${i * 4}px`;
       flap.style.left = `${i * 4}px`;
+
+      leftPage.setAttribute("bindery-side", "left");
+      rightPage.setAttribute("bindery-side", "right");
+
+
       this.export.appendChild(flap);
     }
-    this.setLeaf(0);
+    if (this.currentLeaf) {
+      this.setLeaf(this.currentLeaf);
+    }
+    else {
+      this.setLeaf(0);
+    }
   }
   setLeaf(n) {
     this.currentLeaf = n;
