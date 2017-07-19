@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-	<title>Bindery - Single Page</title>
+	<title>Bindery - Custom Rules</title>
   <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
@@ -253,7 +253,31 @@
 		let rainbowRule = Bindery.createRule({
 			afterBind: function(page, pageIndex, pageCount) {
 				let pct = pageIndex / pageCount;
-				page.element.style.background = "hsl(" + (pct * 360) + ", 80%, 80%)";
+				page.element.style.backgroundColor = "hsl(" + (pct * 360) + ", 80%, 80%)";
+			}
+		});
+
+		let foreedgeRule = Bindery.createRule({
+			afterBind: function(page, pageIndex, pageCount) {
+				let pct = pageIndex / pageCount;
+				let edgePaint = document.createElement("div");
+				if (pageIndex % 2 == 0) {
+					edgePaint.style.background = "url('forward.svg') no-repeat";
+					edgePaint.style.right = "-10px";
+				}
+				else {
+					edgePaint.style.background = "url('back.svg') no-repeat";
+					edgePaint.style.left = "-10px";
+				}
+				Object.assign(edgePaint.style, {
+					backgroundPosition: (pct * 100) + "% 0",
+					backgroundSize: "cover",
+					width: "12px",
+					position: "absolute",
+					top: 0,
+					bottom: 0,
+				});
+				page.element.appendChild(edgePaint);
 			}
 		});
 
@@ -262,7 +286,11 @@
 			standalone: true,
 			startingViewMode: "interactive",
 			pageMargin: { top: 32, inner: 32, outer: 32, bottom: 32 },
-		  rules: [ rainbowRule, shrinkingRule ],
+		  rules: [
+				rainbowRule,
+				shrinkingRule,
+				foreedgeRule,
+			],
 		});
 	</script>
 
