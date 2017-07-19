@@ -221,8 +221,9 @@ class Viewer {
   setLeaf(n) {
     this.currentLeaf = n;
     this.flaps.forEach((flap, i) => {
-      let z = this.flaps.length - Math.abs(i - n);
-      flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${z*5}px) rotateY(${(i < n) ? -180 : 0}deg)`;
+      let z = this.flaps.length - Math.abs(i - n + 0.5);
+      // + 0.5 so left and right are even
+      flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${ z * 4 }px) rotateY(${(i < n) ? -180 : 0}deg)`;
     });
   }
   makeDraggable(flap) {

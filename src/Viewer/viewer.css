@@ -140,7 +140,7 @@
 
 
 .bindery-stage3d {
-  perspective: 2000px;
+  perspective: 3000px;
   min-height: 100vh;
   transform-style: preserve-3d;
 }
@@ -150,16 +150,18 @@
   width: 400px;
   height: 600px;
   transform: rotateY(0);
-  transition: transform 0.5s, box-shadow 0.2s;
+  transition: transform 0.5s, box-shadow 0.1s;
   transform-style: preserve-3d;
   transform-origin: left;
   position: absolute;
   left: 0;
-  right: -10%;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
 
 .bindery-page3d:hover {
-  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 2px 0 4px rgba(0,0,0,0.2);
 }
 .bindery-page3d.flipped {
   transform: rotateY(-180deg);

@@ -253,7 +253,7 @@
 		let rainbowRule = Bindery.createRule({
 			afterBind: function(page, pageIndex, pageCount) {
 				let pct = pageIndex / pageCount;
-				page.element.style.background = "hsl(" + (pct * 360) + ", 100%, 80%)";
+				page.element.style.background = "hsl(" + (pct * 360) + ", 80%, 80%)";
 			}
 		});
 

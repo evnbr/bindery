@@ -6,7 +6,7 @@
   right: 0;
   bottom: 0;
 }
-.bindery-measure-area * {
+/*.bindery-measure-area * {
   outline: 1px solid gray;
   color: gray;
   background: transparent;
@@ -15,4 +15,4 @@
 .bindery-measure-area .bindery-page {
   background: transparent;
   box-shadow: none;
-}
+}*/
