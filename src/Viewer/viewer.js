@@ -39,6 +39,23 @@ class Viewer {
     this.doubleSided = !this.doubleSided;
     this.update();
   }
+  setMode(newMode) {
+    switch (newMode) {
+      case "grid":
+      case "standard":
+      case "default":
+        this.mode = "grid";
+        break;
+      case "interactive":
+      case "preview":
+      case "3d":
+        this.mode = "preview";
+        break;
+      default:
+        console.error(`Bindery: Unknown view mode "${newMode}"`);
+        break;
+    }
+  }
   setGrid() {
     this.mode = "grid";
     this.export.classList.remove("bindery-show-bleed");

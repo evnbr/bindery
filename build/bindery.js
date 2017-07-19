@@ -80,13 +80,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var BinderyRule = function BinderyRule(options) {
   _classCallCheck(this, BinderyRule);
 
+  options = options ? options : {};
   this.name = options.name ? options.name : "Unnamed Bindery Rule";
   this.selector = "";
 
   for (var key in options) {
-    if (key in this) {
-      this[key] = options[key];
-    }
+    this[key] = options[key];
   }
 };
 
@@ -732,8 +731,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var DEFAULT_PAGE_SIZE = {
-  width: 300,
-  height: 400
+  width: 350,
+  height: 500
 };
 var DEFAULT_PAGE_MARGIN = {
   inner: 30,
@@ -754,12 +753,17 @@ var Binder = function () {
     this.setMargin(pageMargin);
 
     this.viewer = new _viewer2.default();
-    this.rules = [];
+    if (opts.startingViewMode) {
+      this.viewer.setMode(opts.startingViewMode);
+    }
 
+    this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
+
     if (opts.standalone) {
       this.runImmeditately = true;
     }
+
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
     if (!opts.source) {
@@ -998,6 +1002,7 @@ exports.default = function (content, rules, done, DELAY) {
 
   var beforeAddRules = function beforeAddRules(elmt) {
     rules.forEach(function (rule) {
+      if (!rule.selector) return;
       if (elmt.matches(rule.selector) && rule.beforeAdd) {
 
         var backupPg = state.currentPage.clone();
@@ -1023,6 +1028,7 @@ exports.default = function (content, rules, done, DELAY) {
   };
   var afterAddRules = function afterAddRules(elmt) {
     rules.forEach(function (rule) {
+      if (!rule.selector) return;
       if (elmt.matches(rule.selector) && rule.afterAdd) {
         rule.afterAdd(elmt, state);
       }
@@ -1030,14 +1036,14 @@ exports.default = function (content, rules, done, DELAY) {
   };
   var newPageRules = function newPageRules(pg) {
     rules.forEach(function (rule) {
-      if (rule.newPage) rule.newPage(pg, state);
+      if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
     });
   };
   var afterBindRules = function afterBindRules(pages) {
     rules.forEach(function (rule) {
       if (rule.afterBind) {
-        pages.forEach(function (pg, i) {
-          rule.afterBind(pg, i);
+        pages.forEach(function (pg, i, arr) {
+          rule.afterBind(pg, i, arr.length);
         });
       }
     });
@@ -1708,6 +1714,25 @@ var Viewer = function () {
       this.update();
     }
   }, {
+    key: "setMode",
+    value: function setMode(newMode) {
+      switch (newMode) {
+        case "grid":
+        case "standard":
+        case "default":
+          this.mode = "grid";
+          break;
+        case "interactive":
+        case "preview":
+        case "3d":
+          this.mode = "preview";
+          break;
+        default:
+          console.error("Bindery: Unknown view mode \"" + newMode + "\"");
+          break;
+      }
+    }
+  }, {
     key: "setGrid",
     value: function setGrid() {
       this.mode = "grid";
@@ -1735,8 +1760,6 @@ var Viewer = function () {
         document.body.appendChild(this.export);
       }
 
-      this.updateLeftRight();
-
       document.body.classList.add("bindery-viewing");
       switch (this.mode) {
         case "grid":
@@ -1749,9 +1772,6 @@ var Viewer = function () {
           this.renderGrid();
       }
     }
-  }, {
-    key: "updateLeftRight",
-    value: function updateLeftRight() {}
   }, {
     key: "renderGrid",
     value: function renderGrid() {
@@ -2358,7 +2378,10 @@ exports.default = {
   PageNumber: _PageNumber2.default,
   RunningHeader: _RunningHeader2.default,
   PageReference: _PageReference2.default,
-  BinderyRule: _BinderyRule2.default
+  BinderyRule: _BinderyRule2.default,
+  createRule: function createRule(options) {
+    return new _BinderyRule2.default(options);
+  }
 };
 
 /***/ }),
@@ -2795,9 +2818,6 @@ var PageNumber = function (_BinderyRule) {
   }
 
   _createClass(PageNumber, [{
-    key: "newPage",
-    value: function newPage(pg, state) {}
-  }, {
     key: "afterBind",
     value: function afterBind(pg, i) {
       pg.number = i + 1;

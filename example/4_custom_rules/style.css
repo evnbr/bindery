@@ -6,33 +6,21 @@
 }
 
 html {
-  font-family: Times, serif;
+  font-family: sans-serif;
   font-size: 16px;
-  line-height: 1.35;
 }
 
 .content, .intro {
+  font-family: Georgia;
   margin: 20px auto;
   max-width: 900px;
   padding: 20px;
 }
 
-h1 {
-  font-size: 8rem;
-  line-height: 0.8;
-  word-break: break-all;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  -webkit-text-stroke: 1px black;
-  color: transparent;
-}
-
 h2 {
-  font-size: 2rem;
-  line-height: 1;
-  margin-bottom: 8rem;
+  font-size: 3rem;
+  margin-bottom: 1rem;
 }
-
 
 h3 {
   font-size: 2em;
@@ -41,10 +29,6 @@ h3 {
 
 p {
   text-indent: 1rem;
-}
-
-h2 + p {
-  text-indent: 0;
 }
 
 sup {
@@ -74,4 +58,30 @@ figcaption {
 
 .toc {
   list-style: none;
+}
+
+#makeBook {
+  display: inline-block;
+  background: navy;
+  color: white;
+  font-family: sans-serif;
+  padding: 1em 1.5em;
+  cursor: pointer;
+  position: fixed;
+  top: 2em;
+  right: 2em;
+  border-radius: 2px;
+  animation: rotateColor 5s;
+  animation-iteration-count: infinite;
+}
+#makeBook:hover {
+  background: black;
+  animation: none;
+}
+
+@keyframes rotateColor {
+  0%   { background-color: blue; }
+  33%  { background-color: green; }
+  67%  { background-color: maroon; }
+  100% { background-color: blue; }
 }

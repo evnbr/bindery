@@ -10,8 +10,6 @@ class PageNumber extends BinderyRule {
     this.selector = ".content";
     this.customClass = options.customClass;
   }
-  newPage(pg, state) {
-  }
   afterBind(pg, i) {
     pg.number = i + 1;
     let el = h(".bindery-num", `${pg.number}`);

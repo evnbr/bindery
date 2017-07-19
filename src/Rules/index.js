@@ -15,5 +15,8 @@ export default {
   PageNumber: PageNumber,
   RunningHeader: RunningHeader,
   PageReference: PageReference,
-  BinderyRule: BinderyRule
+  BinderyRule: BinderyRule,
+  createRule: function(options) {
+    return new BinderyRule(options);
+  }
 }

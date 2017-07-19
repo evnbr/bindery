@@ -18,6 +18,7 @@ export default function(content, rules, done, DELAY) {
 
   let beforeAddRules = (elmt) => {
     rules.forEach( (rule) => {
+      if (!rule.selector) return;
       if (elmt.matches(rule.selector) && rule.beforeAdd) {
 
         let backupPg = state.currentPage.clone();
@@ -43,6 +44,7 @@ export default function(content, rules, done, DELAY) {
   }
   let afterAddRules = (elmt) => {
     rules.forEach( (rule) => {
+      if (!rule.selector) return;
       if (elmt.matches(rule.selector) && rule.afterAdd) {
         rule.afterAdd(elmt, state);
       }
@@ -50,14 +52,14 @@ export default function(content, rules, done, DELAY) {
   }
   let newPageRules = (pg) => {
     rules.forEach( (rule) => {
-      if (rule.newPage) rule.newPage(pg, state);
+      if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
     });
   }
   let afterBindRules = (pages) => {
     rules.forEach( (rule) => {
       if (rule.afterBind) {
-        pages.forEach((pg, i) => {
-          rule.afterBind(pg, i);
+        pages.forEach((pg, i, arr) => {
+          rule.afterBind(pg, i, arr.length);
         });
       }
     });
