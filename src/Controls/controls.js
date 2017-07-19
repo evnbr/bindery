@@ -75,12 +75,23 @@ class Controls {
       { onchange: function() {
           changeUnit(this.value);
       }},
-      h("option", { value: "px" }, "Pixels (96/in)"),
-      h("option", { value: "pt" }, "Points (72/in)"),
-      h("option", { value: "pc" }, "Picas (12pt)"),
-      h("option", { value: "in" }, "Inches (96px)"),
-      h("option", { value: "cm" }, "Centimeters"),
-      h("option", { value: "mm" }, "Millimeters"),
+      h("option", { value: "px" }, "Pixels"),
+      h("option", { disabled: true }, "96px = 1 in"),
+      h("option", { disabled: true }, ""),
+      h("option", { value: "pt" }, "Points"),
+      h("option", { disabled: true }, "72pt = 1 in"),
+      h("option", { disabled: true }, ""),
+      h("option", { value: "pc" }, "Pica"),
+      h("option", { disabled: true }, "6pc = 72pt = 1in"),
+      h("option", { disabled: true }, ""),
+      h("option", { value: "in" }, "Inches"),
+      h("option", { disabled: true }, "1in = 96px"),
+      h("option", { disabled: true }, ""),
+      h("option", { value: "cm" }, "cm"),
+      h("option", { disabled: true }, "2.54cm = 1in"),
+      h("option", { disabled: true }, ""),
+      h("option", { value: "mm" }, "mm"),
+      h("option", { disabled: true }, "25.4mm = 1in"),
     );
     const changeUnit = (newUnit) => {
       const oldUnit = this.binder.pageUnit;
@@ -111,10 +122,17 @@ class Controls {
     );
 
     const paperSize = h(".bindery-toggle", "Paper Size", h("select",
-      h("option", "8.5 x 11"),
-      h("option", "8.5 x 14"),
-      h("option", "11 x 17"),
+      h("option", "Letter"),
+      h("option", { disabled: true }, "8.5 x 11"),
+      h("option", { disabled: true }, ""),
+      h("option", "Legal"),
+      h("option", { disabled: true }, "8.5 x 14"),
+      h("option", { disabled: true }, ""),
+      h("option", "Tabloid"),
+      h("option", { disabled: true }, "11 x 17"),
+      h("option", { disabled: true }, ""),
       h("option", "A4"),
+      h("option", { disabled: true }, "mm x mm"),
     ))
 
     const perSheet = h(".bindery-toggle", "Pages per Sheet", h("select",
