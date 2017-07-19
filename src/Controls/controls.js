@@ -1,4 +1,5 @@
 import css from "./controls.css";
+import convertUnits from "../utils/convertUnits"
 import h from "hyperscript";
 
 const btn = function() {
@@ -20,6 +21,7 @@ const label = function() {
   return h(".bindery-label", ...arguments);
 }
 
+
 class Controls {
   constructor(opts) {
     this.holder = h("div.bindery-controls");
@@ -32,15 +34,15 @@ class Controls {
     };
     const guides = () => {
       guidesToggle.classList.toggle("selected")
-      opts.binder.viewer.toggleGuides();
+      this.binder.viewer.toggleGuides();
     };
     const facing = () => {
       facingToggle.classList.toggle("selected")
       layoutControl.classList.toggle("not-facing")
-      opts.binder.viewer.toggleDouble();
+      this.binder.viewer.toggleDouble();
     };
     const print = () => {
-      opts.binder.viewer.setPrint();
+      this.binder.viewer.setPrint();
       window.print();
     }
 
@@ -68,6 +70,31 @@ class Controls {
       h("div", "W", input.width),
       h("div", "H", input.height),
     );
+
+    const unitSelect = h("select",
+      { onchange: function() {
+          changeUnit(this.value);
+      }},
+      h("option", { value: "px" }, "Pixels (96/in)"),
+      h("option", { value: "pt" }, "Points (72/in)"),
+      h("option", { value: "pc" }, "Picas (12pt)"),
+      h("option", { value: "in" }, "Inches (96px)"),
+      h("option", { value: "cm" }, "Centimeters"),
+      h("option", { value: "mm" }, "Millimeters"),
+    );
+    const changeUnit = (newUnit) => {
+      const oldUnit = this.binder.pageUnit;
+      for (let key in input) {
+        let el = input[key];
+        let newVal = convertUnits(parseFloat(el.value), oldUnit, newUnit);
+        let rounded = Math.round(newVal * 100) / 100
+        el.value = rounded;
+      }
+      this.binder.pageUnit = newUnit;
+    }
+
+    unitSelect.value = this.binder.pageUnit;
+    const unitSwitch = h(".bindery-toggle", "Units", unitSelect);
 
     const marginPreview = h(".preview");
     const marginControl = h(".bindery-val.bindery-margin",
@@ -130,27 +157,30 @@ class Controls {
       interactMode.classList.remove("selected");
       printMode.classList.remove("selected");
 
-      opts.binder.viewer.setGrid()
+      this.binder.viewer.setGrid()
     }
     const setInteractive = () => {
       gridMode.classList.remove("selected");
       interactMode.classList.add("selected");
       printMode.classList.remove("selected");
 
-      opts.binder.viewer.setInteractive();
+      this.binder.viewer.setInteractive();
     }
     const setPrint = () => {
       gridMode.classList.remove("selected");
       interactMode.classList.remove("selected");
       printMode.classList.add("selected");
 
-      opts.binder.viewer.setPrint();
+      this.binder.viewer.setPrint();
     }
-    const gridMode = h(".bindery-viewmode.grid.selected", { onclick: setGrid }, h(".icon"), "Grid");
-    const interactMode = h(".bindery-viewmode.interactive",  { onclick: setInteractive },  h(".icon"), "Bound");
+    const gridMode = h(".bindery-viewmode.grid", { onclick: setGrid }, h(".icon"), "Grid");
+    const interactMode = h(".bindery-viewmode.interactive",  { onclick: setInteractive },  h(".icon"), "Interactive");
     const printMode = h(".bindery-viewmode.print",  { onclick: setPrint }, h(".icon"), "Sheet");
+    if (this.binder.viewer.mode == "grid") gridMode.classList.add("selected");
+    if (this.binder.viewer.mode == "interactive") interactMode.classList.add("selected");
+    if (this.binder.viewer.mode == "print") printMode.classList.add("selected");
     const viewSwitcher = h(".bindery-viewswitcher",
-      gridMode, interactMode, printMode,
+      gridMode, printMode, interactMode,
     );
 
     const header = h("div", { style : {
@@ -262,13 +292,16 @@ class Controls {
 
         label(layoutState, "Pagination"),
         layoutControl,
+        unitSwitch,
         facingToggle,
-        guidesToggle,
 
         label("Print"),
         paperSize,
         perSheet,
         orientation,
+
+        label("View"),
+        guidesToggle,
 
         viewSwitcher,
       )

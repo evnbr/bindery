@@ -4,16 +4,17 @@ import css2 from "./measureArea.css";
 
 class Page {
   constructor() {
+
+    this.flowContent = h(".bindery-content");
+    this.flowBox = h(".bindery-flowbox", this.flowContent);
+    this.footer = h(".bindery-footer");
+    this.bleed = h(".bindery-bleed");
     this.element = h(".bindery-page",
-      { style: `height:${Page.H}px; width:${Page.W}px`},
-      h(".bindery-flowbox",
-        h(".bindery-content")
-      ),
-      h(".bindery-footer"),
+      { style: Page.sizeStyle() },
+      this.bleed,
+      this.flowBox,
+      this.footer,
     );
-    this.flowBox = this.element.querySelector(".bindery-flowbox");
-    this.flowContent = this.element.querySelector(".bindery-content");
-    this.footer = this.element.querySelector(".bindery-footer");
   }
   overflowAmount() {
 
@@ -77,6 +78,19 @@ class Page {
     Page.H = size.height;
   }
 
+  static sizeStyle() {
+    return {
+        height: `${Page.H}${Page.unit}`,
+        width: `${Page.W}${Page.unit}`,
+    }
+  }
+  static spreadSizeStyle() {
+    return {
+        height: `${Page.H}${Page.unit}`,
+        width: `${Page.W * 2}${Page.unit}`,
+    }
+  }
+
   static setMargin(margin) {
     let sheet;
     let existing = document.querySelector("#bindery-margin-stylesheet");
@@ -90,16 +104,16 @@ class Page {
     sheet.innerHTML = `
       .bindery-flowbox,
       .bindery-footer {
-        margin-left: ${margin.outer}px;
-        margin-right: ${margin.inner}px;
+        margin-left: ${margin.outer}${Page.unit};
+        margin-right: ${margin.inner}${Page.unit};
       }
       [bindery-side="right"] .bindery-flowbox,
       [bindery-side="right"] .bindery-footer {
-        margin-left: ${margin.inner}px;
-        margin-right: ${margin.outer}px;
+        margin-left: ${margin.inner}${Page.unit};
+        margin-right: ${margin.outer}${Page.unit};
       }
-      .bindery-flowbox { margin-top: ${margin.top}px; }
-      .bindery-footer { margin-bottom: ${margin.bottom}px; }
+      .bindery-flowbox { margin-top: ${margin.top}${Page.unit}; }
+      .bindery-footer { margin-bottom: ${margin.bottom}${Page.unit}; }
     `;
     document.head.appendChild(sheet);
   }

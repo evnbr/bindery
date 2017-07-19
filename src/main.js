@@ -7,22 +7,30 @@ import Controls from "./Controls/controls";
 import Rules from "./Rules/";
 
 
+const DEFAULT_PAGE_UNIT = "in";
 const DEFAULT_PAGE_SIZE = {
-  width: 350,
-  height: 500
+  width: 4,
+  height: 6,
 }
 const DEFAULT_PAGE_MARGIN = {
-  inner: 30,
-  outer: 50,
-  bottom: 60,
-  top: 40
+  inner: 0.2,
+  outer: 0.2,
+  bottom: 0.2,
+  top: 0.2
+}
+const DEFAULT_BLEED = {
+  inner: 0,
+  outer: 0.2,
+  bottom: 0.2,
+  top: 0.2
 }
 
 class Binder {
   constructor(opts) {
 
-    let pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE
-    let pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN
+    let pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
+    let pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
+    this.pageUnit = opts.pageUnit ? opts.pageUnit : DEFAULT_PAGE_UNIT;
     this.setSize(pageSize);
     this.setMargin(pageMargin);
 
@@ -105,12 +113,14 @@ class Binder {
   }
 
   setSize(size) {
-    this.pageSize = size
+    Page.unit = this.pageUnit;
+    this.pageSize = size;
     Page.setSize(size);
   }
 
   setMargin(margin) {
-    this.pageMargin = margin
+    Page.unit = this.pageUnit;
+    this.pageMargin = margin;
     Page.setMargin(margin);
   }
 
@@ -138,6 +148,19 @@ class Binder {
     }
 
     if (!this.isSizeValid()) {
+
+      let u = this.pageUnit;
+      let w = this.pageSize.width + u;
+      let h = this.pageSize.height + u;
+      let size = `{ width: ${w}, height: ${h} }`;
+      let i = this.pageMargin.inner + u;
+      let o = this.pageMargin.outer + u;
+      let t = this.pageMargin.top + u;
+      let b = this.pageMargin.bottom + u;
+      let margin = `{ top: ${t}, inner: ${i}, outer: ${o}, bottom: ${b} }`;
+      this.viewer.displayError(
+        "Page is too small", `Size: ${size} \n Margin: ${margin} \n Try adjusting the sizes or units.`
+      );
       console.error("Bindery: Cancelled pagination. Page is too small.");
       return;
     }

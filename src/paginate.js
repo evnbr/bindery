@@ -1,4 +1,4 @@
-import elementName from "./elementToString"
+import elToStr from "./utils/elementToString"
 import Page from "./Page/page";
 
 export default function(content, rules, done, DELAY) {
@@ -89,7 +89,7 @@ export default function(content, rules, done, DELAY) {
     if (newPage.hasOverflowed()) {
       let suspect = last(state.path)
       if (suspect) {
-        console.error(`Bindery: NextPage already overflowing, probably due to a style set on ${elementName(suspect)}. It may not fit on the page.`);
+        console.error(`Bindery: NextPage already overflowing, probably due to a style set on ${elToStr(suspect)}. It may not fit on the page.`);
         suspect.parentNode.removeChild(suspect);
       }
       else {
@@ -102,6 +102,8 @@ export default function(content, rules, done, DELAY) {
 
   let moveNodeToNextPage = (nodeToMove) => {
     // nodeToMove.style.outline = "1px solid red";
+
+    // TODO: This breaks example 3 but is required for example 2.
     // state.path.pop();
 
     let old = state.currentPage.creationOrder;
@@ -109,7 +111,7 @@ export default function(content, rules, done, DELAY) {
     state.currentPage = makeNextPage();
     // if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
 
-    // console.log(`moved "${ elementName(nodeToMove)}" from page ${old} to ${state.currentPage.creationOrder}`);
+    // console.log(`moved "${ elToStr(nodeToMove)}" from page ${old} to ${state.currentPage.creationOrder}`);
 
     last(state.path).appendChild(nodeToMove);
     state.path.push(nodeToMove);
@@ -234,13 +236,13 @@ export default function(content, rules, done, DELAY) {
           let abortCallback = () => {
             // let lastNode = last(state.path);
             // console.log("— last node in stack:")
-            // console.log(elementName(lastNode));
+            // console.log(elToStr(lastNode));
             // console.log("— proposed node to move:")
-            // console.log(elementName(node));
+            // console.log(elToStr(node));
             moveNodeToNextPage(node);
             addTextNode(child, addNextChild, abortCallback);
           }
-          // console.log(`Adding text child of "${elementName(node)}"`);
+          // console.log(`Adding text child of "${elToStr(node)}"`);
           // console.log(`Beginning to add "${child.nodeValue.substr(0,24)}"`);
           addTextNode(child, addNextChild, abortCallback);
           break;
@@ -298,7 +300,7 @@ let clonePath = (origPath) => {
     clone.innerHTML = '';
     clone.setAttribute("bindery-continuation", true);
     if (clone.id) {
-      console.warn(`Bindery: Added a break to ${elementName(clone)}, so "${clone.id}" is no longer a unique ID.`);
+      console.warn(`Bindery: Added a break to ${elToStr(clone)}, so "${clone.id}" is no longer a unique ID.`);
     }
     if (i < origPath.length - 1) clone.appendChild(newPath[i+1]);
     newPath[i] = clone;

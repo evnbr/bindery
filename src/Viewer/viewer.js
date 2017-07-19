@@ -1,13 +1,17 @@
 import css from "./viewer.css";
 
 import Page from "../Page/page";
+import errorView from "./error";
 import h from "hyperscript";
 
 class Viewer {
   constructor(opts) {
     this.pages = [];
+
     this.doubleSided = true;
     this.twoUp = false,
+
+    this.mode = "grid";
     this.currentLeaf = 0;
 
     this.export = h(".bindery-export");
@@ -18,11 +22,11 @@ class Viewer {
     if (!this.export.parentNode) {
       document.body.appendChild(this.export);
     }
-    this.export.appendChild(h(".bindery-error",
-      h(".bindery-error-title", title),
-      h(".bindery-error-text", text),
-      h(".bindery-error-footer", "Bindery.js v0.1 Alpha"),
-    ));
+    if (!this.error) {
+      this.export.innerHTML = "";
+      this.error = errorView(title, text);
+      this.export.appendChild(this.error);
+    }
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
@@ -119,11 +123,8 @@ class Viewer {
         let rightPage = right.element;
 
         let wrap = h(".bindery-print-page",
-          h(".bindery-print-wrapper", {
-            style: {
-              height: `${Page.H}px`,
-              width: `${Page.W * 2}px`,
-            }
+          h(".bindery-spread-wrapper", {
+            style: Page.spreadSizeStyle(),
           }, leftPage, rightPage)
         );
 
@@ -132,11 +133,8 @@ class Viewer {
       else {
         let pg = pages[i].element;
         let wrap = h(".bindery-print-page",
-          h(".bindery-print-wrapper", {
-            style: {
-              height: `${Page.H}px`,
-              width: `${Page.W}px`,
-            }
+          h(".bindery-spread-wrapper", {
+            style: Page.sizeStyle(),
           }, pg),
         );
         this.export.appendChild(wrap);
@@ -183,11 +181,8 @@ class Viewer {
         leftPage.setAttribute("bindery-side", "left");
         rightPage.setAttribute("bindery-side", "right");
 
-        let wrap = h(".bindery-print-wrapper", {
-            style: {
-              height: `${Page.H}px`,
-              width: `${Page.W * 2}px`,
-            }
+        let wrap = h(".bindery-spread-wrapper", {
+            style: Page.spreadSizeStyle(),
           }, leftPage, rightPage
         );
 
@@ -197,11 +192,8 @@ class Viewer {
         let pg = pages[i].element;
         pg.setAttribute("bindery-side", "right");
         let wrap = h(".bindery-print-page",
-          h(".bindery-print-wrapper", {
-            style: {
-              height: `${Page.H}px`,
-              width: `${Page.W}px`,
-            }
+          h(".bindery-spread-wrapper", {
+            style: Page.sizeStyle(),
           }, pg),
         );
         this.export.appendChild(wrap);
@@ -235,7 +227,7 @@ class Viewer {
       leafIndex++;
       let li = leafIndex;
       let flap = h("div.bindery-page3d", {
-        style: `height:${Page.H}px; width:${Page.W}px`,
+        style: Page.sizeStyle(),
         onclick: () => {
           let newLeaf = li - 1;
           if (newLeaf == this.currentLeaf) newLeaf++;
@@ -257,7 +249,9 @@ class Viewer {
         flap.appendChild(leftPage);
       }
       else {
-        leftPage = h(".bindery-page.bindery-page3d-back")
+        leftPage = h(".bindery-page.bindery-page3d-back", {
+          style: Page.sizeStyle(),
+        })
         flap.appendChild(leftPage);
       }
       // flap.style.zIndex = `${this.pages.length - i}`;
