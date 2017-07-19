@@ -6,21 +6,31 @@
 }
 
 html {
-  font-family: sans-serif;
+  font-family: Times, serif;
+  font-size: 16px;
+  line-height: 1.35;
 }
 
 .content, .intro {
-  font-family: Georgia;
-  font-size: 16px;
   margin: 20px auto;
   max-width: 900px;
   padding: 20px;
 }
 
-h2 {
-  font-size: 3em;
-  margin-bottom: 1rem;
+h1 {
+  font-size: 8rem;
+  line-height: 0.8;
+  word-break: break-all;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
+
+h2 {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 8rem;
+}
+
 
 h3 {
   font-size: 2em;
@@ -29,6 +39,10 @@ h3 {
 
 p {
   text-indent: 1rem;
+}
+
+h2 + p {
+  text-indent: 0;
 }
 
 sup {

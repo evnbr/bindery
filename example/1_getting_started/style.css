@@ -7,18 +7,18 @@
 
 html {
   font-family: sans-serif;
+  font-size: 16px;
 }
 
 .content, .intro {
   font-family: Georgia;
-  font-size: 16px;
   margin: 20px auto;
   max-width: 900px;
   padding: 20px;
 }
 
 h2 {
-  font-size: 3em;
+  font-size: 3rem;
   margin-bottom: 1rem;
 }
 

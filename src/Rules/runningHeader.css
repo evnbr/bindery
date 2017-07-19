@@ -7,17 +7,25 @@
 .bindery-running-header {
   position: absolute;
   text-align: center;
-  top: 20px;
-  left: 60px;
-  right: 60px;
+  top: 24px;
   margin: auto;
-  font-size: 0.66em;
+  font-size: 0.5em;
   -webkit-user-select: none;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-family: Verdana, sans-serif;
 }
 
 [bindery-side="left"] .bindery-running-header {
+  text-align: right;
+  left: 24px;
+  transform: rotateZ(-90deg) translate3d(-100%,0,0);
+  transform-origin: top left;
   /*right: 40px;*/
 }
 [bindery-side="right"] .bindery-running-header {
-  /*left: 40px;*/
+  text-align: left;
+  right: 24px;
+  transform: rotateZ(90deg) translate3d(100%,0,0);
+  transform-origin: top right;
 }
