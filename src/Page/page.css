@@ -89,11 +89,11 @@
   top: -20px;
   bottom: -20px;
 }
-[bindery-side="left"].bleed .bindery-flowbox {
+.bindery-left.bleed .bindery-flowbox {
   right: 0;
   left: -20px;
 }
-[bindery-side="right"].bleed .bindery-flowbox {
+.bindery-right.bleed .bindery-flowbox {
   left: 0;
   right: -20px;
 }
@@ -105,11 +105,11 @@
   bottom: -0.2in;
   z-index: 0;
 }
-[bindery-side="left"] .bindery-bleed {
+.bindery-left .bindery-bleed {
   right: 0;
   left: -0.2in;
 }
-[bindery-side="right"] .bindery-bleed {
+.bindery-right .bindery-bleed {
   left: 0;
   right: -0.2in;
 }

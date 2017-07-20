@@ -13,9 +13,9 @@
   font-size: 0.667rem;
 }
 
-[bindery-side="left"] .bindery-num {
+.bindery-left .bindery-num {
   left: 20px;
 }
-[bindery-side="right"] .bindery-num {
+.bindery-right .bindery-num {
   right: 20px;
 }

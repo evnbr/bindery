@@ -1,4 +1,4 @@
-.bindery-spread[bindery-side="left"] .bindery-content {
+.bindery-spread.bindery-left .bindery-content {
   /*width: 200%;*/
   position: absolute;
   top: 0;
@@ -6,7 +6,7 @@
   right: -100%;
   bottom: 0;
 }
-.bindery-spread[bindery-side="right"] .bindery-content {
+.bindery-spread.bindery-right .bindery-content {
   position: absolute;
   top: 0;
   left: -100%;

@@ -283,11 +283,20 @@ export default function(content, rules, done, DELAY) {
     let measureArea = document.querySelector(".bindery-measure-area");
     document.body.removeChild(measureArea);
 
-    let orderedPage = reorderPages(state.pages);
+    let orderedPages = reorderPages(state.pages);
 
-    afterBindRules(orderedPage);
+    // TODO: Pass in facingpages options
+    if (true) {
+      orderedPages.forEach((page, i) => {
+        page.setLeftRight((i % 2 == 0) ? "right" : "left")
+      });
+    }
+    else {
+      orderedPages.forEach((page) => { page.setLeftRight("right") });
+    }
+    afterBindRules(orderedPages);
 
-    done(orderedPage);
+    done(orderedPages);
   });
 }
 

@@ -57,6 +57,22 @@ class Page {
     return (box.height > 100) && (box.width > 100) // TODO: Number is arbitrary
   }
 
+  setLeftRight(dir) {
+    if (dir == "left") {
+      this.side = dir;
+      this.element.classList.remove("bindery-right");
+      this.element.classList.add("bindery-left");
+    }
+    else if (dir == "right") {
+      this.side = dir;
+      this.element.classList.remove("bindery-left");
+      this.element.classList.add("bindery-right");
+    }
+    else {
+      throw Error("Bindery: Setting page to invalid direction" + dir);
+    }
+  }
+
   setPreference(dir) {
     if (dir == "left") this.alwaysLeft = true;
     if (dir == "right") this.alwaysRight = true;
@@ -104,13 +120,13 @@ class Page {
     sheet.innerHTML = `
       .bindery-flowbox,
       .bindery-footer {
-        margin-left: ${margin.outer}${Page.unit};
-        margin-right: ${margin.inner}${Page.unit};
-      }
-      [bindery-side="right"] .bindery-flowbox,
-      [bindery-side="right"] .bindery-footer {
         margin-left: ${margin.inner}${Page.unit};
         margin-right: ${margin.outer}${Page.unit};
+      }
+      .bindery-left .bindery-flowbox,
+      .bindery-left .bindery-footer {
+        margin-left: ${margin.outer}${Page.unit};
+        margin-right: ${margin.inner}${Page.unit};
       }
       .bindery-flowbox { margin-top: ${margin.top}${Page.unit}; }
       .bindery-footer { margin-bottom: ${margin.bottom}${Page.unit}; }

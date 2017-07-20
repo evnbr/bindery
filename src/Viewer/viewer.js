@@ -17,6 +17,20 @@ class Viewer {
     this.export = h(".bindery-export");
     this.export.setAttribute("bindery-export", true);
 
+    // Automatically switch into print mode
+    if (window.matchMedia) {
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener((mql) => {
+            if (mql.matches) {
+              this.setPrint();
+            }
+            else {
+              // after print
+            }
+        });
+    }
+
+
   }
   displayError(title, text) {
     if (!this.export.parentNode) {
@@ -84,8 +98,6 @@ class Viewer {
 
     document.body.classList.add("bindery-viewing");
 
-    this.setLeftRight()
-
     if      (this.mode == "grid")        { this.renderGrid(); }
     else if (this.mode == "interactive") { this.renderInteractive(); }
     else if (this.mode == "print")       { this.renderPrint(); }
@@ -143,23 +155,6 @@ class Viewer {
       }
     }
 
-  }
-
-  // TODO: this should happen before we get to viewer.
-  setLeftRight() {
-    if (this.doubleSided) {
-      this.pages.forEach((page, i) => {
-        page.element.setAttribute(
-          "bindery-side",
-          (i % 2 == 0) ? "right" : "left"
-        );
-      });
-    }
-    else {
-      this.pages.forEach((page, i) => {
-        page.element.setAttribute("bindery-side", "right");
-      });
-    }
   }
 
   renderGrid() {

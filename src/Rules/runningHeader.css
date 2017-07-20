@@ -16,14 +16,14 @@
   font-family: Verdana, sans-serif;
 }
 
-[bindery-side="left"] .bindery-running-header {
+.bindery-left .bindery-running-header {
   text-align: right;
   left: 24px;
   transform: rotateZ(-90deg) translate3d(-100%,0,0);
   transform-origin: top left;
   /*right: 40px;*/
 }
-[bindery-side="right"] .bindery-running-header {
+.bindery-right .bindery-running-header {
   text-align: left;
   right: 24px;
   transform: rotateZ(90deg) translate3d(100%,0,0);
