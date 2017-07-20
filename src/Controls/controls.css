@@ -97,6 +97,10 @@
   background: rgba(0,0,0,0.06);
 }
 
+.bindery-inProgress .bindery-btn {
+  opacity: 0.2;
+  pointer-events: none;
+}
 
 .bindery-label {
   font-size: 11px;

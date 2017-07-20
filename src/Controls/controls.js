@@ -245,6 +245,10 @@ class Controls {
       forceRefresh.style.display = "none";
     }
 
+    this.updateProgress = (count) => {
+      header.innerText = `${count} Pages`;
+    }
+
     this.setDone = () => {
       header.innerText = `${this.binder.viewer.pages.length} Pages`;
       inProgress.style.display = "none";

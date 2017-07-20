@@ -1,7 +1,13 @@
 import elToStr from "./utils/elementToString"
 import Page from "./Page/page";
 
-export default function(content, rules, done, DELAY) {
+export default function(
+  content,
+  rules,
+  paginateDoneCallback,
+  paginateProgressCallback,
+  paginateErrorCallback,
+  DELAY) {
 
   let state = {
     path: [], // Stack representing which element we're currently inside
@@ -120,6 +126,8 @@ export default function(content, rules, done, DELAY) {
         console.error(`Bindery: NextPage already overflowing.`);
       }
     }
+
+    paginateProgressCallback(state.pages.length);
 
     return newPage;
   };
@@ -320,7 +328,7 @@ export default function(content, rules, done, DELAY) {
     }
     afterBindRules(orderedPages);
 
-    done(orderedPages);
+    paginateDoneCallback(orderedPages);
   });
 }
 

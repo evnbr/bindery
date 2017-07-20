@@ -942,8 +942,9 @@ var Binder = function () {
 
       this.controls.setInProgress();
 
-      (0, _paginate2.default)(content, this.rules, function (pages) {
-
+      (0, _paginate2.default)(content, this.rules,
+      // Done
+      function (pages) {
         setTimeout(function () {
           _this3.viewer.pages = pages, _this3.viewer.update();
 
@@ -952,7 +953,13 @@ var Binder = function () {
           document.body.classList.remove("bindery-inProgress");
           _this3.startCheckingLayout();
         }, 100);
-      }, this.debugDelay);
+      },
+      // Progress
+      function (pageCount) {
+        _this3.controls.updateProgress(pageCount);
+      },
+      // Error
+      function (error) {}, this.debugDelay);
     }
   }, {
     key: "startCheckingLayout",
@@ -1038,7 +1045,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-exports.default = function (content, rules, done, DELAY) {
+exports.default = function (content, rules, paginateDoneCallback, paginateProgressCallback, paginateErrorCallback, DELAY) {
 
   var state = {
     path: [], // Stack representing which element we're currently inside
@@ -1127,8 +1134,7 @@ exports.default = function (content, rules, done, DELAY) {
     }
     if (state.pages.length == 500) {
       console.warn("Bindery: More than 500 pages, performance may be slow.");
-    }
-    if (state.pages.length == 1000) {
+    } else if (state.pages.length == 1000) {
       console.warn("Bindery: More than 1000 pages, performance may be slow.");
     }
 
@@ -1154,6 +1160,8 @@ exports.default = function (content, rules, done, DELAY) {
         console.error("Bindery: NextPage already overflowing.");
       }
     }
+
+    paginateProgressCallback(state.pages.length);
 
     return newPage;
   };
@@ -1353,7 +1361,7 @@ exports.default = function (content, rules, done, DELAY) {
     }
     afterBindRules(orderedPages);
 
-    done(orderedPages);
+    paginateDoneCallback(orderedPages);
   });
 };
 
@@ -2447,6 +2455,10 @@ var Controls = function Controls(opts) {
     forceRefresh.style.display = "none";
   };
 
+  this.updateProgress = function (count) {
+    header.innerText = count + " Pages";
+  };
+
   this.setDone = function () {
     header.innerText = _this.binder.viewer.pages.length + " Pages";
     inProgress.style.display = "none";
@@ -2544,7 +2556,7 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls {\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.3s;\n  overflow: scroll;\n  padding-bottom: 100px;\n}\n\n.bindery-inProgress .bindery-controls {\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 0 0 16px 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n.bindery-btn-mini {\n  color: #aaa;\n  background: transparent;\n  padding: 6px 8px;\n  margin: -6px -8px;\n  font: inherit;\n}\n.bindery-btn-mini:hover {\n  color: #aaa;\n  background: rgba(0,0,0,0.06);\n}\n\n\n.bindery-label {\n  font-size: 11px;\n  text-transform: uppercase;\n  color: #aaa;\n  letter-spacing: 0.04em;\n  padding: 16px 20px;\n  border-top: 1px solid #ddd;\n}\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  background: white;\n  z-index: 99;\n  width: 240px;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 64px;\n  width: 33%;\n  display: inline-block;\n  text-align: center;\n  font-size: 12px;\n  color: #aaa;\n  cursor: pointer;\n}\n.bindery-viewmode .icon {\n  height: 36px;\n  width: 36px;\n  background: currentColor;\n  margin: 0 auto 8px;\n}\n.bindery-viewmode:hover {\n  color: black;\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(24) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.interactive .icon {\n  -webkit-mask: url(" + __webpack_require__(25) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(26) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 0 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 0 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 20px;\n  left: 20px;\n  right: 20px;\n  bottom: 20px;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.top:hover ~ .preview {\n  border-color: #eee;\n  border-top-color: #a9a9ff;\n}\n.bottom:hover ~ .preview {\n  border-color: #eee;\n  border-bottom-color: #a9a9ff;\n}\n.inner:hover ~ .preview {\n  border-color: #eee;\n  border-left-color: #a9a9ff;\n}\n.outer:hover ~ .preview {\n  border-color: #eee;\n  border-right-color: #a9a9ff;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 0;\n  margin-right: -5px;\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  /*background: none !important;*/\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 54px;\n  height: 24px;\n  z-index: 5;\n  background: white;\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: -2px;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: -2px;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls {\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.3s;\n  overflow: scroll;\n  padding-bottom: 100px;\n}\n\n.bindery-inProgress .bindery-controls {\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 0 0 16px 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n.bindery-btn-mini {\n  color: #aaa;\n  background: transparent;\n  padding: 6px 8px;\n  margin: -6px -8px;\n  font: inherit;\n}\n.bindery-btn-mini:hover {\n  color: #aaa;\n  background: rgba(0,0,0,0.06);\n}\n\n.bindery-inProgress .bindery-btn {\n  opacity: 0.2;\n  pointer-events: none;\n}\n\n.bindery-label {\n  font-size: 11px;\n  text-transform: uppercase;\n  color: #aaa;\n  letter-spacing: 0.04em;\n  padding: 16px 20px;\n  border-top: 1px solid #ddd;\n}\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  background: white;\n  z-index: 99;\n  width: 240px;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 64px;\n  width: 33%;\n  display: inline-block;\n  text-align: center;\n  font-size: 12px;\n  color: #aaa;\n  cursor: pointer;\n}\n.bindery-viewmode .icon {\n  height: 36px;\n  width: 36px;\n  background: currentColor;\n  margin: 0 auto 8px;\n}\n.bindery-viewmode:hover {\n  color: black;\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(24) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.interactive .icon {\n  -webkit-mask: url(" + __webpack_require__(25) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(26) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 0 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 0 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  content: \"\";\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 20px;\n  left: 20px;\n  right: 20px;\n  bottom: 20px;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.top:hover ~ .preview {\n  border-color: #eee;\n  border-top-color: #a9a9ff;\n}\n.bottom:hover ~ .preview {\n  border-color: #eee;\n  border-bottom-color: #a9a9ff;\n}\n.inner:hover ~ .preview {\n  border-color: #eee;\n  border-left-color: #a9a9ff;\n}\n.outer:hover ~ .preview {\n  border-color: #eee;\n  border-right-color: #a9a9ff;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 0;\n  margin-right: -5px;\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  /*background: none !important;*/\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 54px;\n  height: 24px;\n  z-index: 5;\n  background: white;\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: -2px;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: -2px;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
 
 // exports
 

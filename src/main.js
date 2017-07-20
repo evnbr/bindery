@@ -181,22 +181,32 @@ class Binder {
 
     this.controls.setInProgress();
 
-    paginate(content, this.rules, (pages) => {
+    paginate(
+      content,
+      this.rules,
+      // Done
+      (pages) => {
+        setTimeout(() => {
+          this.viewer.pages = pages,
+          this.viewer.update();
 
-      setTimeout(() => {
-        this.viewer.pages = pages,
-        this.viewer.update();
+          this.controls.setDone();
+          if (doneBinding) doneBinding();
+          document.body.classList.remove("bindery-inProgress");
+          this.startCheckingLayout()
 
-        this.controls.setDone();
-        if (doneBinding) doneBinding();
-        document.body.classList.remove("bindery-inProgress");
-        this.startCheckingLayout()
+        }, 100);
+      },
+      // Progress
+      (pageCount) => {
+        this.controls.updateProgress(pageCount);
+      },
+      // Error
+      (error) => {
 
-      }, 100);
-
-
-
-    }, this.debugDelay);
+      },
+      this.debugDelay
+    );
   }
 
   startCheckingLayout() {
