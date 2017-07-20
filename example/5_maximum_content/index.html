@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>My Website - Book</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<link rel="stylesheet" type="text/css" href="book.css" />
+</head>
+
+<body>
+
+	<script type="text/javascript" src="../../build/bindery.js"></script>
+	<script>
+			let binder = new Bindery({
+			  source: {
+					url: 'content.html',
+					selector: ".content",
+				},
+				debugDelay: 0,
+				standalone: true,
+				pageMargin: { top: 0.2, inner: 0.2, outer: 0.6, bottom: 0.4 },
+			  rules: [
+					Bindery.BreakBefore({ selector: "h1" }),
+					Bindery.BreakBefore({ selector: "h2" }),
+					Bindery.Footnote({
+						selector: "p > a",
+						customContent: (elmt, number) => {
+							let url = elmt.href.replace("https://", "");
+							return `${number}: <a href='#'>${url}</a>`
+						}
+					}),
+					Bindery.Spread({ selector: ".big-figure" }),
+					Bindery.RunningHeader({ selector: "h2" }),
+					Bindery.PageNumber(),
+					Bindery.PageReference({
+						selector: ".toc a",
+						updateReference: (element, number) => {
+							element.insertAdjacentHTML(
+								"afterend",
+								`<i style="float:right;">${number}</i>`
+							);
+						}
+					}),
+			  ],
+			});
+
+	</script>
+</body>
+</html>

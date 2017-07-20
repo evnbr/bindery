@@ -29,18 +29,17 @@
 
 		let foreedgeRule = Bindery.createRule({
 			afterBind: function(page, pageIndex, pageCount) {
-				let pct = pageIndex / pageCount;
 				let edgePaint = document.createElement("div");
-				if (pageIndex % 2 == 0) {
+				if (page.side == "right") {
 					edgePaint.style.background = "url('img/forward.svg') no-repeat";
 					edgePaint.style.right = "-10px";
 				}
-				else {
+				else if (page.side == "left") {
 					edgePaint.style.background = "url('img/back.svg') no-repeat";
 					edgePaint.style.left = "-10px";
 				}
 				Object.assign(edgePaint.style, {
-					backgroundPosition: (pct * 100) + "% 0",
+					backgroundPosition: ((pageIndex / pageCount) * 100) + "% 0",
 					backgroundSize: "cover",
 					width: "12px",
 					position: "absolute",

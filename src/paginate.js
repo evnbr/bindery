@@ -11,9 +11,28 @@ export default function(content, rules, done, DELAY) {
     }
   }
 
+
+  // Even when there is no debugDelay,
+  // the throttler will occassionally use rAF
+  // to prevent the call stack from getting too big.
+  //
+  // There might be a better way to do this.
+  let MAX_CALLS = 1000;
+  let numberOfCalls = 0;
   let throttle = (func) => {
-    if (DELAY > 0) setTimeout(func, DELAY);
-    else func();
+    if (DELAY > 0) {
+      setTimeout(func, DELAY);
+    }
+    else {
+      if (numberOfCalls < MAX_CALLS) {
+        numberOfCalls++;
+        func();
+      }
+      else {
+        numberOfCalls = 0;
+        window.requestAnimationFrame(func);
+      }
+    }
   }
 
   let beforeAddRules = (elmt) => {
@@ -71,7 +90,10 @@ export default function(content, rules, done, DELAY) {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
       console.error("Bindery: Moved to new page when last one is still overflowing", state.currentPage.element);
     }
-
+    if (state.pages.length > 100) {
+      console.error("Bindery: too many");
+      // throw Error("Bindery: too many");
+    }
 
     state.path = clonePath(state.path);
     let newPage = new Page();
