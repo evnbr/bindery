@@ -204,7 +204,7 @@ class Controls {
     const header = h("div", { style : {
       "padding": "20px",
       "font-size": "20px"
-    }}, "24 Pages");
+    }}, "Bindery");
 
     const updateLayoutPreview = (newSize, newMargin) => {
       const BASE = 80;
@@ -239,6 +239,7 @@ class Controls {
     updateLayoutPreview(this.binder.pageSize, this.binder.pageMargin);
 
     this.setInProgress = () => {
+      header.innerText = `Paginating...`;
       validCheck.style.display = "none";
       inProgress.style.display = "block";
       forceRefresh.style.display = "none";
