@@ -88,11 +88,13 @@ export default function(content, rules, done, DELAY) {
   // we were in when we overflowed the last page
   let makeNextPage = () => {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
-      console.error("Bindery: Moved to new page when last one is still overflowing", state.currentPage.element);
+      console.warn("Bindery: Moved to new page when last one is still overflowing", state.currentPage.element);
     }
-    if (state.pages.length > 100) {
-      console.error("Bindery: too many");
-      // throw Error("Bindery: too many");
+    if (state.pages.length == 500) {
+      console.warn("Bindery: More than 500 pages, performance may be slow.");
+    }
+    else if (state.pages.length == 1000) {
+      console.warn("Bindery: More than 1000 pages, performance may be slow.");
     }
 
     state.path = clonePath(state.path);

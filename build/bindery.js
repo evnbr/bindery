@@ -1123,11 +1123,13 @@ exports.default = function (content, rules, done, DELAY) {
   // we were in when we overflowed the last page
   var makeNextPage = function makeNextPage() {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
-      console.error("Bindery: Moved to new page when last one is still overflowing", state.currentPage.element);
+      console.warn("Bindery: Moved to new page when last one is still overflowing", state.currentPage.element);
     }
-    if (state.pages.length > 100) {
-      console.error("Bindery: too many");
-      // throw Error("Bindery: too many");
+    if (state.pages.length == 500) {
+      console.warn("Bindery: More than 500 pages, performance may be slow.");
+    }
+    if (state.pages.length == 1000) {
+      console.warn("Bindery: More than 1000 pages, performance may be slow.");
     }
 
     state.path = clonePath(state.path);
@@ -2404,7 +2406,7 @@ var Controls = function Controls(opts) {
   var header = (0, _hyperscript2.default)("div", { style: {
       "padding": "20px",
       "font-size": "20px"
-    } }, "24 Pages");
+    } }, "Bindery");
 
   var updateLayoutPreview = function updateLayoutPreview(newSize, newMargin) {
     var BASE = 80;
