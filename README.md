@@ -4,18 +4,6 @@
 
 bindery.js is a library for producing book layouts in the browser. The core library allows your HTML to flow over multiple pages, and provides an interface to preview and configure the resulting book. Bindery includes plugins that can express numbering, running headers, spreads, footnotes, tables of contents, and more. With just a couple lines of code, you can [convert URLs to footnotes](https://github.com/evnbr/bindery/tree/master/example), [generate fore-edge printing](https://github.com/evnbr/bindery/tree/master/example), [dynamic font sizes](https://github.com/evnbr/bindery/tree/master/example), [convert a video into a flipbook](https://github.com/evnbr/bindery/tree/master/example), and more.
 
-#### Background
-
-bindery.js was originally written in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
-a publication from participants in "HTML Output" at RISD. It consisted mostly of a series of hacks written in jQuery on top of [Remy Francois's CSS
-Regions polyfill](https://github.com/FremyCompany/css-regions-polyfill), but it was enough
-to publish a book without touching inDesign.
-
-In 2016, [Catherine Leigh Schmidt](http://cath.land) and [Lukas WinklerPrins](http://ltwp.net) adapted the code into an easy-to-use [Jekyll](https://jekyllrb.com/) theme for
-the Design Office, under the name [Baby Bindery](https://github.com/thedesignoffice/babybindery).
-
-As of February 2017, it is in the process of being rewritten as a usable, modular library (and without a dependency on jQuery or a polyfill for the [much-maligned CSS Regions spec](https://alistapart.com/blog/post/css-regions-considered-harmful)).
-
 ## Getting started
 
 ```html
@@ -49,21 +37,22 @@ As of February 2017, it is in the process of being rewritten as a usable, modula
   - If the content is on the same page, use a CSS selector. You can also use a reference to the node.
   - If the content must be fetched from a remote page, pass an object in the form of { url, selector}.
 ```js
-// Selector
+// CSS selector
 let binder = new Bindery({
   source: '#content',
 });
 
-// Node
+// Node reference
 let binder = new Bindery({
   source: document.getElementByID('content'),
 });
 
-// Fetch
+// Fetch from a URL
 let binder = new Bindery({
   source: {
     selector: '#content',
-    url: '/posts.html'
+    url: '/posts.html',
+  }
 });
 ```
 
@@ -136,3 +125,10 @@ The goal of bindery.js is to provide an approachable jumping-off point for HTML-
 - [ ] Wrapper for use with React.
 - [ ] Approachable API for writing custom rules
 - [ ] Documentation!
+
+#### Background
+
+bindery.js was originally written in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
+a publication from participants in "HTML Output" at RISD. It was based on the [now-abandoned](https://alistapart.com/blog/post/css-regions-considered-harmful) CSS Regions spec, [polyfill by Remy Francois](https://github.com/FremyCompany/css-regions-polyfill). With thanks to the contributions and feedback from [Catherine Leigh Schmidt](http://cath.land), [Lukas WinklerPrins](http://ltwp.net), and [John Caserta](http://johncaserta.com/).
+
+
