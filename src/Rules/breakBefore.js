@@ -1,18 +1,18 @@
-import BinderyRule from "./BinderyRule";
+import BinderyRule from './BinderyRule';
 
 class BreakBefore extends BinderyRule {
   constructor(options) {
-    options.name = "Break Before";
-    super(options)
+    options.name = 'Break Before';
+    super(options);
   }
   beforeAdd(elmt, state) {
-    if (state.currentPage.flowContent.innerText !== "") {
+    if (state.currentPage.flowContent.innerText !== '') {
       state.currentPage = state.getNewPage();
-      state.currentPage.setPreference("right");
+      state.currentPage.setPreference('right');
     }
   }
 }
 
-export default function(userOptions) {
+export default function (userOptions) {
   return new BreakBefore(userOptions);
 }

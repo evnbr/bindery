@@ -83,6 +83,10 @@
   }
 }
 
+@page {
+  size: portrait; /* landscape and portrait keywords work here */
+  margin: 0;
+}
 
 @media print {
   /* Don't print anything that hasn't been exported. This hides extra controls/ */

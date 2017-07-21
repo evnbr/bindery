@@ -1,10 +1,11 @@
-import BinderyRule from "./BinderyRule"
+import BinderyRule from './BinderyRule';
 
-let prevPage, prevElementPath;
+let prevPage;
+let prevElementPath;
 
 class FullPage extends BinderyRule {
   constructor(options) {
-    options.name = "Full Page Spread"
+    options.name = 'Full Page Spread';
     super(options);
   }
   beforeAdd(elmt, state) {
@@ -12,11 +13,11 @@ class FullPage extends BinderyRule {
     prevElementPath = state.path;
     state.currentPage = state.getNewPage();
 
-    //TODO: Rather than just add padding,
+    // TODO: Rather than just add padding,
     // put full-bleed content on a separate
     // out-of-flow background layer
-    if (elmt.classList.contains("bleed")) {
-      state.currentPage.element.classList.add("bleed");
+    if (elmt.classList.contains('bleed')) {
+      state.currentPage.element.classList.add('bleed');
     }
   }
   afterAdd(elmt, state) {
@@ -25,6 +26,6 @@ class FullPage extends BinderyRule {
   }
 }
 
-export default function(userOptions) {
+export default function (userOptions) {
   return new FullPage(userOptions);
 }
