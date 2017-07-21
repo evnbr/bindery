@@ -1,6 +1,6 @@
-import css from './spread.css';
 import BinderyRule from './BinderyRule';
 
+require('./spread.css');
 
 class Spread extends BinderyRule {
   constructor(options) {
@@ -10,16 +10,16 @@ class Spread extends BinderyRule {
     this.prevPage = null;
     this.prevElementPath = null;
   }
-  beforeAdd(elmt, state) {
+  beforeAdd(elmt, state, requestNewPage) {
     this.prevPage = state.currentPage;
     this.prevElementPath = state.path;
 
-    state.currentPage = state.getNewPage();
+    requestNewPage();
   }
-  afterAdd(elmt, state) {
+  afterAdd(elmt, state, requestNewPage) {
     const leftPage = state.currentPage;
     const dupedContent = leftPage.flowContent.cloneNode(true);
-    const rightPage = state.getNewPage();
+    const rightPage = requestNewPage();
     rightPage.flowBox.innerHTML = '';
     rightPage.flowBox.appendChild(dupedContent);
     rightPage.flowContent = dupedContent;

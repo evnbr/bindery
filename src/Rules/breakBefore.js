@@ -5,10 +5,10 @@ class BreakBefore extends BinderyRule {
     options.name = 'Break Before';
     super(options);
   }
-  beforeAdd(elmt, state) {
+  beforeAdd(elmt, state, requestNewPage) {
     if (state.currentPage.flowContent.innerText !== '') {
-      state.currentPage = state.getNewPage();
-      state.currentPage.setPreference('right');
+      const newPage = requestNewPage();
+      newPage.setPreference('right');
     }
   }
 }

@@ -244,6 +244,7 @@ class Viewer {
       this.export.classList.add('bindery-stage3d');
       this.flaps.push(flap);
 
+
       const rightPage = pages[i].element;
       let leftPage;
       rightPage.classList.add('bindery-page3d-front');
@@ -259,9 +260,20 @@ class Viewer {
         });
         flap.appendChild(leftPage);
       }
-      // flap.style.zIndex = `${this.pages.length - i}`;
-      // flap.style.top = `${i * 4}px`;
-      flap.style.left = `${i * 4}px`;
+      // TODO: Dynamically add/remove pages.
+      // Putting 1000s of elements onscreen
+      // locks up the browser.
+      // if (i > 200) {
+      //   rightPage.style.display = 'none';
+      //   leftPage.style.display = 'none';
+      //   flap.style.background = '#ddd';
+      // }
+
+
+      let leftOffset = 4;
+      if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
+
+      flap.style.left = `${i * leftOffset}px`;
 
       this.export.appendChild(flap);
     }
@@ -273,10 +285,13 @@ class Viewer {
   }
   setLeaf(n) {
     this.currentLeaf = n;
-    this.flaps.forEach((flap, i) => {
-      const z = this.flaps.length - Math.abs((i - n) + 0.5);
+    let zScale = 4;
+    if (this.flaps.length * zScale > 200) zScale = 200 / this.flaps.length;
+
+    this.flaps.forEach((flap, i, arr) => {
       // + 0.5 so left and right are even
-      flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${z * 4}px) rotateY(${(i < n) ? -180 : 0}deg)`;
+      const z = (arr.length - Math.abs((i - n) + 0.5)) * zScale;
+      flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${z}px) rotateY(${(i < n) ? -180 : 0}deg)`;
     });
   }
   // makeDraggable(flap) {

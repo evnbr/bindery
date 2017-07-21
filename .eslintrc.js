@@ -13,6 +13,8 @@ module.exports = {
     semi: ['error', 'always'],
     'no-unused-vars': ['warn'],
     'no-console': 0,
-    'func-names': ['error', 'as-needed']
+    'class-methods-use-this': 0,
+    'func-names': ['error', 'as-needed'],
+    'no-param-reassign': ['error', { 'props': false }]
   },
 };

@@ -77,16 +77,19 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var BinderyRule = function BinderyRule(options) {
+var BinderyRule = function BinderyRule() {
+  var _this = this;
+
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
   _classCallCheck(this, BinderyRule);
 
-  options = options || {};
   this.name = options.name ? options.name : 'Unnamed Bindery Rule';
   this.selector = '';
 
-  for (var key in options) {
-    this[key] = options[key];
-  }
+  Object.keys(options).forEach(function (key) {
+    _this[key] = options[key];
+  });
 };
 
 exports.default = BinderyRule;
@@ -767,12 +770,12 @@ var DEFAULT_PAGE_MARGIN = {
   bottom: 0.2,
   top: 0.2
 };
-var DEFAULT_BLEED = {
-  inner: 0,
-  outer: 0.2,
-  bottom: 0.2,
-  top: 0.2
-};
+// const DEFAULT_BLEED = {
+//   inner: 0,
+//   outer: 0.2,
+//   bottom: 0.2,
+//   top: 0.2,
+// };
 
 var arraysEqual = function arraysEqual(a, b) {
   if (a.length !== b.length) {
@@ -834,6 +837,7 @@ var Binder = function () {
         } else if (response.status === 200) {
           return response.text();
         }
+        return '';
       }).then(function (fetchedContent) {
         var wrapper = document.createElement('div');
         wrapper.innerHTML = fetchedContent;
@@ -1041,15 +1045,76 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-exports.default = function (content, rules, paginateDoneCallback, paginateProgressCallback, paginateErrorCallback, DELAY) {
+var _elementToString = __webpack_require__(7);
+
+var _elementToString2 = _interopRequireDefault(_elementToString);
+
+var _page = __webpack_require__(4);
+
+var _page2 = _interopRequireDefault(_page);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var last = function last(arr) {
+  return arr[arr.length - 1];
+};
+
+// TODO: only do this if not double sided?
+var reorderPages = function reorderPages(pages) {
+  var orderedPages = pages;
+
+  // TODO: this ignores the cover page, assuming its on the right
+  for (var i = 1; i < orderedPages.length - 1; i += 2) {
+    var left = orderedPages[i];
+
+    // TODO: Check more than once
+    if (left.alwaysRight) {
+      if (left.outOfFlow) {
+        orderedPages[i] = pages[i + 1];
+        orderedPages[i + 1] = left;
+      } else {
+        pages.splice(i, 0, new _page2.default());
+      }
+    }
+
+    var right = orderedPages[i + 1];
+
+    if (right.alwaysLeft) {
+      if (right.outOfFlow) {
+        // TODO: don't overflow, assumes that
+        // there are not multiple spreads in a row
+        orderedPages[i + 1] = pages[i + 3];
+        orderedPages[i + 3] = right;
+      } else {
+        pages.splice(i + 1, 0, new _page2.default());
+      }
+    }
+  }
+
+  return orderedPages;
+};
+
+var clonePath = function clonePath(origPath) {
+  var newPath = [];
+  for (var i = origPath.length - 1; i >= 0; i -= 1) {
+    var clone = origPath[i].cloneNode(false); // shallow
+    clone.innerHTML = '';
+    clone.setAttribute('bindery-continuation', true);
+    if (clone.id) {
+      console.warn('Bindery: Added a break to ' + (0, _elementToString2.default)(clone) + ', so "' + clone.id + '" is no longer a unique ID.');
+    }
+    if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
+    newPath[i] = clone;
+  }
+  return newPath;
+};
+
+var paginate = function paginate(content, rules, paginateDoneCallback, paginateProgressCallback, paginateErrorCallback, DELAY) {
   var state = {
     path: [], // Stack representing which element we're currently inside
-    pages: [],
-    getNewPage: function getNewPage() {
-      return (// Gross hack to allow rules to advance to next page
-        makeNextPage()
-      );
-    }
+    pages: []
   };
 
   // Even when there is no debugDelay,
@@ -1071,53 +1136,11 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
     }
   };
 
-  var beforeAddRules = function beforeAddRules(elmt) {
-    rules.forEach(function (rule) {
-      if (!rule.selector) return;
-      if (elmt.matches(rule.selector) && rule.beforeAdd) {
-        var backupPg = state.currentPage.clone();
-        var backupElmt = elmt.cloneNode(true);
-        rule.beforeAdd(elmt, state);
-
-        if (state.currentPage.hasOverflowed()) {
-          console.log('restoring from backup');
-          // restore from backup
-          elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
-
-          var idx = state.pages.indexOf(state.currentPage);
-          state.pages[idx] = backupPg;
-          state.currentPage = backupPg;
-
-          state.currentPage = makeNextPage();
-
-          rule.beforeAdd(elmt, state);
-        }
-      }
-    });
-  };
-  var afterAddRules = function afterAddRules(elmt) {
-    rules.forEach(function (rule) {
-      if (!rule.selector) return;
-      if (elmt.matches(rule.selector) && rule.afterAdd) {
-        rule.afterAdd(elmt, state);
-      }
-    });
-  };
   var newPageRules = function newPageRules(pg) {
     rules.forEach(function (rule) {
       if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
     });
   };
-  var afterBindRules = function afterBindRules(pages) {
-    rules.forEach(function (rule) {
-      if (rule.afterBind) {
-        pages.forEach(function (pg, i, arr) {
-          rule.afterBind(pg, i, arr.length);
-        });
-      }
-    });
-  };
-
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   var makeNextPage = function makeNextPage() {
@@ -1141,8 +1164,6 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
     }
 
     // make sure the cloned page is valid.
-    // this catches elements with an explicitly set height greater than the
-    // flow area, which will never be split and cause an infinite loop
     if (newPage.hasOverflowed()) {
       var suspect = last(state.path);
       if (suspect) {
@@ -1158,6 +1179,48 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
     return newPage;
   };
 
+  var beforeAddRules = function beforeAddRules(elmt) {
+    rules.forEach(function (rule) {
+      if (!rule.selector) return;
+      if (elmt.matches(rule.selector) && rule.beforeAdd) {
+        var backupPg = state.currentPage.clone();
+        var backupElmt = elmt.cloneNode(true);
+        rule.beforeAdd(elmt, state, makeNextPage);
+
+        if (state.currentPage.hasOverflowed()) {
+          console.log('restoring from backup');
+          // restore from backup
+          elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
+
+          var idx = state.pages.indexOf(state.currentPage);
+          state.pages[idx] = backupPg;
+          state.currentPage = backupPg;
+
+          state.currentPage = makeNextPage();
+
+          rule.beforeAdd(elmt, state, makeNextPage);
+        }
+      }
+    });
+  };
+  var afterAddRules = function afterAddRules(elmt) {
+    rules.forEach(function (rule) {
+      if (!rule.selector) return;
+      if (elmt.matches(rule.selector) && rule.afterAdd) {
+        rule.afterAdd(elmt, state, makeNextPage);
+      }
+    });
+  };
+  var afterBindRules = function afterBindRules(pages) {
+    rules.forEach(function (rule) {
+      if (rule.afterBind) {
+        pages.forEach(function (pg, i, arr) {
+          rule.afterBind(pg, i, arr.length);
+        });
+      }
+    });
+  };
+
   var moveNodeToNextPage = function moveNodeToNextPage(nodeToMove) {
     // nodeToMove.style.outline = "1px solid red";
 
@@ -1169,7 +1232,8 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
     state.currentPage = makeNextPage();
     // if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
 
-    // console.log(`moved "${ elToStr(nodeToMove)}" from page ${old} to ${state.currentPage.creationOrder}`);
+    // console.log(`moved "${ elToStr(nodeToMove)}" from page ${old}
+    // to ${state.currentPage.creationOrder}`);
 
     last(state.path).appendChild(nodeToMove);
     state.path.push(nodeToMove);
@@ -1177,10 +1241,10 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
 
   // Adds an text node by binary searching amount of
   // words until it just barely doesnt overflow
-  var addTextNode = function addTextNode(textNode, doneCallback, abortCallback) {
-    last(state.path).appendChild(textNode);
-
+  var addTextNode = function addTextNode(originalNode, doneCallback, abortCallback) {
+    var textNode = originalNode;
     var origText = textNode.nodeValue;
+    last(state.path).appendChild(textNode);
 
     var lastPos = 0;
     var pos = origText.length / 2;
@@ -1198,7 +1262,7 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
         // Is done
         // Back out to word boundary
         while (origText.charAt(pos) !== ' ' && pos > -1) {
-          pos--;
+          pos -= 1;
         }if (pos < 1 && origText.trim().length > 0) {
           // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}..."`);
           textNode.nodeValue = origText;
@@ -1260,7 +1324,7 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
     }
 
     // Add this node to the current page or context
-    if (state.path.length == 0) {
+    if (state.path.length === 0) {
       state.currentPage.flowContent.appendChild(node);
     } else {
       last(state.path).appendChild(node);
@@ -1284,22 +1348,24 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
 
       switch (child.nodeType) {
         case Node.TEXT_NODE:
-          var abortCallback = function abortCallback() {
-            // let lastNode = last(state.path);
-            // console.log("— last node in stack:")
-            // console.log(elToStr(lastNode));
-            // console.log("— proposed node to move:")
-            // console.log(elToStr(node));
-            moveNodeToNextPage(node);
+          {
+            var abortCallback = function abortCallback() {
+              // let lastNode = last(state.path);
+              // console.log("— last node in stack:")
+              // console.log(elToStr(lastNode));
+              // console.log("— proposed node to move:")
+              // console.log(elToStr(node));
+              moveNodeToNextPage(node);
+              addTextNode(child, addNextChild, abortCallback);
+            };
+            // console.log(`Adding text child of "${elToStr(node)}"`);
+            // console.log(`Beginning to add "${child.nodeValue.substr(0,24)}"`);
             addTextNode(child, addNextChild, abortCallback);
-          };
-          // console.log(`Adding text child of "${elToStr(node)}"`);
-          // console.log(`Beginning to add "${child.nodeValue.substr(0,24)}"`);
-          addTextNode(child, addNextChild, abortCallback);
-          break;
+            break;
+          }
         case Node.ELEMENT_NODE:
           {
-            if (child.tagName == 'SCRIPT') {
+            if (child.tagName === 'SCRIPT') {
               addNextChild(); // skip
               break;
             }
@@ -1310,7 +1376,8 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
               addElementNode(child, function () {
                 var addedChild = state.path.pop(); // WHYY
                 // let addedChild = last(state.path);
-                afterAddRules(addedChild); // TODO: AfterAdd rules may want to access original child, not split second half
+                // TODO: AfterAdd rules may want to access original child, not split second half
+                afterAddRules(addedChild);
                 addNextChild();
               });
             });
@@ -1337,10 +1404,10 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
 
     var orderedPages = reorderPages(state.pages);
 
-    // TODO: Pass in facingpages options
-    if (true) {
+    var facingPages = true; // TODO: Pass in facingpages options
+    if (facingPages) {
       orderedPages.forEach(function (page, i) {
-        page.setLeftRight(i % 2 == 0 ? 'right' : 'left');
+        page.setLeftRight(i % 2 === 0 ? 'right' : 'left');
       });
     } else {
       orderedPages.forEach(function (page) {
@@ -1353,69 +1420,7 @@ exports.default = function (content, rules, paginateDoneCallback, paginateProgre
   });
 };
 
-var _elementToString = __webpack_require__(7);
-
-var _elementToString2 = _interopRequireDefault(_elementToString);
-
-var _page = __webpack_require__(4);
-
-var _page2 = _interopRequireDefault(_page);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var last = function last(arr) {
-  return arr[arr.length - 1];
-};
-
-var clonePath = function clonePath(origPath) {
-  var newPath = [];
-  for (var i = origPath.length - 1; i >= 0; i--) {
-    var clone = origPath[i].cloneNode(false);
-    clone.innerHTML = '';
-    clone.setAttribute('bindery-continuation', true);
-    if (clone.id) {
-      console.warn('Bindery: Added a break to ' + (0, _elementToString2.default)(clone) + ', so "' + clone.id + '" is no longer a unique ID.');
-    }
-    if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
-    newPath[i] = clone;
-  }
-  return newPath;
-};
-
-// TODO: only do this if not double sided?
-var reorderPages = function reorderPages(pages) {
-  // TODO: this ignores the cover page, assuming its on the right
-  for (var i = 1; i < pages.length - 1; i += 2) {
-    var left = pages[i];
-
-    // TODO: Check more than once
-    if (left.alwaysRight) {
-      if (left.outOfFlow) {
-        pages[i] = pages[i + 1];
-        pages[i + 1] = left;
-      } else {
-        pages.splice(i, 0, new _page2.default());
-      }
-    }
-
-    var right = pages[i + 1];
-
-    if (right.alwaysLeft) {
-      if (right.outOfFlow) {
-        // TODO: don't overflow, assumes that
-        // there are not multiple spreads in a row
-        pages[i + 1] = pages[i + 3];
-        pages[i + 3] = right;
-      } else {
-        pages.splice(i + 1, 0, new _page2.default());
-      }
-    }
-  }
-
-  return pages;
-};
+exports.default = paginate;
 
 /***/ }),
 /* 7 */
@@ -1436,7 +1441,7 @@ var elementToString = function elementToString(node) {
 
   var classes = '';
   if (node.classList.length > 0) {
-    var _classes = '.' + [].concat(_toConsumableArray(node.classList)).join('.');
+    classes = '.' + [].concat(_toConsumableArray(node.classList)).join('.');
   }
 
   var text = '';
@@ -2074,9 +2079,20 @@ var Viewer = function () {
           });
           flap.appendChild(leftPage);
         }
-        // flap.style.zIndex = `${this.pages.length - i}`;
-        // flap.style.top = `${i * 4}px`;
-        flap.style.left = i * 4 + 'px';
+        // TODO: Dynamically add/remove pages.
+        // Putting 1000s of elements onscreen
+        // locks up the browser.
+        // if (i > 200) {
+        //   rightPage.style.display = 'none';
+        //   leftPage.style.display = 'none';
+        //   flap.style.background = '#ddd';
+        // }
+
+
+        var leftOffset = 4;
+        if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
+
+        flap.style.left = i * leftOffset + 'px';
 
         _this2.export.appendChild(flap);
       };
@@ -2093,13 +2109,14 @@ var Viewer = function () {
   }, {
     key: 'setLeaf',
     value: function setLeaf(n) {
-      var _this3 = this;
-
       this.currentLeaf = n;
-      this.flaps.forEach(function (flap, i) {
-        var z = _this3.flaps.length - Math.abs(i - n + 0.5);
+      var zScale = 4;
+      if (this.flaps.length * zScale > 200) zScale = 200 / this.flaps.length;
+
+      this.flaps.forEach(function (flap, i, arr) {
         // + 0.5 so left and right are even
-        flap.style.transform = 'translate3d(' + (i < n ? 4 : 0) + 'px,0,' + z * 4 + 'px) rotateY(' + (i < n ? -180 : 0) + 'deg)';
+        var z = (arr.length - Math.abs(i - n + 0.5)) * zScale;
+        flap.style.transform = 'translate3d(' + (i < n ? 4 : 0) + 'px,0,' + z + 'px) rotateY(' + (i < n ? -180 : 0) + 'deg)';
       });
     }
     // makeDraggable(flap) {
@@ -2745,10 +2762,10 @@ var BreakBefore = function (_BinderyRule) {
 
   _createClass(BreakBefore, [{
     key: 'beforeAdd',
-    value: function beforeAdd(elmt, state) {
+    value: function beforeAdd(elmt, state, requestNewPage) {
       if (state.currentPage.flowContent.innerText !== '') {
-        state.currentPage = state.getNewPage();
-        state.currentPage.setPreference('right');
+        var newPage = requestNewPage();
+        newPage.setPreference('right');
       }
     }
   }]);
@@ -2785,8 +2802,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var prevPage = void 0,
-    prevElementPath = void 0;
+var prevPage = void 0;
+var prevElementPath = void 0;
 
 var FullPage = function (_BinderyRule) {
   _inherits(FullPage, _BinderyRule);
@@ -2840,10 +2857,6 @@ exports.default = function (userOptions) {
   return new Spread(userOptions);
 };
 
-var _spread = __webpack_require__(32);
-
-var _spread2 = _interopRequireDefault(_spread);
-
 var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
@@ -2855,6 +2868,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+__webpack_require__(32);
 
 var Spread = function (_BinderyRule) {
   _inherits(Spread, _BinderyRule);
@@ -2873,18 +2888,18 @@ var Spread = function (_BinderyRule) {
 
   _createClass(Spread, [{
     key: 'beforeAdd',
-    value: function beforeAdd(elmt, state) {
+    value: function beforeAdd(elmt, state, requestNewPage) {
       this.prevPage = state.currentPage;
       this.prevElementPath = state.path;
 
-      state.currentPage = state.getNewPage();
+      requestNewPage();
     }
   }, {
     key: 'afterAdd',
-    value: function afterAdd(elmt, state) {
+    value: function afterAdd(elmt, state, requestNewPage) {
       var leftPage = state.currentPage;
       var dupedContent = leftPage.flowContent.cloneNode(true);
-      var rightPage = state.getNewPage();
+      var rightPage = requestNewPage();
       rightPage.flowBox.innerHTML = '';
       rightPage.flowBox.appendChild(dupedContent);
       rightPage.flowContent = dupedContent;
@@ -2964,13 +2979,13 @@ exports.default = function (userOptions) {
   return new Footnote(userOptions);
 };
 
-var _BinderyRule2 = __webpack_require__(0);
-
-var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
-
 var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
+var _BinderyRule2 = __webpack_require__(0);
+
+var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3061,18 +3076,20 @@ var PageReference = function (_BinderyRule) {
 
   _createClass(PageReference, [{
     key: 'afterAdd',
-    value: function afterAdd(elmt, state) {
+    value: function afterAdd(elmt) {
       this.references[elmt.getAttribute('href')] = elmt;
       elmt.removeAttribute('href');
     }
   }, {
     key: 'afterBind',
-    value: function afterBind(pg, i) {
-      for (var ref in this.references) {
-        if (pg.element.querySelector(ref)) {
-          this.updateReference(this.references[ref], pg.number);
+    value: function afterBind(page) {
+      var _this2 = this;
+
+      Object.keys(this.references).forEach(function (ref) {
+        if (page.element.querySelector(ref)) {
+          _this2.updateReference(_this2.references[ref], page.number);
         }
-      }
+      });
     }
   }, {
     key: 'updateReference',
@@ -3105,10 +3122,6 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _pageNumber = __webpack_require__(37);
-
-var _pageNumber2 = _interopRequireDefault(_pageNumber);
-
 var _BinderyRule2 = __webpack_require__(0);
 
 var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
@@ -3121,13 +3134,16 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+__webpack_require__(37);
+
 var PageNumber = function (_BinderyRule) {
   _inherits(PageNumber, _BinderyRule);
 
-  function PageNumber(options) {
+  function PageNumber() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     _classCallCheck(this, PageNumber);
 
-    if (!options) options = {};
     options.name = 'Page Number';
 
     var _this = _possibleConstructorReturn(this, (PageNumber.__proto__ || Object.getPrototypeOf(PageNumber)).call(this, options));
@@ -3209,17 +3225,13 @@ exports.default = function (userOptions) {
   return new RunningHeader(userOptions);
 };
 
-var _BinderyRule2 = __webpack_require__(0);
-
-var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
-
 var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _runningHeader = __webpack_require__(40);
+var _BinderyRule2 = __webpack_require__(0);
 
-var _runningHeader2 = _interopRequireDefault(_runningHeader);
+var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3228,6 +3240,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+__webpack_require__(40);
 
 var RunningHeader = function (_BinderyRule) {
   _inherits(RunningHeader, _BinderyRule);
@@ -3245,11 +3259,6 @@ var RunningHeader = function (_BinderyRule) {
   }
 
   _createClass(RunningHeader, [{
-    key: 'infoGetter',
-    value: function infoGetter(elmt) {
-      return { text: elmt.textContent };
-    }
-  }, {
     key: 'afterAdd',
     value: function afterAdd(elmt, state) {
       this.currentHeaderContent = elmt.textContent;
@@ -3257,14 +3266,14 @@ var RunningHeader = function (_BinderyRule) {
     }
   }, {
     key: 'afterPageCreated',
-    value: function afterPageCreated(pg, state) {
+    value: function afterPageCreated(page) {
       var el = (0, _hyperscript2.default)('.bindery-running-header');
       if (this.customClass) {
         el.classList.add(this.customClass);
       }
-      pg.runningHeader = el;
-      pg.element.appendChild(el);
-      pg.runningHeader.textContent = this.currentHeaderContent;
+      page.runningHeader = el;
+      page.element.appendChild(el);
+      page.runningHeader.textContent = this.currentHeaderContent;
     }
   }]);
 

@@ -17,8 +17,6 @@ const pxInOne = {
 
 const unitToPx = (unitVal, unit) => unitVal * pxInOne[unit];
 const pxToUnit = (pixelVal, unit) => pixelVal / pxInOne[unit];
-const convert = (val, from, to) => {
-  return pxToUnit(unitToPx(val, from), to);
-}
+const convert = (val, from, to) => pxToUnit(unitToPx(val, from), to);
 
 module.exports = convert;

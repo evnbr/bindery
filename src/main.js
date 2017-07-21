@@ -18,12 +18,12 @@ const DEFAULT_PAGE_MARGIN = {
   bottom: 0.2,
   top: 0.2,
 };
-const DEFAULT_BLEED = {
-  inner: 0,
-  outer: 0.2,
-  bottom: 0.2,
-  top: 0.2,
-};
+// const DEFAULT_BLEED = {
+//   inner: 0,
+//   outer: 0.2,
+//   bottom: 0.2,
+//   top: 0.2,
+// };
 
 const arraysEqual = (a, b) => {
   if (a.length !== b.length) { return false; }
@@ -76,6 +76,7 @@ class Binder {
         } else if (response.status === 200) {
           return response.text();
         }
+        return '';
       }).then((fetchedContent) => {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = fetchedContent;

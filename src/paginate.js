@@ -4,7 +4,58 @@ import Page from './Page/page';
 
 const last = arr => arr[arr.length - 1];
 
-export default function (
+// TODO: only do this if not double sided?
+const reorderPages = (pages) => {
+  const orderedPages = pages;
+
+  // TODO: this ignores the cover page, assuming its on the right
+  for (let i = 1; i < orderedPages.length - 1; i += 2) {
+    const left = orderedPages[i];
+
+    // TODO: Check more than once
+    if (left.alwaysRight) {
+      if (left.outOfFlow) {
+        orderedPages[i] = pages[i + 1];
+        orderedPages[i + 1] = left;
+      } else {
+        pages.splice(i, 0, new Page());
+      }
+    }
+
+    const right = orderedPages[i + 1];
+
+    if (right.alwaysLeft) {
+      if (right.outOfFlow) {
+        // TODO: don't overflow, assumes that
+        // there are not multiple spreads in a row
+        orderedPages[i + 1] = pages[i + 3];
+        orderedPages[i + 3] = right;
+      } else {
+        pages.splice(i + 1, 0, new Page());
+      }
+    }
+  }
+
+  return orderedPages;
+};
+
+
+const clonePath = (origPath) => {
+  const newPath = [];
+  for (let i = origPath.length - 1; i >= 0; i -= 1) {
+    const clone = origPath[i].cloneNode(false); // shallow
+    clone.innerHTML = '';
+    clone.setAttribute('bindery-continuation', true);
+    if (clone.id) {
+      console.warn(`Bindery: Added a break to ${elToStr(clone)}, so "${clone.id}" is no longer a unique ID.`);
+    }
+    if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
+    newPath[i] = clone;
+  }
+  return newPath;
+};
+
+const paginate = function (
   content,
   rules,
   paginateDoneCallback,
@@ -14,10 +65,7 @@ export default function (
   const state = {
     path: [], // Stack representing which element we're currently inside
     pages: [],
-    getNewPage: () =>  // Gross hack to allow rules to advance to next page
-       makeNextPage(),
   };
-
 
   // Even when there is no debugDelay,
   // the throttler will occassionally use rAF
@@ -38,56 +86,14 @@ export default function (
     }
   };
 
-  const beforeAddRules = (elmt) => {
-    rules.forEach((rule) => {
-      if (!rule.selector) return;
-      if (elmt.matches(rule.selector) && rule.beforeAdd) {
-        const backupPg = state.currentPage.clone();
-        const backupElmt = elmt.cloneNode(true);
-        rule.beforeAdd(elmt, state);
-
-        if (state.currentPage.hasOverflowed()) {
-          console.log('restoring from backup');
-          // restore from backup
-          elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
-
-          const idx = state.pages.indexOf(state.currentPage);
-          state.pages[idx] = backupPg;
-          state.currentPage = backupPg;
-
-          state.currentPage = makeNextPage();
-
-          rule.beforeAdd(elmt, state);
-        }
-      }
-    });
-  };
-  const afterAddRules = (elmt) => {
-    rules.forEach((rule) => {
-      if (!rule.selector) return;
-      if (elmt.matches(rule.selector) && rule.afterAdd) {
-        rule.afterAdd(elmt, state);
-      }
-    });
-  };
   const newPageRules = (pg) => {
     rules.forEach((rule) => {
       if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
     });
   };
-  const afterBindRules = (pages) => {
-    rules.forEach((rule) => {
-      if (rule.afterBind) {
-        pages.forEach((pg, i, arr) => {
-          rule.afterBind(pg, i, arr.length);
-        });
-      }
-    });
-  };
-
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
-  let makeNextPage = () => {
+  const makeNextPage = () => {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
       console.warn('Bindery: Moved to new page when last one is still overflowing', state.currentPage.element);
     }
@@ -108,8 +114,6 @@ export default function (
     }
 
     // make sure the cloned page is valid.
-    // this catches elements with an explicitly set height greater than the
-    // flow area, which will never be split and cause an infinite loop
     if (newPage.hasOverflowed()) {
       const suspect = last(state.path);
       if (suspect) {
@@ -123,6 +127,48 @@ export default function (
     paginateProgressCallback(state.pages.length);
 
     return newPage;
+  };
+
+  const beforeAddRules = (elmt) => {
+    rules.forEach((rule) => {
+      if (!rule.selector) return;
+      if (elmt.matches(rule.selector) && rule.beforeAdd) {
+        const backupPg = state.currentPage.clone();
+        const backupElmt = elmt.cloneNode(true);
+        rule.beforeAdd(elmt, state, makeNextPage);
+
+        if (state.currentPage.hasOverflowed()) {
+          console.log('restoring from backup');
+          // restore from backup
+          elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
+
+          const idx = state.pages.indexOf(state.currentPage);
+          state.pages[idx] = backupPg;
+          state.currentPage = backupPg;
+
+          state.currentPage = makeNextPage();
+
+          rule.beforeAdd(elmt, state, makeNextPage);
+        }
+      }
+    });
+  };
+  const afterAddRules = (elmt) => {
+    rules.forEach((rule) => {
+      if (!rule.selector) return;
+      if (elmt.matches(rule.selector) && rule.afterAdd) {
+        rule.afterAdd(elmt, state, makeNextPage);
+      }
+    });
+  };
+  const afterBindRules = (pages) => {
+    rules.forEach((rule) => {
+      if (rule.afterBind) {
+        pages.forEach((pg, i, arr) => {
+          rule.afterBind(pg, i, arr.length);
+        });
+      }
+    });
   };
 
   const moveNodeToNextPage = (nodeToMove) => {
@@ -145,10 +191,10 @@ export default function (
 
   // Adds an text node by binary searching amount of
   // words until it just barely doesnt overflow
-  const addTextNode = (textNode, doneCallback, abortCallback) => {
-    last(state.path).appendChild(textNode);
-
+  const addTextNode = (originalNode, doneCallback, abortCallback) => {
+    let textNode = originalNode;
     let origText = textNode.nodeValue;
+    last(state.path).appendChild(textNode);
 
     let lastPos = 0;
     let pos = origText.length / 2;
@@ -228,7 +274,7 @@ export default function (
     }
 
     // Add this node to the current page or context
-    if (state.path.length == 0) {
+    if (state.path.length === 0) {
       state.currentPage.flowContent.appendChild(node);
     } else {
       last(state.path).appendChild(node);
@@ -251,7 +297,7 @@ export default function (
       index += 1;
 
       switch (child.nodeType) {
-      case Node.TEXT_NODE:
+      case Node.TEXT_NODE: {
         const abortCallback = () => {
             // let lastNode = last(state.path);
             // console.log("— last node in stack:")
@@ -265,8 +311,9 @@ export default function (
           // console.log(`Beginning to add "${child.nodeValue.substr(0,24)}"`);
         addTextNode(child, addNextChild, abortCallback);
         break;
+      }
       case Node.ELEMENT_NODE: {
-        if (child.tagName == 'SCRIPT') {
+        if (child.tagName === 'SCRIPT') {
           addNextChild(); // skip
           break;
         }
@@ -276,8 +323,9 @@ export default function (
         throttle(() => {
           addElementNode(child, () => {
             const addedChild = state.path.pop(); // WHYY
-              // let addedChild = last(state.path);
-            afterAddRules(addedChild);  // TODO: AfterAdd rules may want to access original child, not split second half
+            // let addedChild = last(state.path);
+            // TODO: AfterAdd rules may want to access original child, not split second half
+            afterAddRules(addedChild);
             addNextChild();
           });
         });
@@ -304,8 +352,8 @@ export default function (
 
     const orderedPages = reorderPages(state.pages);
 
-    // TODO: Pass in facingpages options
-    if (true) {
+    const facingPages = true; // TODO: Pass in facingpages options
+    if (facingPages) {
       orderedPages.forEach((page, i) => {
         page.setLeftRight((i % 2 === 0) ? 'right' : 'left');
       });
@@ -316,53 +364,6 @@ export default function (
 
     paginateDoneCallback(orderedPages);
   });
-}
-
-let clonePath = (origPath) => {
-  const newPath = [];
-  for (let i = origPath.length - 1; i >= 0; i -= 1) {
-    const clone = origPath[i].cloneNode(false);
-    clone.innerHTML = '';
-    clone.setAttribute('bindery-continuation', true);
-    if (clone.id) {
-      console.warn(`Bindery: Added a break to ${elToStr(clone)}, so "${clone.id}" is no longer a unique ID.`);
-    }
-    if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
-    newPath[i] = clone;
-  }
-  return newPath;
 };
 
-// TODO: only do this if not double sided?
-let reorderPages = (pages) => {
-  let orderedPages = pages;
-  // TODO: this ignores the cover page, assuming its on the right
-  for (let i = 1; i < orderedPages.length - 1; i += 2) {
-    const left = orderedPages[i];
-
-    // TODO: Check more than once
-    if (left.alwaysRight) {
-      if (left.outOfFlow) {
-        orderedPages[i] = pages[i + 1];
-        orderedPages[i + 1] = left;
-      } else {
-        pages.splice(i, 0, new Page());
-      }
-    }
-
-    const right = orderedPages[i + 1];
-
-    if (right.alwaysLeft) {
-      if (right.outOfFlow) {
-        // TODO: don't overflow, assumes that
-        // there are not multiple spreads in a row
-        orderedPages[i + 1] = pages[i + 3];
-        orderedPages[i + 3] = right;
-      } else {
-        pages.splice(i + 1, 0, new Page());
-      }
-    }
-  }
-
-  return orderedPages;
-};
+export default paginate;

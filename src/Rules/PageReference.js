@@ -6,16 +6,16 @@ class PageReference extends BinderyRule {
     super(options);
     this.references = {};
   }
-  afterAdd(elmt, state) {
+  afterAdd(elmt) {
     this.references[elmt.getAttribute('href')] = elmt;
     elmt.removeAttribute('href');
   }
-  afterBind(pg, i) {
-    for (const ref in this.references) {
-      if (pg.element.querySelector(ref)) {
-        this.updateReference(this.references[ref], pg.number);
+  afterBind(page) {
+    Object.keys(this.references).forEach((ref) => {
+      if (page.element.querySelector(ref)) {
+        this.updateReference(this.references[ref], page.number);
       }
-    }
+    });
   }
   updateReference(element, number) {
     element.insertAdjacentHTML('afterend', ` (Reference to page ${number})`);
