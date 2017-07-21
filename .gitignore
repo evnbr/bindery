@@ -2,3 +2,7 @@
 node_modules/
 *.sketch
 *.map
+
+*.log
+
+.eslintcache
