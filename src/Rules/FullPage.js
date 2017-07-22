@@ -8,10 +8,11 @@ class FullPage extends BinderyRule {
     options.name = 'Full Page Spread';
     super(options);
   }
-  beforeAdd(elmt, state) {
+  beforeAdd(elmt, state, requestNewPage) {
     prevPage = state.currentPage;
     prevElementPath = state.path;
-    state.currentPage = state.getNewPage();
+
+    requestNewPage();
 
     // TODO: Rather than just add padding,
     // put full-bleed content on a separate
