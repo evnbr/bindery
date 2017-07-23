@@ -6,6 +6,11 @@ date:   2017-07-22 16:29:06 -0700
 
 ## Getting started
 
+Just include the script on the same page as your content, and you're ready to go.
+
+<a class="btn" href="#" class="btn">Download (69kb)</a>
+
+
 {% highlight html %}
 
 <html>

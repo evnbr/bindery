@@ -101,7 +101,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
 }
 
 
-.site-header, .page-content, footer {
+.site-header, .page-content, .site-footer {
   margin: 0 auto;
   max-width: 50rem;
   padding: 0 1rem;
@@ -111,6 +111,11 @@ $accent-light: rgba(5, 0, 154, 0.4);
   position: relative;
   padding-top: 1rem;
   font-weight: 400;
+}
+
+.site-footer {
+  padding-top: 1rem;
+  padding-bottom: 4rem;
 }
 
 
@@ -194,9 +199,10 @@ h1 {
 }
 
 h2 {
+  font: 1rem/1.5 -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
   font-weight: 500;
-  padding-top: 1.5rem;
-  padding-bottom: 4rem;
+  padding-top: 4rem;
+  padding-bottom: 1.5rem;
 }
 
 
@@ -238,7 +244,7 @@ blockquote {
   .page-content {
     margin-top: 4rem;
   }
-  .page-content, footer {
+  .page-content, .site-footer {
     margin-left: $sidebar-width;
   }
   .site-nav {
@@ -273,12 +279,13 @@ pre,
 code {
   border-radius: 3px;
   background-color: #f5f5ff;
+  line-height: 1.4rem;
+  font-family: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+  font-size: 1rem;
 }
 
 code {
   padding: 1px 5px;
-  font-family: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-  font-size: 1rem;
 }
 
 pre {
