@@ -4,6 +4,7 @@ title:  "Intro"
 date:   2017-07-22 16:29:06 -0700
 ---
 
+# Site under construction
 # Design printable books with <span class="sc">html</span> and <span class="sc">css</span>
 
 Bindery.js lets you flow your web content over multiple pages, then preview and configure a book for print. You have complete control over numbering, running headers, spreads, footnotes, and more— as well as print options like bleed, creep, crop marks, booklets, and signatures. With just a couple lines of code, you can annotate `<a>` tags with [<span class="sc">url</span>s as footnotes](https://github.com/evnbr/bindery/tree/master/example), transform your `<nav>` into [a table of contents](#), create painless [fore-edge printing](https://github.com/evnbr/bindery/tree/master/example), making the type [smaller each page](https://github.com/evnbr/bindery/tree/master/example) (à la [Boom](http://www.nytimes.com/2007/03/18/style/18iht-DESIGN19.4945906.html)), display a video [as a flipbook](https://github.com/evnbr/bindery/tree/master/example), and more. No need for InDesign.
