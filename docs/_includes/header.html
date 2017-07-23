@@ -1,0 +1,74 @@
+<header class="site-header" role="banner">
+  {% assign default_paths = site.pages | map: "path" %}
+  {% assign page_paths = site.header_pages | default: default_paths %}
+
+  <h3 class="site-title">
+    <a href="{{ "/" | relative_url }}">
+      <div class="logo"></div>
+      {{ site.title | escape }}
+      <div class="warn">{{ site.version | escape }}</div>
+    </a>
+  </h3>
+
+  {% if page_paths %}
+    <nav class="site-nav">
+
+      {% for post in site.posts %}
+        <div class="nav-item">
+          <a href="#">{{ post.title | escape }}</a>
+        </div>
+      {% endfor %}
+
+    </nav>
+  {% endif %}
+
+  <nav class="docs-nav" style="margin-top: 4rem;">
+      <!-- <div class="nav-head nav-item">
+        Docs
+      </div> -->
+
+      <div class="nav-item">
+        <a href="#">Setup</a>
+      </div>
+      <div class="nav-item">
+        <a href="#">Layout</a>
+      </div>
+      <div class="nav-sub">
+        <div class="nav-item nav-subitem">
+          <a href="#">Size, Margin, Units</a>
+        </div>
+        <div class="nav-item nav-subitem">
+          <a href="#">Running Heads, Numbers</a>
+        </div>
+        <div class="nav-item nav-subitem">
+          <a href="#">Page Breaks, Spreads</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="#">Referencing Content</a>
+      </div>
+      <div class="nav-sub">
+        <div class="nav-item nav-subitem">
+          <a href="#">Footnotes</a>
+        </div>
+        <div class="nav-item nav-subitem">
+          <a href="#">Tables of Contents</a>
+        </div>
+        <div class="nav-item nav-subitem">
+          <a href="#">Indexes</a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <a href="#">Viewing</a>
+      </div>
+      <div class="nav-item">
+        <a href="#">Printing</a>
+      </div>
+      <div class="nav-item">
+        <a href="#">Advanced</a>
+      </div>
+  </nav>
+
+</header>

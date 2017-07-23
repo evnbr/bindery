@@ -1,0 +1,19 @@
+---
+layout: default
+---
+
+<div class="home">
+
+  {{ content }}
+
+  <section class="post-list">
+    {% for post in site.posts %}
+        <!-- <h2>{{ post.title | escape }}</h2> -->
+
+        <div class="post-content" itemprop="articleBody">
+          {{ post.content }}
+        </div>
+    {% endfor %}
+  </section>
+
+</div>
