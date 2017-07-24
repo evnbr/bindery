@@ -816,7 +816,7 @@ exports.convertStrToPx = convertStrToPx;
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(38);
+var content = __webpack_require__(39);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(3)(content, {});
@@ -2795,31 +2795,35 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _breakBefore = __webpack_require__(30);
+var _BreakBefore = __webpack_require__(30);
 
-var _breakBefore2 = _interopRequireDefault(_breakBefore);
+var _BreakBefore2 = _interopRequireDefault(_BreakBefore);
 
-var _FullPage = __webpack_require__(31);
+var _BreakAfter = __webpack_require__(31);
+
+var _BreakAfter2 = _interopRequireDefault(_BreakAfter);
+
+var _FullPage = __webpack_require__(32);
 
 var _FullPage2 = _interopRequireDefault(_FullPage);
 
-var _Spread = __webpack_require__(32);
+var _Spread = __webpack_require__(33);
 
 var _Spread2 = _interopRequireDefault(_Spread);
 
-var _Footnote = __webpack_require__(35);
+var _Footnote = __webpack_require__(36);
 
 var _Footnote2 = _interopRequireDefault(_Footnote);
 
-var _PageReference = __webpack_require__(36);
+var _PageReference = __webpack_require__(37);
 
 var _PageReference2 = _interopRequireDefault(_PageReference);
 
-var _PageNumber = __webpack_require__(37);
+var _PageNumber = __webpack_require__(38);
 
 var _PageNumber2 = _interopRequireDefault(_PageNumber);
 
-var _RunningHeader = __webpack_require__(39);
+var _RunningHeader = __webpack_require__(40);
 
 var _RunningHeader2 = _interopRequireDefault(_RunningHeader);
 
@@ -2833,7 +2837,8 @@ exports.default = {
   Spread: _Spread2.default,
   FullPage: _FullPage2.default,
   Footnote: _Footnote2.default,
-  BreakBefore: _breakBefore2.default,
+  BreakBefore: _BreakBefore2.default,
+  BreakAfter: _BreakAfter2.default,
   PageNumber: _PageNumber2.default,
   RunningHeader: _RunningHeader2.default,
   PageReference: _PageReference2.default,
@@ -2909,6 +2914,58 @@ Object.defineProperty(exports, "__esModule", {
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 exports.default = function (userOptions) {
+  return new BreakAfter(userOptions);
+};
+
+var _BinderyRule2 = __webpack_require__(0);
+
+var _BinderyRule3 = _interopRequireDefault(_BinderyRule2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BreakAfter = function (_BinderyRule) {
+  _inherits(BreakAfter, _BinderyRule);
+
+  function BreakAfter(options) {
+    _classCallCheck(this, BreakAfter);
+
+    options.name = 'Break Before';
+    return _possibleConstructorReturn(this, (BreakAfter.__proto__ || Object.getPrototypeOf(BreakAfter)).call(this, options));
+  }
+
+  _createClass(BreakAfter, [{
+    key: 'afterAdd',
+    value: function afterAdd(elmt, state, requestNewPage) {
+      if (state.currentPage.flowContent.innerText !== '') {
+        var newPage = requestNewPage();
+        newPage.setPreference('right');
+      }
+    }
+  }]);
+
+  return BreakAfter;
+}(_BinderyRule3.default);
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+exports.default = function (userOptions) {
   return new FullPage(userOptions);
 };
 
@@ -2964,7 +3021,7 @@ var FullPage = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2992,7 +3049,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-__webpack_require__(33);
+__webpack_require__(34);
 
 var Spread = function (_BinderyRule) {
   _inherits(Spread, _BinderyRule);
@@ -3046,13 +3103,13 @@ var Spread = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(34);
+var content = __webpack_require__(35);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(3)(content, {});
@@ -3072,7 +3129,7 @@ if(false) {
 }
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)();
@@ -3086,7 +3143,7 @@ exports.push([module.i, ".bindery-spread.bindery-left .bindery-content {\n  /*wi
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3155,7 +3212,7 @@ var Footnote = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3225,7 +3282,7 @@ var PageReference = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3291,7 +3348,7 @@ var PageNumber = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)();
@@ -3305,7 +3362,7 @@ exports.push([module.i, "@media screen {\n  .bindery-show-guides .bindery-runnin
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

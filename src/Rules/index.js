@@ -1,4 +1,5 @@
-import breakBefore from './breakBefore';
+import BreakBefore from './BreakBefore';
+import BreakAfter from './BreakAfter';
 import FullPage from './FullPage';
 import Spread from './Spread';
 import Footnote from './Footnote';
@@ -11,7 +12,8 @@ export default {
   Spread,
   FullPage,
   Footnote,
-  BreakBefore: breakBefore,
+  BreakBefore,
+  BreakAfter,
   PageNumber,
   RunningHeader,
   PageReference,
