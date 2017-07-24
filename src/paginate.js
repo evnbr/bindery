@@ -175,7 +175,7 @@ const paginate = function (
     // nodeToMove.style.outline = "1px solid red";
 
     // TODO: This breaks example 3 but is required for example 2.
-    // state.path.pop();
+    state.path.pop();
 
     // const old = state.currentPage.creationOrder;
     // let fn = state.currentPage.footer.lastChild; // <--
