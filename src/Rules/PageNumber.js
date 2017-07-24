@@ -1,13 +1,12 @@
 import h from 'hyperscript';
 import BinderyRule from './BinderyRule';
 
-require('./pageNumber.css');
+require('./runningHeader.css');
 
 class PageNumber extends BinderyRule {
   constructor(options = {}) {
     options.name = 'Page Number';
     super(options);
-    this.selector = '.content';
     this.customClass = options.customClass;
   }
   afterBind(pg, i) {

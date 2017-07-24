@@ -50,15 +50,14 @@
 			}
 		});
 
-		let binder = new Bindery({
+		Bindery.makeBook({
 		  source: {
 				url: "content.html",
 				selector: ".content"
 			},
-			standalone: true,
-			startingViewMode: "interactive",
+			startingView: "interactive",
 			pageSize: { height: 4, width: 4 },
-			pageMargin: { top: 0.3, inner: 0.3, outer: 0.3, bottom: 0.3 },
+			pageMargin: { top: .3, inner: 0.3, outer: 0.3, bottom: 0.3 },
 		  rules: [
 				rainbowRule,
 				shrinkingRule,

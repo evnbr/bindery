@@ -34,6 +34,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+strong {
+  font-weight: 600;
+}
+
 .post-content {
   font: 22px / 1.35 Times, Times New Roman, serif;
   // font: 20px / 1.4 Minion Pro, Times, Times New Roman, serif;
@@ -62,6 +66,7 @@ body {
 
   &:hover {
     color: white;
+    border-color: $accent;
     background: $accent;
     opacity: 1;
   }

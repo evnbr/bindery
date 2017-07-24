@@ -12,13 +12,11 @@
 
 	<script type="text/javascript" src="../../build/bindery.js"></script>
 	<script>
-			let binder = new Bindery({
+			Bindery.makeBook({
 			  source: {
 					url: 'content.html',
 					selector: ".content",
 				},
-				standalone: true,
-				pageMargin: { top: 0.2, inner: 0.2, outer: 0.6, bottom: 0.4 },
 			  rules: [
 					Bindery.BreakBefore({ selector: "h1" }),
 					Bindery.BreakBefore({ selector: "h2" }),

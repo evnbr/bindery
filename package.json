@@ -22,8 +22,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js",
-    "buildProd": "webpack --config webpack.config.js -p",
-    "lint:js": "eslint src/ webpack.*.js --cache"
+    "minify": "webpack --config webpack.config.js -p",
+    "lint": "eslint src/ webpack.*.js --cache"
   },
   "keywords": [],
   "author": "",

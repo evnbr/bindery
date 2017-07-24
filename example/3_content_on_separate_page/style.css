@@ -52,10 +52,9 @@ sup {
 }
 
 figure {
-  width: 100%;
+  height: 300px;
+  width: 400px;
   background: gray;
-  /*padding-bottom: 400px;*/
-  padding-bottom: 70%;
   position: relative;
 }
 

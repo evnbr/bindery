@@ -124,11 +124,8 @@
 
 	<script type="text/javascript" src="../../build/bindery.js"></script>
 	<script>
-		let binder = new Bindery({
+		Bindery.makeBook({
 		  source: ".content",
-			pageMargin: { top: 40, bottom: 40, inner: 40, outer: 40 },
-			pageSize: { height: 500, width: 350 },
-			pageUnit: "pt",
 		  rules: [
 				Bindery.BreakBefore({ selector: "h2" }),
 				Bindery.Footnote({
@@ -154,7 +151,5 @@
 		  ],
 		});
 	</script>
-
-	<div id="makeBook" onclick="binder.makeBook();">Make Book</div>
 </body>
 </html>

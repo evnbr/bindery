@@ -4,6 +4,13 @@
   }
 }
 
+.bindery-controls * {
+  font: inherit;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .bindery-controls {
   font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
   position: fixed;

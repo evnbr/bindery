@@ -7,7 +7,7 @@ class Page {
   constructor() {
     this.flowContent = h('.bindery-content');
     this.flowBox = h('.bindery-flowbox', this.flowContent);
-    this.footer = h('.bindery-footer');
+    this.footer = h('footer.bindery-footer');
     this.bleed = h('.bindery-bleed');
     this.element = h('.bindery-page',
       { style: Page.sizeStyle() },

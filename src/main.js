@@ -7,16 +7,16 @@ import Controls from './Controls/controls';
 import Rules from './Rules/';
 
 
-const DEFAULT_PAGE_UNIT = 'in';
+const DEFAULT_PAGE_UNIT = 'pt';
 const DEFAULT_PAGE_SIZE = {
-  width: 4,
-  height: 6,
+  width: 288,
+  height: 432,
 };
 const DEFAULT_PAGE_MARGIN = {
-  inner: 0.2,
-  outer: 0.2,
-  bottom: 0.2,
-  top: 0.2,
+  inner: 18,
+  outer: 18,
+  bottom: 24,
+  top: 48,
 };
 // const DEFAULT_BLEED = {
 //   inner: 0,
@@ -34,7 +34,7 @@ const arraysEqual = (a, b) => {
 };
 
 
-class Binder {
+class Bindery {
   constructor(opts) {
     const pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
     const pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
@@ -43,8 +43,8 @@ class Binder {
     this.setMargin(pageMargin);
 
     this.viewer = new Viewer();
-    if (opts.startingViewMode) {
-      this.viewer.setMode(opts.startingViewMode);
+    if (opts.startingView) {
+      this.viewer.setMode(opts.startingView);
     }
 
     this.rules = [];
@@ -108,6 +108,12 @@ class Binder {
     } else {
       console.error('Bindery: Source must be an element or selector');
     }
+  }
+
+  // Convenience constructor
+  static makeBook(opts = {}) {
+    opts.standalone = true;
+    return new Bindery(opts);
   }
 
   cancel() {
@@ -252,7 +258,7 @@ class Binder {
 
 
 Object.keys(Rules).forEach((rule) => {
-  Binder[rule] = Rules[rule];
+  Bindery[rule] = Rules[rule];
 });
 
-module.exports = Binder;
+module.exports = Bindery;
