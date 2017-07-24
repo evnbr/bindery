@@ -3,20 +3,21 @@ import paginate from './paginate';
 import Page from './Page/page';
 import Viewer from './Viewer/viewer';
 import Controls from './Controls/controls';
+import { isValidSize } from './utils/convertUnits';
 
 import Rules from './Rules/';
 
 
 const DEFAULT_PAGE_UNIT = 'pt';
 const DEFAULT_PAGE_SIZE = {
-  width: 288,
-  height: 432,
+  width: '288pt',
+  height: '432pt',
 };
 const DEFAULT_PAGE_MARGIN = {
-  inner: 18,
-  outer: 18,
-  bottom: 24,
-  top: 48,
+  inner: '18pt',
+  outer: '18pt',
+  bottom: '24pt',
+  top: '48pt',
 };
 // const DEFAULT_BLEED = {
 //   inner: 0,
@@ -124,13 +125,15 @@ class Bindery {
   }
 
   setSize(size) {
-    Page.unit = this.pageUnit;
+    isValidSize(size);
+
     this.pageSize = size;
     Page.setSize(size);
   }
 
   setMargin(margin) {
-    Page.unit = this.pageUnit;
+    isValidSize(margin);
+
     this.pageMargin = margin;
     Page.setMargin(margin);
   }
@@ -157,14 +160,13 @@ class Bindery {
     }
 
     if (!this.isSizeValid()) {
-      const u = this.pageUnit;
-      const w = this.pageSize.width + u;
-      const h = this.pageSize.height + u;
+      const w = this.pageSize.width;
+      const h = this.pageSize.height;
       const size = `{ width: ${w}, height: ${h} }`;
-      const i = this.pageMargin.inner + u;
-      const o = this.pageMargin.outer + u;
-      const t = this.pageMargin.top + u;
-      const b = this.pageMargin.bottom + u;
+      const i = this.pageMargin.inner;
+      const o = this.pageMargin.outer;
+      const t = this.pageMargin.top;
+      const b = this.pageMargin.bottom;
       const margin = `{ top: ${t}, inner: ${i}, outer: ${o}, bottom: ${b} }`;
       this.viewer.displayError(
         'Page is too small', `Size: ${size} \n Margin: ${margin} \n Try adjusting the sizes or units.`

@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import convertUnits from '../utils/convertUnits';
+import { convert, cssNumberPattern } from '../utils/convertUnits';
 
 require('./controls.css');
 
@@ -13,6 +13,14 @@ const option = function (...arg) {
 const inputNumber = function (val) {
   return h('input', { type: 'number', value: val });
 };
+const inputNumberUnits = function (val) {
+  return h('input', {
+    type: 'text',
+    value: val,
+    pattern: cssNumberPattern,
+  });
+};
+
 const btn = function (...arg) {
   return h('button.bindery-btn', ...arg);
 };
@@ -75,12 +83,12 @@ class Controls {
     }
 
     const input = {
-      top: inputNumber(this.binder.pageMargin.top),
-      inner: inputNumber(this.binder.pageMargin.inner),
-      outer: inputNumber(this.binder.pageMargin.outer),
-      bottom: inputNumber(this.binder.pageMargin.bottom),
-      width: inputNumber(this.binder.pageSize.width),
-      height: inputNumber(this.binder.pageSize.height),
+      top: inputNumberUnits(this.binder.pageMargin.top),
+      inner: inputNumberUnits(this.binder.pageMargin.inner),
+      outer: inputNumberUnits(this.binder.pageMargin.outer),
+      bottom: inputNumberUnits(this.binder.pageMargin.bottom),
+      width: inputNumberUnits(this.binder.pageSize.width),
+      height: inputNumberUnits(this.binder.pageSize.height),
     };
 
     const sizeControl = h('.bindery-val.bindery-size',
@@ -88,42 +96,42 @@ class Controls {
       h('div', 'H', input.height),
     );
 
-    const changeUnit = (newUnit) => {
-      const oldUnit = this.binder.pageUnit;
-      Object.values(input).forEach((inputEl) => {
-        const el = inputEl;
-        const newVal = convertUnits(parseFloat(el.value), oldUnit, newUnit);
-        const rounded = Math.round(newVal * 100) / 100;
-        el.value = rounded;
-      });
-      this.binder.pageUnit = newUnit;
-    };
+    // const changeUnit = (newUnit) => {
+    //   const oldUnit = this.binder.pageUnit;
+    //   Object.values(input).forEach((inputEl) => {
+    //     const el = inputEl;
+    //     const newVal = convert(parseFloat(el.value), oldUnit, newUnit);
+    //     const rounded = Math.round(newVal * 100) / 100;
+    //     el.value = rounded;
+    //   });
+    //   this.binder.pageUnit = newUnit;
+    // };
 
-    const unitSelect = select(
-      { onchange() {
-        changeUnit(this.value);
-      } },
-      option({ value: 'px' }, 'Pixels'),
-      option({ disabled: true }, '96px = 1 in'),
-      option({ disabled: true }, ''),
-      option({ value: 'pt' }, 'Points'),
-      option({ disabled: true }, '72pt = 1 in'),
-      option({ disabled: true }, ''),
-      option({ value: 'pc' }, 'Pica'),
-      option({ disabled: true }, '6pc = 72pt = 1in'),
-      option({ disabled: true }, ''),
-      option({ value: 'in' }, 'Inches'),
-      option({ disabled: true }, '1in = 96px'),
-      option({ disabled: true }, ''),
-      option({ value: 'cm' }, 'cm'),
-      option({ disabled: true }, '2.54cm = 1in'),
-      option({ disabled: true }, ''),
-      option({ value: 'mm' }, 'mm'),
-      option({ disabled: true }, '25.4mm = 1in'),
-    );
-
-    unitSelect.value = this.binder.pageUnit;
-    const unitSwitch = row('Units', unitSelect);
+    // const unitSelect = select(
+    //   { onchange() {
+    //     changeUnit(this.value);
+    //   } },
+    //   option({ value: 'px' }, 'Pixels'),
+    //   option({ disabled: true }, '96px = 1 in'),
+    //   option({ disabled: true }, ''),
+    //   option({ value: 'pt' }, 'Points'),
+    //   option({ disabled: true }, '72pt = 1 in'),
+    //   option({ disabled: true }, ''),
+    //   option({ value: 'pc' }, 'Pica'),
+    //   option({ disabled: true }, '6pc = 72pt = 1in'),
+    //   option({ disabled: true }, ''),
+    //   option({ value: 'in' }, 'Inches'),
+    //   option({ disabled: true }, '1in = 96px'),
+    //   option({ disabled: true }, ''),
+    //   option({ value: 'cm' }, 'cm'),
+    //   option({ disabled: true }, '2.54cm = 1in'),
+    //   option({ disabled: true }, ''),
+    //   option({ value: 'mm' }, 'mm'),
+    //   option({ disabled: true }, '25.4mm = 1in'),
+    // );
+    //
+    // unitSelect.value = this.binder.pageUnit;
+    // const unitSwitch = row('Units', unitSelect);
 
     const marginPreview = h('.preview');
     const marginControl = h('.bindery-val.bindery-margin',
@@ -335,7 +343,7 @@ class Controls {
 
         label(layoutState, 'Pagination'),
         layoutControl,
-        unitSwitch,
+        // unitSwitch,
         facingToggle,
 
         label('Print'),

@@ -1,4 +1,5 @@
 import h from 'hyperscript';
+import { parseVal } from '../utils/convertUnits';
 
 require('./page.css');
 require('./measureArea.css');
@@ -92,14 +93,15 @@ class Page {
 
   static sizeStyle() {
     return {
-      height: `${Page.H}${Page.unit}`,
-      width: `${Page.W}${Page.unit}`,
+      height: Page.H,
+      width: Page.W,
     };
   }
   static spreadSizeStyle() {
+    const w = parseVal(Page.W);
     return {
-      height: `${Page.H}${Page.unit}`,
-      width: `${Page.W * 2}${Page.unit}`,
+      height: Page.H,
+      width: `${w.val * 2}${w.unit}`,
     };
   }
 

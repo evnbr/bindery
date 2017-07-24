@@ -204,6 +204,10 @@
   width: 100%;
 }
 
+.bindery-val input:invalid {
+    color: maroon;
+}
+
 .bindery-size div {
   position: relative;
   padding: 6px 0 6px 14px;
