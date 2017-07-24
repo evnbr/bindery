@@ -1,10 +1,10 @@
-# Bindery.js
+## Bindery.js - [Docs](http://evanbrooks.info/bindery/)
 
-## About
+### About
 
 bindery.js is a library for producing book layouts in the browser. The core library allows your HTML to flow over multiple pages, and provides an interface to preview and configure the resulting book. Bindery includes plugins that can express numbering, running headers, spreads, footnotes, tables of contents, and more. With just a couple lines of code, you can [convert URLs to footnotes](https://github.com/evnbr/bindery/tree/master/example), [generate fore-edge printing](https://github.com/evnbr/bindery/tree/master/example), [dynamic font sizes](https://github.com/evnbr/bindery/tree/master/example), [convert a video into a flipbook](https://github.com/evnbr/bindery/tree/master/example), and more.
 
-## Getting started
+### Getting started
 
 ```html
 <html>
@@ -22,15 +22,13 @@ bindery.js is a library for producing book layouts in the browser. The core libr
         Bindery.PageNumber(),
       ],
     });
-
-    binder.makeBook();
   </script>
 </html>
 
 ```
 
 
-## Developing
+### Developing
 
 Written in ES6, built with babel, bundled with webpack. The only dependency is [Hyperscript](https://github.com/hyperhype/hyperscript), for templating the UI, which is included in the bundle by default.
 
@@ -48,7 +46,7 @@ The goal of bindery.js is to provide an approachable jumping-off point for HTML-
 - [ ] Examples for use with blogging platforms
 - [ ] Wrapper for use with React.
 - [ ] Approachable API for writing custom rules
-- [ ] Documentation!
+- [ ] Documentation
 
 #### Background
 
