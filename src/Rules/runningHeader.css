@@ -7,10 +7,13 @@
   }
 }
 
+.bindery-sup {
+  font-size: 0.667em;
+}
 
 .bindery-num, .bindery-running-header, .bindery-footer {
   font-size: 10pt;
-  line-height: 1.4em;
+  line-height: 1.3em;
 }
 
 .bindery-num, .bindery-running-header {

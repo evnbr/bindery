@@ -12,9 +12,9 @@ bindery.js is a library for producing book layouts in the browser. The core libr
     <!-- The whole content of your book -->
   </div>
 
-  <script src="./bindery.js"></script>
+  <script src="./bindery.min.js"></script>
   <script>
-    let binder = new Bindery({
+    Bindery.makeBook({
       source: ".content",
       rules: [
         Bindery.BreakBefore({ selector: "h2" }),
@@ -29,82 +29,6 @@ bindery.js is a library for producing book layouts in the browser. The core libr
 
 ```
 
-## Docs
-
-#### Setup Options
-- **`source:`**
-  - Which content to flow across pages.
-  - If the content is on the same page, use a CSS selector. You can also use a reference to the node.
-  - If the content must be fetched from a remote page, pass an object in the form of { url, selector}.
-```js
-// CSS selector
-let binder = new Bindery({
-  source: '#content',
-});
-
-// Node reference
-let binder = new Bindery({
-  source: document.getElementByID('content'),
-});
-
-// Fetch from a URL
-let binder = new Bindery({
-  source: {
-    selector: '#content',
-    url: '/posts.html',
-  }
-});
-```
-
-  
-- **`pageUnit: `**
-  - String representing units. Should be one of the following: `'px'`, `'pt'`, `'pc'`, `'in'`, `'cm'`, `'mm'`
-  - Default: `'in'`
-  
-- **`pageSize:`**
-  - Size of page, in pageUnits { width: Number, height: Number }
-  - Default: `{ width: 4, height: 6 }`
-  
-- **`pageMargin:`**
-  - Size of margins, in pageUnits { top: Number, inner: Number, outer: Number, bottom: Number }
-  - Default:  `{  top: 0.25, inner: 0.25, outer: 0.25, bottom: 0.25, }`
-  
- ```js
-let binder = new Bindery({
-  source: '#content',
-  pageUnit: 'pt',
-  pageSize: { height: 500, width: 350 },
-  pageMargin: { top: 20, bottom: 40, inner: 20, outer: 30 },
-});
-```
- 
-  
-- **`standalone:`**
-  - Boolean. When this is set to true, bindery will run automatically and not show a Done button. This is useful if you want to locate the book at its own url, ie "example.com/book.html".
-  - Default: false
-
-- **`startingViewMode: `**
-  - Should be one of the following:
-    - `'grid'` - Default
-    - `'interactive'` - Interactive 3D Book
-    - `'print'` - Print preview, showing sheet with crop marks and bleed
-
-- **`rules:`**
-  - An array of Rules. Use Rules to set up a page based on what content ends up on it. 
-  - Default: `[]` (No rules applied)
-
-#### Rules
-
-- BreakBefore
-- Footnote
-- FullPage
-- Spread
-- PageReference
-- RunningHeader
-
-#### Creating Custom Rules
-
-TK
 
 ## Developing
 
@@ -130,5 +54,3 @@ The goal of bindery.js is to provide an approachable jumping-off point for HTML-
 
 bindery.js was originally written in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
 a publication from participants in "HTML Output" at RISD. It was based on the [now-abandoned](https://alistapart.com/blog/post/css-regions-considered-harmful) CSS Regions spec, [polyfill by Remy Francois](https://github.com/FremyCompany/css-regions-polyfill). With thanks to the contributions and feedback from [Catherine Leigh Schmidt](http://cath.land), [Lukas WinklerPrins](http://ltwp.net), and [John Caserta](http://johncaserta.com/).
-
-

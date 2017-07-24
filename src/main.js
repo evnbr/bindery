@@ -50,7 +50,7 @@ class Bindery {
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
 
-    if (opts.standalone) { this.runImmeditately = true; }
+    if (opts.autorun) { this.runImmeditately = true; }
 
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
@@ -112,7 +112,7 @@ class Bindery {
 
   // Convenience constructor
   static makeBook(opts = {}) {
-    opts.standalone = true;
+    opts.autorun = opts.autorun ? opts.autorun : true;
     return new Bindery(opts);
   }
 

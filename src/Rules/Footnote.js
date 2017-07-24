@@ -16,7 +16,7 @@ class Footnote extends BinderyRule {
     state.currentPage.footer.appendChild(fn);
   }
   updateReference(elmt, number) {
-    elmt.insertAdjacentHTML('beforeEnd', `<sup>${number}</sup>`);
+    elmt.insertAdjacentHTML('beforeEnd', `<sup class="bindery-sup">${number}</sup>`);
   }
   customContent(elmt, number) {
     return `${number}: Default footnote for "${elmt.textContent.substr(0, 24)}"`;

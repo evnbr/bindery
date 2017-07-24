@@ -54,33 +54,3 @@ figcaption {
   padding: 1rem;
   margin: 1rem 0;
 }
-
-.toc {
-  list-style: none;
-}
-
-#makeBook {
-  display: inline-block;
-  background: navy;
-  color: white;
-  font-family: sans-serif;
-  padding: 1em 1.5em;
-  cursor: pointer;
-  position: fixed;
-  top: 2em;
-  right: 2em;
-  border-radius: 2px;
-  animation: rotateColor 5s;
-  animation-iteration-count: infinite;
-}
-#makeBook:hover {
-  background: black;
-  animation: none;
-}
-
-@keyframes rotateColor {
-  0%   { background-color: blue; }
-  33%  { background-color: green; }
-  67%  { background-color: maroon; }
-  100% { background-color: blue; }
-}

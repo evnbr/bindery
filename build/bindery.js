@@ -835,7 +835,7 @@ var Bindery = function () {
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
 
-    if (opts.standalone) {
+    if (opts.autorun) {
       this.runImmeditately = true;
     }
 
@@ -1057,7 +1057,7 @@ var Bindery = function () {
     value: function makeBook() {
       var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      opts.standalone = true;
+      opts.autorun = opts.autorun ? opts.autorun : true;
       return new Bindery(opts);
     }
   }]);
@@ -3057,7 +3057,7 @@ var Footnote = function (_BinderyRule) {
   }, {
     key: 'updateReference',
     value: function updateReference(elmt, number) {
-      elmt.insertAdjacentHTML('beforeEnd', '<sup>' + number + '</sup>');
+      elmt.insertAdjacentHTML('beforeEnd', '<sup class="bindery-sup">' + number + '</sup>');
     }
   }, {
     key: 'customContent',
@@ -3214,7 +3214,7 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-show-guides .bindery-running-header {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-num {\n    outline: 1px solid cyan;\n  }\n}\n\n\n.bindery-num, .bindery-running-header, .bindery-footer {\n  font-size: 10pt;\n  line-height: 1.4em;\n}\n\n.bindery-num, .bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in;\n}\n\n.bindery-left .bindery-num {\n  left: 18pt;\n}\n\n.bindery-right .bindery-num {\n  right: 18pt;\n}\n\n.bindery-left .bindery-running-header {\n  left: 40pt;\n  text-align: left;\n}\n\n.bindery-right .bindery-running-header {\n  right: 40pt;\n  text-align: right;\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-show-guides .bindery-running-header {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-num {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-sup {\n  font-size: 0.667em;\n}\n\n.bindery-num, .bindery-running-header, .bindery-footer {\n  font-size: 10pt;\n  line-height: 1.3em;\n}\n\n.bindery-num, .bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in;\n}\n\n.bindery-left .bindery-num {\n  left: 18pt;\n}\n\n.bindery-right .bindery-num {\n  right: 18pt;\n}\n\n.bindery-left .bindery-running-header {\n  left: 40pt;\n  text-align: left;\n}\n\n.bindery-right .bindery-running-header {\n  right: 40pt;\n  text-align: right;\n}\n", ""]);
 
 // exports
 
