@@ -193,7 +193,7 @@
 
 .bindery-val input {
   width: 85px;
-  padding: 4px 0 4px 8px;
+  padding: 4px 6px 4px 8px;
   text-align: right;
   border: none;
   background: none;
@@ -210,7 +210,7 @@
 
 .bindery-size div {
   position: relative;
-  padding: 6px 0 6px 14px;
+  padding: 6px 6px 6px 14px;
   color: #aaa;
 }
 
@@ -302,7 +302,7 @@
 .bindery-margin input {
   text-align: center;
   padding: 0;
-  margin-right: -5px;
+  /*margin-right: -5px;*/
   font-size: 12px;
 }
 .bindery-margin input:focus {
@@ -334,7 +334,7 @@
   bottom: 0;
 }
 .bindery-margin .inner {
-  left: -2px;
+  left: 0;
   text-align: left;
   top: calc(50% - 12px);
 }
@@ -343,7 +343,7 @@
 }
 
 .bindery-margin .outer {
-  right: -2px;
+  right: 0;
   text-align: right;
   top: calc(50% - 12px);
 }

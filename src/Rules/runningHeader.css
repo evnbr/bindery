@@ -31,11 +31,13 @@
 }
 
 .bindery-left .bindery-running-header {
-  left: 40pt;
+  left: 18pt;
+  padding-left: 24pt;
   text-align: left;
 }
 
 .bindery-right .bindery-running-header {
-  right: 40pt;
+  right: 18pt;
+  padding-right: 24pt;
   text-align: right;
 }

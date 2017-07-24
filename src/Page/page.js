@@ -117,16 +117,26 @@ class Page {
     sheet.innerHTML = `
       .bindery-flowbox,
       .bindery-footer {
-        margin-left: ${margin.inner}${Page.unit};
-        margin-right: ${margin.outer}${Page.unit};
+        margin-left: ${margin.inner};
+        margin-right: ${margin.outer};
       }
       .bindery-left .bindery-flowbox,
       .bindery-left .bindery-footer {
-        margin-left: ${margin.outer}${Page.unit};
-        margin-right: ${margin.inner}${Page.unit};
+        margin-left: ${margin.outer};
+        margin-right: ${margin.inner};
       }
-      .bindery-flowbox { margin-top: ${margin.top}${Page.unit}; }
-      .bindery-footer { margin-bottom: ${margin.bottom}${Page.unit}; }
+
+      .bindery-left .bindery-num,
+      .bindery-left .bindery-running-header {
+        left: ${margin.outer};
+      }
+      .bindery-right .bindery-num,
+      .bindery-right .bindery-running-header {
+        right: ${margin.outer};
+      }
+
+      .bindery-flowbox { margin-top: ${margin.top}; }
+      .bindery-footer { margin-bottom: ${margin.bottom}; }
     `;
     document.head.appendChild(sheet);
   }

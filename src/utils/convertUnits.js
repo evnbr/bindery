@@ -20,8 +20,8 @@ const pxToUnit = (pixelVal, unit) => pixelVal / pxInOne[unit];
 const convert = (val, from, to) => pxToUnit(unitToPx(val, from), to);
 
 // const isValidRegEx = /^[+-]?[0-9]+.?([0-9]+)?(px|em|ex|%|in|cm|mm|pt|pc)$/;
-const cssNumberRegEx = /^([+-]?[0-9]+.?([0-9]+))?(px|in|cm|mm|pt|pc)$/;
-const cssNumberPattern = '^([+-]?[0-9]+.?([0-9]+))?(px|in|cm|mm|pt|pc)$';
+const cssNumberRegEx = /^([+-]?[0-9]+.?([0-9]+)?)(px|in|cm|mm|pt|pc)$/;
+const cssNumberPattern = '^([+-]?[0-9]+.?([0-9]+)?)(px|in|cm|mm|pt|pc)$';
 
 const isValidLength = str => cssNumberRegEx.test(str);
 const isValidSize = (size) => {
@@ -44,7 +44,12 @@ const parseVal = (str) => {
   };
 };
 
-const convertStr = (str, to) => {
+const convertStrToPx = (str) => {
+  const parts = parseVal(str);
+  return unitToPx(parts.val, parts.unit);
+};
+
+const convertStrToStr = (str, to) => {
   const parts = parseVal(str);
   return `${pxToUnit(unitToPx(parts.val, parts.unit), to)}${to}`;
 };
@@ -55,5 +60,6 @@ export {
   isValidLength,
   isValidSize,
   convert,
-  convertStr,
+  convertStrToStr,
+  convertStrToPx,
 };

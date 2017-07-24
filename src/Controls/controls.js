@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import { convert, cssNumberPattern } from '../utils/convertUnits';
+import { cssNumberPattern, convertStrToPx } from '../utils/convertUnits';
 
 require('./controls.css');
 
@@ -10,9 +10,9 @@ const select = function (...arg) {
 const option = function (...arg) {
   return h('option', ...arg);
 };
-const inputNumber = function (val) {
-  return h('input', { type: 'number', value: val });
-};
+// const inputNumber = function (val) {
+//   return h('input', { type: 'number', value: val });
+// };
 const inputNumberUnits = function (val) {
   return h('input', {
     type: 'text',
@@ -82,7 +82,7 @@ class Controls {
       doneBtn = btn({ onclick: done }, 'Done');
     }
 
-    const input = {
+    const unitInputs = {
       top: inputNumberUnits(this.binder.pageMargin.top),
       inner: inputNumberUnits(this.binder.pageMargin.inner),
       outer: inputNumberUnits(this.binder.pageMargin.outer),
@@ -92,8 +92,8 @@ class Controls {
     };
 
     const sizeControl = h('.bindery-val.bindery-size',
-      h('div', 'W', input.width),
-      h('div', 'H', input.height),
+      h('div', 'W', unitInputs.width),
+      h('div', 'H', unitInputs.height),
     );
 
     // const changeUnit = (newUnit) => {
@@ -135,10 +135,10 @@ class Controls {
 
     const marginPreview = h('.preview');
     const marginControl = h('.bindery-val.bindery-margin',
-      h('.top', input.top),
-      h('.inner', input.inner),
-      h('.outer', input.outer),
-      h('.bottom', input.bottom),
+      h('.top', unitInputs.top),
+      h('.inner', unitInputs.inner),
+      h('.outer', unitInputs.outer),
+      h('.bottom', unitInputs.bottom),
       marginPreview,
     );
 
@@ -244,10 +244,18 @@ class Controls {
         width = BASE;
         height = (BASE * 1) / ratio;
       }
-      const t = (newMargin.top / newSize.height) * height;
-      const b = (newMargin.bottom / newSize.height) * height;
-      const o = (newMargin.outer / newSize.width) * width;
-      const i = (newMargin.inner / newSize.width) * width;
+      const px = {
+        top: convertStrToPx(newMargin.top).val,
+        inner: convertStrToPx(newMargin.inner),
+        outer: convertStrToPx(newMargin.outer),
+        bottom: convertStrToPx(newMargin.bottom),
+        width: convertStrToPx(newSize.width),
+        height: convertStrToPx(newSize.height),
+      };
+      const t = (px.top / px.height) * height;
+      const b = (px.bottom / px.height) * height;
+      const o = (px.outer / px.width) * width;
+      const i = (px.inner / px.width) * width;
 
       sizeControl.style.width = `${width}px`;
       sizeControl.style.height = `${height}px`;
@@ -287,14 +295,14 @@ class Controls {
 
     const updateLayout = () => {
       const newMargin = {
-        top: input.top.value,
-        inner: input.inner.value,
-        outer: input.outer.value,
-        bottom: input.bottom.value,
+        top: unitInputs.top.value,
+        inner: unitInputs.inner.value,
+        outer: unitInputs.outer.value,
+        bottom: unitInputs.bottom.value,
       };
       const newSize = {
-        height: input.height.value,
-        width: input.width.value,
+        height: unitInputs.height.value,
+        width: unitInputs.width.value,
       };
 
       let needsUpdate = false;
@@ -324,9 +332,9 @@ class Controls {
       updateDelay = setTimeout(updateLayout, 700);
     };
 
-    Object.keys(input).forEach((k) => {
-      input[k].addEventListener('change', throttledUpdate);
-      input[k].addEventListener('keyup', throttledUpdate);
+    Object.keys(unitInputs).forEach((k) => {
+      unitInputs[k].addEventListener('change', throttledUpdate);
+      unitInputs[k].addEventListener('keyup', throttledUpdate);
     });
 
     const layoutState = h('div',
