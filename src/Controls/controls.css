@@ -12,7 +12,7 @@
 }
 
 .bindery-controls {
-  font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+  font: 14px / 1.4 -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -110,12 +110,12 @@
 }
 
 .bindery-label {
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  color: #aaa;
-  letter-spacing: 0.04em;
+  color: #929292;
+  letter-spacing: 0.06em;
   padding: 16px 20px;
-  border-top: 1px solid #ddd;
+  box-shadow: inset 0 0.5px rgba(0,0,0,0.2);
 }
 
 .bindery-viewswitcher {
@@ -148,7 +148,7 @@
   color: black;
 }
 .bindery-viewmode.selected {
-  color: navy;
+  color: black;
 }
 
 .bindery-viewmode.grid .icon {
@@ -175,6 +175,7 @@
   border: none;
   background: transparent;
   padding: 12px;
+  width: 100px;
 }
 
 .bindery-toggle select:hover {
@@ -202,6 +203,7 @@
   right: 0;
   height: 100%;
   width: 100%;
+  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;
 }
 
 .bindery-val input:invalid {
@@ -215,7 +217,7 @@
 }
 
 .bindery-size::before, .bindery-size::after {
-  content: "";
+  /*content: "";*/
   display: block;
   position: absolute;
   background: #a9a9ff;
@@ -270,10 +272,10 @@
 }
 .bindery-margin .preview {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   border: 1px solid #a9a9ff;
   height: auto;
   width: auto;
@@ -282,32 +284,16 @@
   transition: border 0.2s;
 }
 
-.top:hover ~ .preview {
-  border-color: #eee;
-  border-top-color: #a9a9ff;
-}
-.bottom:hover ~ .preview {
-  border-color: #eee;
-  border-bottom-color: #a9a9ff;
-}
-.inner:hover ~ .preview {
-  border-color: #eee;
-  border-left-color: #a9a9ff;
-}
-.outer:hover ~ .preview {
-  border-color: #eee;
-  border-right-color: #a9a9ff;
-}
-
 .bindery-margin input {
   text-align: center;
-  padding: 0;
+  padding: 4px;
   /*margin-right: -5px;*/
   font-size: 12px;
 }
 .bindery-margin input:focus {
   /*text-decoration: underline;*/
-  /*background: none !important;*/
+  color: navy;
+  background: none !important;
 }
 
 .bindery-margin > div  {
@@ -315,7 +301,7 @@
   width: 54px;
   height: 24px;
   z-index: 5;
-  background: white;
+  /*background: white;*/
 }
 .bindery-margin > div:hover {
   z-index: 99;

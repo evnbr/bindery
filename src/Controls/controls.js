@@ -1,48 +1,20 @@
 import h from 'hyperscript';
-import { cssNumberPattern, convertStrToPx } from '../utils/convertUnits';
+import { convertStrToPx } from '../utils/convertUnits';
+import {
+  select,
+  option,
+  btn,
+  btnMain,
+  btnMini,
+  switchRow,
+  row,
+  heading,
+  inputNumberUnits,
+} from './components';
 
 require('./controls.css');
 
-
-const select = function (...arg) {
-  return h('select', ...arg);
-};
-const option = function (...arg) {
-  return h('option', ...arg);
-};
-// const inputNumber = function (val) {
-//   return h('input', { type: 'number', value: val });
-// };
-const inputNumberUnits = function (val) {
-  return h('input', {
-    type: 'text',
-    value: val,
-    pattern: cssNumberPattern,
-  });
-};
-
-const btn = function (...arg) {
-  return h('button.bindery-btn', ...arg);
-};
-const btnMini = function (...arg) {
-  return h('button.bindery-btn.bindery-btn-mini', ...arg);
-};
-const btnMain = function (...arg) {
-  return h('button.bindery-btn.bindery-btn-main', ...arg);
-};
-const toggleSwitch = () => h('.bindery-switch', h('.bindery-switch-handle'));
-const switchRow = function (...arg) {
-  return h('.bindery-toggle', ...arg, toggleSwitch);
-};
-const row = function (...arg) {
-  return h('.bindery-toggle', ...arg);
-};
-const label = function (...arg) {
-  return h('.bindery-label', ...arg);
-};
-
-
-class Controls {
+class ControlPanel {
   constructor(opts) {
     this.holder = h('div.bindery-controls');
     document.body.appendChild(this.holder);
@@ -96,43 +68,6 @@ class Controls {
       h('div', 'H', unitInputs.height),
     );
 
-    // const changeUnit = (newUnit) => {
-    //   const oldUnit = this.binder.pageUnit;
-    //   Object.values(input).forEach((inputEl) => {
-    //     const el = inputEl;
-    //     const newVal = convert(parseFloat(el.value), oldUnit, newUnit);
-    //     const rounded = Math.round(newVal * 100) / 100;
-    //     el.value = rounded;
-    //   });
-    //   this.binder.pageUnit = newUnit;
-    // };
-
-    // const unitSelect = select(
-    //   { onchange() {
-    //     changeUnit(this.value);
-    //   } },
-    //   option({ value: 'px' }, 'Pixels'),
-    //   option({ disabled: true }, '96px = 1 in'),
-    //   option({ disabled: true }, ''),
-    //   option({ value: 'pt' }, 'Points'),
-    //   option({ disabled: true }, '72pt = 1 in'),
-    //   option({ disabled: true }, ''),
-    //   option({ value: 'pc' }, 'Pica'),
-    //   option({ disabled: true }, '6pc = 72pt = 1in'),
-    //   option({ disabled: true }, ''),
-    //   option({ value: 'in' }, 'Inches'),
-    //   option({ disabled: true }, '1in = 96px'),
-    //   option({ disabled: true }, ''),
-    //   option({ value: 'cm' }, 'cm'),
-    //   option({ disabled: true }, '2.54cm = 1in'),
-    //   option({ disabled: true }, ''),
-    //   option({ value: 'mm' }, 'mm'),
-    //   option({ disabled: true }, '25.4mm = 1in'),
-    // );
-    //
-    // unitSelect.value = this.binder.pageUnit;
-    // const unitSwitch = row('Units', unitSelect);
-
     const marginPreview = h('.preview');
     const marginControl = h('.bindery-val.bindery-margin',
       h('.top', unitInputs.top),
@@ -161,9 +96,12 @@ class Controls {
       option({ disabled: true }, 'mm x mm'),
     ));
 
-    const perSheet = row('Pages per Sheet', select(
-      option('1'),
-      option('2'),
+    const arrangement = row('Arrange', select(
+      option('1 up'),
+      option('2 up'),
+      option('8 up'),
+      option('Booklet'),
+      option('Signatures'),
     ));
 
     const orientation = row('Orientation', select(
@@ -230,8 +168,17 @@ class Controls {
     } }, 'Bindery');
 
     const updateLayoutPreview = (newSize, newMargin) => {
-      const BASE = 80;
-      let ratio = newSize.width / newSize.height;
+      const px = {
+        top: convertStrToPx(newMargin.top),
+        inner: convertStrToPx(newMargin.inner),
+        outer: convertStrToPx(newMargin.outer),
+        bottom: convertStrToPx(newMargin.bottom),
+        width: convertStrToPx(newSize.width),
+        height: convertStrToPx(newSize.height),
+      };
+
+      const BASE = 90;
+      let ratio = px.width / px.height;
       ratio = Math.max(ratio, 0.6);
       ratio = Math.min(ratio, 1.8);
 
@@ -244,14 +191,7 @@ class Controls {
         width = BASE;
         height = (BASE * 1) / ratio;
       }
-      const px = {
-        top: convertStrToPx(newMargin.top).val,
-        inner: convertStrToPx(newMargin.inner),
-        outer: convertStrToPx(newMargin.outer),
-        bottom: convertStrToPx(newMargin.bottom),
-        width: convertStrToPx(newSize.width),
-        height: convertStrToPx(newSize.height),
-      };
+
       const t = (px.top / px.height) * height;
       const b = (px.bottom / px.height) * height;
       const o = (px.outer / px.width) * width;
@@ -262,6 +202,7 @@ class Controls {
       marginControl.style.width = `${width}px`;
       marginControl.style.height = `${height}px`;
 
+      console.log(t);
       marginPreview.style.top = `${t}px`;
       marginPreview.style.bottom = `${b}px`;
       marginPreview.style.left = `${i}px`;
@@ -349,17 +290,16 @@ class Controls {
         doneBtn,
         printBtn,
 
-        label(layoutState, 'Pagination'),
+        heading(layoutState, 'Pagination'),
         layoutControl,
-        // unitSwitch,
         facingToggle,
 
-        label('Print'),
+        heading('Print'),
         paperSize,
-        perSheet,
         orientation,
+        arrangement,
 
-        label('View'),
+        heading('View'),
         guidesToggle,
 
         viewSwitcher,
@@ -369,4 +309,4 @@ class Controls {
 
 }
 
-export default Controls;
+export default ControlPanel;
