@@ -8,17 +8,21 @@ class PageReference extends BinderyRule {
   }
   afterAdd(elmt) {
     this.references[elmt.getAttribute('href')] = elmt;
-    elmt.removeAttribute('href');
   }
   afterBind(page) {
     Object.keys(this.references).forEach((ref) => {
       if (page.element.querySelector(ref)) {
-        this.updateReference(this.references[ref], page.number);
+        const original = this.references[ref];
+        const parent = original.parentNode;
+        const newEl = this.replace(original, page.number);
+        parent.replaceChild(newEl, original);
       }
     });
   }
-  updateReference(element, number) {
-    element.insertAdjacentHTML('afterend', ` (Reference to page ${number})`);
+  replace(original, number) {
+    // original.removeAttribute('href');
+    original.insertAdjacentHTML('beforeend', ` ⇝ Page ${number}`);
+    return original;
   }
 }
 

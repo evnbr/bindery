@@ -6,22 +6,28 @@ require('./runningHeader.css');
 class RunningHeader extends BinderyRule {
   constructor(options) {
     options.name = 'Running Header';
+    if (options.beginSection) {
+      options.selector = options.beginSection;
+    }
     super(options);
     this.customClass = options.customClass;
     this.currentHeaderContent = '';
   }
   afterAdd(elmt, state) {
-    this.currentHeaderContent = elmt.textContent;
-    state.currentPage.runningHeader.textContent = '';
+    state.currentPage.section = elmt.textContent;
   }
-  afterPageCreated(page) {
-    const el = h('.bindery-running-header');
-    if (this.customClass) {
-      el.classList.add(this.customClass);
+  afterBind(page) {
+    if (page.section) {
+      this.currentHeaderContent = page.section;
     }
-    page.runningHeader = el;
+    page.section = this.currentHeaderContent;
+
+    const el = h('.bindery-running-header');
+    el.innerHTML = this.render(page);
     page.element.appendChild(el);
-    page.runningHeader.textContent = this.currentHeaderContent;
+  }
+  render(page) {
+    return page.number;
   }
 }
 

@@ -127,25 +127,30 @@
 		Bindery.makeBook({
 		  source: ".content",
 		  rules: [
-				Bindery.BreakBefore({ selector: "h2" }),
+				Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
 				Bindery.Footnote({
-					selector: "p > a",
-					customContent: (elmt, number) => `${number}: Link to <a href='#'>${elmt.href}</a>`,
+					selector: 'p > a',
+					render: (elmt, number) => `${number}: Link to <u>${elmt.href}</u>`,
 				}),
-				Bindery.Footnote({ selector: "p" }),
-				Bindery.FullPage({ selector: ".med-figure" }),
-				Bindery.Spread({ selector: ".big-figure" }),
+				Bindery.Footnote({ selector: 'p' }),
+				Bindery.FullPage({ selector: '.med-figure' }),
+				Bindery.Spread({ selector: '.big-figure' }),
 				Bindery.RunningHeader({
-					selector: "h2",
-					customClass: "myPageHeader",
-				}),
-				Bindery.PageNumber({
-					customClass: "myPageNumber",
+					beginSection: 'h2',
+					render: (page) => {
+						if (page.isEmpty) return '';
+						else if (page.element.querySelector('h2')) return '';
+						else if (page.isLeft) return `${page.number} · ${page.section} `;
+						else if (page.isRight) return `John P. Author · ${page.number}`;
+					},
 				}),
 				Bindery.PageReference({
 					selector: ".toc a",
-					updateReference: (element, number) => {
-						element.insertAdjacentHTML("afterend", `<i style="float:right;">${number}</i>`);
+					replace: (element, number) => {
+						let row = document.createElement('div');
+						row.innerHTML = `${element.textContent}`;
+						row.innerHTML += `<span style='float: right;'>${number}</span>`;
+						return row;
 					}
 				}),
 		  ],

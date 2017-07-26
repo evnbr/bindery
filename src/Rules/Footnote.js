@@ -6,20 +6,27 @@ class Footnote extends BinderyRule {
     options.name = 'Footnote';
     super(options);
   }
-  afterAdd(elmt, state) {
-    const number = state.currentPage.footer.querySelectorAll('.footnote').length;
+  afterAdd(element, state) {
+    const number = state.currentPage.footer.querySelectorAll('.footnote').length + 1;
 
-    this.updateReference(elmt, number);
+    const parent = element.parentNode;
+    const newEl = this.replace(element, number);
+    parent.replaceChild(newEl, element);
 
-    const fn = h('.footnote');
-    fn.innerHTML = this.customContent(elmt, number);
-    state.currentPage.footer.appendChild(fn);
+    const footnote = h('.footnote');
+    const contents = this.render(element, number);
+    if (contents instanceof HTMLElement) footnote.appendChild(contents);
+    else if (typeof contents === 'string') footnote.innerHTML = contents;
+    else footnote.textContent = `${number}: Error: You must return an HTML Element or string from render`;
+
+    state.currentPage.footer.appendChild(footnote);
   }
-  updateReference(elmt, number) {
-    elmt.insertAdjacentHTML('beforeEnd', `<sup class="bindery-sup">${number}</sup>`);
+  replace(element, number) {
+    element.insertAdjacentHTML('beforeEnd', `<sup class="bindery-sup">${number}</sup>`);
+    return element;
   }
-  customContent(elmt, number) {
-    return `${number}: Default footnote for "${elmt.textContent.substr(0, 24)}"`;
+  render(element, number) {
+    return `${number}: Default footnote (<a href='http://evanbrooks.info/bindery/#docs'>Docs</a>)`;
   }
 }
 

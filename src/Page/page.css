@@ -71,8 +71,11 @@
 
 .bindery-footer {
   margin: 60px 40px;
-  margin-top: 4px;
+  margin-top: 8pt;
+  padding-top: 8px;
+  border-top: 1px solid black;
   flex: 0 1 auto;
+  z-index: 2;
 }
 
 [bindery-continuation] {

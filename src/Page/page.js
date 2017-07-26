@@ -70,6 +70,18 @@ class Page {
     }
   }
 
+  get isEmpty() {
+    return this.element.textContent.trim() === '';
+  }
+
+  get isLeft() {
+    return this.side === 'left';
+  }
+
+  get isRight() {
+    return this.side === 'right';
+  }
+
   setPreference(dir) {
     if (dir === 'left') this.alwaysLeft = true;
     if (dir === 'right') this.alwaysRight = true;

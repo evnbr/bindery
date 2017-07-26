@@ -2,9 +2,6 @@
   .bindery-show-guides .bindery-running-header {
     outline: 1px solid cyan;
   }
-  .bindery-show-guides .bindery-num {
-    outline: 1px solid cyan;
-  }
 }
 
 .bindery-sup {
@@ -22,22 +19,12 @@
   top: 0.25in;
 }
 
-.bindery-left .bindery-num {
-  left: 18pt;
-}
-
-.bindery-right .bindery-num {
-  right: 18pt;
-}
-
 .bindery-left .bindery-running-header {
   left: 18pt;
-  padding-left: 24pt;
   text-align: left;
 }
 
 .bindery-right .bindery-running-header {
   right: 18pt;
-  padding-right: 24pt;
   text-align: right;
 }
