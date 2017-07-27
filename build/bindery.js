@@ -1,4 +1,5 @@
-var Bindery =
+// [AIV]  Build version: 1.0.0 - Thursday, July 27th, 2017, 11:00:18 AM  
+ var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -897,6 +898,8 @@ var Bindery = function () {
 
     _classCallCheck(this, Bindery);
 
+    console.log('Bindery ' + '1.0.0');
+
     var pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
     var pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
     this.pageUnit = opts.pageUnit ? opts.pageUnit : DEFAULT_PAGE_UNIT;
@@ -1380,10 +1383,6 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
     var pos = 0;
 
     var step = function step() {
-      if (pos > origText.length - 1) {
-        throttle(doneCallback);
-        return;
-      }
       textNode.nodeValue = origText.substr(0, pos);
 
       if (state.currentPage.hasOverflowed()) {
@@ -1422,6 +1421,10 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
         throttle(step);
         return;
       }
+      if (pos > origText.length - 1) {
+        throttle(doneCallback);
+        return;
+      }
 
       pos += 1;
       while (origText.charAt(pos) !== ' ' && pos < origText.length) {
@@ -1452,6 +1455,11 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
     var childNodes = [].concat(_toConsumableArray(node.childNodes));
     // 2. Clear this node
     node.innerHTML = '';
+
+    if (state.currentPage.hasOverflowed()) {
+      console.error('Bindery: Adding ' + (0, _elementToString2.default)(node) + ' causes overflow even when empty');
+      moveNodeToNextPage(node);
+    }
 
     // 3. Try adding each child one by one
     var index = 0;
@@ -2608,7 +2616,7 @@ var ControlPanel = function ControlPanel(opts) {
 
   var layoutState = (0, _hyperscript2.default)('div', { style: { float: 'right' } }, forceRefresh, validCheck, inProgress);
 
-  this.holder.appendChild((0, _hyperscript2.default)('div', {}, header, doneBtn, printBtn, (0, _components.heading)(layoutState, 'Pagination'), layoutControl, facingToggle, (0, _components.heading)('Print'), paperSize, orientation, arrangement, (0, _components.heading)('View'), guidesToggle, viewSwitcher));
+  this.holder.appendChild((0, _hyperscript2.default)('div', {}, header, doneBtn, printBtn, (0, _components.heading)(layoutState, 'Pagination'), layoutControl, facingToggle, (0, _components.heading)('Print'), paperSize, orientation, arrangement, (0, _components.switchRow)('Crop Marks'), (0, _components.heading)('View'), guidesToggle, viewSwitcher));
 };
 
 exports.default = ControlPanel;
@@ -3376,4 +3384,4 @@ exports.push([module.i, "@media screen {\n  .bindery-show-guides .bindery-runnin
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=bindery.js.map
+//# sourceMappingURL=bindery.js.map 
