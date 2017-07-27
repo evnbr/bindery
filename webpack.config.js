@@ -1,3 +1,4 @@
+var WebpackAutoInject = require('webpack-auto-inject-version');
 
 const isProd = process.argv.indexOf('-p') !== -1;
 
@@ -10,6 +11,18 @@ module.exports = {
     library: 'Bindery',
     path: `${__dirname}/build/`,
   },
+  plugins: [
+    new WebpackAutoInject({
+      components: {
+        AutoIncreaseVersion: false,
+      },
+      componentsOptions: {
+        InjectAsComment: {
+          tag: 'Build version: {version} - {date}', // default
+        },
+      },
+    }),
+  ],
   module: {
     rules: [
       {

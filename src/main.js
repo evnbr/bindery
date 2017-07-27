@@ -37,6 +37,8 @@ const arraysEqual = (a, b) => {
 
 class Bindery {
   constructor(opts) {
+    console.log(`Bindery ${'[AIV]{version}[/AIV]'}`);
+
     const pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
     const pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
     this.pageUnit = opts.pageUnit ? opts.pageUnit : DEFAULT_PAGE_UNIT;
