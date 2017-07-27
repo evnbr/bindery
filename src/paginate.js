@@ -215,10 +215,6 @@ const paginate = function (
     let pos = 0;
 
     const step = () => {
-      if (pos > origText.length - 1) {
-        throttle(doneCallback);
-        return;
-      }
       textNode.nodeValue = origText.substr(0, pos);
 
       if (state.currentPage.hasOverflowed()) {
@@ -255,6 +251,10 @@ const paginate = function (
         }
 
         throttle(step);
+        return;
+      }
+      if (pos > origText.length - 1) {
+        throttle(doneCallback);
         return;
       }
 
