@@ -289,6 +289,11 @@ const paginate = function (
     // 2. Clear this node
     node.innerHTML = '';
 
+    if (state.currentPage.hasOverflowed()) {
+      console.error(`Bindery: Adding ${elToStr(node)} causes overflow even when empty`);
+      moveNodeToNextPage(node);
+    }
+
     // 3. Try adding each child one by one
     let index = 0;
     const addNextChild = () => {
