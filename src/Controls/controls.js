@@ -298,6 +298,8 @@ class ControlPanel {
         paperSize,
         orientation,
         arrangement,
+        switchRow('Crop Marks'),
+
 
         heading('View'),
         guidesToggle,

@@ -55,6 +55,7 @@ class Bindery {
 
     if (opts.autorun) { this.runImmeditately = true; }
 
+    this.autoupdate = opts.autoupdate ? opts.autoupdate : false;
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
     if (!opts.source) {
@@ -221,9 +222,11 @@ class Bindery {
   }
 
   startCheckingLayout() {
-    this.layoutChecker = setInterval(() => {
-      this.checkLayoutChange();
-    }, 500);
+    if (this.autoupdate) {
+      this.layoutChecker = setInterval(() => {
+        this.checkLayoutChange();
+      }, 500);
+    }
   }
 
   stopCheckingLayout() {

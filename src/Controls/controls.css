@@ -292,7 +292,6 @@
 }
 .bindery-margin input:focus {
   /*text-decoration: underline;*/
-  color: navy;
   background: none !important;
 }
 
