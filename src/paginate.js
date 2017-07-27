@@ -1,45 +1,11 @@
 import elToStr from './utils/elementToString';
 import Page from './Page/page';
 
+const SHOULD_DEBUG_TEXT = false;
 
 const last = arr => arr[arr.length - 1];
 
 // TODO: only do this if not double sided?
-const reorderPages = (pages) => {
-  const orderedPages = pages;
-
-  // TODO: this ignores the cover page, assuming its on the right
-  for (let i = 1; i < orderedPages.length - 1; i += 2) {
-    const left = orderedPages[i];
-
-    // TODO: Check more than once
-    if (left.alwaysRight) {
-      if (left.outOfFlow) {
-        orderedPages[i] = pages[i + 1];
-        orderedPages[i + 1] = left;
-      } else {
-        pages.splice(i, 0, new Page());
-      }
-    }
-
-    const right = orderedPages[i + 1];
-
-    if (right.alwaysLeft) {
-      if (right.outOfFlow) {
-        // TODO: don't overflow, assumes that
-        // there are not multiple spreads in a row
-        orderedPages[i + 1] = pages[i + 3];
-        orderedPages[i + 3] = right;
-      } else {
-        pages.splice(i + 1, 0, new Page());
-      }
-    }
-  }
-
-  return orderedPages;
-};
-
-
 const clonePath = (origPath) => {
   const newPath = [];
   for (let i = origPath.length - 1; i >= 0; i -= 1) {
@@ -72,10 +38,12 @@ const paginate = function (
   // to prevent the call stack from getting too big.
   //
   // There might be a better way to do this.
-  const MAX_CALLS = 1000;
+  const MAX_CALLS = 500;
   let numberOfCalls = 0;
-  const throttle = (func) => {
-    if (DELAY > 0) {
+  const throttle = (func, shouldPause) => {
+    if (shouldPause) {
+      window.paginateStep = func;
+    } else if (DELAY > 0) {
       setTimeout(func, DELAY);
     } else if (numberOfCalls < MAX_CALLS) {
       numberOfCalls += 1;
@@ -96,6 +64,7 @@ const paginate = function (
   const makeNextPage = () => {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
       console.warn('Bindery: Moved to new page when last one is still overflowing', state.currentPage.element);
+      throw Error('Overflowed');
     }
     if (state.pages.length === 500) {
       console.warn('Bindery: More than 500 pages, performance may be slow.');
@@ -129,35 +98,78 @@ const paginate = function (
     return newPage;
   };
 
+  const makeSpacerPage = () => {
+    const newPage = new Page();
+    newPage.creationOrder = state.pages.length;
+    newPageRules(newPage);
+    return newPage;
+  };
+
+  const reorderPages = (pages) => {
+    const orderedPages = pages;
+
+    // TODO: this ignores the cover page, assuming its on the right
+    for (let i = 1; i < orderedPages.length - 1; i += 2) {
+      const left = orderedPages[i];
+
+      // TODO: Check more than once
+      if (left.alwaysRight) {
+        if (left.outOfFlow) {
+          orderedPages[i] = pages[i + 1];
+          orderedPages[i + 1] = left;
+        } else {
+          pages.splice(i, 0, makeSpacerPage());
+        }
+      }
+
+      const right = orderedPages[i + 1];
+
+      if (right.alwaysLeft) {
+        if (right.outOfFlow) {
+          // TODO: don't overflow, assumes that
+          // there are not multiple spreads in a row
+          orderedPages[i + 1] = pages[i + 3];
+          orderedPages[i + 3] = right;
+        } else {
+          pages.splice(i + 1, 0, new Page());
+        }
+      }
+    }
+
+    return orderedPages;
+  };
+
+
   const beforeAddRules = (elmt) => {
     rules.forEach((rule) => {
       if (!rule.selector) return;
       if (elmt.matches(rule.selector) && rule.beforeAdd) {
-        const backupPg = state.currentPage.clone();
-        const backupElmt = elmt.cloneNode(true);
         rule.beforeAdd(elmt, state, makeNextPage);
-
-        if (state.currentPage.hasOverflowed()) {
-          console.log('restoring from backup');
-          // restore from backup
-          elmt.innerHTML = backupElmt.innerHTML; // TODO: make less hacky
-
-          const idx = state.pages.indexOf(state.currentPage);
-          state.pages[idx] = backupPg;
-          state.currentPage = backupPg;
-
-          state.currentPage = makeNextPage();
-
-          rule.beforeAdd(elmt, state, makeNextPage);
-        }
       }
     });
   };
+
   const afterAddRules = (elmt) => {
     rules.forEach((rule) => {
       if (!rule.selector) return;
       if (elmt.matches(rule.selector) && rule.afterAdd) {
-        rule.afterAdd(elmt, state, makeNextPage);
+        rule.afterAdd(elmt, state, makeNextPage, function overflowCallback() {
+          // TODO:
+          // While this does catch overflows, it introduces a few new bugs.
+          // It is pretty aggressive to move the entire node to the next page.
+          // - 1. there is no guarentee it will fit on the new page
+          // - 2. if it has childNodes, those rules will not be invalidated,
+          // which means footnotes will get left ona previous page.
+          // - 3. if it is a large paragraph, it will leave a large gap. the
+          // correct approach would be to only need to invalidate
+          // the last line of text.
+          elmt.parentNode.removeChild(elmt);
+          makeNextPage();
+          last(state.path).appendChild(elmt);
+          rule.afterAdd(elmt, state, makeNextPage, () => {
+            console.log(`Couldn't apply ${rule.name} to ${elToStr(elmt)}. Caused overflows twice.`);
+          });
+        });
       }
     });
   };
@@ -172,49 +184,52 @@ const paginate = function (
   };
 
   const moveNodeToNextPage = (nodeToMove) => {
-    // nodeToMove.style.outline = "1px solid red";
+    // console.log(`Moving ${elToStr(nodeToMove)} to next page`);
 
-    // TODO: This breaks example 3 but is required for example 2.
-    state.path.pop();
+    const discarded = state.path.pop();     // TODO: this is unclear.
+    // console.log(`Discard ${elToStr(discarded)}`);
 
-    // const old = state.currentPage.creationOrder;
-    // let fn = state.currentPage.footer.lastChild; // <--
+    // remove from old page
+    nodeToMove.parentNode.removeChild(nodeToMove);
+
     state.currentPage = makeNextPage();
-    // if (fn) state.currentPage.footer.appendChild(fn); // <-- move footnote to new page
 
-    // console.log(`moved "${ elToStr(nodeToMove)}" from page ${old}
-    // to ${state.currentPage.creationOrder}`);
-
+    // append to new page
     last(state.path).appendChild(nodeToMove);
+
     state.path.push(nodeToMove);
   };
 
-  // Adds an text node by binary searching amount of
-  // words until it just barely doesnt overflow
+  // Adds an text node by incrementally adding words
+  // until it just barely doesnt overflow
   const addTextNode = (originalNode, doneCallback, abortCallback) => {
     let textNode = originalNode;
     let origText = textNode.nodeValue;
     last(state.path).appendChild(textNode);
 
-    let lastPos = 0;
-    let pos = origText.length / 2;
+    if (!state.currentPage.hasOverflowed()) {
+      throttle(doneCallback);
+      return;
+    }
+
+    let pos = 0;
 
     const step = () => {
-      const dist = Math.abs(lastPos - pos);
-
       if (pos > origText.length - 1) {
         throttle(doneCallback);
         return;
       }
       textNode.nodeValue = origText.substr(0, pos);
 
-      if (dist < 1) { // Is done
+      if (state.currentPage.hasOverflowed()) {
         // Back out to word boundary
-        while (origText.charAt(pos) !== ' ' && pos > -1) pos -= 1;
+        if (origText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
+        while (origText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
 
-        if (pos < 1 && origText.trim().length > 0) {
-          // console.error(`Bindery: Aborted adding "${origText.substr(0,25)}..."`);
+        // if (pos < 1 && origText.trim().length > 0) {
+        if (pos < 1) {
           textNode.nodeValue = origText;
+          textNode.parentNode.removeChild(textNode);
           abortCallback();
           return;
         }
@@ -224,16 +239,7 @@ const paginate = function (
         textNode.nodeValue = fittingText;
         origText = overflowingText;
 
-        // pos = 0; // IS THIS THE PROBLEM?
-        lastPos = 0;
-        pos = origText.length / 2;
-
-        // console.log("Dividing text node: ...",
-        //   fittingText.substr(fittingText.length - 24),
-        //   " 🛑 ",
-        //   overflowingText.substr(0, 24),
-        //   "..."
-        // );
+        pos = 0;
 
         // Start on new page
         state.currentPage = makeNextPage();
@@ -251,26 +257,23 @@ const paginate = function (
         throttle(step);
         return;
       }
-      lastPos = pos;
 
-      const hasOverflowed = state.currentPage.hasOverflowed();
-      pos += (hasOverflowed ? -dist : dist) / 2;
+      pos += 1;
+      while (origText.charAt(pos) !== ' ' && pos < origText.length) pos += 1;
 
-      throttle(step);
+
+      throttle(step, SHOULD_DEBUG_TEXT);
     };
 
-    if (state.currentPage.hasOverflowed()) {
-      step(); // find breakpoint
-    } else throttle(doneCallback); // add in one go
+    step(); // find breakpoint
   };
-
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
   const addElementNode = (node, doneCallback) => {
     if (state.currentPage.hasOverflowed()) {
       // node.style.outline = "1px solid red";
-      console.error('Bindery: Trying to node to a page that\'s already overflowing');
+      console.error('Bindery: Trying to add node to a page that\'s already overflowing');
     }
 
     // Add this node to the current page or context
@@ -299,16 +302,9 @@ const paginate = function (
       switch (child.nodeType) {
       case Node.TEXT_NODE: {
         const abortCallback = () => {
-            // let lastNode = last(state.path);
-            // console.log("— last node in stack:")
-            // console.log(elToStr(lastNode));
-            // console.log("— proposed node to move:")
-            // console.log(elToStr(node));
           moveNodeToNextPage(node);
           addTextNode(child, addNextChild, abortCallback);
         };
-          // console.log(`Adding text child of "${elToStr(node)}"`);
-          // console.log(`Beginning to add "${child.nodeValue.substr(0,24)}"`);
         addTextNode(child, addNextChild, abortCallback);
         break;
       }
@@ -320,20 +316,26 @@ const paginate = function (
 
         beforeAddRules(child);
 
-        throttle(() => {
-          addElementNode(child, () => {
-            const addedChild = state.path.pop(); // WHYY
+        throttle(function addChildAsElement() {
+          addElementNode(child, function addedChildSuccess() {
+            // TODO: Because addElementNode will push node onto the path again
+            const addedChild = state.path.pop();
             // let addedChild = last(state.path);
+
             // TODO: AfterAdd rules may want to access original child, not split second half
             afterAddRules(addedChild);
+
+            if (state.currentPage.hasOverflowed()) {
+              console.log('wasn\'t really a success was it');
+            }
             addNextChild();
           });
         });
         break;
       }
       default:
-        console.log(`Bindery: Unknown node type: ${child.nodeType}`);
-        addNextChild(); // skip
+        // Skip unknown nodes
+        addNextChild();
       }
     };
 
@@ -355,6 +357,7 @@ const paginate = function (
     const facingPages = true; // TODO: Pass in facingpages options
     if (facingPages) {
       orderedPages.forEach((page, i) => {
+        page.number = i + 1;
         page.setLeftRight((i % 2 === 0) ? 'right' : 'left');
       });
     } else {

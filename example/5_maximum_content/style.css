@@ -52,6 +52,7 @@ sup {
 }
 
 figure {
+  max-width: 100%;
   height: 300px;
   width: 400px;
   background: gray;

@@ -11,6 +11,7 @@ module.exports = {
     'linebreak-style': ['error', 'unix'],
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
+    'prefer-arrow-callback': ['error', { 'allowNamedFunctions': true }],
     'no-unused-vars': ['warn'],
     'no-console': 0,
     'class-methods-use-this': 0,

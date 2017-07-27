@@ -9,7 +9,7 @@ const elementToString = (node) => {
 
   let text = '';
   if (id.length < 1 && classes.length < 2) {
-    text = `("${node.textContent.substr(0, 20).replace(/\s+/g, ' ')}...")`;
+    text = `("${node.textContent.substr(0, 30).replace(/\s+/g, ' ')}...")`;
   }
   return tag + id + classes + text;
 };

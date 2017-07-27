@@ -14,9 +14,9 @@ const DEFAULT_PAGE_SIZE = {
   height: '432pt',
 };
 const DEFAULT_PAGE_MARGIN = {
-  inner: '18pt',
-  outer: '18pt',
-  bottom: '24pt',
+  inner: '24pt',
+  outer: '32pt',
+  bottom: '54pt',
   top: '48pt',
 };
 // const DEFAULT_BLEED = {
@@ -223,6 +223,7 @@ class Bindery {
       this.checkLayoutChange();
     }, 500);
   }
+
   stopCheckingLayout() {
     if (this.layoutChecker) {
       clearInterval(this.layoutChecker);
