@@ -68,6 +68,10 @@
   flex: 1 1 auto;
   min-height: 0;
 }
+.bindery-content {
+  /* hack to prevent margin collapse, leading to wrong height */
+  padding: 0.1px;
+}
 
 /* Footer */
 .bindery-footer {
