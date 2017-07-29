@@ -1,4 +1,4 @@
-var WebpackAutoInject = require('webpack-auto-inject-version');
+const WebpackAutoInject = require('webpack-auto-inject-version');
 
 const isProd = process.argv.indexOf('-p') !== -1;
 
@@ -42,11 +42,23 @@ module.exports = {
         },
       },
       {
-        test: /\.svg/,
-        loader: 'svg-url-loader',
-        options: {},
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'svg-url-loader',
+          },
+          {
+            loader: 'svgo-loader',
+            options: {
+              plugins: [
+                { removeTitle: true },
+                { convertColors: { shorthex: false } },
+                { convertPathData: false },
+              ],
+            },
+          },
+        ],
       },
-
     ],
   },
 };
