@@ -32,14 +32,8 @@ bindery.js is a library for producing book layouts in the browser. The core libr
     Bindery.makeBook({
       source: ".content",
       rules: [
-        Bindery.PageBreak({
-          selector: 'h2',
-          position: 'before',
-          continue: 'right',
-        }),
-        Bindery.RunningHeader({
-          beginSection: 'h2',
-        }),
+        Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+        Bindery.RunningHeader({ beginSection: 'h2' }),
         Bindery.Footnote({
           selector: 'p > a',
           render: function(element, number) {
