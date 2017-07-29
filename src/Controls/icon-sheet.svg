@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="36px" height="36px" viewBox="0 0 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
     <title>icon-sheet</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="icon-sheet" stroke="#000000">
-            <rect id="Rectangle-2-Copy" x="1.5" y="4.5" width="32" height="26"></rect>
-            <path d="M17.5,7.5 L17.5,9.5" id="Line-2-Copy" stroke-linecap="square"></path>
-            <path d="M8.5,7.5 L8.5,9.5" id="Line-2-Copy-2" stroke-linecap="square"></path>
-            <path d="M26.5,7.5 L26.5,9.5" id="Line-2-Copy-3" stroke-linecap="square"></path>
-            <path d="M4.5,11.5 L6.5,11.5" id="Line-3" stroke-linecap="square"></path>
-            <path d="M28.5,11.5 L30.5,11.5" id="Line-3-Copy" stroke-linecap="square"></path>
-            <path d="M17.5,24.5 L17.5,26.5" id="Line-2-Copy-4" stroke-linecap="square" transform="translate(17.500000, 25.500000) scale(1, -1) translate(-17.500000, -25.500000) "></path>
-            <path d="M8.5,24.5 L8.5,26.5" id="Line-2-Copy-5" stroke-linecap="square" transform="translate(8.500000, 25.500000) scale(1, -1) translate(-8.500000, -25.500000) "></path>
-            <path d="M26.5,23.5 L26.5,26.5" id="Line-2-Copy-6" stroke-linecap="square" transform="translate(27.000000, 25.000000) scale(1, -1) translate(-27.000000, -25.000000) "></path>
-            <path d="M4.5,22.5 L6.5,22.5" id="Line-3-Copy-2" stroke-linecap="square" transform="translate(5.500000, 22.500000) scale(1, -1) translate(-5.500000, -22.500000) "></path>
-            <path d="M26.5,21.5 L30.5,21.5" id="Line-3-Copy-3" stroke-linecap="square" transform="translate(28.500000, 22.000000) scale(1, -1) translate(-28.500000, -22.000000) "></path>
+            <rect id="Rectangle-2-Copy-13" x="4.5" y="5.5" width="24" height="19"></rect>
+            <path d="M7.5,8.5 L9.5,8.5" id="Line" stroke-linecap="square"></path>
+            <path d="M14.5,8.5 L16.5,8.5" id="Line-Copy-9" stroke-linecap="square"></path>
+            <path d="M14.5,21.5 L16.5,21.5" id="Line-Copy-11" stroke-linecap="square"></path>
+            <path d="M16.5,8.5 L18.5,8.5" id="Line-Copy-10" stroke-linecap="square"></path>
+            <path d="M16.5,21.5 L18.5,21.5" id="Line-Copy-12" stroke-linecap="square"></path>
+            <path d="M23.5,8.5 L25.5,8.5" id="Line-Copy-7" stroke-linecap="square"></path>
+            <path d="M23.5,21.5 L25.5,21.5" id="Line-Copy-8" stroke-linecap="square"></path>
+            <path d="M7.5,21.5 L9.5,21.5" id="Line-Copy" stroke-linecap="square"></path>
+            <path d="M7.5,8.5 L7.5,10.5" id="Line" stroke-linecap="square"></path>
+            <path d="M25.5,8.5 L25.5,10.5" id="Line-Copy-5" stroke-linecap="square"></path>
+            <path d="M16.5,8.5 L16.5,10.5" id="Line-Copy-3" stroke-linecap="square"></path>
+            <path d="M7.5,19.5 L7.5,21.5" id="Line-Copy-2" stroke-linecap="square"></path>
+            <path d="M25.5,19.5 L25.5,21.5" id="Line-Copy-6" stroke-linecap="square"></path>
+            <path d="M16.5,19.5 L16.5,21.5" id="Line-Copy-4" stroke-linecap="square"></path>
         </g>
     </g>
 </svg>

@@ -51,16 +51,20 @@ class Viewer {
   constructor() {
     this.pages = [];
 
-    this.doubleSided = true;
-    this.twoUp = false;
-    this.isShowingCropMarks = true;
+    this.export = h('.bindery-export');
 
-    this.mode = 'grid';
+    this.doubleSided = true;
+    this.printArrange = ARRANGE_SPREAD;
+    this.isShowingCropMarks = true;
+    this.setOrientation('landscape');
+
+    this.mode = MODE_PREVIEW;
     this.currentLeaf = 0;
 
-    this.export = h('.bindery-export');
-    this.export.setAttribute('bindery-export', true);
+    this.listenForPrint();
+  }
 
+  listenForPrint() {
     // Automatically switch into print mode
     if (window.matchMedia) {
       const mediaQueryList = window.matchMedia('print');
@@ -83,6 +87,23 @@ class Viewer {
       this.export.classList.add('bindery-show-crop');
     } else {
       this.export.classList.remove('bindery-show-crop');
+    }
+  }
+
+  setOrientation(newVal) {
+    if (newVal === this.orientation) return;
+    this.orientation = newVal;
+    setOrientationCSS(newVal);
+    if (this.mode === MODE_SHEET) {
+      this.update();
+    }
+  }
+
+  setPrintArrange(newVal) {
+    if (newVal === this.printArrange) return;
+    this.printArrange = newVal;
+    if (this.mode === MODE_SHEET) {
+      this.update();
     }
   }
 
@@ -117,15 +138,21 @@ class Viewer {
     case 'grid':
     case 'standard':
     case 'default':
-      this.mode = 'grid';
+      this.mode = MODE_PREVIEW;
       break;
     case 'interactive':
-    case 'preview':
+    case 'flip':
     case '3d':
-      this.mode = 'interactive';
+      this.mode = MODE_FLIP;
       break;
     case 'print':
-      this.mode = 'print';
+    case 'sheet':
+      this.mode = MODE_SHEET;
+      break;
+    case 'outline':
+    case 'outlines':
+    case 'guides':
+      this.mode = MODE_OUTLINE;
       break;
     default:
       console.error(`Bindery: Unknown view mode "${newMode}"`);
@@ -133,16 +160,32 @@ class Viewer {
     }
   }
   setGrid() {
-    this.mode = 'grid';
-    this.update();
+    if (this.mode === MODE_PREVIEW) return;
+    if (this.mode === MODE_OUTLINE) {
+      this.mode = MODE_PREVIEW;
+      this.updateGuides();
+    } else {
+      this.mode = MODE_PREVIEW;
+      this.update();
+    }
+  }
+  setOutline() {
+    if (this.mode === MODE_OUTLINE) return;
+    if (this.mode === MODE_PREVIEW) {
+      this.mode = MODE_OUTLINE;
+      this.updateGuides();
+    } else {
+      this.mode = MODE_OUTLINE;
+      this.update();
+    }
   }
   setPrint() {
-    this.mode = 'print';
+    if (this.mode === MODE_SHEET) return;
+    this.mode = MODE_SHEET;
     this.update();
   }
   setInteractive() {
-    this.mode = 'interactive';
-    this.export.classList.remove('bindery-show-bleed');
+    this.mode = MODE_FLIP;
     this.update();
   }
   update() {
@@ -152,11 +195,13 @@ class Viewer {
 
     document.body.classList.add('bindery-viewing');
 
-    if (this.mode === 'grid') {
+    if (this.mode === MODE_PREVIEW) {
       this.renderGrid();
-    } else if (this.mode === 'interactive') {
+    } else if (this.mode === MODE_OUTLINE) {
+      this.renderGrid();
+    } else if (this.mode === MODE_FLIP) {
       this.renderInteractive();
-    } else if (this.mode === 'print') {
+    } else if (this.mode === MODE_SHEET) {
       this.renderPrint();
     } else {
       this.renderGrid();
@@ -164,9 +209,11 @@ class Viewer {
   }
 
   renderPrint() {
-    this.mode = 'print';
+    this.mode = MODE_SHEET;
     this.export.style.display = 'block';
+
     this.export.classList.add('bindery-show-bleed');
+    this.export.classList.remove('bindery-show-guides');
 
     this.export.innerHTML = '';
 
@@ -196,6 +243,24 @@ class Viewer {
       pages.unshift(spacerPage);
       pages.push(spacerPage2);
     }
+    if (this.printArrange === ARRANGE_BOOKLET) {
+      while (pages.length % 4 !== 0) {
+        const spacerPage = new Page();
+        spacerPage.element.style.visibility = 'hidden';
+        pages.push(spacerPage);
+      }
+      const bookletOrder = [];
+      const len = pages.length;
+
+      for (let i = 0; i < len / 2; i += 2) {
+        bookletOrder.push(pages[len - 1 - i]);
+        bookletOrder.push(pages[i]);
+        bookletOrder.push(pages[i + 1]);
+        bookletOrder.push(pages[len - 2 - i]);
+      }
+
+      pages = bookletOrder;
+    }
 
 
     for (let i = 0; i < pages.length; i += (isTwoUp ? 2 : 1)) {
@@ -211,6 +276,15 @@ class Viewer {
           leftPage, rightPage, cropMarksSpread()
         ));
 
+        if (this.printArrange === ARRANGE_BOOKLET) {
+          const isFront = i % 4 === 0;
+          const sheetIndex = parseInt((i + 1) / 4, 10) + 1;
+          const meta = h(
+            '.bindery-print-meta',
+            `Sheet ${sheetIndex} of ${pages.length / 4}: ${isFront ? 'Outside' : 'Inside'}`);
+          sheet.appendChild(meta);
+        }
+
 
         this.export.appendChild(sheet);
       } else {
@@ -224,10 +298,19 @@ class Viewer {
     }
   }
 
+  updateGuides() {
+    if (this.mode === MODE_OUTLINE) {
+      this.export.classList.add('bindery-show-bleed');
+      this.export.classList.add('bindery-show-guides');
+    } else {
+      this.export.classList.remove('bindery-show-bleed');
+      this.export.classList.remove('bindery-show-guides');
+    }
+  }
+
   renderGrid() {
-    this.mode = 'grid';
+    this.updateGuides();
     this.export.style.display = 'block';
-    this.export.classList.remove('bindery-show-bleed');
 
     this.export.innerHTML = '';
 
@@ -275,11 +358,13 @@ class Viewer {
     }
   }
   renderInteractive() {
-    this.mode = 'interactive';
+    this.mode = MODE_FLIP;
     this.export.style.display = 'block';
     this.export.innerHTML = '';
     this.flaps = [];
+
     this.export.classList.remove('bindery-show-bleed');
+    this.export.classList.remove('bindery-show-guides');
 
     const pages = this.pages.slice();
 
@@ -308,7 +393,6 @@ class Viewer {
           this.setLeaf(newLeaf);
         },
       });
-      // this.makeDraggable(flap);
       this.export.classList.add('bindery-stage3d');
       this.flaps.push(flap);
 
@@ -331,12 +415,6 @@ class Viewer {
       // TODO: Dynamically add/remove pages.
       // Putting 1000s of elements onscreen
       // locks up the browser.
-      // if (i > 200) {
-      //   rightPage.style.display = 'none';
-      //   leftPage.style.display = 'none';
-      //   flap.style.background = '#ddd';
-      // }
-
 
       let leftOffset = 4;
       if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
@@ -362,32 +440,6 @@ class Viewer {
       flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${z}px) rotateY(${(i < n) ? -180 : 0}deg)`;
     });
   }
-  // makeDraggable(flap) {
-  //   let isDragging = false;
-  //   let pct = 0;
-  //   flap.addEventListener('mousedown', () => {
-  //     isDragging = true;
-  //     flap.style.transition = 'none';
-  //   });
-  //   document.body.addEventListener('mousemove', (e) => {
-  //     if (isDragging) {
-  //       e.preventDefault();
-  //       const pt = coords(e);
-  //       pct = progress01(pt.x, 1000, 200);
-  //       const ang = transition(pct, 0, -180);
-  //       const z = this.flaps.length;
-  //       flap.style.transform = `translate3d(${0}px,0,${z * 5}px) rotateY(${ang}deg)`;
-  //     }
-  //   });
-  //   document.body.addEventListener('mouseup', (e) => {
-  //     if (isDragging) {
-  //       isDragging = false;
-  //       flap.style.transition = '';
-  //       if (pct > 0.5) this.setLeaf(this.currentLeaf);
-  //       else this.setLeaf(this.currentLeaf + 1);
-  //     }
-  //   });
-  // }
 }
 
 // const transition = (pct, a, b) => a + (pct * (b - a));

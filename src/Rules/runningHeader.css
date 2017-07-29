@@ -1,9 +1,3 @@
-@media screen {
-  .bindery-show-guides .bindery-running-header {
-    outline: 1px solid cyan;
-  }
-}
-
 .bindery-sup {
   font-size: 0.667em;
 }

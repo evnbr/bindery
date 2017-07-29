@@ -15,6 +15,7 @@ class RunningHeader extends BinderyRule {
   }
   afterAdd(elmt, state) {
     state.currentPage.section = elmt.textContent;
+    return elmt;
   }
   afterBind(page) {
     if (page.section) {

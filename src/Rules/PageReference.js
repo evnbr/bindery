@@ -24,7 +24,7 @@ class PageReference extends BinderyRule {
   }
   replace(original, number) {
     // original.removeAttribute('href');
-    original.insertAdjacentHTML('beforeend', ` ⇝ Page ${number}`);
+    original.insertAdjacentHTML('beforeend', ` ↝ Page ${number}`);
     return original;
   }
 }

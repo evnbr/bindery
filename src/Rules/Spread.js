@@ -15,6 +15,7 @@ class Spread extends BinderyRule {
     this.prevElementPath = state.path;
 
     requestNewPage();
+    return elmt;
   }
   afterAdd(elmt, state, requestNewPage) {
     const leftPage = state.currentPage;
@@ -36,6 +37,8 @@ class Spread extends BinderyRule {
 
     state.currentPage = this.prevPage;
     state.path = this.prevElementPath;
+
+    return elmt;
   }
 }
 

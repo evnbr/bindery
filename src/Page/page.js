@@ -2,7 +2,6 @@ import h from 'hyperscript';
 import { parseVal } from '../utils/convertUnits';
 
 require('./page.css');
-require('./measureArea.css');
 
 class Page {
   constructor() {

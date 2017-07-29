@@ -1,4 +1,4 @@
-// [AIV]  Build version: 1.0.0 - Thursday, July 27th, 2017, 11:14:37 AM  
+// [AIV]  Build version: 2.0.0-alpha.2 - Saturday, July 29th, 2017, 3:05:40 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -675,7 +675,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 __webpack_require__(13);
-__webpack_require__(15);
 
 var Page = function () {
   function Page() {
@@ -844,7 +843,7 @@ var _page = __webpack_require__(5);
 
 var _page2 = _interopRequireDefault(_page);
 
-var _viewer = __webpack_require__(17);
+var _viewer = __webpack_require__(15);
 
 var _viewer2 = _interopRequireDefault(_viewer);
 
@@ -854,7 +853,7 @@ var _controls2 = _interopRequireDefault(_controls);
 
 var _convertUnits = __webpack_require__(4);
 
-var _Rules = __webpack_require__(29);
+var _Rules = __webpack_require__(30);
 
 var _Rules2 = _interopRequireDefault(_Rules);
 
@@ -898,7 +897,7 @@ var Bindery = function () {
 
     _classCallCheck(this, Bindery);
 
-    console.log('Bindery ' + '1.0.0');
+    console.log('Bindery ' + '2.0.0-alpha.2');
 
     var pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
     var pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
@@ -1311,20 +1310,22 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
     return orderedPages;
   };
 
-  var beforeAddRules = function beforeAddRules(elmt) {
+  var beforeAddRules = function beforeAddRules(element) {
+    var addedElement = element;
     rules.forEach(function (rule) {
       if (!rule.selector) return;
-      if (elmt.matches(rule.selector) && rule.beforeAdd) {
-        rule.beforeAdd(elmt, state, makeNextPage);
+      if (addedElement.matches(rule.selector) && rule.beforeAdd) {
+        addedElement = rule.beforeAdd(addedElement, state, makeNextPage);
       }
     });
   };
 
-  var afterAddRules = function afterAddRules(elmt) {
+  var afterAddRules = function afterAddRules(element) {
+    var addedElement = element;
     rules.forEach(function (rule) {
       if (!rule.selector) return;
-      if (elmt.matches(rule.selector) && rule.afterAdd) {
-        rule.afterAdd(elmt, state, makeNextPage, function overflowCallback() {
+      if (addedElement.matches(rule.selector) && rule.afterAdd) {
+        addedElement = rule.afterAdd(addedElement, state, makeNextPage, function overflowCallback() {
           // TODO:
           // While this does catch overflows, it introduces a few new bugs.
           // It is pretty aggressive to move the entire node to the next page.
@@ -1334,11 +1335,11 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
           // - 3. if it is a large paragraph, it will leave a large gap. the
           // correct approach would be to only need to invalidate
           // the last line of text.
-          elmt.parentNode.removeChild(elmt);
+          addedElement.parentNode.removeChild(addedElement);
           makeNextPage();
-          last(state.path).appendChild(elmt);
-          rule.afterAdd(elmt, state, makeNextPage, function () {
-            console.log('Couldn\'t apply ' + rule.name + ' to ' + (0, _elementToString2.default)(elmt) + '. Caused overflows twice.');
+          last(state.path).appendChild(addedElement);
+          addedElement = rule.afterAdd(addedElement, state, makeNextPage, function () {
+            console.log('Couldn\'t apply ' + rule.name + ' to ' + (0, _elementToString2.default)(addedElement) + '. Caused overflows twice.');
           });
         });
       }
@@ -1355,10 +1356,7 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
   };
 
   var moveNodeToNextPage = function moveNodeToNextPage(nodeToMove) {
-    // console.log(`Moving ${elToStr(nodeToMove)} to next page`);
-
-    var discarded = state.path.pop(); // TODO: this is unclear.
-    // console.log(`Discard ${elToStr(discarded)}`);
+    state.path.pop(); // TODO: this is unclear.
 
     // remove from old page
     nodeToMove.parentNode.removeChild(nodeToMove);
@@ -1385,7 +1383,7 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
 
     var pos = 0;
 
-    var step = function step() {
+    var splitTextStep = function splitTextStep() {
       textNode.nodeValue = origText.substr(0, pos);
 
       if (state.currentPage.hasOverflowed()) {
@@ -1393,8 +1391,7 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
         if (origText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
         while (origText.charAt(pos) !== ' ' && pos > 0) {
           pos -= 1;
-        } // if (pos < 1 && origText.trim().length > 0) {
-        if (pos < 1) {
+        }if (pos < 1) {
           textNode.nodeValue = origText;
           textNode.parentNode.removeChild(textNode);
           abortCallback();
@@ -1421,7 +1418,7 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
           return;
         }
 
-        throttle(step);
+        throttle(splitTextStep);
         return;
       }
       if (pos > origText.length - 1) {
@@ -1432,10 +1429,10 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
       pos += 1;
       while (origText.charAt(pos) !== ' ' && pos < origText.length) {
         pos += 1;
-      }throttle(step, SHOULD_DEBUG_TEXT);
+      }throttle(splitTextStep, SHOULD_DEBUG_TEXT);
     };
 
-    step(); // find breakpoint
+    splitTextStep();
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
@@ -1854,53 +1851,13 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0,0,0,0.1);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible;\n  }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important;\n  }\n\n\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    pointer-events: none;\n  }\n\n  /*.bindery-show-bleed .bindery-page::after {\n    outline: 1px solid rgba(0,0,0,0.2);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.3);\n  }*/\n\n  .bindery-show-guides .bindery-page::after {\n    outline: 1px solid magenta;\n  }\n\n  .bindery-show-guides .bindery-flowbox {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    outline: 1px solid cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue;\n  }\n  .bindery-show-guides .bindery-bleed {\n    outline: 1px solid yellow;\n  }\n\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n\n/* Footer */\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2;\n}\n.bindery-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n  margin-top: 0 !important;\n}\n\n/*Old Bleed Stuff*/\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n.bindery-left.bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n.bindery-right.bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n\n/*Bleed as layer*/\n.bindery-bleed {\n  position: absolute;\n  top: -0.2in;\n  bottom: -0.2in;\n  z-index: 0;\n}\n.bindery-left .bindery-bleed {\n  right: 0;\n  left: -0.2in;\n}\n.bindery-right .bindery-bleed {\n  left: 0;\n  right: -0.2in;\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0,0,0,0.1);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible;\n  }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important;\n  }\n\n\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    pointer-events: none;\n    z-index: 999;\n  }\n\n\n  .bindery-export * {\n    transition: box-shadow 0.5s;\n  }\n\n  .bindery-show-guides * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2);\n  }\n\n  .bindery-show-guides .bindery-page::after {\n    box-shadow: 0 0 0 1px magenta;\n  }\n\n  .bindery-show-guides .bindery-flowbox {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-running-header {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue;\n  }\n  .bindery-show-guides .bindery-bleed {\n    box-shadow: 0 0 0 1px yellow;\n  }\n\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n.bindery-content {\n  /* hack to prevent margin collapse, leading to wrong height */\n  padding: 0.1px;\n}\n\n/* Footer */\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2;\n}\n.bindery-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n  margin-top: 0 !important;\n}\n\n/*Old Bleed Stuff*/\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n.bindery-left.bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n.bindery-right.bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n\n/*Bleed as layer*/\n.bindery-bleed {\n  position: absolute;\n  top: -0.2in;\n  bottom: -0.2in;\n  z-index: 0;\n}\n.bindery-left .bindery-bleed {\n  right: 0;\n  left: -0.2in;\n}\n.bindery-right .bindery-bleed {\n  left: 0;\n  right: -0.2in;\n}\n\n.bindery-measure-area {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
 /* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(16);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// add the styles to the DOM
-var update = __webpack_require__(3)(content, {});
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../../node_modules/css-loader/index.js!./measureArea.css", function() {
-			var newContent = require("!!../../node_modules/css-loader/index.js!./measureArea.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(2)();
-// imports
-
-
-// module
-exports.push([module.i, ".bindery-measure-area {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1920,7 +1877,7 @@ var _page = __webpack_require__(5);
 
 var _page2 = _interopRequireDefault(_page);
 
-var _error = __webpack_require__(18);
+var _error = __webpack_require__(16);
 
 var _error2 = _interopRequireDefault(_error);
 
@@ -1928,39 +1885,98 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-__webpack_require__(19);
+__webpack_require__(17);
+__webpack_require__(20);
+
+var MODE_FLIP = 'interactive';
+var MODE_PREVIEW = 'grid';
+var MODE_SHEET = 'print';
+var MODE_OUTLINE = 'outline';
+
+var ARRANGE_ONE = 'arrange_one';
+var ARRANGE_SPREAD = 'arrange_two';
+var ARRANGE_BOOKLET = 'arrange_booklet';
+// const ARRANGE_SIGNATURE = 'arrange_signature';
+
+
+var cropMarksSingle = function cropMarksSingle() {
+  return (0, _hyperscript2.default)('.bindery-crop-wrap', (0, _hyperscript2.default)('.bindery-crop-top'), (0, _hyperscript2.default)('.bindery-crop-bottom'), (0, _hyperscript2.default)('.bindery-crop-left'), (0, _hyperscript2.default)('.bindery-crop-right'));
+};
+var cropMarksSpread = function cropMarksSpread() {
+  return (0, _hyperscript2.default)('.bindery-crop-wrap', (0, _hyperscript2.default)('.bindery-crop-top'), (0, _hyperscript2.default)('.bindery-crop-bottom'), (0, _hyperscript2.default)('.bindery-crop-left'), (0, _hyperscript2.default)('.bindery-crop-right'), (0, _hyperscript2.default)('.bindery-crop-fold'));
+};
+
+var ORIENTATION_STYLE_ID = 'bindery-orientation-stylesheet';
+
+var setOrientationCSS = function setOrientationCSS(newValue) {
+  var sheet = void 0;
+  var existing = document.querySelector('#' + ORIENTATION_STYLE_ID);
+  if (existing) {
+    sheet = existing;
+  } else {
+    sheet = document.createElement('style');
+    sheet.id = ORIENTATION_STYLE_ID;
+  }
+  sheet.innerHTML = '@page { size: ' + newValue + '; }';
+  document.head.appendChild(sheet);
+};
 
 var Viewer = function () {
   function Viewer() {
-    var _this = this;
-
     _classCallCheck(this, Viewer);
 
     this.pages = [];
 
-    this.doubleSided = true;
-    this.twoUp = false;
+    this.export = (0, _hyperscript2.default)('.bindery-export');
 
-    this.mode = 'grid';
+    this.doubleSided = true;
+    this.printArrange = ARRANGE_SPREAD;
+    this.isShowingCropMarks = true;
+    this.setOrientation('landscape');
+
+    this.mode = MODE_PREVIEW;
     this.currentLeaf = 0;
 
-    this.export = (0, _hyperscript2.default)('.bindery-export');
-    this.export.setAttribute('bindery-export', true);
-
-    // Automatically switch into print mode
-    if (window.matchMedia) {
-      var mediaQueryList = window.matchMedia('print');
-      mediaQueryList.addListener(function (mql) {
-        if (mql.matches) {
-          _this.setPrint();
-        } else {
-          // after print
-        }
-      });
-    }
+    this.listenForPrint();
   }
 
   _createClass(Viewer, [{
+    key: 'listenForPrint',
+    value: function listenForPrint() {
+      var _this = this;
+
+      // Automatically switch into print mode
+      if (window.matchMedia) {
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function (mql) {
+          if (mql.matches) {
+            _this.setPrint();
+          } else {
+            // after print
+          }
+        });
+      }
+    }
+  }, {
+    key: 'setOrientation',
+    value: function setOrientation(newVal) {
+      if (newVal === this.orientation) return;
+      this.orientation = newVal;
+      setOrientationCSS(newVal);
+      if (this.mode === MODE_SHEET) {
+        this.update();
+      }
+    }
+  }, {
+    key: 'setPrintArrange',
+    value: function setPrintArrange(newVal) {
+      if (newVal === this.printArrange) return;
+      this.printArrange = newVal;
+      if (this.mode === MODE_SHEET) {
+        this.update();
+      }
+    }
+  }, {
     key: 'displayError',
     value: function displayError(title, text) {
       if (!this.export.parentNode) {
@@ -2003,15 +2019,21 @@ var Viewer = function () {
         case 'grid':
         case 'standard':
         case 'default':
-          this.mode = 'grid';
+          this.mode = MODE_PREVIEW;
           break;
         case 'interactive':
-        case 'preview':
+        case 'flip':
         case '3d':
-          this.mode = 'interactive';
+          this.mode = MODE_FLIP;
           break;
         case 'print':
-          this.mode = 'print';
+        case 'sheet':
+          this.mode = MODE_SHEET;
+          break;
+        case 'outline':
+        case 'outlines':
+        case 'guides':
+          this.mode = MODE_OUTLINE;
           break;
         default:
           console.error('Bindery: Unknown view mode "' + newMode + '"');
@@ -2021,20 +2043,38 @@ var Viewer = function () {
   }, {
     key: 'setGrid',
     value: function setGrid() {
-      this.mode = 'grid';
-      this.update();
+      if (this.mode === MODE_PREVIEW) return;
+      if (this.mode === MODE_OUTLINE) {
+        this.mode = MODE_PREVIEW;
+        this.updateGuides();
+      } else {
+        this.mode = MODE_PREVIEW;
+        this.update();
+      }
+    }
+  }, {
+    key: 'setOutline',
+    value: function setOutline() {
+      if (this.mode === MODE_OUTLINE) return;
+      if (this.mode === MODE_PREVIEW) {
+        this.mode = MODE_OUTLINE;
+        this.updateGuides();
+      } else {
+        this.mode = MODE_OUTLINE;
+        this.update();
+      }
     }
   }, {
     key: 'setPrint',
     value: function setPrint() {
-      this.mode = 'print';
+      if (this.mode === MODE_SHEET) return;
+      this.mode = MODE_SHEET;
       this.update();
     }
   }, {
     key: 'setInteractive',
     value: function setInteractive() {
-      this.mode = 'interactive';
-      this.export.classList.remove('bindery-show-bleed');
+      this.mode = MODE_FLIP;
       this.update();
     }
   }, {
@@ -2046,11 +2086,13 @@ var Viewer = function () {
 
       document.body.classList.add('bindery-viewing');
 
-      if (this.mode === 'grid') {
+      if (this.mode === MODE_PREVIEW) {
         this.renderGrid();
-      } else if (this.mode === 'interactive') {
+      } else if (this.mode === MODE_OUTLINE) {
+        this.renderGrid();
+      } else if (this.mode === MODE_FLIP) {
         this.renderInteractive();
-      } else if (this.mode === 'print') {
+      } else if (this.mode === MODE_SHEET) {
         this.renderPrint();
       } else {
         this.renderGrid();
@@ -2059,15 +2101,34 @@ var Viewer = function () {
   }, {
     key: 'renderPrint',
     value: function renderPrint() {
-      this.mode = 'print';
+      this.mode = MODE_SHEET;
       this.export.style.display = 'block';
+
       this.export.classList.add('bindery-show-bleed');
+      this.export.classList.remove('bindery-show-guides');
 
       this.export.innerHTML = '';
 
       var pages = this.pages.slice();
+      var isTwoUp = this.printArrange !== ARRANGE_ONE;
 
-      if (this.twoUp) {
+      var spread = function spread() {
+        for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
+          arg[_key] = arguments[_key];
+        }
+
+        return _hyperscript2.default.apply(undefined, ['.bindery-spread-wrapper'].concat(arg));
+      };
+      var orient = this.orientation;
+      var printSheet = function printSheet() {
+        for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          arg[_key2] = arguments[_key2];
+        }
+
+        return _hyperscript2.default.apply(undefined, ['.bindery-print-page.bindery-letter-' + orient].concat(arg));
+      };
+
+      if (this.printArrange === ARRANGE_SPREAD) {
         if (this.pages.length % 2 !== 0) {
           var pg = new _page2.default();
           pages.push(pg);
@@ -2079,35 +2140,66 @@ var Viewer = function () {
         pages.unshift(spacerPage);
         pages.push(spacerPage2);
       }
+      if (this.printArrange === ARRANGE_BOOKLET) {
+        while (pages.length % 4 !== 0) {
+          var _spacerPage = new _page2.default();
+          _spacerPage.element.style.visibility = 'hidden';
+          pages.push(_spacerPage);
+        }
+        var bookletOrder = [];
+        var len = pages.length;
 
-      for (var i = 0; i < pages.length; i += this.twoUp ? 2 : 1) {
-        if (this.twoUp) {
-          var left = pages[i];
-          var right = pages[i + 1];
+        for (var i = 0; i < len / 2; i += 2) {
+          bookletOrder.push(pages[len - 1 - i]);
+          bookletOrder.push(pages[i]);
+          bookletOrder.push(pages[i + 1]);
+          bookletOrder.push(pages[len - 2 - i]);
+        }
+
+        pages = bookletOrder;
+      }
+
+      for (var _i = 0; _i < pages.length; _i += isTwoUp ? 2 : 1) {
+        if (isTwoUp) {
+          var left = pages[_i];
+          var right = pages[_i + 1];
 
           var leftPage = left.element;
           var rightPage = right.element;
 
-          var wrap = (0, _hyperscript2.default)('.bindery-print-page', (0, _hyperscript2.default)('.bindery-spread-wrapper', {
-            style: _page2.default.spreadSizeStyle()
-          }, leftPage, rightPage));
+          var sheet = printSheet(spread({ style: _page2.default.spreadSizeStyle() }, leftPage, rightPage, cropMarksSpread()));
 
-          this.export.appendChild(wrap);
+          if (this.printArrange === ARRANGE_BOOKLET) {
+            var isFront = _i % 4 === 0;
+            var sheetIndex = parseInt((_i + 1) / 4, 10) + 1;
+            var meta = (0, _hyperscript2.default)('.bindery-print-meta', 'Sheet ' + sheetIndex + ' of ' + pages.length / 4 + ': ' + (isFront ? 'Outside' : 'Inside'));
+            sheet.appendChild(meta);
+          }
+
+          this.export.appendChild(sheet);
         } else {
-          var _pg = pages[i].element;
-          var _wrap = (0, _hyperscript2.default)('.bindery-print-page', (0, _hyperscript2.default)('.bindery-spread-wrapper', {
-            style: _page2.default.sizeStyle()
-          }, _pg));
-          this.export.appendChild(_wrap);
+          var _pg = pages[_i].element;
+          var _sheet = printSheet(spread({ style: _page2.default.sizeStyle() }, _pg, cropMarksSingle()));
+          this.export.appendChild(_sheet);
         }
+      }
+    }
+  }, {
+    key: 'updateGuides',
+    value: function updateGuides() {
+      if (this.mode === MODE_OUTLINE) {
+        this.export.classList.add('bindery-show-bleed');
+        this.export.classList.add('bindery-show-guides');
+      } else {
+        this.export.classList.remove('bindery-show-bleed');
+        this.export.classList.remove('bindery-show-guides');
       }
     }
   }, {
     key: 'renderGrid',
     value: function renderGrid() {
-      this.mode = 'grid';
+      this.updateGuides();
       this.export.style.display = 'block';
-      this.export.classList.remove('bindery-show-bleed');
 
       this.export.innerHTML = '';
 
@@ -2142,10 +2234,10 @@ var Viewer = function () {
         } else {
           var _pg2 = pages[i].element;
           _pg2.setAttribute('bindery-side', 'right');
-          var _wrap2 = (0, _hyperscript2.default)('.bindery-print-page', (0, _hyperscript2.default)('.bindery-spread-wrapper', {
+          var _wrap = (0, _hyperscript2.default)('.bindery-print-page', (0, _hyperscript2.default)('.bindery-spread-wrapper', {
             style: _page2.default.sizeStyle()
           }, _pg2));
-          this.export.appendChild(_wrap2);
+          this.export.appendChild(_wrap);
         }
       }
     }
@@ -2154,11 +2246,13 @@ var Viewer = function () {
     value: function renderInteractive() {
       var _this2 = this;
 
-      this.mode = 'interactive';
+      this.mode = MODE_FLIP;
       this.export.style.display = 'block';
       this.export.innerHTML = '';
       this.flaps = [];
+
       this.export.classList.remove('bindery-show-bleed');
+      this.export.classList.remove('bindery-show-guides');
 
       var pages = this.pages.slice();
 
@@ -2188,7 +2282,6 @@ var Viewer = function () {
             _this2.setLeaf(newLeaf);
           }
         });
-        // this.makeDraggable(flap);
         _this2.export.classList.add('bindery-stage3d');
         _this2.flaps.push(flap);
 
@@ -2210,12 +2303,6 @@ var Viewer = function () {
         // TODO: Dynamically add/remove pages.
         // Putting 1000s of elements onscreen
         // locks up the browser.
-        // if (i > 200) {
-        //   rightPage.style.display = 'none';
-        //   leftPage.style.display = 'none';
-        //   flap.style.background = '#ddd';
-        // }
-
 
         var leftOffset = 4;
         if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
@@ -2247,33 +2334,18 @@ var Viewer = function () {
         flap.style.transform = 'translate3d(' + (i < n ? 4 : 0) + 'px,0,' + z + 'px) rotateY(' + (i < n ? -180 : 0) + 'deg)';
       });
     }
-    // makeDraggable(flap) {
-    //   let isDragging = false;
-    //   let pct = 0;
-    //   flap.addEventListener('mousedown', () => {
-    //     isDragging = true;
-    //     flap.style.transition = 'none';
-    //   });
-    //   document.body.addEventListener('mousemove', (e) => {
-    //     if (isDragging) {
-    //       e.preventDefault();
-    //       const pt = coords(e);
-    //       pct = progress01(pt.x, 1000, 200);
-    //       const ang = transition(pct, 0, -180);
-    //       const z = this.flaps.length;
-    //       flap.style.transform = `translate3d(${0}px,0,${z * 5}px) rotateY(${ang}deg)`;
-    //     }
-    //   });
-    //   document.body.addEventListener('mouseup', (e) => {
-    //     if (isDragging) {
-    //       isDragging = false;
-    //       flap.style.transition = '';
-    //       if (pct > 0.5) this.setLeaf(this.currentLeaf);
-    //       else this.setLeaf(this.currentLeaf + 1);
-    //     }
-    //   });
-    // }
-
+  }, {
+    key: 'isShowingCropMarks',
+    get: function get() {
+      return this.export.classList.contains('bindery-show-crop');
+    },
+    set: function set(newVal) {
+      if (newVal) {
+        this.export.classList.add('bindery-show-crop');
+      } else {
+        this.export.classList.remove('bindery-show-crop');
+      }
+    }
   }]);
 
   return Viewer;
@@ -2291,7 +2363,7 @@ var Viewer = function () {
 exports.default = Viewer;
 
 /***/ }),
-/* 18 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2312,13 +2384,13 @@ var _hyperscript2 = _interopRequireDefault(_hyperscript);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(20);
+var content = __webpack_require__(18);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(3)(content, {});
@@ -2338,7 +2410,7 @@ if(false) {
 }
 
 /***/ }),
-/* 20 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)();
@@ -2346,16 +2418,56 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  .bindery-export {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f1f1f1;\n    padding: 50px 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 100vh;\n  }\n\n   .bindery-measure-area {\n     position: fixed;\n     top: 0;\n     left: 0;\n     background: #f1f1f1;\n     padding: 50px 20px;\n     padding-right: 240px;\n     z-index: 99;\n   }\n\n   .bindery-print-page {\n     margin: 0 auto;\n   }\n\n   .bindery-error {\n     font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n     font-size: 16px;\n     margin: 15vh 15vw;\n     max-width: 500px;\n     background: url(" + __webpack_require__(21) + ") no-repeat 0% 0%;\n     background-size: 48px;\n     padding-top: 64px;\n   }\n\n   .bindery-error-title {\n     font-size: 1.5em;\n     margin-bottom: 16px;\n   }\n\n   .bindery-error-text {\n     margin-bottom: 16px;\n     white-space: pre-line;\n   }\n\n   .bindery-error-footer {\n     opacity: 0.5;\n     font-size: 0.66rem;\n     text-transform: uppercase;\n     letter-spacing: 0.02em;\n   }\n\n   .bindery-show-bleed .bindery-print-page {\n     background: white;\n     outline: 1px solid rgba(0,0,0,0.1);\n     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n     width: 11in;\n     height: 8.5in;\n     margin: 20px auto;\n   }\n\n   .bindery-spread-wrapper:before {\n     display: none;\n   }\n   .bindery-show-bleed .bindery-spread-wrapper:before {\n     display: block;\n   }\n}\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0;\n    /*transform: translate3d(0, 50px, 0);*/\n  }\n  100% {\n    opacity: 1;\n    /*transform: translate3d(0, 0, 0);*/\n  }\n}\n\n@page {\n  size: portrait; /* landscape and portrait keywords work here */\n  margin: 0;\n}\n\n@media print {\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not(.bindery-export) {\n    display: none !important;\n  }\n\n  .bindery-print-page {\n    margin: 20px;\n  }\n\n  .bindery-spread-wrapper:before {\n    display: block;\n  }\n\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not(.bindery-export) {\n  display: none !important;\n}\n\n.bindery-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden;\n}\n\n\n.bindery-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 50px auto;\n}\n\n/* Crop Marks */\n.bindery-spread-wrapper:before {\n\tcontent: \"\";\n  pointer-events: none;\n\tposition: absolute;\n\ttop: -30px;\n\tleft: -30px;\n  border-width: 30px;\n\twidth: 100%;\n\theight: 100%;\n  -webkit-border-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowMjAwMjQwRUNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDowMjAwMjQwRkNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkJFRjE1REVCQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkJFRjE1REVDQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+OTmWYwAAA3VJREFUeNrs2MGKgzAUhtH+pXt9/6esT3An3RWEQWidScw5EFpchZvwgaaqbswnyevn/fDT610Yaa+c624EgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgA/+ZhBFNb7ZWRpKpMYcaDT3bPer0LI+0Vr4QAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFgAAv0tbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFgAAH0lbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWwN97GMHUlrf/m73Su1SVKcx48Mnrp0a4CyPtFa+EAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABV/UjwADn4TtZkBC9rAAAAABJRU5ErkJggg==) 140 fill stretch round;\n\tborder-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowMjAwMjQwRUNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDowMjAwMjQwRkNDRDMxMUUzOEYzQ0EwRDQ2MzU4OTNGQyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkJFRjE1REVCQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkJFRjE1REVDQ0NEMDExRTM4RjNDQTBENDYzNTg5M0ZDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+OTmWYwAAA3VJREFUeNrs2MGKgzAUhtH+pXt9/6esT3An3RWEQWidScw5EFpchZvwgaaqbswnyevn/fDT610Yaa+c624EgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgA/+ZhBFNb7ZWRpKpMYcaDT3bPer0LI+0Vr4QAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFgAAv0tbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFgAAH0lbZQyHrW1txsAXLW09jcErISBYAAAAXEOqfHOf8uCT3bNe78JIe+VcvmEBggUgWIBgAQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFiBYRgAIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWwN97GMHUlrf/m73Su1SVKcx48Mnrp0a4CyPtFa+EAIIFCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABggUgWACCBQgWgGABggUgWACCBQgWgGABCBYgWACCBSBYgGABCBaAYAGCBSBYAIIFCBaAYAEIFiBYAIIFIFiAYAEIFoBgAYIFIFgAggUIFoBgAYIFIFgAggUIFoBgAQgWIFgAggUgWIBgAQgWgGABV/UjwADn4TtZkBC9rAAAAABJRU5ErkJggg==) 140 fill stretch round;\n\tborder-image-slice: 133;\n\tborder-image-repeat: stretch round;\n\tbox-sizing: content-box;\n  border-style: solid;\n  z-index: 999;\n}\n\n\n.bindery-stage3d {\n  perspective: 3000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: transform 0.5s, box-shadow 0.1s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n\n.bindery-page3d:hover {\n  box-shadow: 2px 0 4px rgba(0,0,0,0.2);\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page3d-front::after {\n  box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)\n}\n.bindery-page3d .bindery-page3d-back::after {\n  box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  .bindery-export {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f1f1f1;\n    padding: 50px 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 100vh;\n    /*min-width: calc(11in + 320px);*/\n  }\n\n   .bindery-measure-area {\n     position: fixed;\n     top: 0;\n     left: 0;\n     background: #f1f1f1;\n     padding: 50px 20px;\n     padding-right: 240px;\n     z-index: 99;\n   }\n\n   .bindery-print-page {\n     margin: 0 auto;\n   }\n\n   .bindery-error {\n     font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n     font-size: 16px;\n     margin: 15vh 15vw;\n     max-width: 500px;\n     background: url(" + __webpack_require__(19) + ") no-repeat 0% 0%;\n     background-size: 48px;\n     padding-top: 64px;\n   }\n\n   .bindery-error-title {\n     font-size: 1.5em;\n     margin-bottom: 16px;\n   }\n\n   .bindery-error-text {\n     margin-bottom: 16px;\n     white-space: pre-line;\n   }\n\n   .bindery-error-footer {\n     opacity: 0.5;\n     font-size: 0.66rem;\n     text-transform: uppercase;\n     letter-spacing: 0.02em;\n   }\n\n   .bindery-show-bleed .bindery-print-page {\n     background: white;\n     outline: 1px solid rgba(0,0,0,0.1);\n     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n     margin: 20px auto;\n   }\n\n   .bindery-letter-landscape {\n     width: 11in;\n     height: 8.5in;\n   }\n   .bindery-letter-portrait {\n     width: 8.5in;\n     height: 11in;\n   }\n\n}\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0;\n    /*transform: translate3d(0, 50px, 0);*/\n  }\n  100% {\n    opacity: 1;\n    /*transform: translate3d(0, 0, 0);*/\n  }\n}\n\n@page {\n  margin: 0;\n}\n\n@media print {\n  .bindery-export {\n    -webkit-print-color-adjust: exact;\n  }\n\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not(.bindery-export) {\n    display: none !important;\n  }\n\n  .bindery-print-page {\n    margin: 20px;\n  }\n\n}\n\nbody.bindery-viewing {\n  margin: 0;\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not(.bindery-export) {\n  display: none !important;\n}\n\n.bindery-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden;\n}\n\n.bindery-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 50px auto;\n}\n\n.bindery-print-page .bindery-spread-wrapper {\n  margin: 0 auto;\n}\n\n.bindery-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt;\n}\n\n.bindery-stage3d {\n  perspective: 3000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: transform 0.5s, box-shadow 0.1s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n\n.bindery-page3d:hover {\n  box-shadow: 2px 0 4px rgba(0,0,0,0.2);\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page3d-front::after {\n  box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)\n}\n.bindery-page3d .bindery-page3d-back::after {\n  box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, exports) {
 
-module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='UTF-8'?%3E %3Csvg width='36px' height='36px' viewBox='0 0 36 36' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3Einteractive copy 4%3C/title%3E %3Cdesc%3ECreated with Sketch.%3C/desc%3E %3Cdefs%3E %3Crect id='path-1' x='0' y='4' width='15' height='23'%3E%3C/rect%3E %3Crect id='path-2' x='15' y='4' width='15' height='23'%3E%3C/rect%3E %3Cpolygon id='path-3' points='14 4.07147535 27 0 27 22.9285247 14 27'%3E%3C/polygon%3E %3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='interactive-copy-4'%3E %3Cg id='Group-2-Copy-3' transform='translate(3.000000, 2.000000)'%3E %3Cg id='Rectangle-2-Copy-6'%3E %3Cuse fill='%23FFFFFF' fill-rule='evenodd' xlink:href='%23path-1'%3E%3C/use%3E %3Crect stroke='%23000000' stroke-width='1' x='0.5' y='4.5' width='14' height='22'%3E%3C/rect%3E %3C/g%3E %3Cg id='Rectangle-2-Copy-7'%3E %3Cuse fill='%23FFFFFF' fill-rule='evenodd' xlink:href='%23path-2'%3E%3C/use%3E %3Crect stroke='%23000000' stroke-width='1' x='15.5' y='4.5' width='14' height='22'%3E%3C/rect%3E %3C/g%3E %3Cg id='Rectangle-2-Copy-6'%3E %3Cuse fill='%23FFFFFF' fill-rule='evenodd' xlink:href='%23path-3'%3E%3C/use%3E %3Cpath stroke='%23000000' stroke-width='1' d='M14.5,4.43882867 L14.5,26.3194563 L26.5,22.5611713 L26.5,0.680543732 L14.5,4.43882867 Z'%3E%3C/path%3E %3C/g%3E %3Cpolygon id='Path-2' fill='%23000000' opacity='0.3' points='16.3241613 26.7071852 25.7154453 22.615177 26.1596848 4.74924377 28 4.30920273 28 27'%3E%3C/polygon%3E %3C/g%3E %3Ccircle id='Oval' fill='%23000000' cx='11' cy='14' r='1'%3E%3C/circle%3E %3Ccircle id='Oval' fill='%23000000' cx='11' cy='21' r='1'%3E%3C/circle%3E %3Cpath d='M28.1793786,11.0743011 C24.667534,11.0743011 21.8206214,13.9212136 21.8206214,17.4330583' id='Oval-2' stroke='%23000000' transform='translate(25.000000, 14.253680) rotate(-45.000000) translate(-25.000000, -14.253680) '%3E%3C/path%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
+module.exports = "\"data:image/svg+xml,%3Csvg width='36' height='36' viewBox='0 0 36 36' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cdefs%3E%3Cpath id='a' d='M0 4H15V27H0z'/%3E%3Cpath id='b' d='M15 4H30V27H15z'/%3E%3Cpath id='c' d='M14 4.07147535L27 0 27 22.9285247 14 27z'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23a'/%3E%3Cpath stroke='%23000000' d='M0.5 4.5H14.5V26.5H0.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23b'/%3E%3Cpath stroke='%23000000' d='M15.5 4.5H29.5V26.5H15.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23c'/%3E%3Cpath stroke='%23000000' d='M14.5,4.43882867 L14.5,26.3194563 L26.5,22.5611713 L26.5,0.680543732 L14.5,4.43882867 Z'/%3E%3C/g%3E%3Cpath fill='%23000000' opacity='.3' d='M16.3241613 26.7071852L25.7154453 22.615177 26.1596848 4.74924377 28 4.30920273 28 27z' transform='translate(3 2)'/%3E%3Ccircle fill='%23000000' cx='11' cy='14' r='1'/%3E%3Ccircle fill='%23000000' cx='11' cy='21' r='1'/%3E%3Cpath d='M28.1793786,11.0743011 C24.667534,11.0743011 21.8206214,13.9212136 21.8206214,17.4330583' stroke='%23000000' transform='rotate(-45 25 14.254)'/%3E%3C/g%3E%3C/svg%3E\""
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(21);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// add the styles to the DOM
+var update = __webpack_require__(3)(content, {});
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../../node_modules/css-loader/index.js!./crop.css", function() {
+			var newContent = require("!!../../node_modules/css-loader/index.js!./crop.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(2)();
+// imports
+
+
+// module
+exports.push([module.i, ".bindery-crop-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999;\n}\n.bindery-show-crop .bindery-crop-wrap {\n  display: block;\n}\n.bindery-show-crop .bindery-print-page .bindery-spread-wrapper {\n  margin: 30pt auto;\n}\n\n\n.bindery-crop-wrap > div {\n  position: absolute;\n  overflow: hidden;\n}\n.bindery-crop-wrap > div::after,\n.bindery-crop-wrap > div::before {\n  content: \"\";\n  background: black;\n  width: 12pt;\n  height: 12pt;\n  display: block;\n  position: absolute;\n}\n\n.bindery-crop-wrap > div::before {\n  top: 0; left: 0;\n}\n\n.bindery-crop-wrap > div::after {\n  bottom: 0; right: 0;\n}\n\n.bindery-crop-fold,\n.bindery-crop-left,\n.bindery-crop-right {\n  transform: scaleX(0.5);\n  top: -20pt;\n  bottom: -20pt;\n  width: 1px;\n  margin: auto;\n}\n\n.bindery-crop-fold { right: 0; left: 0; }\n.bindery-crop-left { left: 0; }\n.bindery-crop-right { right: 0; }\n\n.bindery-crop-top,\n.bindery-crop-bottom {\n  transform: scaleY(0.5);\n  left: -20pt;\n  right: -20pt;\n  height: 1px;\n}\n.bindery-crop-top { top: 0; }\n.bindery-crop-bottom { bottom: 0; }\n", ""]);
+
+// exports
+
 
 /***/ }),
 /* 22 */
@@ -2377,6 +2489,8 @@ var _convertUnits = __webpack_require__(4);
 var _components = __webpack_require__(23);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2403,21 +2517,24 @@ var ControlPanel = function ControlPanel(opts) {
   var printBtn = (0, _components.btnMain)({ onclick: print }, 'Print');
 
   var layoutControl = void 0;
-  var guidesToggle = void 0;
+  var cropToggle = void 0;
   var facingToggle = void 0;
 
-  var toggleGuides = function toggleGuides() {
-    guidesToggle.classList.toggle('selected');
-    _this.binder.viewer.toggleGuides();
+  var toggleCrop = function toggleCrop() {
+    _this.binder.viewer.isShowingCropMarks = !_this.binder.viewer.isShowingCropMarks;
+    cropToggle.classList.toggle('selected');
   };
-  guidesToggle = (0, _components.switchRow)({ onclick: toggleGuides }, 'Show Bounds');
 
   var toggleFacing = function toggleFacing() {
     facingToggle.classList.toggle('selected');
     layoutControl.classList.toggle('not-facing');
     _this.binder.viewer.toggleDouble();
   };
+
+  cropToggle = (0, _components.switchRow)({ onclick: toggleCrop }, 'Crop Marks');
+  cropToggle.classList.add('selected');
   facingToggle = (0, _components.switchRow)({ onclick: toggleFacing }, 'Facing Pages');
+
   facingToggle.classList.add('selected');
 
   var doneBtn = '';
@@ -2441,11 +2558,19 @@ var ControlPanel = function ControlPanel(opts) {
 
   layoutControl = (0, _hyperscript2.default)('.bindery-layout-control', sizeControl, marginControl);
 
-  var paperSize = (0, _components.row)('Paper Size', (0, _components.select)((0, _components.option)('Letter'), (0, _components.option)({ disabled: true }, '8.5 x 11'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)('Legal'), (0, _components.option)({ disabled: true }, '8.5 x 14'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)('Tabloid'), (0, _components.option)({ disabled: true }, '11 x 17'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)('A4'), (0, _components.option)({ disabled: true }, 'mm x mm')));
+  var paperSize = (0, _components.row)('Paper Size', (0, _components.select)((0, _components.option)('Letter'), (0, _components.option)({ disabled: true }, '8.5 x 11'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)({ disabled: true }, 'Legal'), (0, _components.option)({ disabled: true }, '8.5 x 14'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)({ disabled: true }, 'Tabloid'), (0, _components.option)({ disabled: true }, '11 x 17'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)({ disabled: true }, 'A4'), (0, _components.option)({ disabled: true }, 'mm x mm')));
 
-  var arrangement = (0, _components.row)('Arrange', (0, _components.select)((0, _components.option)('1 up'), (0, _components.option)('2 up'), (0, _components.option)('8 up'), (0, _components.option)('Booklet'), (0, _components.option)('Signatures')));
+  var arrangeSelect = (0, _components.select)((0, _components.option)({ value: 'arrange_one' }, 'Pages'), (0, _components.option)({ value: 'arrange_two', selected: true }, 'Spreads'), (0, _components.option)({ value: 'arrange_booklet' }, 'Booklet'), (0, _components.option)({ disabled: true }, 'Grid'), (0, _components.option)({ disabled: true }, 'Signatures'));
+  arrangeSelect.addEventListener('change', function () {
+    _this.binder.viewer.setPrintArrange(arrangeSelect.value);
+  });
+  var arrangement = (0, _components.row)('Print', arrangeSelect);
 
-  var orientation = (0, _components.row)('Orientation', (0, _components.select)((0, _components.option)('Landscape'), (0, _components.option)('Portrait')));
+  var orientationSelect = (0, _components.select)((0, _components.option)({ value: 'landscape' }, 'Landscape'), (0, _components.option)({ value: 'portrait' }, 'Portrait'));
+  orientationSelect.addEventListener('change', function () {
+    _this.binder.viewer.setOrientation(orientationSelect.value);
+  });
+  var orientation = (0, _components.row)('Orientation', orientationSelect);
 
   var validCheck = (0, _hyperscript2.default)('div', { style: {
       display: 'none',
@@ -2454,7 +2579,7 @@ var ControlPanel = function ControlPanel(opts) {
   var inProgress = (0, _hyperscript2.default)('div', { style: {
       display: 'none'
     } }, 'Updating...');
-  var forceRefresh = (0, _components.btnMini)({ onclick: function onclick() {
+  var forceRefresh = (0, _components.btn)({ onclick: function onclick() {
       inProgress.style.display = 'block';
       forceRefresh.style.display = 'none';
       setTimeout(function () {
@@ -2463,44 +2588,53 @@ var ControlPanel = function ControlPanel(opts) {
           forceRefresh.style.display = 'block';
         }, 100);
       });
-    } }, 'Update');
+    } }, 'Update Layout');
 
   var gridMode = void 0;
   var printMode = void 0;
-  var interactMode = void 0;
+  var outlineMode = void 0;
+  var flipMode = void 0;
+  var viewModes = void 0;
   var setGrid = function setGrid() {
+    viewModes.forEach(function (v) {
+      return v.classList.remove('selected');
+    });
     gridMode.classList.add('selected');
-    interactMode.classList.remove('selected');
-    printMode.classList.remove('selected');
-
     _this.binder.viewer.setGrid();
   };
+  var setOutline = function setOutline() {
+    viewModes.forEach(function (v) {
+      return v.classList.remove('selected');
+    });
+    outlineMode.classList.add('selected');
+    _this.binder.viewer.setOutline();
+  };
   var setInteractive = function setInteractive() {
-    gridMode.classList.remove('selected');
-    interactMode.classList.add('selected');
-    printMode.classList.remove('selected');
-
+    viewModes.forEach(function (v) {
+      return v.classList.remove('selected');
+    });
+    flipMode.classList.add('selected');
     _this.binder.viewer.setInteractive();
   };
   var setPrint = function setPrint() {
-    gridMode.classList.remove('selected');
-    interactMode.classList.remove('selected');
+    viewModes.forEach(function (v) {
+      return v.classList.remove('selected');
+    });
     printMode.classList.add('selected');
-
     _this.binder.viewer.setPrint();
   };
-  gridMode = (0, _hyperscript2.default)('.bindery-viewmode.grid', { onclick: setGrid }, (0, _hyperscript2.default)('.icon'), 'Grid');
-  interactMode = (0, _hyperscript2.default)('.bindery-viewmode.interactive', { onclick: setInteractive }, (0, _hyperscript2.default)('.icon'), 'Interactive');
+  gridMode = (0, _hyperscript2.default)('.bindery-viewmode.grid', { onclick: setGrid }, (0, _hyperscript2.default)('.icon'), 'Preview');
+  outlineMode = (0, _hyperscript2.default)('.bindery-viewmode.outline', { onclick: setOutline }, (0, _hyperscript2.default)('.icon'), 'Outline');
+  flipMode = (0, _hyperscript2.default)('.bindery-viewmode.flip', { onclick: setInteractive }, (0, _hyperscript2.default)('.icon'), 'Flip');
   printMode = (0, _hyperscript2.default)('.bindery-viewmode.print', { onclick: setPrint }, (0, _hyperscript2.default)('.icon'), 'Sheet');
-  if (this.binder.viewer.mode === 'grid') gridMode.classList.add('selected');
-  if (this.binder.viewer.mode === 'interactive') interactMode.classList.add('selected');
-  if (this.binder.viewer.mode === 'print') printMode.classList.add('selected');
-  var viewSwitcher = (0, _hyperscript2.default)('.bindery-viewswitcher', gridMode, printMode, interactMode);
+  viewModes = [gridMode, outlineMode, flipMode, printMode];
 
-  var header = (0, _hyperscript2.default)('div', { style: {
-      padding: '20px',
-      'font-size': '20px'
-    } }, 'Bindery');
+  if (this.binder.viewer.mode === 'grid') gridMode.classList.add('selected');
+  if (this.binder.viewer.mode === 'interactive') flipMode.classList.add('selected');
+  if (this.binder.viewer.mode === 'print') printMode.classList.add('selected');
+  var viewSwitcher = _hyperscript2.default.apply(undefined, ['.bindery-viewswitcher'].concat(_toConsumableArray(viewModes)));
+
+  var header = (0, _components.title)('Loading...');
 
   var updateLayoutPreview = function updateLayoutPreview(newSize, newMargin) {
     var px = {
@@ -2537,7 +2671,6 @@ var ControlPanel = function ControlPanel(opts) {
     marginControl.style.width = width + 'px';
     marginControl.style.height = height + 'px';
 
-    console.log(t);
     marginPreview.style.top = t + 'px';
     marginPreview.style.bottom = b + 'px';
     marginPreview.style.left = i + 'px';
@@ -2617,9 +2750,9 @@ var ControlPanel = function ControlPanel(opts) {
     unitInputs[k].addEventListener('keyup', throttledUpdate);
   });
 
-  var layoutState = (0, _hyperscript2.default)('div', { style: { float: 'right' } }, forceRefresh, validCheck, inProgress);
+  var layoutState = (0, _hyperscript2.default)('div', forceRefresh, validCheck, inProgress);
 
-  this.holder.appendChild((0, _hyperscript2.default)('div', {}, header, doneBtn, printBtn, (0, _components.heading)(layoutState, 'Pagination'), layoutControl, facingToggle, (0, _components.heading)('Print'), paperSize, orientation, arrangement, (0, _components.switchRow)('Crop Marks'), (0, _components.heading)('View'), guidesToggle, viewSwitcher));
+  this.holder.appendChild((0, _hyperscript2.default)('div', {}, header, arrangement, paperSize, orientation, cropToggle, (0, _components.expandRow)('Book Setup'), (0, _components.expandArea)(layoutControl, layoutState), doneBtn, printBtn, viewSwitcher));
 };
 
 exports.default = ControlPanel;
@@ -2634,7 +2767,7 @@ exports.default = ControlPanel;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.inputNumberUnits = exports.switchRow = exports.option = exports.select = exports.btnMini = exports.btnMain = exports.btn = exports.heading = exports.row = undefined;
+exports.inputNumberUnits = exports.switchRow = exports.option = exports.select = exports.btnMini = exports.btnMain = exports.btn = exports.heading = exports.expandArea = exports.expandRow = exports.row = exports.title = undefined;
 
 var _hyperscript = __webpack_require__(0);
 
@@ -2644,43 +2777,70 @@ var _convertUnits = __webpack_require__(4);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Structure
-var heading = function heading() {
+var title = function title() {
   for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
     arg[_key] = arguments[_key];
   }
 
-  return _hyperscript2.default.apply(undefined, ['.bindery-label'].concat(arg));
+  return _hyperscript2.default.apply(undefined, ['.bindery-title'].concat(arg));
+};
+
+// Structure
+var heading = function heading() {
+  for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+    arg[_key2] = arguments[_key2];
+  }
+
+  return _hyperscript2.default.apply(undefined, ['.bindery-heading'].concat(arg));
 };
 
 var row = function row() {
-  for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    arg[_key2] = arguments[_key2];
+  for (var _len3 = arguments.length, arg = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+    arg[_key3] = arguments[_key3];
   }
 
   return _hyperscript2.default.apply(undefined, ['.bindery-toggle'].concat(arg));
 };
 
+var expandRow = function expandRow() {
+  for (var _len4 = arguments.length, arg = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+    arg[_key4] = arguments[_key4];
+  }
+
+  return _hyperscript2.default.apply(undefined, ['.bindery-expand-row', {
+    onclick: function onclick() {
+      this.classList.toggle('selected');
+    }
+  }].concat(arg));
+};
+var expandArea = function expandArea() {
+  for (var _len5 = arguments.length, arg = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+    arg[_key5] = arguments[_key5];
+  }
+
+  return _hyperscript2.default.apply(undefined, ['.bindery-expand-area'].concat(arg));
+};
+
 // Button
 var btn = function btn() {
-  for (var _len3 = arguments.length, arg = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-    arg[_key3] = arguments[_key3];
+  for (var _len6 = arguments.length, arg = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+    arg[_key6] = arguments[_key6];
   }
 
   return _hyperscript2.default.apply(undefined, ['button.bindery-btn'].concat(arg));
 };
 
 var btnMini = function btnMini() {
-  for (var _len4 = arguments.length, arg = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-    arg[_key4] = arguments[_key4];
+  for (var _len7 = arguments.length, arg = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+    arg[_key7] = arguments[_key7];
   }
 
   return _hyperscript2.default.apply(undefined, ['button.bindery-btn.bindery-btn-mini'].concat(arg));
 };
 
 var btnMain = function btnMain() {
-  for (var _len5 = arguments.length, arg = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-    arg[_key5] = arguments[_key5];
+  for (var _len8 = arguments.length, arg = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+    arg[_key8] = arguments[_key8];
   }
 
   return _hyperscript2.default.apply(undefined, ['button.bindery-btn.bindery-btn-main'].concat(arg));
@@ -2688,16 +2848,16 @@ var btnMain = function btnMain() {
 
 // Menu
 var select = function select() {
-  for (var _len6 = arguments.length, arg = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-    arg[_key6] = arguments[_key6];
+  for (var _len9 = arguments.length, arg = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
+    arg[_key9] = arguments[_key9];
   }
 
   return _hyperscript2.default.apply(undefined, ['select'].concat(arg));
 };
 
 var option = function option() {
-  for (var _len7 = arguments.length, arg = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-    arg[_key7] = arguments[_key7];
+  for (var _len10 = arguments.length, arg = Array(_len10), _key10 = 0; _key10 < _len10; _key10++) {
+    arg[_key10] = arguments[_key10];
   }
 
   return _hyperscript2.default.apply(undefined, ['option'].concat(arg));
@@ -2718,14 +2878,17 @@ var toggleSwitch = function toggleSwitch() {
 };
 
 var switchRow = function switchRow() {
-  for (var _len8 = arguments.length, arg = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-    arg[_key8] = arguments[_key8];
+  for (var _len11 = arguments.length, arg = Array(_len11), _key11 = 0; _key11 < _len11; _key11++) {
+    arg[_key11] = arguments[_key11];
   }
 
   return _hyperscript2.default.apply(undefined, ['.bindery-toggle'].concat(arg, [toggleSwitch]));
 };
 
+exports.title = title;
 exports.row = row;
+exports.expandRow = expandRow;
+exports.expandArea = expandArea;
 exports.heading = heading;
 exports.btn = btn;
 exports.btnMain = btnMain;
@@ -2770,7 +2933,7 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls * {\n  font: inherit;\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\n.bindery-controls {\n  font: 14px / 1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: white;\n  outline: 1px solid rgba(0,0,0,0.05);\n  animation: fadeIn 0.3s;\n  overflow: scroll;\n  padding-bottom: 100px;\n}\n\n.bindery-inProgress .bindery-controls {\n  pointer-events: none;\n}\n\n@keyframes fadeIn {\n  0% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  20% {\n    opacity: 0;\n    transform: translate3d(20px, 0, 0);\n  }\n  100% {\n    opacity: 1;\n    transform: translate3d(0, 0, 0);\n  }\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 12px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 2px;\n  margin: 0 0 16px 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n.bindery-btn-mini {\n  color: #aaa;\n  background: transparent;\n  padding: 6px 8px;\n  margin: -6px -8px;\n  font: inherit;\n}\n.bindery-btn-mini:hover {\n  color: #aaa;\n  background: rgba(0,0,0,0.06);\n}\n\n.bindery-inProgress .bindery-btn {\n  opacity: 0.2;\n  pointer-events: none;\n}\n\n.bindery-label {\n  font-size: 10px;\n  text-transform: uppercase;\n  color: #929292;\n  letter-spacing: 0.06em;\n  padding: 16px 20px;\n  box-shadow: inset 0 0.5px rgba(0,0,0,0.2);\n}\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  background: white;\n  z-index: 99;\n  width: 240px;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 64px;\n  width: 33%;\n  display: inline-block;\n  text-align: center;\n  font-size: 12px;\n  color: #aaa;\n  cursor: pointer;\n}\n.bindery-viewmode .icon {\n  height: 36px;\n  width: 36px;\n  background: currentColor;\n  margin: 0 auto 8px;\n}\n.bindery-viewmode:hover {\n  color: black;\n}\n.bindery-viewmode.selected {\n  color: black;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(26) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.interactive .icon {\n  -webkit-mask: url(" + __webpack_require__(27) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(28) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 8px;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n  width: 100px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 6px 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;\n}\n\n.bindery-val input:invalid {\n    color: maroon;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 6px 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  /*content: \"\";*/\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 4px;\n  /*margin-right: -5px;*/\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  background: none !important;\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 54px;\n  height: 24px;\n  z-index: 5;\n  /*background: white;*/\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: 0;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: 0;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls * {\n  font: inherit;\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\n.bindery-controls {\n  font: 14px / 1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: #f1f1f1;\n  /*outline: 1px solid rgba(0,0,0,0.05);*/\n  overflow: scroll;\n  padding-bottom: 100px;\n}\n\n.bindery-inProgress .bindery-controls {\n  pointer-events: none;\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  margin: 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n\n.bindery-inProgress .bindery-btn {\n  opacity: 0.2;\n  pointer-events: none;\n}\n\n.bindery-heading {\n  font-size: 10px;\n  text-transform: uppercase;\n  color: #929292;\n  letter-spacing: 0.06em;\n  padding: 16px 20px;\n  box-shadow: inset 0 0.5px rgba(0,0,0,0.2);\n}\n\n.bindery-title {\n  padding: 20px;\n  font-size: 18px;\n}\n\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  /*background: white;*/\n  z-index: 99;\n  width: 240px;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 4px;\n}\n.bindery-viewmode .icon {\n  height: 32px;\n  width: 32px;\n  background: currentColor;\n  margin: 0 auto;\n}\n.bindery-viewmode:hover {\n  background: rgba(0,0,0,0.04);\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(26) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.flip .icon {\n  -webkit-mask: url(" + __webpack_require__(27) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.outline .icon {\n  -webkit-mask: url(" + __webpack_require__(28) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(29) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val, .bindery-expand-row {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 4px;\n}\n.bindery-expand-row {\n  color: navy;\n}\n.bindery-expand-row::after {\n  content: '+';\n  font-size: 1.5em;\n  padding: 0 0;\n  position: absolute;\n  right: 20px;\n  top: 0;\n  font-weight: 300;\n}\n.bindery-expand-row.selected::after {\n  content: '\\2013';\n}\n\n.bindery-expand-row:hover {\n  background: rgba(0,0,0,0.04);\n}\n.bindery-expand-area {\n  display: none;\n  /*background: #f4f4f4;\n  box-shadow: inset 0 -0.5px 0 rgba(0,0,0,0.2);*/\n  margin-bottom: 16px;\n  padding: 12px 0;\n}\n.bindery-expand-row.selected {\n  /*background: #f4f4f4;\n  box-shadow: inset 0 0.5px 0 rgba(0,0,0,0.2);*/\n  margin-bottom: 0;\n}\n.bindery-expand-row.selected + .bindery-expand-area {\n  display: block;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n  width: 100px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 6px 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;\n}\n\n.bindery-val input:invalid {\n    color: maroon;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 6px 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  /*content: \"\";*/\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 4px;\n  /*margin-right: -5px;*/\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  background: none !important;\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 54px;\n  height: 24px;\n  z-index: 5;\n  /*background: white;*/\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: 0;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: 0;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
 
 // exports
 
@@ -2779,22 +2942,28 @@ exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {
 /* 26 */
 /***/ (function(module, exports) {
 
-module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='UTF-8'?%3E %3Csvg width='36px' height='36px' viewBox='0 0 36 36' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3Eicon-grid%3C/title%3E %3Cdesc%3ECreated with Sketch.%3C/desc%3E %3Cdefs%3E%3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='icon-grid' stroke='%23000000'%3E %3Cg id='Group-4-Copy' transform='translate(6.000000, 1.000000)'%3E %3Crect id='Rectangle-2-Copy-4' x='0.5' y='18.5' width='10' height='15'%3E%3C/rect%3E %3Crect id='Rectangle-2-Copy-13' x='10.5' y='18.5' width='10' height='15'%3E%3C/rect%3E %3Crect id='Rectangle-2-Copy-13' x='10.5' y='0.5' width='10' height='15'%3E%3C/rect%3E %3Crect id='Rectangle-2-Copy-14' x='0.5' y='0.5' width='10' height='15'%3E%3C/rect%3E %3C/g%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
 /* 27 */
 /***/ (function(module, exports) {
 
-module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='UTF-8'?%3E %3Csvg width='36px' height='36px' viewBox='0 0 36 36' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3Eicon-interactive%3C/title%3E %3Cdesc%3ECreated with Sketch.%3C/desc%3E %3Cdefs%3E%3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='icon-interactive' fill='%23000000'%3E %3Cg id='Group-2-Copy-3' transform='translate(3.000000, 2.000000)' fill-rule='nonzero'%3E %3Cpath d='M1,5 L1,26 L14,26 L14,5 L1,5 Z M0,4 L15,4 L15,27 L0,27 L0,4 Z' id='Rectangle-2-Copy-6'%3E%3C/path%3E %3Cpath d='M29,5 L28,4 L28,5 L29,5 Z M28,26 L29,26 L28,27 L28,26 Z M25.4092533,5 L25.4092533,4 L29,4 L29,27 L14,27 L14.4960545,26 L28,26 L28,5 L25.4092533,5 Z M29,26 L28,27 L28,26 L29,26 Z M28,4 L29,5 L28,5 L28,4 Z M28,5 L25.4092533,5 L25.4092533,4 L29,4 L29,27 L14,27 L14.4960545,26 L28,26 L28,5 Z' id='Rectangle-2-Copy-7'%3E%3C/path%3E %3Cpath d='M15,4.78817695 L15,25.6047192 L25,22.2118231 L25,1.39528082 L15,4.78817695 Z M14,4.07147535 L26,0 L26,22.9285247 L14,27 L14,4.07147535 Z' id='Rectangle-2-Copy-6'%3E%3C/path%3E %3C/g%3E %3Cpolygon id='Path-2' opacity='0.3' points='18.3241613 28.7071852 27.7154453 24.615177 28.1596848 6.74924377 30 6.30920273 30 29'%3E%3C/polygon%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M0.5 0.5H11.5V15.5H0.5z' transform='translate(5 8)'/%3E%3Cpath d='M22.5,15.5 L22.5,0.5' stroke-linecap='square' transform='translate(5 8)'/%3E%3Cpath d='M16.5,8.5 L16.5,23.5 L16.9093327,23.5 L24.5,20.6534998 L24.5,5.72150023 L17.1755617,8.46816459 L17,8.5 L16.5,8.5 Z'/%3E%3Cpath d='M27.5 23.5L16.5 23.5M24.5 8.5L27.5 8.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
 /* 28 */
 /***/ (function(module, exports) {
 
-module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='UTF-8'?%3E %3Csvg width='36px' height='36px' viewBox='0 0 36 36' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E %3C!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch --%3E %3Ctitle%3Eicon-sheet%3C/title%3E %3Cdesc%3ECreated with Sketch.%3C/desc%3E %3Cdefs%3E%3C/defs%3E %3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E %3Cg id='icon-sheet' stroke='%23000000'%3E %3Crect id='Rectangle-2-Copy' x='1.5' y='4.5' width='32' height='26'%3E%3C/rect%3E %3Cpath d='M17.5,7.5 L17.5,9.5' id='Line-2-Copy' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M8.5,7.5 L8.5,9.5' id='Line-2-Copy-2' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M26.5,7.5 L26.5,9.5' id='Line-2-Copy-3' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M4.5,11.5 L6.5,11.5' id='Line-3' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M28.5,11.5 L30.5,11.5' id='Line-3-Copy' stroke-linecap='square'%3E%3C/path%3E %3Cpath d='M17.5,24.5 L17.5,26.5' id='Line-2-Copy-4' stroke-linecap='square' transform='translate(17.500000, 25.500000) scale(1, -1) translate(-17.500000, -25.500000) '%3E%3C/path%3E %3Cpath d='M8.5,24.5 L8.5,26.5' id='Line-2-Copy-5' stroke-linecap='square' transform='translate(8.500000, 25.500000) scale(1, -1) translate(-8.500000, -25.500000) '%3E%3C/path%3E %3Cpath d='M26.5,23.5 L26.5,26.5' id='Line-2-Copy-6' stroke-linecap='square' transform='translate(27.000000, 25.000000) scale(1, -1) translate(-27.000000, -25.000000) '%3E%3C/path%3E %3Cpath d='M4.5,22.5 L6.5,22.5' id='Line-3-Copy-2' stroke-linecap='square' transform='translate(5.500000, 22.500000) scale(1, -1) translate(-5.500000, -22.500000) '%3E%3C/path%3E %3Cpath d='M26.5,21.5 L30.5,21.5' id='Line-3-Copy-3' stroke-linecap='square' transform='translate(28.500000, 22.000000) scale(1, -1) translate(-28.500000, -22.000000) '%3E%3C/path%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23000000'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3Cpath stroke='%23000000' d='M8.5 13.5H13.5V20.5H8.5z'/%3E%3Cpath fill='%23000000' d='M8 11H14V12H8z'/%3E%3Cpath stroke='%23000000' d='M19.5 13.5H24.5V20.5H19.5z'/%3E%3Cpath fill='%23000000' d='M19 11H25V12H19z'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
 /* 29 */
+/***/ (function(module, exports) {
+
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M4.5 5.5H28.5V24.5H4.5z'/%3E%3Cpath d='M7.5 8.5L9.5 8.5M14.5 8.5L16.5 8.5M14.5 21.5L16.5 21.5M16.5 8.5L18.5 8.5M16.5 21.5L18.5 21.5M23.5 8.5L25.5 8.5M23.5 21.5L25.5 21.5M7.5 21.5L9.5 21.5M7.5 8.5L7.5 10.5M25.5 8.5L25.5 10.5M16.5 8.5L16.5 10.5M7.5 19.5L7.5 21.5M25.5 19.5L25.5 21.5M16.5 19.5L16.5 21.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
+
+/***/ }),
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2804,27 +2973,27 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _PageBreak = __webpack_require__(30);
+var _PageBreak = __webpack_require__(31);
 
 var _PageBreak2 = _interopRequireDefault(_PageBreak);
 
-var _FullPage = __webpack_require__(31);
+var _FullPage = __webpack_require__(32);
 
 var _FullPage2 = _interopRequireDefault(_FullPage);
 
-var _Spread = __webpack_require__(32);
+var _Spread = __webpack_require__(33);
 
 var _Spread2 = _interopRequireDefault(_Spread);
 
-var _Footnote = __webpack_require__(35);
+var _Footnote = __webpack_require__(36);
 
 var _Footnote2 = _interopRequireDefault(_Footnote);
 
-var _PageReference = __webpack_require__(36);
+var _PageReference = __webpack_require__(37);
 
 var _PageReference2 = _interopRequireDefault(_PageReference);
 
-var _RunningHeader = __webpack_require__(37);
+var _RunningHeader = __webpack_require__(38);
 
 var _RunningHeader2 = _interopRequireDefault(_RunningHeader);
 
@@ -2848,7 +3017,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2903,6 +3072,7 @@ var PageBreak = function (_BinderyRule) {
           state.currentPage.setPreference(this.continue);
         }
       }
+      return elmt;
     }
   }, {
     key: 'afterAdd',
@@ -2913,6 +3083,7 @@ var PageBreak = function (_BinderyRule) {
           newPage.setPreference(this.continue);
         }
       }
+      return elmt;
     }
   }]);
 
@@ -2920,7 +3091,7 @@ var PageBreak = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2975,12 +3146,15 @@ var FullPage = function (_BinderyRule) {
       if (elmt.classList.contains('bleed')) {
         state.currentPage.element.classList.add('bleed');
       }
+
+      return elmt;
     }
   }, {
     key: 'afterAdd',
     value: function afterAdd(elmt, state) {
       state.currentPage = prevPage;
       state.path = prevElementPath;
+      return elmt;
     }
   }]);
 
@@ -2988,7 +3162,7 @@ var FullPage = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3016,7 +3190,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-__webpack_require__(33);
+__webpack_require__(34);
 
 var Spread = function (_BinderyRule) {
   _inherits(Spread, _BinderyRule);
@@ -3040,6 +3214,7 @@ var Spread = function (_BinderyRule) {
       this.prevElementPath = state.path;
 
       requestNewPage();
+      return elmt;
     }
   }, {
     key: 'afterAdd',
@@ -3063,6 +3238,8 @@ var Spread = function (_BinderyRule) {
 
       state.currentPage = this.prevPage;
       state.path = this.prevElementPath;
+
+      return elmt;
     }
   }]);
 
@@ -3070,13 +3247,13 @@ var Spread = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(34);
+var content = __webpack_require__(35);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(3)(content, {});
@@ -3096,7 +3273,7 @@ if(false) {
 }
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)();
@@ -3110,7 +3287,7 @@ exports.push([module.i, ".bindery-spread.bindery-left .bindery-content {\n  /*wi
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3173,7 +3350,10 @@ var Footnote = function (_BinderyRule) {
         parent.replaceChild(element, replacement);
 
         overflowCallback();
+        return element;
       }
+
+      return replacement;
     }
   }, {
     key: 'replace',
@@ -3192,7 +3372,7 @@ var Footnote = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3237,7 +3417,10 @@ var PageReference = function (_BinderyRule) {
   _createClass(PageReference, [{
     key: 'afterAdd',
     value: function afterAdd(elmt) {
-      this.references[elmt.getAttribute('href')] = elmt;
+      var ref = elmt.getAttribute('href');
+      elmt.setAttribute('data-page-reference', ref);
+      this.references[ref] = elmt;
+      return elmt;
     }
   }, {
     key: 'afterBind',
@@ -3257,7 +3440,7 @@ var PageReference = function (_BinderyRule) {
     key: 'replace',
     value: function replace(original, number) {
       // original.removeAttribute('href');
-      original.insertAdjacentHTML('beforeend', ' \u21DD Page ' + number);
+      original.insertAdjacentHTML('beforeend', ' \u219D Page ' + number);
       return original;
     }
   }]);
@@ -3266,7 +3449,7 @@ var PageReference = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3298,7 +3481,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-__webpack_require__(38);
+__webpack_require__(39);
 
 var RunningHeader = function (_BinderyRule) {
   _inherits(RunningHeader, _BinderyRule);
@@ -3322,6 +3505,7 @@ var RunningHeader = function (_BinderyRule) {
     key: 'afterAdd',
     value: function afterAdd(elmt, state) {
       state.currentPage.section = elmt.textContent;
+      return elmt;
     }
   }, {
     key: 'afterBind',
@@ -3346,13 +3530,13 @@ var RunningHeader = function (_BinderyRule) {
 }(_BinderyRule3.default);
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(39);
+var content = __webpack_require__(40);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
 var update = __webpack_require__(3)(content, {});
@@ -3372,7 +3556,7 @@ if(false) {
 }
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)();
@@ -3380,7 +3564,7 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-show-guides .bindery-running-header {\n    outline: 1px solid cyan;\n  }\n}\n\n.bindery-sup {\n  font-size: 0.667em;\n}\n\n.bindery-num, .bindery-running-header, .bindery-footer {\n  font-size: 10pt;\n}\n\n.bindery-num, .bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in;\n}\n\n.bindery-left .bindery-running-header {\n  left: 18pt;\n  text-align: left;\n}\n\n.bindery-right .bindery-running-header {\n  right: 18pt;\n  text-align: right;\n}\n", ""]);
+exports.push([module.i, ".bindery-sup {\n  font-size: 0.667em;\n}\n\n.bindery-num, .bindery-running-header, .bindery-footer {\n  font-size: 10pt;\n}\n\n.bindery-num, .bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in;\n}\n\n.bindery-left .bindery-running-header {\n  left: 18pt;\n  text-align: left;\n}\n\n.bindery-right .bindery-running-header {\n  right: 18pt;\n  text-align: right;\n}\n", ""]);
 
 // exports
 

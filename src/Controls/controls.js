@@ -1,14 +1,15 @@
 import h from 'hyperscript';
 import { convertStrToPx } from '../utils/convertUnits';
 import {
+  title,
   select,
   option,
   btn,
   btnMain,
-  btnMini,
   switchRow,
   row,
-  heading,
+  expandRow,
+  expandArea,
   inputNumberUnits,
 } from './components';
 
@@ -32,21 +33,24 @@ class ControlPanel {
     const printBtn = btnMain({ onclick: print }, 'Print');
 
     let layoutControl;
-    let guidesToggle;
+    let cropToggle;
     let facingToggle;
 
-    const toggleGuides = () => {
-      guidesToggle.classList.toggle('selected');
-      this.binder.viewer.toggleGuides();
+    const toggleCrop = () => {
+      this.binder.viewer.isShowingCropMarks = !this.binder.viewer.isShowingCropMarks;
+      cropToggle.classList.toggle('selected');
     };
-    guidesToggle = switchRow({ onclick: toggleGuides }, 'Show Bounds');
 
     const toggleFacing = () => {
       facingToggle.classList.toggle('selected');
       layoutControl.classList.toggle('not-facing');
       this.binder.viewer.toggleDouble();
     };
+
+    cropToggle = switchRow({ onclick: toggleCrop }, 'Crop Marks');
+    cropToggle.classList.add('selected');
     facingToggle = switchRow({ onclick: toggleFacing }, 'Facing Pages');
+
     facingToggle.classList.add('selected');
 
     let doneBtn = '';
@@ -86,28 +90,36 @@ class ControlPanel {
       option('Letter'),
       option({ disabled: true }, '8.5 x 11'),
       option({ disabled: true }, ''),
-      option('Legal'),
+      option({ disabled: true }, 'Legal'),
       option({ disabled: true }, '8.5 x 14'),
       option({ disabled: true }, ''),
-      option('Tabloid'),
+      option({ disabled: true }, 'Tabloid'),
       option({ disabled: true }, '11 x 17'),
       option({ disabled: true }, ''),
-      option('A4'),
+      option({ disabled: true }, 'A4'),
       option({ disabled: true }, 'mm x mm'),
     ));
 
-    const arrangement = row('Arrange', select(
-      option('1 up'),
-      option('2 up'),
-      option('8 up'),
-      option('Booklet'),
-      option('Signatures'),
-    ));
+    const arrangeSelect = select(
+      option({ value: 'arrange_one' }, 'Pages'),
+      option({ value: 'arrange_two', selected: true }, 'Spreads'),
+      option({ value: 'arrange_booklet' }, 'Booklet'),
+      option({ disabled: true }, 'Grid'),
+      option({ disabled: true }, 'Signatures'),
+    );
+    arrangeSelect.addEventListener('change', () => {
+      this.binder.viewer.setPrintArrange(arrangeSelect.value);
+    });
+    const arrangement = row('Print', arrangeSelect);
 
-    const orientation = row('Orientation', select(
-      option('Landscape'),
-      option('Portrait'),
-    ));
+    const orientationSelect = select(
+      option({ value: 'landscape' }, 'Landscape'),
+      option({ value: 'portrait' }, 'Portrait'),
+    );
+    orientationSelect.addEventListener('change', () => {
+      this.binder.viewer.setOrientation(orientationSelect.value);
+    });
+    const orientation = row('Orientation', orientationSelect);
 
     const validCheck = h('div', { style: {
       display: 'none',
@@ -116,7 +128,7 @@ class ControlPanel {
     const inProgress = h('div', { style: {
       display: 'none',
     } }, 'Updating...');
-    const forceRefresh = btnMini({ onclick: () => {
+    const forceRefresh = btn({ onclick: () => {
       inProgress.style.display = 'block';
       forceRefresh.style.display = 'none';
       setTimeout(() => {
@@ -125,47 +137,51 @@ class ControlPanel {
           forceRefresh.style.display = 'block';
         }, 100);
       });
-    } }, 'Update');
+    } }, 'Update Layout');
 
 
     let gridMode;
     let printMode;
-    let interactMode;
+    let outlineMode;
+    let flipMode;
+    let viewModes;
     const setGrid = () => {
+      viewModes.forEach(v => v.classList.remove('selected'));
       gridMode.classList.add('selected');
-      interactMode.classList.remove('selected');
-      printMode.classList.remove('selected');
-
       this.binder.viewer.setGrid();
     };
+    const setOutline = () => {
+      viewModes.forEach(v => v.classList.remove('selected'));
+      outlineMode.classList.add('selected');
+      this.binder.viewer.setOutline();
+    };
     const setInteractive = () => {
-      gridMode.classList.remove('selected');
-      interactMode.classList.add('selected');
-      printMode.classList.remove('selected');
-
+      viewModes.forEach(v => v.classList.remove('selected'));
+      flipMode.classList.add('selected');
       this.binder.viewer.setInteractive();
     };
     const setPrint = () => {
-      gridMode.classList.remove('selected');
-      interactMode.classList.remove('selected');
+      viewModes.forEach(v => v.classList.remove('selected'));
       printMode.classList.add('selected');
-
       this.binder.viewer.setPrint();
     };
-    gridMode = h('.bindery-viewmode.grid', { onclick: setGrid }, h('.icon'), 'Grid');
-    interactMode = h('.bindery-viewmode.interactive', { onclick: setInteractive }, h('.icon'), 'Interactive');
+    gridMode = h('.bindery-viewmode.grid', { onclick: setGrid }, h('.icon'), 'Preview');
+    outlineMode = h('.bindery-viewmode.outline', { onclick: setOutline }, h('.icon'), 'Outline');
+    flipMode = h('.bindery-viewmode.flip', { onclick: setInteractive }, h('.icon'), 'Flip');
     printMode = h('.bindery-viewmode.print', { onclick: setPrint }, h('.icon'), 'Sheet');
-    if (this.binder.viewer.mode === 'grid') gridMode.classList.add('selected');
-    if (this.binder.viewer.mode === 'interactive') interactMode.classList.add('selected');
-    if (this.binder.viewer.mode === 'print') printMode.classList.add('selected');
-    const viewSwitcher = h('.bindery-viewswitcher',
-      gridMode, printMode, interactMode,
-    );
+    viewModes = [
+      gridMode,
+      outlineMode,
+      flipMode,
+      printMode,
+    ];
 
-    const header = h('div', { style: {
-      padding: '20px',
-      'font-size': '20px',
-    } }, 'Bindery');
+    if (this.binder.viewer.mode === 'grid') gridMode.classList.add('selected');
+    if (this.binder.viewer.mode === 'interactive') flipMode.classList.add('selected');
+    if (this.binder.viewer.mode === 'print') printMode.classList.add('selected');
+    const viewSwitcher = h('.bindery-viewswitcher', ...viewModes);
+
+    const header = title('Loading...');
 
     const updateLayoutPreview = (newSize, newMargin) => {
       const px = {
@@ -202,7 +218,6 @@ class ControlPanel {
       marginControl.style.width = `${width}px`;
       marginControl.style.height = `${height}px`;
 
-      console.log(t);
       marginPreview.style.top = `${t}px`;
       marginPreview.style.bottom = `${b}px`;
       marginPreview.style.left = `${i}px`;
@@ -279,30 +294,28 @@ class ControlPanel {
     });
 
     const layoutState = h('div',
-      { style: { float: 'right' } },
       forceRefresh,
       validCheck,
       inProgress,
     );
 
+
     this.holder.appendChild(h('div', {},
         header,
-        doneBtn,
-        printBtn,
 
-        heading(layoutState, 'Pagination'),
-        layoutControl,
-        facingToggle,
-
-        heading('Print'),
+        arrangement,
         paperSize,
         orientation,
-        arrangement,
-        switchRow('Crop Marks'),
+        cropToggle,
 
+        expandRow('Book Setup'),
+        expandArea(
+          layoutControl,
+          layoutState
+        ),
 
-        heading('View'),
-        guidesToggle,
+        doneBtn,
+        printBtn,
 
         viewSwitcher,
       )
