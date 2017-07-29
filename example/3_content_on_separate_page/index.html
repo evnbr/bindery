@@ -17,12 +17,11 @@
 					url: 'content.html',
 					selector: ".content",
 				},
-				debugDelay: -1,
 			  rules: [
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
 					Bindery.Footnote({
-						selector: 'p > a',
-						render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.href}</u>`,
+						selector: 'a',
+						render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.getAttribute('href')}</u>`,
 					}),
 					Bindery.Spread({ selector: ".big-figure" }),
 					Bindery.RunningHeader({

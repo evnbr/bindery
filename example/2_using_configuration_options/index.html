@@ -130,7 +130,7 @@
 				Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
 				Bindery.Footnote({
 					selector: 'p > a',
-					render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.href}</u>`,
+					render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.getAttribute('href')}</u>`,
 				}),
 				Bindery.Footnote({ selector: 'p' }),
 				Bindery.FullPage({ selector: '.med-figure' }),
