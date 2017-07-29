@@ -1,0 +1,63 @@
+.bindery-crop-wrap {
+  display: none;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+.bindery-show-crop .bindery-crop-wrap {
+  display: block;
+}
+.bindery-show-crop .bindery-print-page .bindery-spread-wrapper {
+  margin: 30pt auto;
+}
+
+
+.bindery-crop-wrap > div {
+  position: absolute;
+  overflow: hidden;
+}
+.bindery-crop-wrap > div::after,
+.bindery-crop-wrap > div::before {
+  content: "";
+  background: black;
+  width: 12pt;
+  height: 12pt;
+  display: block;
+  position: absolute;
+}
+
+.bindery-crop-wrap > div::before {
+  top: 0; left: 0;
+}
+
+.bindery-crop-wrap > div::after {
+  bottom: 0; right: 0;
+}
+
+.bindery-crop-fold,
+.bindery-crop-left,
+.bindery-crop-right {
+  transform: scaleX(0.5);
+  top: -20pt;
+  bottom: -20pt;
+  width: 1px;
+  margin: auto;
+}
+
+.bindery-crop-fold { right: 0; left: 0; }
+.bindery-crop-left { left: 0; }
+.bindery-crop-right { right: 0; }
+
+.bindery-crop-top,
+.bindery-crop-bottom {
+  transform: scaleY(0.5);
+  left: -20pt;
+  right: -20pt;
+  height: 1px;
+}
+.bindery-crop-top { top: 0; }
+.bindery-crop-bottom { bottom: 0; }

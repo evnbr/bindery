@@ -4,6 +4,48 @@ import Page from '../Page/page';
 import errorView from './error';
 
 require('./viewer.css');
+require('./crop.css');
+
+const MODE_FLIP = 'interactive';
+const MODE_PREVIEW = 'grid';
+const MODE_SHEET = 'print';
+const MODE_OUTLINE = 'outline';
+
+const ARRANGE_ONE = 'arrange_one';
+const ARRANGE_SPREAD = 'arrange_two';
+const ARRANGE_BOOKLET = 'arrange_booklet';
+// const ARRANGE_SIGNATURE = 'arrange_signature';
+
+
+const cropMarksSingle = () => h('.bindery-crop-wrap',
+  h('.bindery-crop-top'),
+  h('.bindery-crop-bottom'),
+  h('.bindery-crop-left'),
+  h('.bindery-crop-right'),
+);
+const cropMarksSpread = () => h('.bindery-crop-wrap',
+  h('.bindery-crop-top'),
+  h('.bindery-crop-bottom'),
+  h('.bindery-crop-left'),
+  h('.bindery-crop-right'),
+  h('.bindery-crop-fold'),
+);
+
+const ORIENTATION_STYLE_ID = 'bindery-orientation-stylesheet';
+
+const setOrientationCSS = (newValue) => {
+  let sheet;
+  const existing = document.querySelector(`#${ORIENTATION_STYLE_ID}`);
+  if (existing) {
+    sheet = existing;
+  } else {
+    sheet = document.createElement('style');
+    sheet.id = ORIENTATION_STYLE_ID;
+  }
+  sheet.innerHTML = `@page { size: ${newValue}; }`;
+  document.head.appendChild(sheet);
+};
+
 
 class Viewer {
   constructor() {
@@ -11,6 +53,7 @@ class Viewer {
 
     this.doubleSided = true;
     this.twoUp = false;
+    this.isShowingCropMarks = true;
 
     this.mode = 'grid';
     this.currentLeaf = 0;
@@ -30,6 +73,19 @@ class Viewer {
       });
     }
   }
+
+  get isShowingCropMarks() {
+    return this.export.classList.contains('bindery-show-crop');
+  }
+
+  set isShowingCropMarks(newVal) {
+    if (newVal) {
+      this.export.classList.add('bindery-show-crop');
+    } else {
+      this.export.classList.remove('bindery-show-crop');
+    }
+  }
+
   displayError(title, text) {
     if (!this.export.parentNode) {
       document.body.appendChild(this.export);
@@ -114,9 +170,21 @@ class Viewer {
 
     this.export.innerHTML = '';
 
-    const pages = this.pages.slice();
+    let pages = this.pages.slice();
+    const isTwoUp = this.printArrange !== ARRANGE_ONE;
 
-    if (this.twoUp) {
+    const spread = function (...arg) {
+      return h('.bindery-spread-wrapper', ...arg);
+    };
+    const orient = this.orientation;
+    const printSheet = function (...arg) {
+      return h(
+        `.bindery-print-page.bindery-letter-${orient}`,
+        ...arg
+      );
+    };
+
+    if (this.printArrange === ARRANGE_SPREAD) {
       if (this.pages.length % 2 !== 0) {
         const pg = new Page();
         pages.push(pg);
@@ -129,29 +197,29 @@ class Viewer {
       pages.push(spacerPage2);
     }
 
-    for (let i = 0; i < pages.length; i += (this.twoUp ? 2 : 1)) {
-      if (this.twoUp) {
+
+    for (let i = 0; i < pages.length; i += (isTwoUp ? 2 : 1)) {
+      if (isTwoUp) {
         const left = pages[i];
         const right = pages[i + 1];
 
         const leftPage = left.element;
         const rightPage = right.element;
 
-        const wrap = h('.bindery-print-page',
-          h('.bindery-spread-wrapper', {
-            style: Page.spreadSizeStyle(),
-          }, leftPage, rightPage)
-        );
+        const sheet = printSheet(spread(
+          { style: Page.spreadSizeStyle() },
+          leftPage, rightPage, cropMarksSpread()
+        ));
 
-        this.export.appendChild(wrap);
+
+        this.export.appendChild(sheet);
       } else {
         const pg = pages[i].element;
-        const wrap = h('.bindery-print-page',
-          h('.bindery-spread-wrapper', {
-            style: Page.sizeStyle(),
-          }, pg),
-        );
-        this.export.appendChild(wrap);
+        const sheet = printSheet(spread(
+          { style: Page.sizeStyle() },
+          pg, cropMarksSingle()
+        ));
+        this.export.appendChild(sheet);
       }
     }
   }
