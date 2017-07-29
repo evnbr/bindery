@@ -20,10 +20,13 @@ class FullPage extends BinderyRule {
     if (elmt.classList.contains('bleed')) {
       state.currentPage.element.classList.add('bleed');
     }
+
+    return elmt;
   }
   afterAdd(elmt, state) {
     state.currentPage = prevPage;
     state.path = prevElementPath;
+    return elmt;
   }
 }
 

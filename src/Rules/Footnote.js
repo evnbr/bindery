@@ -27,7 +27,10 @@ class Footnote extends BinderyRule {
       parent.replaceChild(element, replacement);
 
       overflowCallback();
+      return element;
     }
+
+    return replacement;
   }
   replace(element, number) {
     element.insertAdjacentHTML('beforeEnd', `<sup class="bindery-sup">${number}</sup>`);

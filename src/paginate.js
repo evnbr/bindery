@@ -140,20 +140,26 @@ const paginate = function (
   };
 
 
-  const beforeAddRules = (elmt) => {
+  const beforeAddRules = (element) => {
+    let addedElement = element;
     rules.forEach((rule) => {
       if (!rule.selector) return;
-      if (elmt.matches(rule.selector) && rule.beforeAdd) {
-        rule.beforeAdd(elmt, state, makeNextPage);
+      if (addedElement.matches(rule.selector) && rule.beforeAdd) {
+        addedElement = rule.beforeAdd(addedElement, state, makeNextPage);
       }
     });
   };
 
-  const afterAddRules = (elmt) => {
+  const afterAddRules = (element) => {
+    let addedElement = element;
     rules.forEach((rule) => {
       if (!rule.selector) return;
-      if (elmt.matches(rule.selector) && rule.afterAdd) {
-        rule.afterAdd(elmt, state, makeNextPage, function overflowCallback() {
+      if (addedElement.matches(rule.selector) && rule.afterAdd) {
+        addedElement = rule.afterAdd(
+          addedElement,
+          state,
+          makeNextPage,
+          function overflowCallback() {
           // TODO:
           // While this does catch overflows, it introduces a few new bugs.
           // It is pretty aggressive to move the entire node to the next page.
@@ -163,13 +169,14 @@ const paginate = function (
           // - 3. if it is a large paragraph, it will leave a large gap. the
           // correct approach would be to only need to invalidate
           // the last line of text.
-          elmt.parentNode.removeChild(elmt);
-          makeNextPage();
-          last(state.path).appendChild(elmt);
-          rule.afterAdd(elmt, state, makeNextPage, () => {
-            console.log(`Couldn't apply ${rule.name} to ${elToStr(elmt)}. Caused overflows twice.`);
-          });
-        });
+            addedElement.parentNode.removeChild(addedElement);
+            makeNextPage();
+            last(state.path).appendChild(addedElement);
+            addedElement = rule.afterAdd(addedElement, state, makeNextPage, () => {
+              console.log(`Couldn't apply ${rule.name} to ${elToStr(addedElement)}. Caused overflows twice.`);
+            });
+          }
+        );
       }
     });
   };
@@ -184,10 +191,7 @@ const paginate = function (
   };
 
   const moveNodeToNextPage = (nodeToMove) => {
-    // console.log(`Moving ${elToStr(nodeToMove)} to next page`);
-
-    const discarded = state.path.pop();     // TODO: this is unclear.
-    // console.log(`Discard ${elToStr(discarded)}`);
+    state.path.pop();     // TODO: this is unclear.
 
     // remove from old page
     nodeToMove.parentNode.removeChild(nodeToMove);
@@ -214,7 +218,7 @@ const paginate = function (
 
     let pos = 0;
 
-    const step = () => {
+    const splitTextStep = () => {
       textNode.nodeValue = origText.substr(0, pos);
 
       if (state.currentPage.hasOverflowed()) {
@@ -222,7 +226,6 @@ const paginate = function (
         if (origText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
         while (origText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
 
-        // if (pos < 1 && origText.trim().length > 0) {
         if (pos < 1) {
           textNode.nodeValue = origText;
           textNode.parentNode.removeChild(textNode);
@@ -250,7 +253,7 @@ const paginate = function (
           return;
         }
 
-        throttle(step);
+        throttle(splitTextStep);
         return;
       }
       if (pos > origText.length - 1) {
@@ -262,10 +265,10 @@ const paginate = function (
       while (origText.charAt(pos) !== ' ' && pos < origText.length) pos += 1;
 
 
-      throttle(step, SHOULD_DEBUG_TEXT);
+      throttle(splitTextStep, SHOULD_DEBUG_TEXT);
     };
 
-    step(); // find breakpoint
+    splitTextStep();
   };
 
   // Adds an element node by clearing its childNodes, then inserting them

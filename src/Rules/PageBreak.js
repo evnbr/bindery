@@ -20,6 +20,7 @@ class PageBreak extends BinderyRule {
         state.currentPage.setPreference(this.continue);
       }
     }
+    return elmt;
   }
   afterAdd(elmt, state, requestNewPage) {
     if (this.position === 'after' || this.position === 'both') {
@@ -28,6 +29,7 @@ class PageBreak extends BinderyRule {
         newPage.setPreference(this.continue);
       }
     }
+    return elmt;
   }
 }
 

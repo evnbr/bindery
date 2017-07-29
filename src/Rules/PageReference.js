@@ -7,7 +7,10 @@ class PageReference extends BinderyRule {
     this.references = {};
   }
   afterAdd(elmt) {
-    this.references[elmt.getAttribute('href')] = elmt;
+    const ref = elmt.getAttribute('href');
+    elmt.setAttribute('data-page-reference', ref);
+    this.references[ref] = elmt;
+    return elmt;
   }
   afterBind(page) {
     Object.keys(this.references).forEach((ref) => {
