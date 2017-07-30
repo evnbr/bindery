@@ -51,7 +51,8 @@ class Viewer {
   constructor() {
     this.pages = [];
 
-    this.export = h('.bindery-export');
+    this.zoom = h('.bindery-zoom-wrap');
+    this.export = h('.bindery-export', this.zoom);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
@@ -62,6 +63,7 @@ class Viewer {
     this.currentLeaf = 0;
 
     this.listenForPrint();
+    this.listenForResize();
   }
 
   listenForPrint() {
@@ -76,6 +78,17 @@ class Viewer {
         }
       });
     }
+  }
+
+  listenForResize() {
+    window.addEventListener('resize', () => {
+      if (!this.throttleResize) {
+        this.throttleResize = setTimeout(() => {
+          this.updateZoom();
+          this.throttleResize = null;
+        }, 20);
+      }
+    });
   }
 
   get isShowingCropMarks() {
@@ -112,9 +125,9 @@ class Viewer {
       document.body.appendChild(this.export);
     }
     if (!this.error) {
-      this.export.innerHTML = '';
+      this.zoom.innerHTML = '';
       this.error = errorView(title, text);
-      this.export.appendChild(this.error);
+      this.zoom.appendChild(this.error);
     }
   }
   cancel() {
@@ -206,6 +219,8 @@ class Viewer {
     } else {
       this.renderGrid();
     }
+
+    this.updateZoom();
   }
 
   renderPrint() {
@@ -215,7 +230,7 @@ class Viewer {
     this.export.classList.add('bindery-show-bleed');
     this.export.classList.remove('bindery-show-guides');
 
-    this.export.innerHTML = '';
+    this.zoom.innerHTML = '';
 
     let pages = this.pages.slice();
     const isTwoUp = this.printArrange !== ARRANGE_ONE;
@@ -286,15 +301,26 @@ class Viewer {
         }
 
 
-        this.export.appendChild(sheet);
+        this.zoom.appendChild(sheet);
       } else {
         const pg = pages[i].element;
         const sheet = printSheet(spread(
           { style: Page.sizeStyle() },
           pg, cropMarksSingle()
         ));
-        this.export.appendChild(sheet);
+        this.zoom.appendChild(sheet);
       }
+    }
+  }
+
+  updateZoom() {
+    const exportW = this.zoom.getBoundingClientRect().width;
+    const contentW = this.zoom.firstElementChild.getBoundingClientRect().width;
+    const scale = exportW / (contentW + 20);
+    if (scale < 1) {
+      this.zoom.style.transform = `scale(${scale})`;
+    } else {
+      this.zoom.style.transform = '';
     }
   }
 
@@ -312,7 +338,7 @@ class Viewer {
     this.updateGuides();
     this.export.style.display = 'block';
 
-    this.export.innerHTML = '';
+    this.zoom.innerHTML = '';
 
     const pages = this.pages.slice();
 
@@ -344,7 +370,7 @@ class Viewer {
         }, leftPage, rightPage
         );
 
-        this.export.appendChild(wrap);
+        this.zoom.appendChild(wrap);
       } else {
         const pg = pages[i].element;
         pg.setAttribute('bindery-side', 'right');
@@ -353,14 +379,14 @@ class Viewer {
             style: Page.sizeStyle(),
           }, pg),
         );
-        this.export.appendChild(wrap);
+        this.zoom.appendChild(wrap);
       }
     }
   }
   renderInteractive() {
     this.mode = MODE_FLIP;
     this.export.style.display = 'block';
-    this.export.innerHTML = '';
+    this.zoom.innerHTML = '';
     this.flaps = [];
 
     this.export.classList.remove('bindery-show-bleed');
@@ -421,7 +447,7 @@ class Viewer {
 
       flap.style.left = `${i * leftOffset}px`;
 
-      this.export.appendChild(flap);
+      this.zoom.appendChild(flap);
     }
     if (this.currentLeaf) {
       this.setLeaf(this.currentLeaf);

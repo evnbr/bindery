@@ -103,10 +103,18 @@
     margin: 20px;
   }
 
+  .bindery-zoom-wrap[style] {
+    transform: none !important;
+  }
+
 }
 
 body.bindery-viewing {
   margin: 0;
+}
+
+.bindery-zoom-wrap {
+  transform-origin: top left;
 }
 
 /* Don't print anything that hasn't been exported. This hides extra controls/ */

@@ -147,7 +147,7 @@
   position: relative;
   display: block;
   font-size: 14px;
-  padding: 8px 20px;
+  padding: 12px 20px;
   cursor: pointer;
   margin-bottom: 4px;
 }
@@ -160,7 +160,7 @@
   padding: 0 0;
   position: absolute;
   right: 20px;
-  top: 0;
+  top: 6px;
   font-weight: 300;
 }
 .bindery-expand-row.selected::after {

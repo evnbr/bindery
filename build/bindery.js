@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.2 - Saturday, July 29th, 2017, 3:05:40 PM  
+// [AIV]  Build version: 2.0.0-alpha.2 - Saturday, July 29th, 2017, 6:19:08 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -1851,7 +1851,7 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0,0,0,0.1);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible;\n  }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important;\n  }\n\n\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    pointer-events: none;\n    z-index: 999;\n  }\n\n\n  .bindery-export * {\n    transition: box-shadow 0.5s;\n  }\n\n  .bindery-show-guides * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2);\n  }\n\n  .bindery-show-guides .bindery-page::after {\n    box-shadow: 0 0 0 1px magenta;\n  }\n\n  .bindery-show-guides .bindery-flowbox {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-running-header {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue;\n  }\n  .bindery-show-guides .bindery-bleed {\n    box-shadow: 0 0 0 1px yellow;\n  }\n\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n.bindery-content {\n  /* hack to prevent margin collapse, leading to wrong height */\n  padding: 0.1px;\n}\n\n/* Footer */\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2;\n}\n.bindery-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n  margin-top: 0 !important;\n}\n\n/*Old Bleed Stuff*/\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n.bindery-left.bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n.bindery-right.bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n\n/*Bleed as layer*/\n.bindery-bleed {\n  position: absolute;\n  top: -0.2in;\n  bottom: -0.2in;\n  z-index: 0;\n}\n.bindery-left .bindery-bleed {\n  right: 0;\n  left: -0.2in;\n}\n.bindery-right .bindery-bleed {\n  left: 0;\n  right: -0.2in;\n}\n\n.bindery-measure-area {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0,0,0,0.1);\n    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n    overflow: hidden;\n  }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible;\n  }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important;\n  }\n\n\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    pointer-events: none;\n    z-index: 999;\n  }\n\n\n  .bindery-zoom-wrap * {\n    transition: box-shadow 0.5s;\n  }\n\n  .bindery-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2);\n  }\n\n  .bindery-show-guides .bindery-page::after {\n    box-shadow: 0 0 0 1px magenta;\n  }\n\n  .bindery-show-guides .bindery-flowbox {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-footer {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-running-header {\n    box-shadow: 0 0 0 1px cyan;\n  }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue;\n  }\n  .bindery-show-guides .bindery-bleed {\n    box-shadow: 0 0 0 1px yellow;\n  }\n\n}\n\n.bindery-page {\n  /*width: 400px;*/\n  /*height: 600px;*/\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto;\n}\n\n.bindery-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0;\n}\n.bindery-content {\n  /* hack to prevent margin collapse, leading to wrong height */\n  padding: 0.1px;\n}\n\n/* Footer */\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2;\n}\n.bindery-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt;\n}\n\n[bindery-continuation] {\n  text-indent: 0 !important;\n  margin-top: 0 !important;\n}\n\n/*Old Bleed Stuff*/\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px;\n}\n.bindery-left.bleed .bindery-flowbox {\n  right: 0;\n  left: -20px;\n}\n.bindery-right.bleed .bindery-flowbox {\n  left: 0;\n  right: -20px;\n}\n\n/*Bleed as layer*/\n.bindery-bleed {\n  position: absolute;\n  top: -0.2in;\n  bottom: -0.2in;\n  z-index: 0;\n}\n.bindery-left .bindery-bleed {\n  right: 0;\n  left: -0.2in;\n}\n.bindery-right .bindery-bleed {\n  left: 0;\n  right: -0.2in;\n}\n\n.bindery-measure-area {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n", ""]);
 
 // exports
 
@@ -1927,7 +1927,8 @@ var Viewer = function () {
 
     this.pages = [];
 
-    this.export = (0, _hyperscript2.default)('.bindery-export');
+    this.zoom = (0, _hyperscript2.default)('.bindery-zoom-wrap');
+    this.export = (0, _hyperscript2.default)('.bindery-export', this.zoom);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
@@ -1938,6 +1939,7 @@ var Viewer = function () {
     this.currentLeaf = 0;
 
     this.listenForPrint();
+    this.listenForResize();
   }
 
   _createClass(Viewer, [{
@@ -1956,6 +1958,20 @@ var Viewer = function () {
           }
         });
       }
+    }
+  }, {
+    key: 'listenForResize',
+    value: function listenForResize() {
+      var _this2 = this;
+
+      window.addEventListener('resize', function () {
+        if (!_this2.throttleResize) {
+          _this2.throttleResize = setTimeout(function () {
+            _this2.updateZoom();
+            _this2.throttleResize = null;
+          }, 20);
+        }
+      });
     }
   }, {
     key: 'setOrientation',
@@ -1983,9 +1999,9 @@ var Viewer = function () {
         document.body.appendChild(this.export);
       }
       if (!this.error) {
-        this.export.innerHTML = '';
+        this.zoom.innerHTML = '';
         this.error = (0, _error2.default)(title, text);
-        this.export.appendChild(this.error);
+        this.zoom.appendChild(this.error);
       }
     }
   }, {
@@ -2097,6 +2113,8 @@ var Viewer = function () {
       } else {
         this.renderGrid();
       }
+
+      this.updateZoom();
     }
   }, {
     key: 'renderPrint',
@@ -2107,7 +2125,7 @@ var Viewer = function () {
       this.export.classList.add('bindery-show-bleed');
       this.export.classList.remove('bindery-show-guides');
 
-      this.export.innerHTML = '';
+      this.zoom.innerHTML = '';
 
       var pages = this.pages.slice();
       var isTwoUp = this.printArrange !== ARRANGE_ONE;
@@ -2176,12 +2194,24 @@ var Viewer = function () {
             sheet.appendChild(meta);
           }
 
-          this.export.appendChild(sheet);
+          this.zoom.appendChild(sheet);
         } else {
           var _pg = pages[_i].element;
           var _sheet = printSheet(spread({ style: _page2.default.sizeStyle() }, _pg, cropMarksSingle()));
-          this.export.appendChild(_sheet);
+          this.zoom.appendChild(_sheet);
         }
+      }
+    }
+  }, {
+    key: 'updateZoom',
+    value: function updateZoom() {
+      var exportW = this.zoom.getBoundingClientRect().width;
+      var contentW = this.zoom.firstElementChild.getBoundingClientRect().width;
+      var scale = exportW / (contentW + 20);
+      if (scale < 1) {
+        this.zoom.style.transform = 'scale(' + scale + ')';
+      } else {
+        this.zoom.style.transform = '';
       }
     }
   }, {
@@ -2201,7 +2231,7 @@ var Viewer = function () {
       this.updateGuides();
       this.export.style.display = 'block';
 
-      this.export.innerHTML = '';
+      this.zoom.innerHTML = '';
 
       var pages = this.pages.slice();
 
@@ -2230,25 +2260,25 @@ var Viewer = function () {
             style: _page2.default.spreadSizeStyle()
           }, leftPage, rightPage);
 
-          this.export.appendChild(wrap);
+          this.zoom.appendChild(wrap);
         } else {
           var _pg2 = pages[i].element;
           _pg2.setAttribute('bindery-side', 'right');
           var _wrap = (0, _hyperscript2.default)('.bindery-print-page', (0, _hyperscript2.default)('.bindery-spread-wrapper', {
             style: _page2.default.sizeStyle()
           }, _pg2));
-          this.export.appendChild(_wrap);
+          this.zoom.appendChild(_wrap);
         }
       }
     }
   }, {
     key: 'renderInteractive',
     value: function renderInteractive() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.mode = MODE_FLIP;
       this.export.style.display = 'block';
-      this.export.innerHTML = '';
+      this.zoom.innerHTML = '';
       this.flaps = [];
 
       this.export.classList.remove('bindery-show-bleed');
@@ -2278,18 +2308,18 @@ var Viewer = function () {
           style: _page2.default.sizeStyle(),
           onclick: function onclick() {
             var newLeaf = li - 1;
-            if (newLeaf === _this2.currentLeaf) newLeaf += 1;
-            _this2.setLeaf(newLeaf);
+            if (newLeaf === _this3.currentLeaf) newLeaf += 1;
+            _this3.setLeaf(newLeaf);
           }
         });
-        _this2.export.classList.add('bindery-stage3d');
-        _this2.flaps.push(flap);
+        _this3.export.classList.add('bindery-stage3d');
+        _this3.flaps.push(flap);
 
         var rightPage = pages[i].element;
         var leftPage = void 0;
         rightPage.classList.add('bindery-page3d-front');
         flap.appendChild(rightPage);
-        if (_this2.doubleSided) {
+        if (_this3.doubleSided) {
           flap.classList.add('bindery-doubleSided');
           leftPage = pages[i + 1].element;
           leftPage.classList.add('bindery-page3d-back');
@@ -2309,7 +2339,7 @@ var Viewer = function () {
 
         flap.style.left = i * leftOffset + 'px';
 
-        _this2.export.appendChild(flap);
+        _this3.zoom.appendChild(flap);
       };
 
       for (var i = 1; i < pages.length - 1; i += this.doubleSided ? 2 : 1) {
@@ -2418,7 +2448,7 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  .bindery-export {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f1f1f1;\n    padding: 50px 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 100vh;\n    /*min-width: calc(11in + 320px);*/\n  }\n\n   .bindery-measure-area {\n     position: fixed;\n     top: 0;\n     left: 0;\n     background: #f1f1f1;\n     padding: 50px 20px;\n     padding-right: 240px;\n     z-index: 99;\n   }\n\n   .bindery-print-page {\n     margin: 0 auto;\n   }\n\n   .bindery-error {\n     font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n     font-size: 16px;\n     margin: 15vh 15vw;\n     max-width: 500px;\n     background: url(" + __webpack_require__(19) + ") no-repeat 0% 0%;\n     background-size: 48px;\n     padding-top: 64px;\n   }\n\n   .bindery-error-title {\n     font-size: 1.5em;\n     margin-bottom: 16px;\n   }\n\n   .bindery-error-text {\n     margin-bottom: 16px;\n     white-space: pre-line;\n   }\n\n   .bindery-error-footer {\n     opacity: 0.5;\n     font-size: 0.66rem;\n     text-transform: uppercase;\n     letter-spacing: 0.02em;\n   }\n\n   .bindery-show-bleed .bindery-print-page {\n     background: white;\n     outline: 1px solid rgba(0,0,0,0.1);\n     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n     margin: 20px auto;\n   }\n\n   .bindery-letter-landscape {\n     width: 11in;\n     height: 8.5in;\n   }\n   .bindery-letter-portrait {\n     width: 8.5in;\n     height: 11in;\n   }\n\n}\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0;\n    /*transform: translate3d(0, 50px, 0);*/\n  }\n  100% {\n    opacity: 1;\n    /*transform: translate3d(0, 0, 0);*/\n  }\n}\n\n@page {\n  margin: 0;\n}\n\n@media print {\n  .bindery-export {\n    -webkit-print-color-adjust: exact;\n  }\n\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not(.bindery-export) {\n    display: none !important;\n  }\n\n  .bindery-print-page {\n    margin: 20px;\n  }\n\n}\n\nbody.bindery-viewing {\n  margin: 0;\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not(.bindery-export) {\n  display: none !important;\n}\n\n.bindery-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden;\n}\n\n.bindery-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 50px auto;\n}\n\n.bindery-print-page .bindery-spread-wrapper {\n  margin: 0 auto;\n}\n\n.bindery-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt;\n}\n\n.bindery-stage3d {\n  perspective: 3000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: transform 0.5s, box-shadow 0.1s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n\n.bindery-page3d:hover {\n  box-shadow: 2px 0 4px rgba(0,0,0,0.2);\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page3d-front::after {\n  box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)\n}\n.bindery-page3d .bindery-page3d-back::after {\n  box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-viewing {\n    background: #f1f1f1 !important;\n  }\n  .bindery-export {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f1f1f1;\n    padding: 50px 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 100vh;\n    /*min-width: calc(11in + 320px);*/\n  }\n\n   .bindery-measure-area {\n     position: fixed;\n     top: 0;\n     left: 0;\n     background: #f1f1f1;\n     padding: 50px 20px;\n     padding-right: 240px;\n     z-index: 99;\n   }\n\n   .bindery-print-page {\n     margin: 0 auto;\n   }\n\n   .bindery-error {\n     font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n     font-size: 16px;\n     margin: 15vh 15vw;\n     max-width: 500px;\n     background: url(" + __webpack_require__(19) + ") no-repeat 0% 0%;\n     background-size: 48px;\n     padding-top: 64px;\n   }\n\n   .bindery-error-title {\n     font-size: 1.5em;\n     margin-bottom: 16px;\n   }\n\n   .bindery-error-text {\n     margin-bottom: 16px;\n     white-space: pre-line;\n   }\n\n   .bindery-error-footer {\n     opacity: 0.5;\n     font-size: 0.66rem;\n     text-transform: uppercase;\n     letter-spacing: 0.02em;\n   }\n\n   .bindery-show-bleed .bindery-print-page {\n     background: white;\n     outline: 1px solid rgba(0,0,0,0.1);\n     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);\n     margin: 20px auto;\n   }\n\n   .bindery-letter-landscape {\n     width: 11in;\n     height: 8.5in;\n   }\n   .bindery-letter-portrait {\n     width: 8.5in;\n     height: 11in;\n   }\n\n}\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0;\n    /*transform: translate3d(0, 50px, 0);*/\n  }\n  100% {\n    opacity: 1;\n    /*transform: translate3d(0, 0, 0);*/\n  }\n}\n\n@page {\n  margin: 0;\n}\n\n@media print {\n  .bindery-export {\n    -webkit-print-color-adjust: exact;\n  }\n\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not(.bindery-export) {\n    display: none !important;\n  }\n\n  .bindery-print-page {\n    margin: 20px;\n  }\n\n  .bindery-zoom-wrap[style] {\n    transform: none !important;\n  }\n\n}\n\nbody.bindery-viewing {\n  margin: 0;\n}\n\n.bindery-zoom-wrap {\n  transform-origin: top left;\n}\n\n/* Don't print anything that hasn't been exported. This hides extra controls/ */\n.bindery-viewing > :not(.bindery-export) {\n  display: none !important;\n}\n\n.bindery-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden;\n}\n\n.bindery-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 50px auto;\n}\n\n.bindery-print-page .bindery-spread-wrapper {\n  margin: 0 auto;\n}\n\n.bindery-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt;\n}\n\n.bindery-stage3d {\n  perspective: 3000px;\n  min-height: 100vh;\n  transform-style: preserve-3d;\n}\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transition: transform 0.5s, box-shadow 0.1s;\n  transform-style: preserve-3d;\n  transform-origin: left;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n\n.bindery-page3d:hover {\n  box-shadow: 2px 0 4px rgba(0,0,0,0.2);\n}\n.bindery-page3d.flipped {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page {\n  position: absolute;\n  backface-visibility: hidden;\n}\n\n.bindery-page3d .bindery-page3d-front {\n  transform: rotateY(0);\n}\n.bindery-page3d .bindery-page3d-back {\n  transform: rotateY(-180deg);\n}\n\n.bindery-page3d .bindery-page3d-front::after {\n  box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)\n}\n.bindery-page3d .bindery-page3d-back::after {\n  box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)\n}\n", ""]);
 
 // exports
 
@@ -2933,7 +2963,7 @@ exports = module.exports = __webpack_require__(2)();
 
 
 // module
-exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls * {\n  font: inherit;\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\n.bindery-controls {\n  font: 14px / 1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: #f1f1f1;\n  /*outline: 1px solid rgba(0,0,0,0.05);*/\n  overflow: scroll;\n  padding-bottom: 100px;\n}\n\n.bindery-inProgress .bindery-controls {\n  pointer-events: none;\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  margin: 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n\n.bindery-inProgress .bindery-btn {\n  opacity: 0.2;\n  pointer-events: none;\n}\n\n.bindery-heading {\n  font-size: 10px;\n  text-transform: uppercase;\n  color: #929292;\n  letter-spacing: 0.06em;\n  padding: 16px 20px;\n  box-shadow: inset 0 0.5px rgba(0,0,0,0.2);\n}\n\n.bindery-title {\n  padding: 20px;\n  font-size: 18px;\n}\n\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  /*background: white;*/\n  z-index: 99;\n  width: 240px;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 4px;\n}\n.bindery-viewmode .icon {\n  height: 32px;\n  width: 32px;\n  background: currentColor;\n  margin: 0 auto;\n}\n.bindery-viewmode:hover {\n  background: rgba(0,0,0,0.04);\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(26) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.flip .icon {\n  -webkit-mask: url(" + __webpack_require__(27) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.outline .icon {\n  -webkit-mask: url(" + __webpack_require__(28) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(29) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val, .bindery-expand-row {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 8px 20px;\n  cursor: pointer;\n  margin-bottom: 4px;\n}\n.bindery-expand-row {\n  color: navy;\n}\n.bindery-expand-row::after {\n  content: '+';\n  font-size: 1.5em;\n  padding: 0 0;\n  position: absolute;\n  right: 20px;\n  top: 0;\n  font-weight: 300;\n}\n.bindery-expand-row.selected::after {\n  content: '\\2013';\n}\n\n.bindery-expand-row:hover {\n  background: rgba(0,0,0,0.04);\n}\n.bindery-expand-area {\n  display: none;\n  /*background: #f4f4f4;\n  box-shadow: inset 0 -0.5px 0 rgba(0,0,0,0.2);*/\n  margin-bottom: 16px;\n  padding: 12px 0;\n}\n.bindery-expand-row.selected {\n  /*background: #f4f4f4;\n  box-shadow: inset 0 0.5px 0 rgba(0,0,0,0.2);*/\n  margin-bottom: 0;\n}\n.bindery-expand-row.selected + .bindery-expand-area {\n  display: block;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n  width: 100px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 6px 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;\n}\n\n.bindery-val input:invalid {\n    color: maroon;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 6px 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  /*content: \"\";*/\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 4px;\n  /*margin-right: -5px;*/\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  background: none !important;\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 54px;\n  height: 24px;\n  z-index: 5;\n  /*background: white;*/\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: 0;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: 0;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
+exports.push([module.i, "@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important;\n  }\n}\n\n.bindery-controls * {\n  font: inherit;\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\n.bindery-controls {\n  font: 14px / 1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  background: #f1f1f1;\n  /*outline: 1px solid rgba(0,0,0,0.05);*/\n  overflow: scroll;\n  padding-bottom: 100px;\n}\n\n.bindery-inProgress .bindery-controls {\n  pointer-events: none;\n}\n\n.bindery-status {\n  color: white;\n  padding: 6px 10px;\n}\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0,0,0,0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  margin: 16px;\n  width: auto;\n}\n\n.bindery-btn-main {\n  background: navy;\n  color: white;\n  /*border-color: black;*/\n}\n\n.bindery-btn:focus {\n  /*outline: 1px solid blue;*/\n  outline: none;\n}\n.bindery-btn:hover {\n  background: rgba(0,0,0,0.1);\n}\n.bindery-btn:active {\n  background: rgba(0,0,0,0.14);\n}\n.bindery-btn-main:hover {\n  background: navy;\n  opacity: 0.7;\n}\n.bindery-btn-main:active {\n  background: black;\n  opacity: 1;\n}\n\n.bindery-inProgress .bindery-btn {\n  opacity: 0.2;\n  pointer-events: none;\n}\n\n.bindery-heading {\n  font-size: 10px;\n  text-transform: uppercase;\n  color: #929292;\n  letter-spacing: 0.06em;\n  padding: 16px 20px;\n  box-shadow: inset 0 0.5px rgba(0,0,0,0.2);\n}\n\n.bindery-title {\n  padding: 20px;\n  font-size: 18px;\n}\n\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  /*background: white;*/\n  z-index: 99;\n  width: 240px;\n}\n.bindery-viewmode {\n  background-position: top center;\n  background-repeat: no-repeat;\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 4px;\n}\n.bindery-viewmode .icon {\n  height: 32px;\n  width: 32px;\n  background: currentColor;\n  margin: 0 auto;\n}\n.bindery-viewmode:hover {\n  background: rgba(0,0,0,0.04);\n}\n.bindery-viewmode.selected {\n  color: navy;\n}\n\n.bindery-viewmode.grid .icon {\n  -webkit-mask: url(" + __webpack_require__(26) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.flip .icon {\n  -webkit-mask: url(" + __webpack_require__(27) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.outline .icon {\n  -webkit-mask: url(" + __webpack_require__(28) + ") no-repeat 50% 50%;\n}\n.bindery-viewmode.print .icon {\n  -webkit-mask: url(" + __webpack_require__(29) + ") no-repeat 50% 50%;\n}\n\n.bindery-toggle, .bindery-val, .bindery-expand-row {\n  position: relative;\n  display: block;\n  font-size: 14px;\n  padding: 12px 20px;\n  cursor: pointer;\n  margin-bottom: 4px;\n}\n.bindery-expand-row {\n  color: navy;\n}\n.bindery-expand-row::after {\n  content: '+';\n  font-size: 1.5em;\n  padding: 0 0;\n  position: absolute;\n  right: 20px;\n  top: 6px;\n  font-weight: 300;\n}\n.bindery-expand-row.selected::after {\n  content: '\\2013';\n}\n\n.bindery-expand-row:hover {\n  background: rgba(0,0,0,0.04);\n}\n.bindery-expand-area {\n  display: none;\n  /*background: #f4f4f4;\n  box-shadow: inset 0 -0.5px 0 rgba(0,0,0,0.2);*/\n  margin-bottom: 16px;\n  padding: 12px 0;\n}\n.bindery-expand-row.selected {\n  /*background: #f4f4f4;\n  box-shadow: inset 0 0.5px 0 rgba(0,0,0,0.2);*/\n  margin-bottom: 0;\n}\n.bindery-expand-row.selected + .bindery-expand-area {\n  display: block;\n}\n\n.bindery-toggle select {\n  float: right;\n  border: none;\n  background: transparent;\n  padding: 12px;\n  width: 100px;\n}\n\n.bindery-toggle select:hover {\n  background: rgba(0,0,0,0.04);\n}\n\n.bindery-infopanel {\n  font-size: 14px;\n  margin-bottom: 8px;\n}\n\n.bindery-infopanel div {\n  padding: 8px 20px;\n}\n\n\n.bindery-val input {\n  width: 85px;\n  padding: 4px 6px 4px 8px;\n  text-align: right;\n  border: none;\n  background: none;\n  position: absolute;\n  top: 0;\n  right: 0;\n  height: 100%;\n  width: 100%;\n  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;\n}\n\n.bindery-val input:invalid {\n    color: maroon;\n}\n\n.bindery-size div {\n  position: relative;\n  padding: 6px 6px 6px 14px;\n  color: #aaa;\n}\n\n.bindery-size::before, .bindery-size::after {\n  /*content: \"\";*/\n  display: block;\n  position: absolute;\n  background: #a9a9ff;\n}\n.bindery-size::before {\n  top: 0;\n  left: 6px;\n  bottom: 0;\n  width: 1px;\n}\n.bindery-size::after {\n  top: 6px;\n  left: 0;\n  right: 0;\n  height: 1px;\n}\n\n.bindery-size input {\n}\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px;\n}\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px;\n}\n\n.not-facing .bindery-size {\n  margin-right: 20px;\n  box-shadow: none;\n}\n.not-facing .bindery-margin {\n  box-shadow: none;\n}\n\n.bindery-layout-control {\n    margin: 4px 20px 16px;\n}\n\n\n.bindery-margin {\n  overflow: hidden;\n}\n.bindery-margin .preview {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  border: 1px solid #a9a9ff;\n  height: auto;\n  width: auto;\n  z-index: 0;\n  pointer-events: none;\n  transition: border 0.2s;\n}\n\n.bindery-margin input {\n  text-align: center;\n  padding: 4px;\n  /*margin-right: -5px;*/\n  font-size: 12px;\n}\n.bindery-margin input:focus {\n  /*text-decoration: underline;*/\n  background: none !important;\n}\n\n.bindery-margin > div  {\n  position: absolute;\n  width: 54px;\n  height: 24px;\n  z-index: 5;\n  /*background: white;*/\n}\n.bindery-margin > div:hover {\n  z-index: 99;\n}\n\n.bindery-margin .top {\n  left: 0;\n  right: 0;\n  margin: auto;\n  top: 0;\n}\n.bindery-margin .bottom {\n  left: 0;\n  right: 0;\n  margin: auto;\n  bottom: 0;\n}\n.bindery-margin .inner {\n  left: 0;\n  text-align: left;\n  top: calc(50% - 12px);\n}\n.bindery-margin .inner input {\n  text-align: left;\n}\n\n.bindery-margin .outer {\n  right: 0;\n  text-align: right;\n  top: calc(50% - 12px);\n}\n.bindery-margin .outer input {\n  text-align: right;\n}\n\n\n.bindery-val input:focus {\n    outline: none;\n    background: rgba(0,0,0,0.04);\n}\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0,0,0,0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  font-size: 8px;\n  transition: all 0.2s;\n  position: relative;\n}\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0,0,0,0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px;\n}\n.bindery-toggle:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0,0,0,0.3);\n}\n\n.bindery-toggle.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.42);\n}\n.bindery-toggle.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px;\n}\n", ""]);
 
 // exports
 
