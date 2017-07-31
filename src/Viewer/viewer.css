@@ -114,7 +114,8 @@ body.bindery-viewing {
 
 .bindery-zoom-wrap {
   transform-origin: top left;
-  height: 0; /* adjust scrollheight on scaled down */
+  transform-style: preserve-3d;
+  height: calc(100vh - 40px); /* adjust scrollheight on scaled down */
 }
 
 /* Don't print anything that hasn't been exported. This hides extra controls/ */
