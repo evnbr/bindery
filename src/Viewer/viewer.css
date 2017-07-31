@@ -6,13 +6,12 @@
     transition: opacity 0.2s;
     opacity: 1;
     background: #f1f1f1;
-    padding: 50px 20px;
+    padding: 20px;
     z-index: 99;
     position: relative;
     padding-right: 240px;
     animation: fadeUp 0.3s;
-    min-height: 100vh;
-    /*min-width: calc(11in + 320px);*/
+    min-height: 90vh;
   }
 
    .bindery-measure-area {
@@ -115,6 +114,7 @@ body.bindery-viewing {
 
 .bindery-zoom-wrap {
   transform-origin: top left;
+  height: 0; /* adjust scrollheight on scaled down */
 }
 
 /* Don't print anything that hasn't been exported. This hides extra controls/ */
@@ -132,7 +132,7 @@ body.bindery-viewing {
   position: relative;
   display: flex;
   width: 800px;
-  margin: 50px auto;
+  margin: 0 auto 50px;
 }
 
 .bindery-print-page .bindery-spread-wrapper {
@@ -148,7 +148,6 @@ body.bindery-viewing {
 
 .bindery-stage3d {
   perspective: 3000px;
-  min-height: 100vh;
   transform-style: preserve-3d;
 }
 
