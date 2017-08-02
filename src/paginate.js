@@ -10,9 +10,10 @@ const last = arr => arr[arr.length - 1];
 const clonePath = (origPath) => {
   const newPath = [];
   for (let i = origPath.length - 1; i >= 0; i -= 1) {
-    const clone = origPath[i].cloneNode(false); // shallow
+    const original = origPath[i];
+    const clone = original.cloneNode(false); // shallow
     clone.innerHTML = '';
-    clone.setAttribute('bindery-continuation', true);
+    clone.classList.add('bindery-continuation');
     if (clone.id) {
       // console.warn(`Bindery: Added a break to ${elToStr(clone)},
       // so "${clone.id}" is no longer a unique ID.`);
@@ -21,6 +22,72 @@ const clonePath = (origPath) => {
     newPath[i] = clone;
   }
   return newPath;
+};
+
+const reorderPages = (pages, makeNewPage) => {
+  const orderedPages = pages;
+
+  // TODO: this ignores the cover page, assuming its on the right
+  for (let i = 1; i < orderedPages.length - 1; i += 2) {
+    const left = orderedPages[i];
+
+    // TODO: Check more than once
+    if (left.alwaysRight) {
+      if (left.outOfFlow) {
+        orderedPages[i] = pages[i + 1];
+        orderedPages[i + 1] = left;
+      } else {
+        pages.splice(i, 0, makeNewPage());
+      }
+    }
+
+    const right = orderedPages[i + 1];
+
+    if (right.alwaysLeft) {
+      if (right.outOfFlow) {
+        // TODO: don't overflow, assumes that
+        // there are not multiple spreads in a row
+        orderedPages[i + 1] = pages[i + 3];
+        orderedPages[i + 3] = right;
+      } else {
+        pages.splice(i + 1, 0, new Page());
+      }
+    }
+  }
+
+  return orderedPages;
+};
+
+const annotatePages = (pages) => {
+  // Page numbers
+  const facingPages = true; // TODO: Pass in facingpages options
+  if (facingPages) {
+    pages.forEach((page, i) => {
+      page.number = i + 1;
+      page.setLeftRight((i % 2 === 0) ? 'right' : 'left');
+    });
+  } else {
+    pages.forEach((page) => { page.setLeftRight('right'); });
+  }
+
+  // Sections
+  const running = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
+  pages.forEach((page) => {
+    page.heading = {};
+    Object.keys(running).forEach((tagName, i) => {
+      const element = page.element.querySelector(tagName);
+      if (element) {
+        running[tagName] = element.textContent;
+        // clear remainder
+        Object.keys(running).forEach((lowerTag, j) => {
+          if (j > i) running[lowerTag] = '';
+        });
+      }
+      if (running[tagName] !== '') {
+        page.heading[tagName] = running[tagName];
+      }
+    });
+  });
 };
 
 const paginate = function (
@@ -61,9 +128,16 @@ const paginate = function (
       if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
     });
   };
+
+  const makeNewPage = () => {
+    const newPage = new Page();
+    newPageRules(newPage);
+    return newPage;
+  };
+
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
-  const makeNextPage = () => {
+  const continueOnNewPage = () => {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
       console.warn('Bindery: Moved to new page when last one is still overflowing', state.currentPage.element);
       throw Error('Overflowed');
@@ -75,9 +149,7 @@ const paginate = function (
     }
 
     state.path = clonePath(state.path);
-    const newPage = new Page();
-    newPage.creationOrder = state.pages.length;
-    newPageRules(newPage);
+    const newPage = makeNewPage();
     state.pages.push(newPage);
     state.currentPage = newPage; // TODO redundant
     if (state.path[0]) {
@@ -100,54 +172,12 @@ const paginate = function (
     return newPage;
   };
 
-  const makeSpacerPage = () => {
-    const newPage = new Page();
-    newPage.creationOrder = state.pages.length;
-    newPageRules(newPage);
-    return newPage;
-  };
-
-  const reorderPages = (pages) => {
-    const orderedPages = pages;
-
-    // TODO: this ignores the cover page, assuming its on the right
-    for (let i = 1; i < orderedPages.length - 1; i += 2) {
-      const left = orderedPages[i];
-
-      // TODO: Check more than once
-      if (left.alwaysRight) {
-        if (left.outOfFlow) {
-          orderedPages[i] = pages[i + 1];
-          orderedPages[i + 1] = left;
-        } else {
-          pages.splice(i, 0, makeSpacerPage());
-        }
-      }
-
-      const right = orderedPages[i + 1];
-
-      if (right.alwaysLeft) {
-        if (right.outOfFlow) {
-          // TODO: don't overflow, assumes that
-          // there are not multiple spreads in a row
-          orderedPages[i + 1] = pages[i + 3];
-          orderedPages[i + 3] = right;
-        } else {
-          pages.splice(i + 1, 0, new Page());
-        }
-      }
-    }
-
-    return orderedPages;
-  };
-
-
   const beforeAddRules = (element) => {
     let addedElement = element;
     rules.forEach((rule) => {
       if (!rule.selector) return;
       if (addedElement.matches(rule.selector) && rule.beforeAdd) {
-        addedElement = rule.beforeAdd(addedElement, state, makeNextPage);
+        addedElement = rule.beforeAdd(addedElement, state, continueOnNewPage);
       }
     });
   };
@@ -160,7 +190,7 @@ const paginate = function (
         addedElement = rule.afterAdd(
           addedElement,
           state,
-          makeNextPage,
+          continueOnNewPage,
           function overflowCallback() {
           // TODO:
           // While this does catch overflows, it introduces a few new bugs.
@@ -172,9 +202,9 @@ const paginate = function (
           // correct approach would be to only need to invalidate
           // the last line of text.
             addedElement.parentNode.removeChild(addedElement);
-            makeNextPage();
+            continueOnNewPage();
             last(state.path).appendChild(addedElement);
-            addedElement = rule.afterAdd(addedElement, state, makeNextPage, () => {
+            addedElement = rule.afterAdd(addedElement, state, continueOnNewPage, () => {
               console.log(`Couldn't apply ${rule.name} to ${elToStr(addedElement)}. Caused overflows twice.`);
             });
           }
@@ -193,12 +223,13 @@ const paginate = function (
   };
 
   const moveNodeToNextPage = (nodeToMove) => {
-    state.path.pop();     // TODO: this is unclear.
+    // So this node won't get cloned. TODO: this is unclear
+    state.path.pop();
 
     // remove from old page
     nodeToMove.parentNode.removeChild(nodeToMove);
 
-    state.currentPage = makeNextPage();
+    continueOnNewPage();
 
     // append to new page
     last(state.path).appendChild(nodeToMove);
@@ -209,8 +240,8 @@ const paginate = function (
   // Adds an text node by incrementally adding words
   // until it just barely doesnt overflow
   const addTextNode = (originalNode, doneCallback, abortCallback) => {
+    let originalText = originalNode.nodeValue;
     let textNode = originalNode;
-    let origText = textNode.nodeValue;
     last(state.path).appendChild(textNode);
 
     if (!state.currentPage.hasOverflowed()) {
@@ -221,31 +252,32 @@ const paginate = function (
     let pos = 0;
 
     const splitTextStep = () => {
-      textNode.nodeValue = origText.substr(0, pos);
+      textNode.nodeValue = originalText.substr(0, pos);
 
       if (state.currentPage.hasOverflowed()) {
         // Back out to word boundary
-        if (origText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
-        while (origText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
+        if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
+        while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
 
         if (pos < 1) {
-          textNode.nodeValue = origText;
+          textNode.nodeValue = originalText;
           textNode.parentNode.removeChild(textNode);
           abortCallback();
           return;
         }
 
-        const fittingText = origText.substr(0, pos);
-        const overflowingText = origText.substr(pos);
+        const fittingText = originalText.substr(0, pos);
+        const overflowingText = originalText.substr(pos);
         textNode.nodeValue = fittingText;
-        origText = overflowingText;
+        originalText = overflowingText;
 
         pos = 0;
 
         // Start on new page
-        state.currentPage = makeNextPage();
+        continueOnNewPage();
 
-        textNode = document.createTextNode(origText);
+        // Continue working with clone
+        textNode = document.createTextNode(originalText);
         last(state.path).appendChild(textNode);
 
         // If the remainder fits there, we're done
@@ -258,13 +290,13 @@ const paginate = function (
         throttle(splitTextStep);
         return;
       }
-      if (pos > origText.length - 1) {
+      if (pos > originalText.length - 1) {
         throttle(doneCallback);
         return;
       }
 
       pos += 1;
-      while (origText.charAt(pos) !== ' ' && pos < origText.length) pos += 1;
+      while (originalText.charAt(pos) !== ' ' && pos < originalText.length) pos += 1;
 
 
       throttle(splitTextStep, SHOULD_DEBUG_TEXT);
@@ -358,55 +390,27 @@ const paginate = function (
   const book = new Book();
   state.book = book;
 
-  state.currentPage = makeNextPage();
+  state.currentPage = continueOnNewPage();
   content.style.margin = 0;
   content.style.padding = 0;
 
-  addElementNode(content, () => {
+  const finish = () => {
     const end = window.performance.now();
     console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
     const measureArea = document.querySelector('.bindery-measure-area');
     document.body.removeChild(measureArea);
 
-    const orderedPages = reorderPages(state.pages);
-
-    // Page numbers
-    const facingPages = true; // TODO: Pass in facingpages options
-    if (facingPages) {
-      orderedPages.forEach((page, i) => {
-        page.number = i + 1;
-        page.setLeftRight((i % 2 === 0) ? 'right' : 'left');
-      });
-    } else {
-      orderedPages.forEach((page) => { page.setLeftRight('right'); });
-    }
-
-    // Sections
-    const running = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
-    orderedPages.forEach((page) => {
-      page.heading = {};
-      Object.keys(running).forEach((tagName, i) => {
-        const element = page.element.querySelector(tagName);
-        if (element) {
-          running[tagName] = element.textContent;
-          // clear remainder
-          Object.keys(running).forEach((lowerTag, j) => {
-            if (j > i) running[lowerTag] = '';
-          });
-        }
-        if (running[tagName] !== '') {
-          page.heading[tagName] = running[tagName];
-        }
-      });
-    });
-
+    const orderedPages = reorderPages(state.pages, makeNewPage);
+    annotatePages(orderedPages);
 
     book.pages = orderedPages;
     book.setCompleted();
 
     afterBindRules(book);
     paginateDoneCallback(book);
-  });
+  };
+
+  addElementNode(content, finish);
 };
 
 export default paginate;
