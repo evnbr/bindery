@@ -13,8 +13,6 @@ import {
   inputNumberUnits,
 } from './components';
 
-require('./controls.css');
-
 class ControlPanel {
   constructor(opts) {
     this.holder = h('div.bindery-controls');
@@ -54,7 +52,7 @@ class ControlPanel {
     facingToggle.classList.add('selected');
 
     let doneBtn = '';
-    if (!this.binder.runImmeditately) {
+    if (!this.binder.autorun) {
       doneBtn = btn({ onclick: done }, 'Done');
     }
 

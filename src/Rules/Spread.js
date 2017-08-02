@@ -1,7 +1,5 @@
 import BinderyRule from './BinderyRule';
 
-require('./spread.css');
-
 class Spread extends BinderyRule {
   constructor(options) {
     options.name = 'Spread';

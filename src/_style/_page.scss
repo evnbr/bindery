@@ -5,11 +5,13 @@
     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
     overflow: hidden;
   }
+
   .bindery-show-bleed .bindery-page {
     box-shadow: none;
     outline: none;
     overflow: visible;
   }
+
   .bindery-page3d .bindery-page {
     overflow: hidden !important;
   }
@@ -30,30 +32,29 @@
     transition: box-shadow 0.5s;
   }
 
-  .bindery-show-guides .bindery-zoom-wrap * {
-    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2);
+  .bindery-show-guides {
+    .bindery-zoom-wrap * {
+      box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2);
+    }
+    .bindery-page::after {
+      box-shadow: 0 0 0 1px magenta;
+    }
+    .bindery-flowbox {
+      box-shadow: 0 0 0 1px cyan;
+    }
+    .bindery-footer {
+      box-shadow: 0 0 0 1px cyan;
+    }
+    .bindery-running-header {
+      box-shadow: 0 0 0 1px cyan;
+    }
+    .bindery-content {
+      box-shadow: inset 0 0 0 1px blue;
+    }
+    .bindery-bleed {
+      box-shadow: 0 0 0 1px yellow;
+    }
   }
-
-  .bindery-show-guides .bindery-page::after {
-    box-shadow: 0 0 0 1px magenta;
-  }
-
-  .bindery-show-guides .bindery-flowbox {
-    box-shadow: 0 0 0 1px cyan;
-  }
-  .bindery-show-guides .bindery-footer {
-    box-shadow: 0 0 0 1px cyan;
-  }
-  .bindery-show-guides .bindery-running-header {
-    box-shadow: 0 0 0 1px cyan;
-  }
-  .bindery-show-guides .bindery-content {
-    box-shadow: inset 0 0 0 1px blue;
-  }
-  .bindery-show-guides .bindery-bleed {
-    box-shadow: 0 0 0 1px yellow;
-  }
-
 }
 
 .bindery-page {
@@ -74,12 +75,12 @@
   flex: 1 1 auto;
   min-height: 0;
 }
+
 .bindery-content {
   /* hack to prevent margin collapse, leading to wrong height */
   padding: 0.1px;
 }
 
-/* Footer */
 .bindery-footer {
   margin: 60px 40px;
   margin-top: 8pt;
@@ -122,21 +123,52 @@
   top: -0.2in;
   bottom: -0.2in;
   z-index: 0;
-}
-.bindery-left .bindery-bleed {
-  right: 0;
-  left: -0.2in;
-}
-.bindery-right .bindery-bleed {
-  left: 0;
-  right: -0.2in;
+  .bindery-left & {
+    right: 0;
+    left: -0.2in;
+  }
+  .bindery-right & {
+    left: 0;
+    right: -0.2in;
+  }
 }
 
-.bindery-measure-area {
-  visibility: hidden;
+
+.bindery-spread.bindery-left .bindery-content {
+  /*width: 200%;*/
   position: absolute;
   top: 0;
   left: 0;
+  right: -100%;
+  bottom: 0;
+}
+.bindery-spread.bindery-right .bindery-content {
+  position: absolute;
+  top: 0;
+  left: -100%;
   right: 0;
   bottom: 0;
+}
+
+.bindery-sup {
+  font-size: 0.667em;
+}
+
+.bindery-running-header, .bindery-footer {
+  font-size: 10pt;
+}
+
+.bindery-running-header {
+  position: absolute;
+  text-align: center;
+  top: 0.25in;
+
+  .bindery-left & {
+    left: 18pt;
+    text-align: left;
+  }
+  .bindery-right & {
+    right: 18pt;
+    text-align: right;
+  }
 }

@@ -1,8 +1,6 @@
 import h from 'hyperscript';
 import { parseVal } from '../utils/convertUnits';
 
-require('./page.css');
-
 class Page {
   constructor() {
     this.flowContent = h('.bindery-content');

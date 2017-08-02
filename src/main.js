@@ -7,6 +7,8 @@ import { isValidSize } from './utils/convertUnits';
 
 import Rules from './Rules/';
 
+require('./_style/main.scss');
+
 
 const DEFAULT_PAGE_UNIT = 'pt';
 const DEFAULT_PAGE_SIZE = {
@@ -53,7 +55,7 @@ class Bindery {
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
 
-    if (opts.autorun) { this.runImmeditately = true; }
+    if (opts.autorun) { this.autorun = true; }
 
     this.autoupdate = opts.autoupdate ? opts.autoupdate : false;
     this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
@@ -68,7 +70,7 @@ class Bindery {
         console.error(`Bindery: Could not find element that matches selector "${opts.source}"`);
         return;
       }
-      if (this.runImmeditately) {
+      if (this.autorun) {
         this.makeBook();
       }
     } else if (typeof opts.source === 'object' && opts.source.url) {
@@ -90,7 +92,7 @@ class Bindery {
           console.error(`Bindery: Could not find element that matches selector "${selector}"`);
           return;
         }
-        if (this.runImmeditately) {
+        if (this.autorun) {
           this.makeBook();
         }
       }).catch((error) => {
@@ -98,15 +100,11 @@ class Bindery {
         const scheme = window.location.href.split('://')[0];
         if (scheme === 'file') {
           this.viewer.displayError(`Can't fetch content from "${url}"`, 'Web pages can\'t fetch content unless they are on a server.');
-          // alert(`Can't fetch content from "${url}". Web pages can't fetch content
-          // unless they are on a server. \n\n What you can do: \n 1. Include the content
-          // you need on this page, or \n 2. Put this page on your server,
-          // or \n 3. Run a local server`);
         }
       });
     } else if (opts.source instanceof HTMLElement) {
       this.source = opts.source;
-      if (this.runImmeditately) {
+      if (this.autorun) {
         this.makeBook();
       }
     } else {
@@ -150,8 +148,7 @@ class Bindery {
       if (rule instanceof Rules.BinderyRule) {
         this.rules.push(rule);
       } else {
-        console.warn('Bindery: The following is not an instance of BinderyRule and will be ignored:');
-        console.warn(rule);
+        throw Error(`Bindery: The following is not an instance of BinderyRule and will be ignored: ${rule}`);
       }
     });
   }
@@ -246,7 +243,6 @@ class Bindery {
 
     const newOverflows = this.getPageOverflows();
     if (!arraysEqual(newOverflows, this.pageOverflows)) {
-        // console.info("Layout changed");
       this.throttledUpdateBook();
       this.pageOverflows = newOverflows;
     }

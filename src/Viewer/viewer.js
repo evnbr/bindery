@@ -3,9 +3,6 @@ import h from 'hyperscript';
 import Page from '../Page/page';
 import errorView from './error';
 
-require('./viewer.css');
-require('./crop.css');
-
 const MODE_FLIP = 'interactive';
 const MODE_PREVIEW = 'grid';
 const MODE_SHEET = 'print';
@@ -15,7 +12,6 @@ const ARRANGE_ONE = 'arrange_one';
 const ARRANGE_SPREAD = 'arrange_two';
 const ARRANGE_BOOKLET = 'arrange_booklet';
 // const ARRANGE_SIGNATURE = 'arrange_signature';
-
 
 const cropMarksSingle = () => h('.bindery-crop-wrap',
   h('.bindery-crop-top'),

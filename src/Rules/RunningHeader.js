@@ -1,8 +1,6 @@
 import h from 'hyperscript';
 import BinderyRule from './BinderyRule';
 
-require('./runningHeader.css');
-
 class RunningHeader extends BinderyRule {
   constructor(options) {
     options.name = 'Running Header';

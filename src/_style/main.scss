@@ -1,0 +1,15 @@
+
+$prefix: "bindery";
+
+$accent: navy;
+$background: #f4f4f4;
+$sidebarWidth: 240px;
+
+$hover: rgba(0,0,0,0.04);
+
+$system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+
+@import '_controls.scss';
+@import '_crop.scss';
+@import '_page.scss';
+@import '_viewer.scss';

@@ -1,27 +1,30 @@
 @media screen {
   .bindery-viewing {
-    background: #f1f1f1 !important;
+    background: $background !important;
   }
   .bindery-export {
     transition: opacity 0.2s;
     opacity: 1;
-    background: #f1f1f1;
+    background: $background;
     padding: 20px;
     z-index: 99;
     position: relative;
-    padding-right: 240px;
+    padding-right: $sidebarWidth;
     animation: fadeUp 0.3s;
     min-height: 90vh;
   }
 
    .bindery-measure-area {
      position: fixed;
+     background: $background;
+     padding: 50px 20px;
+     padding-right: $sidebarWidth;
+     z-index: 99;
+     visibility: hidden;
      top: 0;
      left: 0;
-     background: #f1f1f1;
-     padding: 50px 20px;
-     padding-right: 240px;
-     z-index: 99;
+     right: 0;
+     bottom: 0;
    }
 
    .bindery-print-page {
@@ -30,7 +33,7 @@
 
    .bindery-spinner {
      border: 2px solid transparent;
-     border-left-color: navy;
+     border-left-color: $accent;
      width: 32px;
      height: 32px;
      border-radius: 50%;
@@ -50,30 +53,27 @@
    }
 
    .bindery-error {
-     font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
-     font-size: 16px;
+     font: 16px / 1.4 $system;
      margin: 15vh 15vw;
      max-width: 500px;
-     background: url('./icon-error.svg') no-repeat 0% 0%;
+     background: url('../_assets/icon-error.svg') no-repeat 0% 0%;
      background-size: 48px;
      padding-top: 64px;
-   }
 
-   .bindery-error-title {
-     font-size: 1.5em;
-     margin-bottom: 16px;
-   }
-
-   .bindery-error-text {
-     margin-bottom: 16px;
-     white-space: pre-line;
-   }
-
-   .bindery-error-footer {
-     opacity: 0.5;
-     font-size: 0.66rem;
-     text-transform: uppercase;
-     letter-spacing: 0.02em;
+     &-title {
+       font-size: 1.5em;
+       margin-bottom: 16px;
+     }
+     &-text {
+       margin-bottom: 16px;
+       white-space: pre-line;
+     }
+     &-footer {
+       opacity: 0.5;
+       font-size: 0.66em;
+       text-transform: uppercase;
+       letter-spacing: 0.02em;
+     }
    }
 
    .bindery-show-bleed .bindery-print-page {
@@ -83,13 +83,15 @@
      margin: 20px auto;
    }
 
-   .bindery-letter-landscape {
-     width: 11in;
-     height: 8.5in;
-   }
-   .bindery-letter-portrait {
-     width: 8.5in;
-     height: 11in;
+   .bindery-letter {
+     &-landscape {
+       width: 11in;
+       height: 8.5in;
+     }
+     &-portrait {
+       width: 8.5in;
+       height: 11in;
+     }
    }
 
 }
@@ -102,7 +104,6 @@
   0%   { transform: rotateZ(0); }
   100% { transform: rotateZ(360deg); }
 }
-
 
 @page {
   margin: 0;
@@ -164,7 +165,7 @@ body.bindery-viewing {
 .bindery-print-meta {
   padding: 12pt;
   text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+  font-family: $system;
   font-size: 8pt;
 }
 
@@ -178,38 +179,39 @@ body.bindery-viewing {
   width: 400px;
   height: 600px;
   transform: rotateY(0);
-  transition: transform 0.5s, box-shadow 0.1s;
   transform-style: preserve-3d;
   transform-origin: left;
+  transition: transform 0.5s, box-shadow 0.1s;
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-}
 
-.bindery-page3d:hover {
-  box-shadow: 2px 0 4px rgba(0,0,0,0.2);
-}
-.bindery-page3d.flipped {
-  transform: rotateY(-180deg);
-}
+  &:hover {
+    box-shadow: 2px 0 4px rgba(0,0,0,0.2);
+  }
 
-.bindery-page3d .bindery-page {
-  position: absolute;
-  backface-visibility: hidden;
-}
+  &.flipped {
+    transform: rotateY(-180deg);
+  }
 
-.bindery-page3d .bindery-page3d-front {
-  transform: rotateY(0);
-}
-.bindery-page3d .bindery-page3d-back {
-  transform: rotateY(-180deg);
-}
+  .bindery-page {
+    position: absolute;
+    backface-visibility: hidden;
+  }
 
-.bindery-page3d .bindery-page3d-front::after {
-  box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)
-}
-.bindery-page3d .bindery-page3d-back::after {
-  box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)
+  &-front {
+    transform: rotateY(0);
+    &::after {
+      box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)
+    }
+  }
+
+  &-back {
+    transform: rotateY(-180deg);
+    &::after {
+      box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)
+    }
+  }
 }
