@@ -136,12 +136,11 @@
 				Bindery.FullPage({ selector: '.med-figure' }),
 				Bindery.Spread({ selector: '.big-figure' }),
 				Bindery.RunningHeader({
-					beginSection: 'h2',
 					render: (page) => {
 						if (page.isEmpty) return '';
 						else if (page.element.querySelector('h2')) return '';
-						else if (page.isLeft) return `${page.number} · ${page.section} `;
-						else if (page.isRight) return `John P. Author · ${page.number}`;
+						else if (page.isLeft) return `${page.number} · ${page.heading.h2} `;
+						else if (page.isRight) return `${page.heading.h1} · ${page.number}`;
 					},
 				}),
 				Bindery.PageReference({

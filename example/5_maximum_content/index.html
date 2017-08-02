@@ -25,12 +25,11 @@
 					}),
 					Bindery.Spread({ selector: ".big-figure" }),
 					Bindery.RunningHeader({
-						beginSection: 'h2',
 						render: (page) => {
 							if (page.isEmpty) return '';
-							else if (page.element.querySelector('h2')) return '';
-							else if (page.isLeft) return `${page.number} · ${page.section} `;
-							else if (page.isRight) return `John P. Author · ${page.number}`;
+							else if (page.element.querySelector('h1, h2')) return '';
+							else if (page.isLeft) return `${page.number} · ${page.heading.h1} `;
+							else if (page.isRight) return `${page.heading.h2} · ${page.number}`;
 						},
 					}),
 					Bindery.PageReference({

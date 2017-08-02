@@ -380,9 +380,32 @@ const paginate = function (
     } else {
       orderedPages.forEach((page) => { page.setLeftRight('right'); });
     }
-    afterBindRules(orderedPages);
 
-    paginateDoneCallback(orderedPages);
+    // Sections
+    const running = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
+    orderedPages.forEach((page) => {
+      page.heading = {};
+      Object.keys(running).forEach((tagName, i) => {
+        const element = page.element.querySelector(tagName);
+        if (element) {
+          running[tagName] = element.textContent;
+          // clear remainder
+          Object.keys(running).forEach((lowerTag, j) => {
+            if (j > i) running[lowerTag] = '';
+          });
+        }
+        if (running[tagName] !== '') {
+          page.heading[tagName] = running[tagName];
+        }
+      });
+    });
+
+
+    book.pages = orderedPages;
+    book.setCompleted();
+
+    afterBindRules(book);
+    paginateDoneCallback(book);
   });
 };
 
