@@ -1,4 +1,5 @@
 import elToStr from './utils/elementToString';
+import Book from './Book';
 import Page from './Page/page';
 
 const SHOULD_DEBUG_TEXT = false;
@@ -13,7 +14,8 @@ const clonePath = (origPath) => {
     clone.innerHTML = '';
     clone.setAttribute('bindery-continuation', true);
     if (clone.id) {
-      console.warn(`Bindery: Added a break to ${elToStr(clone)}, so "${clone.id}" is no longer a unique ID.`);
+      // console.warn(`Bindery: Added a break to ${elToStr(clone)},
+      // so "${clone.id}" is no longer a unique ID.`);
     }
     if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
     newPath[i] = clone;
@@ -180,11 +182,11 @@ const paginate = function (
       }
     });
   };
-  const afterBindRules = (pages) => {
+  const afterBindRules = (book) => {
     rules.forEach((rule) => {
       if (rule.afterBind) {
-        pages.forEach((pg, i, arr) => {
-          rule.afterBind(pg, i, arr.length);
+        book.pages.forEach((page) => {
+          rule.afterBind(page, book);
         });
       }
     });
@@ -293,7 +295,7 @@ const paginate = function (
     node.innerHTML = '';
 
     if (state.currentPage.hasOverflowed()) {
-      console.error(`Bindery: Adding ${elToStr(node)} causes overflow even when empty`);
+      // console.error(`Bindery: Adding ${elToStr(node)} causes overflow even when empty`);
       moveNodeToNextPage(node);
     }
 
@@ -351,17 +353,24 @@ const paginate = function (
     addNextChild();
   };
 
+  const start = window.performance.now();
+
+  const book = new Book();
+  state.book = book;
+
   state.currentPage = makeNextPage();
   content.style.margin = 0;
   content.style.padding = 0;
 
   addElementNode(content, () => {
-    console.log(`Bindery: Pages created in ${2}ms`);
+    const end = window.performance.now();
+    console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
     const measureArea = document.querySelector('.bindery-measure-area');
     document.body.removeChild(measureArea);
 
     const orderedPages = reorderPages(state.pages);
 
+    // Page numbers
     const facingPages = true; // TODO: Pass in facingpages options
     if (facingPages) {
       orderedPages.forEach((page, i) => {

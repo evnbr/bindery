@@ -6,24 +6,28 @@ class PageReference extends BinderyRule {
     super(options);
     this.references = {};
   }
-  afterAdd(elmt) {
-    const ref = elmt.getAttribute('href');
-    elmt.setAttribute('data-page-reference', ref);
-    this.references[ref] = elmt;
+  afterAdd(elmt, state) {
+    let ref = elmt.getAttribute('href');
+    if (ref) {
+      // TODO: Make more robust, validate
+      // that selector is valid
+      if (ref[0] !== '#') {
+        ref = ref.substr(ref.indexOf('#'));
+      }
+      ref = ref.replace('#', '');
+      ref = `[id="${ref}"]`; // in case it starts with a number
+
+      this.references[ref] = elmt;
+
+      state.book.firstPageForSelector(ref, (number) => {
+        const parent = elmt.parentNode;
+        const newEl = this.replace(elmt, number);
+        parent.replaceChild(newEl, elmt);
+      });
+    }
     return elmt;
   }
-  afterBind(page) {
-    Object.keys(this.references).forEach((ref) => {
-      if (page.element.querySelector(ref)) {
-        const original = this.references[ref];
-        const parent = original.parentNode;
-        const newEl = this.replace(original, page.number);
-        parent.replaceChild(newEl, original);
-      }
-    });
-  }
   replace(original, number) {
-    // original.removeAttribute('href');
     original.insertAdjacentHTML('beforeend', ` ↝ Page ${number}`);
     return original;
   }

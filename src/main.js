@@ -185,7 +185,8 @@ class Bindery {
     this.source.style.display = 'none';
 
     // In case we're updating an existing layout
-    document.body.classList.remove('bindery-viewing');
+    this.viewer.clear();
+    document.body.classList.add('bindery-viewing');
     document.body.classList.add('bindery-inProgress');
 
     if (!this.controls) {
@@ -198,9 +199,9 @@ class Bindery {
       content,
       this.rules,
       // Done
-      (pages) => {
+      (book) => {
         setTimeout(() => {
-          this.viewer.pages = pages;
+          this.viewer.book = book;
           this.viewer.update();
 
           this.controls.setDone();

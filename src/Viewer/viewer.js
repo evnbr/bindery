@@ -49,7 +49,7 @@ const setOrientationCSS = (newValue) => {
 
 class Viewer {
   constructor() {
-    this.pages = [];
+    this.book = null;
 
     this.zoomBox = h('.bindery-zoom-wrap');
     this.export = h('.bindery-export', this.zoomBox);
@@ -129,6 +129,10 @@ class Viewer {
       this.error = errorView(title, text);
       this.zoomBox.appendChild(this.error);
     }
+  }
+  clear() {
+    this.book = null;
+    this.zoomBox.innerHTML = '';
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
@@ -232,7 +236,7 @@ class Viewer {
 
     this.zoomBox.innerHTML = '';
 
-    let pages = this.pages.slice();
+    let pages = this.book.pages.slice();
     const isTwoUp = this.printArrange !== ARRANGE_ONE;
 
     const spread = function (...arg) {
@@ -247,7 +251,7 @@ class Viewer {
     };
 
     if (this.printArrange === ARRANGE_SPREAD) {
-      if (this.pages.length % 2 !== 0) {
+      if (this.book.pages.length % 2 !== 0) {
         const pg = new Page();
         pages.push(pg);
       }
@@ -340,10 +344,10 @@ class Viewer {
 
     this.zoomBox.innerHTML = '';
 
-    const pages = this.pages.slice();
+    const pages = this.book.pages.slice();
 
     if (this.doubleSided) {
-      if (this.pages.length % 2 !== 0) {
+      if (this.book.pages.length % 2 !== 0) {
         const pg = new Page();
         pages.push(pg);
       }
@@ -392,10 +396,10 @@ class Viewer {
     this.export.classList.remove('bindery-show-bleed');
     this.export.classList.remove('bindery-show-guides');
 
-    const pages = this.pages.slice();
+    const pages = this.book.pages.slice();
 
     if (this.doubleSided) {
-      if (this.pages.length % 2 !== 0) {
+      if (this.book.pages.length % 2 !== 0) {
         const pg = new Page();
         pages.push(pg);
       }
