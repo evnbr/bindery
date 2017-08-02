@@ -18,6 +18,16 @@ const clonePath = (origPath) => {
       // console.warn(`Bindery: Added a break to ${elToStr(clone)},
       // so "${clone.id}" is no longer a unique ID.`);
     }
+    if (clone.tagName === 'OL') {
+      // restart numbering
+      let prevStart = 1;
+      if (original.hasAttribute('start')) {
+        prevStart = parseInt(original.getAttribute('start'), 10);
+      }
+      const prevCount = original.children.length;
+      const newStart = prevStart + prevCount;
+      clone.setAttribute('start', newStart);
+    }
     if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
     newPath[i] = clone;
   }
