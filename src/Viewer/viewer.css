@@ -28,6 +28,27 @@
      margin: 0 auto;
    }
 
+   .bindery-spinner {
+     border: 2px solid transparent;
+     border-left-color: navy;
+     width: 32px;
+     height: 32px;
+     border-radius: 50%;
+     position: absolute;
+     top: 0;
+     left: 0;
+     bottom: 0;
+     right: 0;
+     margin: auto;
+     z-index: 999;
+     opacity: 0;
+   }
+
+   .bindery-inProgress .bindery-spinner {
+     opacity: 1;
+     animation: spin 0.6s linear infinite;
+   }
+
    .bindery-error {
      font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
      font-size: 16px;
@@ -74,15 +95,14 @@
 }
 
 @keyframes fadeUp {
-  0% {
-    opacity: 0;
-    /*transform: translate3d(0, 50px, 0);*/
-  }
-  100% {
-    opacity: 1;
-    /*transform: translate3d(0, 0, 0);*/
-  }
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
 }
+@keyframes spin {
+  0%   { transform: rotateZ(0); }
+  100% { transform: rotateZ(360deg); }
+}
+
 
 @page {
   margin: 0;
@@ -118,8 +138,9 @@ body.bindery-viewing {
   height: calc(100vh - 40px); /* adjust scrollheight on scaled down */
 }
 
-/* Don't print anything that hasn't been exported. This hides extra controls/ */
-.bindery-viewing > :not(.bindery-export) {
+/* Don't print anything that hasn't been exported. This hides extra controls */
+/* TODO: make selectors more reasonable */
+.bindery-viewing > :not(.bindery-export):not(.bindery-controls):not(.bindery-measure-area) {
   display: none !important;
 }
 

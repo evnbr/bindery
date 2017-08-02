@@ -11,12 +11,12 @@ const heading = function (...arg) {
 };
 
 const row = function (...arg) {
-  return h('.bindery-toggle', ...arg);
+  return h('.bindery-row', ...arg);
 };
 
 const expandRow = function (...arg) {
   return h(
-    '.bindery-expand-row',
+    '.bindery-row.bindery-expand-row',
     { onclick() {
       this.classList.toggle('selected');
     } },
@@ -62,7 +62,7 @@ const inputNumberUnits = function (val) {
 const toggleSwitch = () => h('.bindery-switch', h('.bindery-switch-handle'));
 
 const switchRow = function (...arg) {
-  return h('.bindery-toggle', ...arg, toggleSwitch);
+  return h('.bindery-row', ...arg, toggleSwitch);
 };
 
 export {

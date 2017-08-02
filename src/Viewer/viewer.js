@@ -52,7 +52,8 @@ class Viewer {
     this.book = null;
 
     this.zoomBox = h('.bindery-zoom-wrap');
-    this.export = h('.bindery-export', this.zoomBox);
+    const spinner = h('.bindery-spinner');
+    this.export = h('.bindery-export', this.zoomBox, spinner);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
@@ -64,6 +65,8 @@ class Viewer {
 
     this.listenForPrint();
     this.listenForResize();
+
+    document.body.appendChild(this.export);
   }
 
   listenForPrint() {

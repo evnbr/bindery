@@ -67,13 +67,13 @@ class ControlPanel {
       height: inputNumberUnits(this.binder.pageSize.height),
     };
 
-    const sizeControl = h('.bindery-val.bindery-size',
+    const sizeControl = h('.bindery-row.bindery-size',
       h('div', 'W', unitInputs.width),
       h('div', 'H', unitInputs.height),
     );
 
     const marginPreview = h('.preview');
-    const marginControl = h('.bindery-val.bindery-margin',
+    const marginControl = h('.bindery-row.bindery-margin',
       h('.top', unitInputs.top),
       h('.inner', unitInputs.inner),
       h('.outer', unitInputs.outer),
@@ -125,7 +125,7 @@ class ControlPanel {
       display: 'none',
       color: '#e2b200',
     } }, 'Too Small');
-    const inProgress = h('div', { style: {
+    const inProgress = btn({ style: {
       display: 'none',
     } }, 'Updating...');
     const forceRefresh = btn({ onclick: () => {
@@ -237,7 +237,7 @@ class ControlPanel {
     };
 
     this.setDone = () => {
-      header.innerText = `${this.binder.viewer.pages.length} Pages`;
+      header.innerText = `${this.binder.viewer.book.pages.length} Pages`;
       inProgress.style.display = 'none';
       forceRefresh.style.display = 'block';
       validCheck.style.display = 'none';
@@ -245,7 +245,7 @@ class ControlPanel {
 
     this.setInvalid = () => {
       validCheck.style.display = 'block';
-      forceRefresh.style.display = 'none';
+      forceRefresh.style.display = 'block';
       inProgress.style.display = 'none';
     };
 

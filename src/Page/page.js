@@ -17,20 +17,25 @@ class Page {
     );
   }
   overflowAmount() {
-    if (this.element.offsetParent === null) {
-      let measureArea = document.querySelector('.bindery-measure-area');
-      if (!measureArea) measureArea = document.body.appendChild(h('.bindery-measure-area'));
+    if (this.element.parentNode !== Page.measureArea) {
+      if (!Page.measureArea) Page.measureArea = document.body.appendChild(h('.bindery-measure-area'));
 
-      if (this.element.parentNode !== measureArea) {
-        measureArea.innerHTML = '';
-        measureArea.appendChild(this.element);
+      if (this.element.parentNode !== Page.measureArea) {
+        Page.measureArea.innerHTML = '';
+        Page.measureArea.appendChild(this.element);
+      }
+      if (Page.measureArea.parentNode !== document.body) {
+        document.body.appendChild(Page.measureArea);
       }
     }
-    const contentH = this.flowContent.getBoundingClientRect().height;
-    const boxH = this.flowBox.getBoundingClientRect().height;
+
+    // const contentH = this.flowContent.getBoundingClientRect().height;
+    // const boxH = this.flowBox.getBoundingClientRect().height;
+    const contentH = this.flowContent.offsetHeight;
+    const boxH = this.flowBox.offsetHeight;
 
     if (boxH === 0) {
-      console.error('Bindery: Trying to flow into a box of zero height.');
+      throw Error('Bindery: Trying to flow into a box of zero height.');
     }
 
     return contentH - boxH;

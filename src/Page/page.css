@@ -26,7 +26,6 @@
     z-index: 999;
   }
 
-
   .bindery-zoom-wrap * {
     transition: box-shadow 0.5s;
   }
@@ -58,8 +57,6 @@
 }
 
 .bindery-page {
-  /*width: 400px;*/
-  /*height: 600px;*/
   width: 200px;
   height: 300px;
   position: relative;
@@ -67,6 +64,7 @@
   flex-direction: column;
   flex-wrap: nowrap;
   margin: auto;
+  word-break: break-word;
 }
 
 .bindery-flowbox {
@@ -135,6 +133,7 @@
 }
 
 .bindery-measure-area {
+  visibility: hidden;
   position: absolute;
   top: 0;
   left: 0;
