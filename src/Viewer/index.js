@@ -26,9 +26,18 @@ const cropMarksSpread = () => h('.bindery-crop-wrap',
   h('.bindery-crop-right'),
   h('.bindery-crop-fold'),
 );
+
 const spread = function (...arg) {
   return h('.bindery-spread-wrapper', ...arg);
 };
+
+const bookletMeta = (i, len) => {
+  const isFront = i % 4 === 0;
+  const sheetIndex = parseInt((i + 1) / 4, 10) + 1;
+  return h('.bindery-print-meta',
+    `Sheet ${sheetIndex} of ${len / 4}: ${isFront ? 'Outside' : 'Inside'}`);
+};
+
 
 const ORIENTATION_STYLE_ID = 'bindery-orientation-stylesheet';
 
@@ -77,6 +86,57 @@ const padPages = (pages) => {
   pages.push(spacerPage2);
 
   return pages;
+};
+
+const renderGridLayout = (pages, isTwoUp) => {
+  const gridLayout = document.createDocumentFragment();
+  if (isTwoUp) {
+    for (let i = 0; i < pages.length; i += 2) {
+      const wrap = spread(
+        { style: Page.spreadSizeStyle() },
+        pages[i].element, pages[i + 1].element
+      );
+      gridLayout.appendChild(wrap);
+    }
+  } else {
+    pages.forEach((pg) => {
+      const wrap = spread({ style: Page.sizeStyle() }, pg.element);
+      gridLayout.appendChild(wrap);
+    });
+  }
+
+  return gridLayout;
+};
+
+const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
+  const printLayout = document.createDocumentFragment();
+
+  const size = isTwoUp ? Page.spreadSizeStyle() : Page.sizeStyle();
+  const cropMarks = isTwoUp ? cropMarksSpread : cropMarksSingle;
+
+  const printSheet = function (...arg) {
+    return h(`.bindery-print-page.bindery-letter-${orient}`,
+      spread({ style: size }, ...arg, cropMarks())
+    );
+  };
+
+  if (isTwoUp) {
+    for (let i = 0; i < pages.length; i += 2) {
+      const sheet = printSheet(pages[i].element, pages[i + 1].element);
+      printLayout.appendChild(sheet);
+      if (isBooklet) {
+        const meta = bookletMeta(i, pages.length);
+        sheet.appendChild(meta);
+      }
+    }
+  } else {
+    pages.forEach((pg) => {
+      const sheet = printSheet(pg.element);
+      printLayout.appendChild(sheet);
+    });
+  }
+
+  return printLayout;
 };
 
 class Viewer {
@@ -144,6 +204,8 @@ class Viewer {
     setOrientationCSS(newVal);
     if (this.mode === MODE_SHEET) {
       this.update();
+    } else {
+      this.setPrint();
     }
   }
 
@@ -152,6 +214,8 @@ class Viewer {
     this.printArrange = newVal;
     if (this.mode === MODE_SHEET) {
       this.update();
+    } else {
+      this.setPrint();
     }
   }
 
@@ -188,13 +252,11 @@ class Viewer {
   setMode(newMode) {
     switch (newMode) {
     case 'grid':
-    case 'standard':
     case 'default':
       this.mode = MODE_PREVIEW;
       break;
     case 'interactive':
     case 'flip':
-    case '3d':
       this.mode = MODE_FLIP;
       break;
     case 'print':
@@ -203,7 +265,6 @@ class Viewer {
       break;
     case 'outline':
     case 'outlines':
-    case 'guides':
       this.mode = MODE_OUTLINE;
       break;
     default:
@@ -241,12 +302,14 @@ class Viewer {
     this.update();
   }
   update() {
+    if (!this.book) return;
     if (!this.export.parentNode) {
       document.body.appendChild(this.export);
     }
 
     this.flaps = [];
     document.body.classList.add('bindery-viewing');
+    const scrollPct = document.body.scrollTop / document.body.scrollHeight;
 
     if (this.mode === MODE_PREVIEW) {
       this.renderGrid();
@@ -260,6 +323,7 @@ class Viewer {
       this.renderGrid();
     }
 
+    document.body.scrollTop = document.body.scrollHeight * scrollPct;
     this.updateZoom();
   }
 
@@ -290,49 +354,19 @@ class Viewer {
 
     this.zoomBox.innerHTML = '';
 
-    let pages = this.book.pages.slice();
     const isTwoUp = this.printArrange !== ARRANGE_ONE;
-
+    const isBooklet = this.printArrange === ARRANGE_BOOKLET;
     const orient = this.orientation;
-    const printSheet = function (...arg) {
-      return h(`.bindery-print-page.bindery-letter-${orient}`, ...arg);
-    };
 
+    let pages = this.book.pages.slice();
     if (this.printArrange === ARRANGE_SPREAD) {
       pages = padPages(pages);
     } else if (this.printArrange === ARRANGE_BOOKLET) {
       pages = orderPagesBooklet(pages);
     }
 
-
-    for (let i = 0; i < pages.length; i += (isTwoUp ? 2 : 1)) {
-      if (isTwoUp) {
-        const left = pages[i];
-        const right = pages[i + 1];
-
-        const sheet = printSheet(spread(
-          { style: Page.spreadSizeStyle() },
-          left.element, right.element, cropMarksSpread()
-        ));
-
-        if (this.printArrange === ARRANGE_BOOKLET) {
-          const isFront = i % 4 === 0;
-          const sheetIndex = parseInt((i + 1) / 4, 10) + 1;
-          const meta = h('.bindery-print-meta',
-            `Sheet ${sheetIndex} of ${pages.length / 4}: ${isFront ? 'Outside' : 'Inside'}`);
-          sheet.appendChild(meta);
-        }
-
-        this.zoomBox.appendChild(sheet);
-      } else {
-        const pg = pages[i].element;
-        const sheet = printSheet(spread(
-          { style: Page.sizeStyle() },
-          pg, cropMarksSingle()
-        ));
-        this.zoomBox.appendChild(sheet);
-      }
-    }
+    const printLayout = renderPrintLayout(pages, isTwoUp, orient, isBooklet);
+    this.zoomBox.appendChild(printLayout);
   }
 
   renderGrid() {
@@ -345,23 +379,10 @@ class Viewer {
       pages = padPages(pages);
     }
 
-    for (let i = 0; i < pages.length; i += (this.doubleSided ? 2 : 1)) {
-      if (this.doubleSided) {
-        const left = pages[i];
-        const right = pages[i + 1];
-
-        const wrap = spread(
-          { style: Page.spreadSizeStyle() },
-          left.element, right.element
-        );
-        this.zoomBox.appendChild(wrap);
-      } else {
-        const pg = pages[i].element;
-        const wrap = spread({ style: Page.sizeStyle() }, pg);
-        this.zoomBox.appendChild(wrap);
-      }
-    }
+    const gridLayout = renderGridLayout(pages, this.doubleSided);
+    this.zoomBox.appendChild(gridLayout);
   }
+
   renderInteractive() {
     this.zoomBox.innerHTML = '';
     this.flaps = [];
@@ -432,14 +453,5 @@ class Viewer {
     });
   }
 }
-
-// const transition = (pct, a, b) => a + (pct * (b - a));
-// const clamp = (val, min, max) => {
-//   return (((val <= min) ? min : val) >= max) ? max : val;
-// };
-// const progress = (val, a, b) => (val - a) / (b - a);
-// const progress01 = (val, a, b) => clamp(progress(val, a, b), 0, 1);
-// const coords = (e) => ((e = e.touches && e.touches[0] || e), ({ x: e.pageX, y: e.pageY }));
-
 
 export default Viewer;
