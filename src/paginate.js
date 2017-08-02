@@ -1,6 +1,6 @@
 import elToStr from './utils/elementToString';
 import Book from './Book';
-import Page from './Page/page';
+import Page from './Page';
 
 const SHOULD_DEBUG_TEXT = false;
 
@@ -40,7 +40,7 @@ const paginate = function (
   // to prevent the call stack from getting too big.
   //
   // There might be a better way to do this.
-  const MAX_CALLS = 500;
+  const MAX_CALLS = 100;
   let numberOfCalls = 0;
   const throttle = (func, shouldPause) => {
     if (shouldPause) {

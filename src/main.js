@@ -1,8 +1,8 @@
 import paginate from './paginate';
 
-import Page from './Page/page';
-import Viewer from './Viewer/viewer';
-import Controls from './Controls/controls';
+import Page from './Page';
+import Viewer from './Viewer';
+import Controls from './Controls';
 import { isValidSize } from './utils/convertUnits';
 
 import Rules from './Rules/';
@@ -21,12 +21,6 @@ const DEFAULT_PAGE_MARGIN = {
   bottom: '54pt',
   top: '48pt',
 };
-// const DEFAULT_BLEED = {
-//   inner: 0,
-//   outer: 0.2,
-//   bottom: 0.2,
-//   top: 0.2,
-// };
 
 const arraysEqual = (a, b) => {
   if (a.length !== b.length) { return false; }
@@ -145,10 +139,10 @@ class Bindery {
 
   addRules(newRules) {
     newRules.forEach((rule) => {
-      if (rule instanceof Rules.BinderyRule) {
+      if (rule instanceof Rules.Rule) {
         this.rules.push(rule);
       } else {
-        throw Error(`Bindery: The following is not an instance of BinderyRule and will be ignored: ${rule}`);
+        throw Error(`Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`);
       }
     });
   }

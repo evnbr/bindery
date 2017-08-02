@@ -1,10 +1,10 @@
-import BinderyRule from './BinderyRule';
+import Rule from './Rule';
 
 // API:
 // position: 'before' (default) | 'after' | 'both'
 // continue: | 'any' (default) | 'left' | 'right'
 
-class PageBreak extends BinderyRule {
+class PageBreak extends Rule {
   constructor(options) {
     options.name = 'Page Break';
     options.position = options.position ? options.position : 'before';

@@ -1,6 +1,6 @@
 import h from 'hyperscript';
 
-import Page from '../Page/page';
+import Page from '../Page';
 import errorView from './error';
 
 const MODE_FLIP = 'interactive';
@@ -26,6 +26,9 @@ const cropMarksSpread = () => h('.bindery-crop-wrap',
   h('.bindery-crop-right'),
   h('.bindery-crop-fold'),
 );
+const spread = function (...arg) {
+  return h('.bindery-spread-wrapper', ...arg);
+};
 
 const ORIENTATION_STYLE_ID = 'bindery-orientation-stylesheet';
 
@@ -42,6 +45,39 @@ const setOrientationCSS = (newValue) => {
   document.head.appendChild(sheet);
 };
 
+const orderPagesBooklet = (pages) => {
+  while (pages.length % 4 !== 0) {
+    const spacerPage = new Page();
+    spacerPage.element.style.visibility = 'hidden';
+    pages.push(spacerPage);
+  }
+  const bookletOrder = [];
+  const len = pages.length;
+
+  for (let i = 0; i < len / 2; i += 2) {
+    bookletOrder.push(pages[len - 1 - i]);
+    bookletOrder.push(pages[i]);
+    bookletOrder.push(pages[i + 1]);
+    bookletOrder.push(pages[len - 2 - i]);
+  }
+
+  return bookletOrder;
+};
+
+const padPages = (pages) => {
+  if (pages.length % 2 !== 0) {
+    const pg = new Page();
+    pages.push(pg);
+  }
+  const spacerPage = new Page();
+  const spacerPage2 = new Page();
+  spacerPage.element.style.visibility = 'hidden';
+  spacerPage2.element.style.visibility = 'hidden';
+  pages.unshift(spacerPage);
+  pages.push(spacerPage2);
+
+  return pages;
+};
 
 class Viewer {
   constructor() {
@@ -65,15 +101,15 @@ class Viewer {
     document.body.appendChild(this.export);
   }
 
+  // Automatically switch into print mode
   listenForPrint() {
-    // Automatically switch into print mode
     if (window.matchMedia) {
       const mediaQueryList = window.matchMedia('print');
       mediaQueryList.addListener((mql) => {
         if (mql.matches) {
           this.setPrint();
         } else {
-              // after print
+          // after print
         }
       });
     }
@@ -209,6 +245,7 @@ class Viewer {
       document.body.appendChild(this.export);
     }
 
+    this.flaps = [];
     document.body.classList.add('bindery-viewing');
 
     if (this.mode === MODE_PREVIEW) {
@@ -224,96 +261,6 @@ class Viewer {
     }
 
     this.updateZoom();
-  }
-
-  renderPrint() {
-    this.mode = MODE_SHEET;
-    this.export.style.display = 'block';
-
-    this.export.classList.add('bindery-show-bleed');
-    this.export.classList.remove('bindery-show-guides');
-
-    this.zoomBox.innerHTML = '';
-
-    let pages = this.book.pages.slice();
-    const isTwoUp = this.printArrange !== ARRANGE_ONE;
-
-    const spread = function (...arg) {
-      return h('.bindery-spread-wrapper', ...arg);
-    };
-    const orient = this.orientation;
-    const printSheet = function (...arg) {
-      return h(
-        `.bindery-print-page.bindery-letter-${orient}`,
-        ...arg
-      );
-    };
-
-    if (this.printArrange === ARRANGE_SPREAD) {
-      if (this.book.pages.length % 2 !== 0) {
-        const pg = new Page();
-        pages.push(pg);
-      }
-      const spacerPage = new Page();
-      const spacerPage2 = new Page();
-      spacerPage.element.style.visibility = 'hidden';
-      spacerPage2.element.style.visibility = 'hidden';
-      pages.unshift(spacerPage);
-      pages.push(spacerPage2);
-    }
-    if (this.printArrange === ARRANGE_BOOKLET) {
-      while (pages.length % 4 !== 0) {
-        const spacerPage = new Page();
-        spacerPage.element.style.visibility = 'hidden';
-        pages.push(spacerPage);
-      }
-      const bookletOrder = [];
-      const len = pages.length;
-
-      for (let i = 0; i < len / 2; i += 2) {
-        bookletOrder.push(pages[len - 1 - i]);
-        bookletOrder.push(pages[i]);
-        bookletOrder.push(pages[i + 1]);
-        bookletOrder.push(pages[len - 2 - i]);
-      }
-
-      pages = bookletOrder;
-    }
-
-
-    for (let i = 0; i < pages.length; i += (isTwoUp ? 2 : 1)) {
-      if (isTwoUp) {
-        const left = pages[i];
-        const right = pages[i + 1];
-
-        const leftPage = left.element;
-        const rightPage = right.element;
-
-        const sheet = printSheet(spread(
-          { style: Page.spreadSizeStyle() },
-          leftPage, rightPage, cropMarksSpread()
-        ));
-
-        if (this.printArrange === ARRANGE_BOOKLET) {
-          const isFront = i % 4 === 0;
-          const sheetIndex = parseInt((i + 1) / 4, 10) + 1;
-          const meta = h(
-            '.bindery-print-meta',
-            `Sheet ${sheetIndex} of ${pages.length / 4}: ${isFront ? 'Outside' : 'Inside'}`);
-          sheet.appendChild(meta);
-        }
-
-
-        this.zoomBox.appendChild(sheet);
-      } else {
-        const pg = pages[i].element;
-        const sheet = printSheet(spread(
-          { style: Page.sizeStyle() },
-          pg, cropMarksSingle()
-        ));
-        this.zoomBox.appendChild(sheet);
-      }
-    }
   }
 
   updateZoom() {
@@ -337,84 +284,98 @@ class Viewer {
     }
   }
 
-  renderGrid() {
-    this.updateGuides();
-    this.export.style.display = 'block';
+  renderPrint() {
+    this.export.classList.add('bindery-show-bleed');
+    this.export.classList.remove('bindery-show-guides');
 
     this.zoomBox.innerHTML = '';
 
-    const pages = this.book.pages.slice();
+    let pages = this.book.pages.slice();
+    const isTwoUp = this.printArrange !== ARRANGE_ONE;
 
-    if (this.doubleSided) {
-      if (this.book.pages.length % 2 !== 0) {
-        const pg = new Page();
-        pages.push(pg);
-      }
-      const spacerPage = new Page();
-      const spacerPage2 = new Page();
-      spacerPage.element.style.visibility = 'hidden';
-      spacerPage2.element.style.visibility = 'hidden';
-      pages.unshift(spacerPage);
-      pages.push(spacerPage2);
+    const orient = this.orientation;
+    const printSheet = function (...arg) {
+      return h(`.bindery-print-page.bindery-letter-${orient}`, ...arg);
+    };
+
+    if (this.printArrange === ARRANGE_SPREAD) {
+      pages = padPages(pages);
+    } else if (this.printArrange === ARRANGE_BOOKLET) {
+      pages = orderPagesBooklet(pages);
     }
 
+
+    for (let i = 0; i < pages.length; i += (isTwoUp ? 2 : 1)) {
+      if (isTwoUp) {
+        const left = pages[i];
+        const right = pages[i + 1];
+
+        const sheet = printSheet(spread(
+          { style: Page.spreadSizeStyle() },
+          left.element, right.element, cropMarksSpread()
+        ));
+
+        if (this.printArrange === ARRANGE_BOOKLET) {
+          const isFront = i % 4 === 0;
+          const sheetIndex = parseInt((i + 1) / 4, 10) + 1;
+          const meta = h('.bindery-print-meta',
+            `Sheet ${sheetIndex} of ${pages.length / 4}: ${isFront ? 'Outside' : 'Inside'}`);
+          sheet.appendChild(meta);
+        }
+
+        this.zoomBox.appendChild(sheet);
+      } else {
+        const pg = pages[i].element;
+        const sheet = printSheet(spread(
+          { style: Page.sizeStyle() },
+          pg, cropMarksSingle()
+        ));
+        this.zoomBox.appendChild(sheet);
+      }
+    }
+  }
+
+  renderGrid() {
+    this.updateGuides();
+    this.zoomBox.innerHTML = '';
+
+    let pages = this.book.pages.slice();
+
+    if (this.doubleSided) {
+      pages = padPages(pages);
+    }
 
     for (let i = 0; i < pages.length; i += (this.doubleSided ? 2 : 1)) {
       if (this.doubleSided) {
         const left = pages[i];
         const right = pages[i + 1];
 
-        const leftPage = left.element;
-        const rightPage = right.element;
-
-
-        const wrap = h('.bindery-spread-wrapper', {
-          style: Page.spreadSizeStyle(),
-        }, leftPage, rightPage
+        const wrap = spread(
+          { style: Page.spreadSizeStyle() },
+          left.element, right.element
         );
-
         this.zoomBox.appendChild(wrap);
       } else {
         const pg = pages[i].element;
-        pg.setAttribute('bindery-side', 'right');
-        const wrap = h('.bindery-print-page',
-          h('.bindery-spread-wrapper', {
-            style: Page.sizeStyle(),
-          }, pg),
-        );
+        const wrap = spread({ style: Page.sizeStyle() }, pg);
         this.zoomBox.appendChild(wrap);
       }
     }
   }
   renderInteractive() {
-    this.mode = MODE_FLIP;
-    this.export.style.display = 'block';
     this.zoomBox.innerHTML = '';
     this.flaps = [];
 
     this.export.classList.remove('bindery-show-bleed');
     this.export.classList.remove('bindery-show-guides');
 
-    const pages = this.book.pages.slice();
-
-    if (this.doubleSided) {
-      if (this.book.pages.length % 2 !== 0) {
-        const pg = new Page();
-        pages.push(pg);
-      }
-    }
-    const spacerPage = new Page();
-    const spacerPage2 = new Page();
-    spacerPage.element.style.visibility = 'hidden';
-    spacerPage2.element.style.visibility = 'hidden';
-    pages.unshift(spacerPage);
-    pages.push(spacerPage2);
+    const pages = padPages(this.book.pages.slice());
 
     let leafIndex = 0;
     for (let i = 1; i < pages.length - 1; i += (this.doubleSided ? 2 : 1)) {
       leafIndex += 1;
       const li = leafIndex;
-      const flap = h('div.bindery-page3d', {
+      const flap = h('.bindery-page3d', {
         style: Page.sizeStyle(),
         onclick: () => {
           let newLeaf = li - 1;
@@ -458,6 +419,7 @@ class Viewer {
       this.setLeaf(0);
     }
   }
+
   setLeaf(n) {
     this.currentLeaf = n;
     let zScale = 4;

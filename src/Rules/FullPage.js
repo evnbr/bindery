@@ -1,9 +1,9 @@
-import BinderyRule from './BinderyRule';
+import Rule from './Rule';
 
 let prevPage;
 let prevElementPath;
 
-class FullPage extends BinderyRule {
+class FullPage extends Rule {
   constructor(options) {
     options.name = 'Full Page Spread';
     super(options);

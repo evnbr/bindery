@@ -15,9 +15,6 @@ import {
 
 class ControlPanel {
   constructor(opts) {
-    this.holder = h('div.bindery-controls');
-    document.body.appendChild(this.holder);
-
     this.binder = opts.binder;
 
     const done = () => {
@@ -297,24 +294,17 @@ class ControlPanel {
       inProgress,
     );
 
-
-    this.holder.appendChild(h('div', {},
+    this.holder = document.body.appendChild(
+      h('.bindery-controls',
         header,
-
         arrangement,
         paperSize,
         orientation,
         cropToggle,
-
         expandRow('Book Setup'),
-        expandArea(
-          layoutControl,
-          layoutState
-        ),
-
+        expandArea(layoutControl, layoutState),
         doneBtn,
         printBtn,
-
         viewSwitcher,
       )
     );

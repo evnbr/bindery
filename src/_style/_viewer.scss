@@ -201,14 +201,14 @@ body.bindery-viewing {
     backface-visibility: hidden;
   }
 
-  &-front {
+  .bindery-page3d-front {
     transform: rotateY(0);
     &::after {
       box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)
     }
   }
 
-  &-back {
+  .bindery-page3d-back {
     transform: rotateY(-180deg);
     &::after {
       box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)

@@ -1,7 +1,7 @@
 import h from 'hyperscript';
-import BinderyRule from './BinderyRule';
+import Rule from './Rule';
 
-class Footnote extends BinderyRule {
+class Footnote extends Rule {
   constructor(options) {
     options.name = 'Footnote';
     super(options);

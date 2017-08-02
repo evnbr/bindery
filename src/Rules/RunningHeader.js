@@ -1,7 +1,7 @@
 import h from 'hyperscript';
-import BinderyRule from './BinderyRule';
+import Rule from './Rule';
 
-class RunningHeader extends BinderyRule {
+class RunningHeader extends Rule {
   constructor(options) {
     options.name = 'Running Header';
     super(options);

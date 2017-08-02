@@ -4,7 +4,7 @@ import Spread from './Spread';
 import Footnote from './Footnote';
 import PageReference from './PageReference';
 import RunningHeader from './RunningHeader';
-import BinderyRule from './BinderyRule';
+import Rule from './Rule';
 
 export default {
   Spread,
@@ -13,8 +13,8 @@ export default {
   PageBreak,
   RunningHeader,
   PageReference,
-  BinderyRule,
+  Rule,
   createRule(options) {
-    return new BinderyRule(options);
+    return new Rule(options);
   },
 };

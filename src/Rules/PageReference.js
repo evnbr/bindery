@@ -1,6 +1,6 @@
-import BinderyRule from './BinderyRule';
+import Rule from './Rule';
 
-class PageReference extends BinderyRule {
+class PageReference extends Rule {
   constructor(options) {
     options.name = 'Page Reference';
     super(options);

@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import { parseVal } from '../utils/convertUnits';
+import { parseVal } from './utils/convertUnits';
 
 class Page {
   constructor() {

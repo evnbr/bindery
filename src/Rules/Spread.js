@@ -1,6 +1,6 @@
-import BinderyRule from './BinderyRule';
+import Rule from './Rule';
 
-class Spread extends BinderyRule {
+class Spread extends Rule {
   constructor(options) {
     options.name = 'Spread';
     super(options);
