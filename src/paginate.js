@@ -197,8 +197,8 @@ const paginate = function (
     });
   };
 
-  const afterAddRules = (element) => {
-    let addedElement = element;
+  const afterAddRules = (originalElement) => {
+    let addedElement = originalElement;
     rules.forEach((rule) => {
       if (!rule.selector) return;
       if (addedElement.matches(rule.selector) && rule.afterAdd) {
@@ -206,7 +206,7 @@ const paginate = function (
           addedElement,
           state,
           continueOnNewPage,
-          function overflowCallback() {
+          function overflowCallback(problemElement) {
           // TODO:
           // While this does catch overflows, it introduces a few new bugs.
           // It is pretty aggressive to move the entire node to the next page.
@@ -216,11 +216,12 @@ const paginate = function (
           // - 3. if it is a large paragraph, it will leave a large gap. the
           // correct approach would be to only need to invalidate
           // the last line of text.
-            addedElement.parentNode.removeChild(addedElement);
+            problemElement.parentNode.removeChild(problemElement);
             continueOnNewPage();
-            last(state.path).appendChild(addedElement);
-            addedElement = rule.afterAdd(addedElement, state, continueOnNewPage, () => {
-              console.log(`Couldn't apply ${rule.name} to ${elToStr(addedElement)}. Caused overflows twice.`);
+            const lastEl = last(state.path);
+            lastEl.appendChild(problemElement);
+            return rule.afterAdd(problemElement, state, continueOnNewPage, () => {
+              console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
             });
           }
         );

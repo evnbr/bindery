@@ -10,6 +10,9 @@ class Footnote extends Rule {
     const number = state.currentPage.footer.querySelectorAll('.footnote').length + 1;
 
     const parent = element.parentNode;
+    if (!parent) {
+      throw Error('Bindery: Rule assumes element has been added but it has no parent.');
+    }
     const defensiveClone = element.cloneNode(true);
     const replacement = this.replace(defensiveClone, number);
     parent.replaceChild(replacement, element);
@@ -26,8 +29,7 @@ class Footnote extends Rule {
       state.currentPage.footer.removeChild(footnote);
       parent.replaceChild(element, replacement);
 
-      overflowCallback();
-      return element;
+      return overflowCallback(element);
     }
 
     return replacement;
