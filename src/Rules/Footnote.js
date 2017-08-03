@@ -7,8 +7,7 @@ class Footnote extends Rule {
     super(options);
   }
   afterAdd(element, state, requestNewPage, overflowCallback) {
-    const number = state.currentPage.footer.querySelectorAll('.footnote').length + 1;
-
+    const number = state.currentPage.footer.children.length + 1;
     const parent = element.parentNode;
     if (!parent) {
       throw Error('Bindery: Rule assumes element has been added but it has no parent.');
