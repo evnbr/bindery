@@ -1,4 +1,5 @@
 import elToStr from './utils/elementToString';
+import { prefix, prefixClass } from './utils/prefixClass';
 import Book from './Book';
 import Page from './Page';
 
@@ -13,7 +14,8 @@ const clonePath = (origPath) => {
     const original = origPath[i];
     const clone = original.cloneNode(false); // shallow
     clone.innerHTML = '';
-    clone.classList.add('bindery-continuation');
+    original.classList.add(prefix('continues'));
+    clone.classList.add(prefix('continuation'));
     if (clone.id) {
       // console.warn(`Bindery: Added a break to ${elToStr(clone)},
       // so "${clone.id}" is no longer a unique ID.`);
@@ -94,8 +96,8 @@ const annotatePages = (pages) => {
       if (element) {
         running[tagName] = element.textContent;
         // clear remainder
-        Object.keys(running).forEach((lowerTag, j) => {
-          if (j > i) running[lowerTag] = '';
+        Object.keys(running).forEach((tag, j) => {
+          if (j > i) running[tag] = '';
         });
       }
       if (running[tagName] !== '') {
@@ -154,9 +156,10 @@ const paginate = function (
   // we were in when we overflowed the last page
   const continueOnNewPage = () => {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
-      console.warn('Bindery: Moved to new page when last one is still overflowing', state.currentPage.element);
-      throw Error('Overflowed');
+      console.warn(state.currentPage.element);
+      throw Error('Bindery: Moved to new page when last one is still overflowing');
     }
+
     if (state.pages.length === 500) {
       console.warn('Bindery: More than 500 pages, performance may be slow.');
     } else if (state.pages.length === 1000) {
@@ -238,24 +241,88 @@ const paginate = function (
     });
   };
 
+  // Walk up the tree to see if we can safely
+  // insert a split into this node.
+  const isSplittable = (node) => {
+    const selectorsNotToSplit = ['tr'];
+    if (selectorsNotToSplit.some(sel => node.matches(sel))) {
+      if (node.hasAttribute('data-bindery-did-move')) {
+        // don't split it again.
+        return true;
+      }
+      return false;
+    }
+    if (node.parentElement) {
+      return isSplittable(node.parentElement);
+    }
+    return true;
+  };
+
+
+  // TODO: Once a node is moved to a new page, it should
+  // no longer trigger another move. otherwise tall elements
+  // will trigger endlessly get shifted to the next page
   const moveNodeToNextPage = (nodeToMove) => {
     // So this node won't get cloned. TODO: this is unclear
     state.path.pop();
 
-    // remove from old page
-    nodeToMove.parentNode.removeChild(nodeToMove);
+    // find the nearest splittable parent
+    let willMove = nodeToMove;
+    const pathToRestore = [];
+    while (!isSplittable(last(state.path))) {
+      // console.log('Not OK to split:', last(state.path));
+      willMove = state.path.pop();
+      pathToRestore.unshift(willMove);
+    }
 
+    // console.log('OK to split:', last(state.path));
+    // console.log('Will move:', willMove);
+    willMove.setAttribute('data-bindery-did-move', true);
+
+    const parent = willMove.parentNode;
+    // remove the unsplittable node and subnodes
+    parent.removeChild(willMove);
+
+    // TODO: step back even further if the
+    // to avoid leaving otherwise empty nodes behind
+    if (last(state.path).textContent.trim() === '') {
+      console.log('Leaving empty node', last(state.path));
+      parent.appendChild(willMove);
+      willMove = state.path.pop();
+      pathToRestore.unshift(willMove);
+      willMove.parentNode.removeChild(willMove);
+    }
+
+    // create new page and clone context onto it
     continueOnNewPage();
 
-    // append to new page
-    last(state.path).appendChild(nodeToMove);
+    // append node as first in new page
+    last(state.path).appendChild(willMove);
 
+    // restore subpath
+    pathToRestore.forEach((restore) => {
+      state.path.push(restore);
+    });
     state.path.push(nodeToMove);
+  };
+
+  const addTextNode = (originalNode, doneCallback, abortCallback) => {
+    const textNode = originalNode;
+    last(state.path).appendChild(textNode);
+
+    if (state.currentPage.hasOverflowed()) {
+      // It doesnt fit
+      textNode.parentNode.removeChild(textNode);
+      abortCallback();
+    } else {
+      // It fits
+      throttle(doneCallback);
+    }
   };
 
   // Adds an text node by incrementally adding words
   // until it just barely doesnt overflow
-  const addTextNode = (originalNode, doneCallback, abortCallback) => {
+  const addTextNodeIncremental = (originalNode, doneCallback, abortCallback) => {
     let originalText = originalNode.nodeValue;
     let textNode = originalNode;
     last(state.path).appendChild(textNode);
@@ -325,7 +392,6 @@ const paginate = function (
   // one by one recursively until thet overflow the page
   const addElementNode = (node, doneCallback) => {
     if (state.currentPage.hasOverflowed()) {
-      // node.style.outline = "1px solid red";
       console.error('Bindery: Trying to add node to a page that\'s already overflowing');
     }
 
@@ -342,9 +408,33 @@ const paginate = function (
     // 2. Clear this node
     node.innerHTML = '';
 
+    // Overflows when empty
     if (state.currentPage.hasOverflowed()) {
       // console.error(`Bindery: Adding ${elToStr(node)} causes overflow even when empty`);
       moveNodeToNextPage(node);
+    }
+
+    if (!isSplittable(node)) {
+      // // Try adding in one go
+      // childNodes.forEach((child) => {
+      //   node.appendChild(child);
+      // });
+      // // If it worked, go to next node
+      // if (!state.currentPage.hasOverflowed()) {
+      //   throttle(doneCallback);
+      //   return;
+      // }
+      // // Try moving to next page in one go
+      // moveNodeToNextPage(node);
+      //
+      // // If it worked, go to next node
+      // if (!state.currentPage.hasOverflowed()) {
+      //   throttle(doneCallback);
+      //   return;
+      // }
+      //
+      // // Sorry, we gotta break it
+      // node.innerHTML = '';
     }
 
     // 3. Try adding each child one by one
@@ -359,11 +449,20 @@ const paginate = function (
 
       switch (child.nodeType) {
       case Node.TEXT_NODE: {
-        const abortCallback = () => {
-          moveNodeToNextPage(node);
+        if (isSplittable(node)) {
+          const abortCallback = () => {
+            moveNodeToNextPage(node);
+            addTextNodeIncremental(child, addNextChild, abortCallback);
+          };
+          addTextNodeIncremental(child, addNextChild, abortCallback);
+        } else {
+          const abortCallback = () => {
+            moveNodeToNextPage(node);
+            node.outline = '1px solid red';
+            addTextNode(child, addNextChild, abortCallback);
+          };
           addTextNode(child, addNextChild, abortCallback);
-        };
-        addTextNode(child, addNextChild, abortCallback);
+        }
         break;
       }
       case Node.ELEMENT_NODE: {
@@ -376,9 +475,9 @@ const paginate = function (
 
         throttle(function addChildAsElement() {
           addElementNode(child, function addedChildSuccess() {
-            // TODO: Because addElementNode will push node onto the path again
+            // We're now done with this element and its children,
+            // so we pop up a level
             const addedChild = state.path.pop();
-            // let addedChild = last(state.path);
 
             // TODO: AfterAdd rules may want to access original child, not split second half
             afterAddRules(addedChild);
@@ -402,18 +501,17 @@ const paginate = function (
   };
 
   const start = window.performance.now();
+  content.style.margin = 0;
+  content.style.padding = 0;
 
   const book = new Book();
   state.book = book;
-
-  state.currentPage = continueOnNewPage();
-  content.style.margin = 0;
-  content.style.padding = 0;
+  continueOnNewPage();
 
   const finish = () => {
     const end = window.performance.now();
     console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
-    const measureArea = document.querySelector('.bindery-measure-area');
+    const measureArea = document.querySelector(prefixClass('measure-area'));
     document.body.removeChild(measureArea);
 
     const orderedPages = reorderPages(state.pages, makeNewPage);
