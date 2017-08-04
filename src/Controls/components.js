@@ -1,43 +1,40 @@
 import h from 'hyperscript';
+import { prefix, prefixClass } from '../utils/prefixClass';
 import { cssNumberPattern } from '../utils/convertUnits';
 
 const title = function (...arg) {
-  return h('.bindery-title', ...arg);
+  return h(prefixClass('title'), ...arg);
 };
 
 // Structure
 const heading = function (...arg) {
-  return h('.bindery-heading', ...arg);
+  return h(prefixClass('heading'), ...arg);
 };
 
 const row = function (...arg) {
-  return h('.bindery-row', ...arg);
+  return h(prefixClass('row'), ...arg);
 };
 
 const expandRow = function (...arg) {
   return h(
-    '.bindery-row.bindery-expand-row',
+    `.${prefix('row')}.${prefix('expand-row')}`,
     { onclick() {
       this.classList.toggle('selected');
     } },
     ...arg);
 };
 const expandArea = function (...arg) {
-  return h('.bindery-expand-area', ...arg);
+  return h(prefixClass('expand-area'), ...arg);
 };
 
 
 // Button
 const btn = function (...arg) {
-  return h('button.bindery-btn', ...arg);
-};
-
-const btnMini = function (...arg) {
-  return h('button.bindery-btn.bindery-btn-mini', ...arg);
+  return h(`button.${prefix('btn')}`, ...arg);
 };
 
 const btnMain = function (...arg) {
-  return h('button.bindery-btn.bindery-btn-main', ...arg);
+  return h(`button.${prefix('btn')}.${prefix('btn-main')}`, ...arg);
 };
 
 // Menu
@@ -59,10 +56,20 @@ const inputNumberUnits = function (val) {
 };
 
 // Switch
-const toggleSwitch = () => h('.bindery-switch', h('.bindery-switch-handle'));
+const toggleSwitch = () => h(prefixClass('switch'), h(prefixClass('switch-handle')));
 
 const switchRow = function (...arg) {
-  return h('.bindery-row', ...arg, toggleSwitch);
+  return h(prefixClass('row'), ...arg, toggleSwitch);
+};
+
+// View Swithcer
+const viewMode = function (id, action, text) {
+  const sel = `.${prefix('viewmode')}.${prefix(id)}`;
+  return h(sel,
+    { onclick: action },
+    h(prefixClass('icon')),
+    text
+  );
 };
 
 export {
@@ -73,9 +80,9 @@ export {
   heading,
   btn,
   btnMain,
-  btnMini,
   select,
   option,
   switchRow,
   inputNumberUnits,
+  viewMode,
 };

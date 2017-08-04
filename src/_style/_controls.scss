@@ -13,6 +13,7 @@
   width: $sidebarWidth;
   z-index: 999;
   margin: auto;
+  color: $text;
   background: $background;
   overflow: scroll;
   padding-bottom: 100px;
@@ -51,7 +52,8 @@
   width: auto;
 
   &:focus {
-    outline: 1px solid blue;
+    outline: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
   }
 
   &:hover {
@@ -90,6 +92,7 @@
   right: 0;
   z-index: 99;
   width: $sidebarWidth;
+  background: $background;
 }
 
 .bindery-viewmode {
@@ -110,23 +113,23 @@
     color: $accent;
   }
 
-  .icon {
+  .bindery-icon {
     height: 32px;
     width: 32px;
     background: currentColor;
     margin: 0 auto;
   }
 
-  &.grid .icon {
+  &.bindery-grid .bindery-icon {
     -webkit-mask: url('../_assets/icon-grid.svg') no-repeat 50% 50%;
   }
-  &.flip .icon {
+  &.bindery-flip .bindery-icon {
     -webkit-mask: url('../_assets/icon-flip.svg') no-repeat 50% 50%;
   }
-  &.outline .icon {
+  &.bindery-outline .bindery-icon {
     -webkit-mask: url('../_assets/icon-outline.svg') no-repeat 50% 50%;
   }
-  &.print .icon {
+  &.bindery-print .bindery-icon {
     -webkit-mask: url('../_assets/icon-sheet.svg') no-repeat 50% 50%;
   }
 }
@@ -278,7 +281,7 @@
       text-align: right;
     }
   }
-  .preview {
+  .bindery-preview {
     top: 0;
     left: 0;
     right: 0;

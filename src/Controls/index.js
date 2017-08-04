@@ -1,5 +1,7 @@
 import h from 'hyperscript';
 import { convertStrToPx } from '../utils/convertUnits';
+import { prefix, prefixClass } from '../utils/prefixClass';
+
 import {
   title,
   select,
@@ -8,6 +10,7 @@ import {
   btnMain,
   switchRow,
   row,
+  viewMode,
   expandRow,
   expandArea,
   inputNumberUnits,
@@ -62,13 +65,13 @@ class ControlPanel {
       height: inputNumberUnits(this.binder.pageSize.height),
     };
 
-    const sizeControl = h('.bindery-row.bindery-size',
+    const sizeControl = h(`.${prefix('row')}.${prefix('size')}`,
       h('div', 'W', unitInputs.width),
       h('div', 'H', unitInputs.height),
     );
 
-    const marginPreview = h('.preview');
-    const marginControl = h('.bindery-row.bindery-margin',
+    const marginPreview = h(prefixClass('preview'));
+    const marginControl = h(`.${prefix('row')}.${prefix('margin')}`,
       h('.top', unitInputs.top),
       h('.inner', unitInputs.inner),
       h('.outer', unitInputs.outer),
@@ -76,7 +79,7 @@ class ControlPanel {
       marginPreview,
     );
 
-    layoutControl = h('.bindery-layout-control',
+    layoutControl = h(prefixClass('layout-control'),
       sizeControl,
       marginControl
     );
@@ -160,21 +163,20 @@ class ControlPanel {
       printMode.classList.add('selected');
       this.binder.viewer.setPrint();
     };
-    gridMode = h('.bindery-viewmode.grid', { onclick: setGrid }, h('.icon'), 'Preview');
-    outlineMode = h('.bindery-viewmode.outline', { onclick: setOutline }, h('.icon'), 'Outline');
-    flipMode = h('.bindery-viewmode.flip', { onclick: setInteractive }, h('.icon'), 'Flip');
-    printMode = h('.bindery-viewmode.print', { onclick: setPrint }, h('.icon'), 'Sheet');
+
+    gridMode = viewMode('grid', setGrid, 'Preview');
+    outlineMode = viewMode('outline', setOutline, 'Outline');
+    flipMode = viewMode('flip', setInteractive, 'Flip');
+    printMode = viewMode('print', setPrint, 'Sheet');
     viewModes = [
       gridMode,
       outlineMode,
       flipMode,
       printMode,
     ];
+    console.log(viewModes);
 
-    if (this.binder.viewer.mode === 'grid') gridMode.classList.add('selected');
-    if (this.binder.viewer.mode === 'interactive') flipMode.classList.add('selected');
-    if (this.binder.viewer.mode === 'print') printMode.classList.add('selected');
-    const viewSwitcher = h('.bindery-viewswitcher', ...viewModes);
+    const viewSwitcher = h(prefixClass('viewswitcher'), ...viewModes);
 
     const header = title('Loading...');
 
@@ -295,7 +297,7 @@ class ControlPanel {
     );
 
     this.holder = document.body.appendChild(
-      h('.bindery-controls',
+      h(prefixClass('controls'),
         header,
         arrangement,
         paperSize,
