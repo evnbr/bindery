@@ -16,6 +16,4 @@ class RunningHeader extends Rule {
   }
 }
 
-export default function (userOptions) {
-  return new RunningHeader(userOptions);
-}
+export default RunningHeader;

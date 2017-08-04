@@ -1,6 +1,6 @@
-import Rule from './Rule';
+import Replace from './Replace';
 
-class PageReference extends Rule {
+class PageReference extends Replace {
   constructor(options) {
     options.name = 'Page Reference';
     super(options);
@@ -33,6 +33,4 @@ class PageReference extends Rule {
   }
 }
 
-export default function (options) {
-  return new PageReference(options);
-}
+export default PageReference;

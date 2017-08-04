@@ -30,6 +30,4 @@ class FullPage extends Rule {
   }
 }
 
-export default function (userOptions) {
-  return new FullPage(userOptions);
-}
+export default FullPage;

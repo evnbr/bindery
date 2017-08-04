@@ -40,6 +40,4 @@ class Spread extends Rule {
   }
 }
 
-export default function (userOptions) {
-  return new Spread(userOptions);
-}
+export default Spread;

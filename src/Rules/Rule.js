@@ -1,5 +1,5 @@
 export default class Rule {
-  constructor(options = {}) {
+  constructor(options) {
     this.name = options.name ? options.name : 'Unnamed Bindery Rule';
     this.selector = '';
 

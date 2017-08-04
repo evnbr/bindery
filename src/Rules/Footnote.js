@@ -1,37 +1,29 @@
 import h from 'hyperscript';
-import Rule from './Rule';
+import Replace from './Replace';
 
-class Footnote extends Rule {
+class Footnote extends Replace {
   constructor(options) {
     options.name = 'Footnote';
     super(options);
   }
   afterAdd(element, state, requestNewPage, overflowCallback) {
     const number = state.currentPage.footer.children.length + 1;
-    const parent = element.parentNode;
-    if (!parent) {
-      throw Error('Bindery: Rule assumes element has been added but it has no parent.');
-    }
-    const defensiveClone = element.cloneNode(true);
-    const replacement = this.replace(defensiveClone, number);
-    parent.replaceChild(replacement, element);
 
     const footnote = h('.footnote');
     const contents = this.render(element, number);
     if (contents instanceof HTMLElement) footnote.appendChild(contents);
-    else if (typeof contents === 'string') footnote.innerHTML = contents;
-    else footnote.textContent = `<sup>${number}</sup> Error: You must return an HTML Element or string from render`;
+    else footnote.innerHTML = contents;
 
     state.currentPage.footer.appendChild(footnote);
 
-    if (state.currentPage.hasOverflowed()) {
+    return super.afterAdd(element, state, requestNewPage, (overflowEl) => {
       state.currentPage.footer.removeChild(footnote);
-      parent.replaceChild(element, replacement);
-
-      return overflowCallback(element);
-    }
-
-    return replacement;
+      return overflowCallback(overflowEl);
+    });
+  }
+  createReplacement(state, element) {
+    const number = state.currentPage.footer.children.length;
+    return this.replace(element, number);
   }
   replace(element, number) {
     element.insertAdjacentHTML('beforeEnd', `<sup class="bindery-sup">${number}</sup>`);
@@ -42,6 +34,4 @@ class Footnote extends Rule {
   }
 }
 
-export default function (userOptions) {
-  return new Footnote(userOptions);
-}
+export default Footnote;

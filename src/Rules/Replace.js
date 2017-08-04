@@ -11,7 +11,7 @@ class Replace extends Rule {
       throw Error('Bindery: Rule assumes element has been added but it has no parent.', element);
     }
     const defensiveClone = element.cloneNode(true);
-    const replacement = this.replace(defensiveClone);
+    const replacement = this.createReplacement(state, defensiveClone);
     parent.replaceChild(replacement, element);
 
     if (state.currentPage.hasOverflowed()) {
@@ -22,12 +22,13 @@ class Replace extends Rule {
 
     return replacement;
   }
+  createReplacement(state, element) {
+    return this.replace(element);
+  }
   replace(element) {
     element.insertAdjacentHTML('beforeEnd', '<sup class="bindery-sup">Default Replacement</sup>');
     return element;
   }
 }
 
-export default function (userOptions) {
-  return new Replace(userOptions);
-}
+export default Replace;

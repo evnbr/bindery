@@ -33,6 +33,4 @@ class PageBreak extends Rule {
   }
 }
 
-export default function (userOptions) {
-  return new PageBreak(userOptions);
-}
+export default PageBreak;
