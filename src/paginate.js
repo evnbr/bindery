@@ -243,8 +243,13 @@ const paginate = function (
 
   // Walk up the tree to see if we can safely
   // insert a split into this node.
+  const selectorsNotToSplit = rules
+    .filter(rule => rule.avoidSplit)
+    .map(rule => rule.selector);
+
+  console.log(selectorsNotToSplit);
+
   const isSplittable = (node) => {
-    const selectorsNotToSplit = ['tr'];
     if (selectorsNotToSplit.some(sel => node.matches(sel))) {
       if (node.hasAttribute('data-bindery-did-move')) {
         // don't split it again.
@@ -286,7 +291,7 @@ const paginate = function (
     // TODO: step back even further if the
     // to avoid leaving otherwise empty nodes behind
     if (last(state.path).textContent.trim() === '') {
-      console.log('Leaving empty node', last(state.path));
+      // console.log('Leaving empty node', last(state.path));
       parent.appendChild(willMove);
       willMove = state.path.pop();
       pathToRestore.unshift(willMove);

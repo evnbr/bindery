@@ -11,6 +11,9 @@ class PageBreak extends Rule {
     options.continue = options.continue ? options.continue : 'any';
     super(options);
   }
+  get avoidSplit() {
+    return this.position === 'avoid';
+  }
   beforeAdd(elmt, state, requestNewPage) {
     if (this.position === 'before' || this.position === 'both') {
       if (!state.currentPage.isEmpty) {

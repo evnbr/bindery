@@ -19,6 +19,7 @@
 				rules: [
 					Bindery.PageBreak({ selector: '.vertical-navbox', position: 'before', continue: 'right' }),
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+					Bindery.PageBreak({ selector: 'tr', position: 'avoid' }),
 					Bindery.Replace({
 						selector: '.navbox-list a[href]',
 						replace: (element) => {
