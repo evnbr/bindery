@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Book</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+	<script type="text/javascript" src="../../build/bindery.js"></script>
+	<script type="text/javascript" src="getArticle.js"></script>
+	<script>
+		getArticleWithTitle('Book', (article) => {
+			let originalArticle = article;
+
+			Bindery.makeBook({
+				source: originalArticle,
+				rules: [
+					Bindery.PageBreak({ selector: '.vertical-navbox', position: 'before', continue: 'right' }),
+					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+					Bindery.Replace({
+						selector: '.navbox-list a[href]',
+						replace: (element) => {
+							let href = element.getAttribute('href');
+							const span = document.createElement('span');
+							span.innerHTML = `${element.innerHTML}: `;
+							span.innerHTML += `<a href='${href}'>${href.replace('https://', '')}</a>`;
+							return span;
+						},
+					}),
+					Bindery.Footnote({
+						selector: 'a[title]:not(.internal)',
+						render: (elmt, number) => {
+							let href = elmt.getAttribute('href');
+							let note = `<sup>${number}</sup> `; // ${elmt.title}
+							note += ` <a href='${href}'>${href.replace('https://', '')}</a>`;
+							return note;
+						},
+					}),
+					Bindery.Footnote({
+						selector: 'sup.reference a',
+						replace: (element, number) => {
+							const span = document.createElement('span');
+							span.textContent = `${number}`;
+							return span;
+						},
+						render: (elmt, number) => {
+							let id = elmt.href.substr(elmt.href.indexOf('#'));
+							let sel = id + ' .reference-text';
+							let refEl = originalArticle.querySelector(sel);
+							let content = refEl.innerHTML || '?';
+							let note = `<sup>${number}</sup> Source: ${content}`;
+							return note;
+						},
+					}),
+					Bindery.RunningHeader({
+						render: (page) => {
+							if (page.isLeft) return `${page.number} · ${page.heading.h1} `;
+							else if (page.isRight) {
+								let section = Object.values(page.heading).slice(1).join(' ‣ ');
+								if (section !== '') return `${section} · ${page.number}`;
+								else return `${page.number}`;
+							}
+						},
+					}),
+					Bindery.PageReference({
+						selector: '#toc a',
+						replace: (element, number) => {
+							element.insertAdjacentHTML('beforeend', `<span class='num'>${number}</span>`);
+							return element;
+						}
+					}),
+					Bindery.PageReference({
+						selector: '.mw-cite-backlink a',
+						replace: (element, number) => {
+							const span = document.createElement('span');
+							span.textContent = `Page ${number}:`;
+							return span;
+						}
+					}),
+			  ],
+			});
+		});
+
+
+	</script>
+</body>
+</html>
