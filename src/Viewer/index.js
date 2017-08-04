@@ -328,14 +328,16 @@ class Viewer {
   }
 
   updateZoom() {
-    const scrollPct = document.body.scrollTop / document.body.scrollHeight;
-    const exportW = this.zoomBox.getBoundingClientRect().width;
-    const contentW = this.zoomBox.firstElementChild.getBoundingClientRect().width;
+    if (this.zoomBox.firstElementChild) {
+      const scrollPct = document.body.scrollTop / document.body.scrollHeight;
+      const exportW = this.zoomBox.getBoundingClientRect().width;
+      const contentW = this.zoomBox.firstElementChild.getBoundingClientRect().width;
 
-    const scale = Math.min(1, exportW / (contentW + 20));
+      const scale = Math.min(1, exportW / (contentW + 20));
 
-    this.zoomBox.style.transform = `scale(${scale})`;
-    document.body.scrollTop = document.body.scrollHeight * scrollPct;
+      this.zoomBox.style.transform = `scale(${scale})`;
+      document.body.scrollTop = document.body.scrollHeight * scrollPct;
+    }
   }
 
   updateGuides() {
