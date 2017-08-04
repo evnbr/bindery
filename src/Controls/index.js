@@ -174,7 +174,6 @@ class ControlPanel {
       flipMode,
       printMode,
     ];
-    console.log(viewModes);
 
     const viewSwitcher = h(prefixClass('viewswitcher'), ...viewModes);
 
