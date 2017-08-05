@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.3 - Thursday, August 3rd, 2017, 11:44:02 PM  
+// [AIV]  Build version: 2.0.0-alpha.3 - Friday, August 4th, 2017, 7:11:11 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -62,47 +62,17 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var split = __webpack_require__(10)
+var ClassList = __webpack_require__(11)
 
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Rule = function Rule() {
-  var _this = this;
-
-  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  _classCallCheck(this, Rule);
-
-  this.name = options.name ? options.name : 'Unnamed Bindery Rule';
-  this.selector = '';
-
-  Object.keys(options).forEach(function (key) {
-    _this[key] = options[key];
-  });
-};
-
-exports.default = Rule;
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var split = __webpack_require__(9)
-var ClassList = __webpack_require__(10)
-
-var w = typeof window === 'undefined' ? __webpack_require__(12) : window
+var w = typeof window === 'undefined' ? __webpack_require__(13) : window
 var document = w.document
 var Text = w.Text
 
@@ -262,6 +232,34 @@ function isArray (arr) {
 
 
 /***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Rule = function Rule(options) {
+  var _this = this;
+
+  _classCallCheck(this, Rule);
+
+  this.name = options.name ? options.name : 'Unnamed Bindery Rule';
+  this.selector = '';
+
+  Object.keys(options).forEach(function (key) {
+    _this[key] = options[key];
+  });
+};
+
+exports.default = Rule;
+
+/***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -376,7 +374,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _hyperscript = __webpack_require__(1);
+var _hyperscript = __webpack_require__(0);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
@@ -546,11 +544,83 @@ exports.default = Page;
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Rule2 = __webpack_require__(1);
+
+var _Rule3 = _interopRequireDefault(_Rule2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Replace = function (_Rule) {
+  _inherits(Replace, _Rule);
+
+  function Replace(options) {
+    _classCallCheck(this, Replace);
+
+    options.name = 'Footnote';
+    return _possibleConstructorReturn(this, (Replace.__proto__ || Object.getPrototypeOf(Replace)).call(this, options));
+  }
+
+  _createClass(Replace, [{
+    key: 'afterAdd',
+    value: function afterAdd(element, state, requestNewPage, overflowCallback) {
+      var parent = element.parentNode;
+      if (!parent) {
+        throw Error('Bindery: Rule assumes element has been added but it has no parent.', element);
+      }
+      var defensiveClone = element.cloneNode(true);
+      var replacement = this.createReplacement(state, defensiveClone);
+      parent.replaceChild(replacement, element);
+
+      if (state.currentPage.hasOverflowed()) {
+        parent.replaceChild(element, replacement);
+
+        return overflowCallback(element);
+      }
+
+      return replacement;
+    }
+  }, {
+    key: 'createReplacement',
+    value: function createReplacement(state, element) {
+      return this.replace(element);
+    }
+  }, {
+    key: 'replace',
+    value: function replace(element) {
+      element.insertAdjacentHTML('beforeEnd', '<sup class="bindery-sup">Default Replacement</sup>');
+      return element;
+    }
+  }]);
+
+  return Replace;
+}(_Rule3.default);
+
+exports.default = Replace;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _paginate = __webpack_require__(6);
+var _paginate = __webpack_require__(7);
 
 var _paginate2 = _interopRequireDefault(_paginate);
 
@@ -558,17 +628,17 @@ var _Page = __webpack_require__(4);
 
 var _Page2 = _interopRequireDefault(_Page);
 
-var _Viewer = __webpack_require__(13);
+var _Viewer = __webpack_require__(14);
 
 var _Viewer2 = _interopRequireDefault(_Viewer);
 
-var _Controls = __webpack_require__(15);
+var _Controls = __webpack_require__(16);
 
 var _Controls2 = _interopRequireDefault(_Controls);
 
 var _convertUnits = __webpack_require__(2);
 
-var _Rules = __webpack_require__(17);
+var _Rules = __webpack_require__(18);
 
 var _Rules2 = _interopRequireDefault(_Rules);
 
@@ -576,7 +646,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-__webpack_require__(25);
+__webpack_require__(26);
 
 var DEFAULT_PAGE_UNIT = 'pt';
 var DEFAULT_PAGE_SIZE = {
@@ -860,7 +930,7 @@ Object.keys(_Rules2.default).forEach(function (rule) {
 module.exports = Bindery;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -870,13 +940,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _elementToString = __webpack_require__(7);
+var _elementToString = __webpack_require__(8);
 
 var _elementToString2 = _interopRequireDefault(_elementToString);
 
 var _prefixClass = __webpack_require__(3);
 
-var _Book = __webpack_require__(8);
+var _Book = __webpack_require__(9);
 
 var _Book2 = _interopRequireDefault(_Book);
 
@@ -892,40 +962,6 @@ var SHOULD_DEBUG_TEXT = false;
 
 var last = function last(arr) {
   return arr[arr.length - 1];
-};
-
-// TODO: only do this if not double sided?
-var clonePath = function clonePath(origPath) {
-  var newPath = [];
-  for (var i = origPath.length - 1; i >= 0; i -= 1) {
-    var original = origPath[i];
-    var clone = original.cloneNode(false); // shallow
-    clone.innerHTML = '';
-    original.classList.add((0, _prefixClass.prefix)('continues'));
-    clone.classList.add((0, _prefixClass.prefix)('continuation'));
-    if (clone.id) {
-      // console.warn(`Bindery: Added a break to ${elToStr(clone)},
-      // so "${clone.id}" is no longer a unique ID.`);
-    }
-    if (clone.tagName === 'OL') {
-      // restart numbering
-      var prevStart = 1;
-      if (original.hasAttribute('start')) {
-        // the OL is also a continuation
-        prevStart = parseInt(original.getAttribute('start'), 10);
-      }
-      if (i < origPath.length - 1 && origPath[i + 1].tagName === 'LI') {
-        // the first list item is a continuation
-        prevStart -= 1;
-      }
-      var prevCount = original.children.length;
-      var newStart = prevStart + prevCount;
-      clone.setAttribute('start', newStart);
-    }
-    if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
-    newPath[i] = clone;
-  }
-  return newPath;
 };
 
 var reorderPages = function reorderPages(pages, makeNewPage) {
@@ -1000,6 +1036,58 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
   var state = {
     path: [], // Stack representing which element we're currently inside
     pages: []
+  };
+
+  var markAsContinues = function markAsContinues(node) {
+    node.classList.add((0, _prefixClass.prefix)('continues'));
+    rules.filter(function (rule) {
+      return rule.customContinuesClass;
+    }).forEach(function (rule) {
+      return node.classList.add(rule.customContinuesClass);
+    });
+  };
+
+  var markAsContinuation = function markAsContinuation(node) {
+    node.classList.add((0, _prefixClass.prefix)('continuation'));
+    rules.filter(function (rule) {
+      return rule.customContinuationClass;
+    }).forEach(function (rule) {
+      return node.classList.add(rule.customContinuationClass);
+    });
+  };
+
+  // TODO: only do this if not double sided?
+  var clonePath = function clonePath(origPath) {
+    var newPath = [];
+    for (var i = origPath.length - 1; i >= 0; i -= 1) {
+      var original = origPath[i];
+      var clone = original.cloneNode(false); // shallow
+      clone.innerHTML = '';
+      markAsContinues(original);
+      markAsContinuation(clone);
+      if (clone.id) {
+        // console.warn(`Bindery: Added a break to ${elToStr(clone)},
+        // so "${clone.id}" is no longer a unique ID.`);
+      }
+      if (clone.tagName === 'OL') {
+        // restart numbering
+        var prevStart = 1;
+        if (original.hasAttribute('start')) {
+          // the OL is also a continuation
+          prevStart = parseInt(original.getAttribute('start'), 10);
+        }
+        if (i < origPath.length - 1 && origPath[i + 1].tagName === 'LI') {
+          // the first list item is a continuation
+          prevStart -= 1;
+        }
+        var prevCount = original.children.length;
+        var newStart = prevStart + prevCount;
+        clone.setAttribute('start', newStart);
+      }
+      if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
+      newPath[i] = clone;
+    }
+    return newPath;
   };
 
   // Even when there is no debugDelay,
@@ -1121,8 +1209,15 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
 
   // Walk up the tree to see if we can safely
   // insert a split into this node.
+  var selectorsNotToSplit = rules.filter(function (rule) {
+    return rule.avoidSplit;
+  }).map(function (rule) {
+    return rule.selector;
+  });
+
+  console.log(selectorsNotToSplit);
+
   var isSplittable = function isSplittable(node) {
-    var selectorsNotToSplit = ['tr'];
     if (selectorsNotToSplit.some(function (sel) {
       return node.matches(sel);
     })) {
@@ -1165,7 +1260,7 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
     // TODO: step back even further if the
     // to avoid leaving otherwise empty nodes behind
     if (last(state.path).textContent.trim() === '') {
-      console.log('Leaving empty node', last(state.path));
+      // console.log('Leaving empty node', last(state.path));
       parent.appendChild(willMove);
       willMove = state.path.pop();
       pathToRestore.unshift(willMove);
@@ -1410,7 +1505,7 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
 exports.default = paginate;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1441,7 +1536,7 @@ var elementToString = function elementToString(node) {
 exports.default = elementToString;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1525,7 +1620,7 @@ var Book = function () {
 exports.default = Book;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1637,11 +1732,11 @@ module.exports = (function split(undef) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // contains, add, remove, toggle
-var indexof = __webpack_require__(11)
+var indexof = __webpack_require__(12)
 
 module.exports = ClassList
 
@@ -1742,7 +1837,7 @@ function isTruthy(value) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 
@@ -1757,13 +1852,13 @@ module.exports = function(arr, obj){
 };
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1775,7 +1870,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _hyperscript = __webpack_require__(1);
+var _hyperscript = __webpack_require__(0);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
@@ -1783,7 +1878,7 @@ var _Page = __webpack_require__(4);
 
 var _Page2 = _interopRequireDefault(_Page);
 
-var _error = __webpack_require__(14);
+var _error = __webpack_require__(15);
 
 var _error2 = _interopRequireDefault(_error);
 
@@ -2115,6 +2210,8 @@ var Viewer = function () {
 
       this.flaps = [];
       document.body.classList.add('bindery-viewing');
+      document.body.setAttribute('bindery-view-mode', this.mode);
+
       var scrollPct = document.body.scrollTop / document.body.scrollHeight;
 
       if (this.mode === MODE_PREVIEW) {
@@ -2149,6 +2246,7 @@ var Viewer = function () {
   }, {
     key: 'updateGuides',
     value: function updateGuides() {
+      document.body.setAttribute('bindery-view-mode', this.mode);
       if (this.mode === MODE_OUTLINE) {
         this.export.classList.add('bindery-show-bleed');
         this.export.classList.add('bindery-show-guides');
@@ -2292,7 +2390,7 @@ var Viewer = function () {
 exports.default = Viewer;
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2306,14 +2404,14 @@ exports.default = function (title, text) {
   return (0, _hyperscript2.default)('.bindery-error', (0, _hyperscript2.default)('.bindery-error-title', title), (0, _hyperscript2.default)('.bindery-error-text', text), (0, _hyperscript2.default)('.bindery-error-footer', 'Bindery ' + '2.0.0-alpha.3'));
 };
 
-var _hyperscript = __webpack_require__(1);
+var _hyperscript = __webpack_require__(0);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2323,7 +2421,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _hyperscript = __webpack_require__(1);
+var _hyperscript = __webpack_require__(0);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
@@ -2331,11 +2429,9 @@ var _convertUnits = __webpack_require__(2);
 
 var _prefixClass = __webpack_require__(3);
 
-var _components = __webpack_require__(16);
+var _components = __webpack_require__(17);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2430,47 +2526,22 @@ var ControlPanel = function ControlPanel(opts) {
       });
     } }, 'Update Layout');
 
-  var gridMode = void 0;
-  var printMode = void 0;
-  var outlineMode = void 0;
-  var flipMode = void 0;
-  var viewModes = void 0;
   var setGrid = function setGrid() {
-    viewModes.forEach(function (v) {
-      return v.classList.remove('selected');
-    });
-    gridMode.classList.add('selected');
     _this.binder.viewer.setGrid();
   };
   var setOutline = function setOutline() {
-    viewModes.forEach(function (v) {
-      return v.classList.remove('selected');
-    });
-    outlineMode.classList.add('selected');
     _this.binder.viewer.setOutline();
   };
   var setInteractive = function setInteractive() {
-    viewModes.forEach(function (v) {
-      return v.classList.remove('selected');
-    });
-    flipMode.classList.add('selected');
     _this.binder.viewer.setInteractive();
   };
   var setPrint = function setPrint() {
-    viewModes.forEach(function (v) {
-      return v.classList.remove('selected');
-    });
-    printMode.classList.add('selected');
     _this.binder.viewer.setPrint();
   };
 
-  gridMode = (0, _components.viewMode)('grid', setGrid, 'Preview');
-  outlineMode = (0, _components.viewMode)('outline', setOutline, 'Outline');
-  flipMode = (0, _components.viewMode)('flip', setInteractive, 'Flip');
-  printMode = (0, _components.viewMode)('print', setPrint, 'Sheet');
-  viewModes = [gridMode, outlineMode, flipMode, printMode];
+  var viewModes = [(0, _components.viewMode)('grid', setGrid, 'Preview'), (0, _components.viewMode)('outline', setOutline, 'Outline'), (0, _components.viewMode)('flip', setInteractive, 'Flip'), (0, _components.viewMode)('print', setPrint, 'Sheet')];
 
-  var viewSwitcher = _hyperscript2.default.apply(undefined, [(0, _prefixClass.prefixClass)('viewswitcher')].concat(_toConsumableArray(viewModes)));
+  var viewSwitcher = _hyperscript2.default.apply(undefined, [(0, _prefixClass.prefixClass)('viewswitcher')].concat(viewModes));
 
   var header = (0, _components.title)('Loading...');
 
@@ -2596,7 +2667,7 @@ var ControlPanel = function ControlPanel(opts) {
 exports.default = ControlPanel;
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2607,7 +2678,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.viewMode = exports.inputNumberUnits = exports.switchRow = exports.option = exports.select = exports.btnMain = exports.btn = exports.heading = exports.expandArea = exports.expandRow = exports.row = exports.title = undefined;
 
-var _hyperscript = __webpack_require__(1);
+var _hyperscript = __webpack_require__(0);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
@@ -2737,7 +2808,7 @@ exports.inputNumberUnits = inputNumberUnits;
 exports.viewMode = viewMode;
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2747,56 +2818,77 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _FullPage = __webpack_require__(18);
+var _Continuation2 = __webpack_require__(19);
 
-var _FullPage2 = _interopRequireDefault(_FullPage);
+var _Continuation3 = _interopRequireDefault(_Continuation2);
 
-var _Footnote = __webpack_require__(19);
+var _FullPage2 = __webpack_require__(20);
 
-var _Footnote2 = _interopRequireDefault(_Footnote);
+var _FullPage3 = _interopRequireDefault(_FullPage2);
 
-var _PageReference = __webpack_require__(20);
+var _Footnote2 = __webpack_require__(21);
 
-var _PageReference2 = _interopRequireDefault(_PageReference);
+var _Footnote3 = _interopRequireDefault(_Footnote2);
 
-var _RunningHeader = __webpack_require__(21);
+var _PageReference2 = __webpack_require__(22);
 
-var _RunningHeader2 = _interopRequireDefault(_RunningHeader);
+var _PageReference3 = _interopRequireDefault(_PageReference2);
 
-var _Replace = __webpack_require__(22);
+var _RunningHeader2 = __webpack_require__(23);
 
-var _Replace2 = _interopRequireDefault(_Replace);
+var _RunningHeader3 = _interopRequireDefault(_RunningHeader2);
 
-var _Rule = __webpack_require__(0);
+var _Replace2 = __webpack_require__(5);
+
+var _Replace3 = _interopRequireDefault(_Replace2);
+
+var _Rule = __webpack_require__(1);
 
 var _Rule2 = _interopRequireDefault(_Rule);
 
-var _Spread = __webpack_require__(23);
+var _Spread2 = __webpack_require__(24);
 
-var _Spread2 = _interopRequireDefault(_Spread);
+var _Spread3 = _interopRequireDefault(_Spread2);
 
-var _PageBreak = __webpack_require__(24);
+var _PageBreak2 = __webpack_require__(25);
 
-var _PageBreak2 = _interopRequireDefault(_PageBreak);
+var _PageBreak3 = _interopRequireDefault(_PageBreak2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
-  FullPage: _FullPage2.default,
-  Footnote: _Footnote2.default,
-  RunningHeader: _RunningHeader2.default,
-  Replace: _Replace2.default,
   Rule: _Rule2.default,
-  Spread: _Spread2.default,
-  PageBreak: _PageBreak2.default,
-  PageReference: _PageReference2.default,
+  Continuation: function Continuation(options) {
+    return new _Continuation3.default(options);
+  },
+  FullPage: function FullPage(options) {
+    return new _FullPage3.default(options);
+  },
+  Footnote: function Footnote(options) {
+    return new _Footnote3.default(options);
+  },
+  RunningHeader: function RunningHeader(options) {
+    return new _RunningHeader3.default(options);
+  },
+  Replace: function Replace(options) {
+    return new _Replace3.default(options);
+  },
+  Spread: function Spread(options) {
+    return new _Spread3.default(options);
+  },
+  PageBreak: function PageBreak(options) {
+    return new _PageBreak3.default(options);
+  },
+  PageReference: function PageReference(options) {
+    return new _PageReference3.default(options);
+  },
   createRule: function createRule(options) {
     return new _Rule2.default(options);
   }
 };
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2808,11 +2900,65 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-exports.default = function (userOptions) {
-  return new FullPage(userOptions);
-};
+var _Rule2 = __webpack_require__(1);
 
-var _Rule2 = __webpack_require__(0);
+var _Rule3 = _interopRequireDefault(_Rule2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// API:
+// position: 'before' (default) | 'after' | 'both' | 'avoid'
+// continue: | 'any' (default) | 'left' | 'right'
+
+var Continuation = function (_Rule) {
+  _inherits(Continuation, _Rule);
+
+  function Continuation(options) {
+    _classCallCheck(this, Continuation);
+
+    options.name = 'Continuation';
+    options.hasContinuationClass = options.hasContinuationClass || 'my-continues';
+    options.isContinuationClass = options.isContinuationClass || 'my-continuation';
+    return _possibleConstructorReturn(this, (Continuation.__proto__ || Object.getPrototypeOf(Continuation)).call(this, options));
+  }
+
+  _createClass(Continuation, [{
+    key: 'customContinuesClass',
+    get: function get() {
+      return this.hasContinuationClass;
+    }
+  }, {
+    key: 'customContinuationClass',
+    get: function get() {
+      return this.isContinuationClass;
+    }
+  }]);
+
+  return Continuation;
+}(_Rule3.default);
+
+exports.default = Continuation;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Rule2 = __webpack_require__(1);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
@@ -2866,8 +3012,10 @@ var FullPage = function (_Rule) {
   return FullPage;
 }(_Rule3.default);
 
+exports.default = FullPage;
+
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2879,17 +3027,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-exports.default = function (userOptions) {
-  return new Footnote(userOptions);
-};
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _hyperscript = __webpack_require__(1);
+var _hyperscript = __webpack_require__(0);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _Rule2 = __webpack_require__(0);
+var _Replace2 = __webpack_require__(5);
 
-var _Rule3 = _interopRequireDefault(_Rule2);
+var _Replace3 = _interopRequireDefault(_Replace2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2899,8 +3045,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Footnote = function (_Rule) {
-  _inherits(Footnote, _Rule);
+var Footnote = function (_Replace) {
+  _inherits(Footnote, _Replace);
 
   function Footnote(options) {
     _classCallCheck(this, Footnote);
@@ -2913,28 +3059,23 @@ var Footnote = function (_Rule) {
     key: 'afterAdd',
     value: function afterAdd(element, state, requestNewPage, overflowCallback) {
       var number = state.currentPage.footer.children.length + 1;
-      var parent = element.parentNode;
-      if (!parent) {
-        throw Error('Bindery: Rule assumes element has been added but it has no parent.');
-      }
-      var defensiveClone = element.cloneNode(true);
-      var replacement = this.replace(defensiveClone, number);
-      parent.replaceChild(replacement, element);
 
       var footnote = (0, _hyperscript2.default)('.footnote');
       var contents = this.render(element, number);
-      if (contents instanceof HTMLElement) footnote.appendChild(contents);else if (typeof contents === 'string') footnote.innerHTML = contents;else footnote.textContent = '<sup>' + number + '</sup> Error: You must return an HTML Element or string from render';
+      if (contents instanceof HTMLElement) footnote.appendChild(contents);else footnote.innerHTML = contents;
 
       state.currentPage.footer.appendChild(footnote);
 
-      if (state.currentPage.hasOverflowed()) {
+      return _get(Footnote.prototype.__proto__ || Object.getPrototypeOf(Footnote.prototype), 'afterAdd', this).call(this, element, state, requestNewPage, function (overflowEl) {
         state.currentPage.footer.removeChild(footnote);
-        parent.replaceChild(element, replacement);
-
-        return overflowCallback(element);
-      }
-
-      return replacement;
+        return overflowCallback(overflowEl);
+      });
+    }
+  }, {
+    key: 'createReplacement',
+    value: function createReplacement(state, element) {
+      var number = state.currentPage.footer.children.length;
+      return this.replace(element, number);
     }
   }, {
     key: 'replace',
@@ -2950,10 +3091,12 @@ var Footnote = function (_Rule) {
   }]);
 
   return Footnote;
-}(_Rule3.default);
+}(_Replace3.default);
+
+exports.default = Footnote;
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2965,13 +3108,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-exports.default = function (options) {
-  return new PageReference(options);
-};
+var _Replace2 = __webpack_require__(5);
 
-var _Rule2 = __webpack_require__(0);
-
-var _Rule3 = _interopRequireDefault(_Rule2);
+var _Replace3 = _interopRequireDefault(_Replace2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2981,8 +3120,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var PageReference = function (_Rule) {
-  _inherits(PageReference, _Rule);
+var PageReference = function (_Replace) {
+  _inherits(PageReference, _Replace);
 
   function PageReference(options) {
     _classCallCheck(this, PageReference);
@@ -3029,10 +3168,12 @@ var PageReference = function (_Rule) {
   }]);
 
   return PageReference;
-}(_Rule3.default);
+}(_Replace3.default);
+
+exports.default = PageReference;
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3044,15 +3185,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-exports.default = function (userOptions) {
-  return new RunningHeader(userOptions);
-};
-
-var _hyperscript = __webpack_require__(1);
+var _hyperscript = __webpack_require__(0);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _Rule2 = __webpack_require__(0);
+var _Rule2 = __webpack_require__(1);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
@@ -3091,8 +3228,10 @@ var RunningHeader = function (_Rule) {
   return RunningHeader;
 }(_Rule3.default);
 
+exports.default = RunningHeader;
+
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3104,80 +3243,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-exports.default = function (userOptions) {
-  return new Replace(userOptions);
-};
-
-var _Rule2 = __webpack_require__(0);
-
-var _Rule3 = _interopRequireDefault(_Rule2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Replace = function (_Rule) {
-  _inherits(Replace, _Rule);
-
-  function Replace(options) {
-    _classCallCheck(this, Replace);
-
-    options.name = 'Footnote';
-    return _possibleConstructorReturn(this, (Replace.__proto__ || Object.getPrototypeOf(Replace)).call(this, options));
-  }
-
-  _createClass(Replace, [{
-    key: 'afterAdd',
-    value: function afterAdd(element, state, requestNewPage, overflowCallback) {
-      var parent = element.parentNode;
-      if (!parent) {
-        throw Error('Bindery: Rule assumes element has been added but it has no parent.', element);
-      }
-      var defensiveClone = element.cloneNode(true);
-      var replacement = this.replace(defensiveClone);
-      parent.replaceChild(replacement, element);
-
-      if (state.currentPage.hasOverflowed()) {
-        parent.replaceChild(element, replacement);
-
-        return overflowCallback(element);
-      }
-
-      return replacement;
-    }
-  }, {
-    key: 'replace',
-    value: function replace(element) {
-      element.insertAdjacentHTML('beforeEnd', '<sup class="bindery-sup">Default Replacement</sup>');
-      return element;
-    }
-  }]);
-
-  return Replace;
-}(_Rule3.default);
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-exports.default = function (userOptions) {
-  return new Spread(userOptions);
-};
-
-var _Rule2 = __webpack_require__(0);
+var _Rule2 = __webpack_require__(1);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
@@ -3243,8 +3309,10 @@ var Spread = function (_Rule) {
   return Spread;
 }(_Rule3.default);
 
+exports.default = Spread;
+
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3256,11 +3324,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-exports.default = function (userOptions) {
-  return new PageBreak(userOptions);
-};
-
-var _Rule2 = __webpack_require__(0);
+var _Rule2 = __webpack_require__(1);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
@@ -3273,7 +3337,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // API:
-// position: 'before' (default) | 'after' | 'both'
+// position: 'before' (default) | 'after' | 'both' | 'avoid'
 // continue: | 'any' (default) | 'left' | 'right'
 
 var PageBreak = function (_Rule) {
@@ -3312,22 +3376,29 @@ var PageBreak = function (_Rule) {
       }
       return elmt;
     }
+  }, {
+    key: 'avoidSplit',
+    get: function get() {
+      return this.position === 'avoid';
+    }
   }]);
 
   return PageBreak;
 }(_Rule3.default);
 
+exports.default = PageBreak;
+
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(26);
+var content = __webpack_require__(27);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(33)(content, {});
+var update = __webpack_require__(34)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -3344,21 +3415,21 @@ if(false) {
 }
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(27)();
+exports = module.exports = __webpack_require__(28)();
 // imports
 
 
 // module
-exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible; }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important; }\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    pointer-events: none;\n    z-index: 999; }\n  .bindery-zoom-wrap * {\n    transition: box-shadow 0.5s; }\n  .bindery-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .bindery-show-guides .bindery-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .bindery-show-guides .bindery-flowbox {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-footer {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .bindery-show-guides .bindery-bleed {\n    box-shadow: 0 0 0 1px yellow; } }\n\n.bindery-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.bindery-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.bindery-content {\n  /* hack to prevent margin collapse, leading to wrong height */\n  padding: 0.1px; }\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n.bindery-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt; }\n\n/*Old Bleed Stuff*/\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px; }\n\n.bindery-left.bleed .bindery-flowbox {\n  right: 0;\n  left: -20px; }\n\n.bindery-right.bleed .bindery-flowbox {\n  left: 0;\n  right: -20px; }\n\n/*Bleed as layer*/\n.bindery-bleed {\n  position: absolute;\n  top: -0.2in;\n  bottom: -0.2in;\n  z-index: 0; }\n  .bindery-left .bindery-bleed {\n    right: 0;\n    left: -0.2in; }\n  .bindery-right .bindery-bleed {\n    left: 0;\n    right: -0.2in; }\n\n.bindery-spread.bindery-left .bindery-content {\n  /*width: 200%;*/\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: -100%;\n  bottom: 0; }\n\n.bindery-spread.bindery-right .bindery-content {\n  position: absolute;\n  top: 0;\n  left: -100%;\n  right: 0;\n  bottom: 0; }\n\n.bindery-sup {\n  font-size: 0.667em; }\n\n.bindery-running-header, .bindery-footer {\n  font-size: 10pt; }\n\n.bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .bindery-left .bindery-running-header {\n    left: 18pt;\n    text-align: left; }\n  .bindery-right .bindery-running-header {\n    right: 18pt;\n    text-align: right; }\n\np.bindery-continuation {\n  text-indent: 0 !important; }\n\nli.bindery-continuation {\n  list-style: none !important; }\n\n.bindery-crop-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .bindery-show-crop .bindery-crop-wrap {\n    display: block; }\n  .bindery-crop-wrap > div {\n    position: absolute;\n    overflow: hidden; }\n    .bindery-crop-wrap > div::before, .bindery-crop-wrap > div:after {\n      content: \"\";\n      background: black;\n      width: 12pt;\n      height: 12pt;\n      display: block;\n      position: absolute; }\n    .bindery-crop-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .bindery-crop-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.bindery-show-crop .bindery-print-page .bindery-spread-wrapper {\n  margin: 30pt auto; }\n\n.bindery-crop-fold, .bindery-crop-left, .bindery-crop-right {\n  transform: scaleX(0.5);\n  top: -20pt;\n  bottom: -20pt;\n  width: 1px;\n  margin: auto; }\n\n.bindery-crop-fold {\n  right: 0;\n  left: 0; }\n\n.bindery-crop-left {\n  left: 0; }\n\n.bindery-crop-right {\n  right: 0; }\n\n.bindery-crop-top, .bindery-crop-bottom {\n  transform: scaleY(0.5);\n  left: -20pt;\n  right: -20pt;\n  height: 1px; }\n\n.bindery-crop-top {\n  top: 0; }\n\n.bindery-crop-bottom {\n  bottom: 0; }\n\n@media screen {\n  .bindery-viewing {\n    background: #f4f4f4 !important; }\n  .bindery-export {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .bindery-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    padding-right: 240px;\n    z-index: 99;\n    visibility: hidden;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0; }\n  .bindery-print-page {\n    margin: 0 auto; }\n  .bindery-spinner {\n    border: 2px solid transparent;\n    border-left-color: navy;\n    width: 32px;\n    height: 32px;\n    border-radius: 50%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    bottom: 0;\n    right: 0;\n    margin: auto;\n    z-index: 999;\n    opacity: 0; }\n  .bindery-inProgress .bindery-spinner {\n    opacity: 1;\n    animation: spin 0.6s linear infinite; }\n  .bindery-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    background: url(" + __webpack_require__(28) + ") no-repeat 0% 0%;\n    background-size: 48px;\n    padding-top: 64px; }\n    .bindery-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .bindery-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .bindery-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .bindery-show-bleed .bindery-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .bindery-letter-landscape {\n    width: 11in;\n    height: 8.5in; }\n  .bindery-letter-portrait {\n    width: 8.5in;\n    height: 11in; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .bindery-export {\n    -webkit-print-color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not(.bindery-export) {\n    display: none !important; }\n  .bindery-print-page {\n    margin: 20px; }\n  .bindery-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.bindery-viewing {\n  margin: 0; }\n\n.bindery-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.bindery-viewing > :not(.bindery-export):not(.bindery-controls):not(.bindery-measure-area) {\n  display: none !important; }\n\n.bindery-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden; }\n\n.bindery-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.bindery-print-page .bindery-spread-wrapper {\n  margin: 0 auto; }\n\n.bindery-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.bindery-stage3d {\n  perspective: 3000px;\n  transform-style: preserve-3d; }\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .bindery-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .bindery-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .bindery-page3d .bindery-page {\n    position: absolute;\n    backface-visibility: hidden; }\n  .bindery-page3d .bindery-page3d-front {\n    transform: rotateY(0); }\n    .bindery-page3d .bindery-page3d-front::after {\n      box-shadow: inset 12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n  .bindery-page3d .bindery-page3d-back {\n    transform: rotateY(-180deg); }\n    .bindery-page3d .bindery-page3d-back::after {\n      box-shadow: inset -12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n\n@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important; } }\n\n.bindery-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  padding-bottom: 100px; }\n\n.bindery-controls * {\n  font: inherit;\n  color: inherit;\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\n.bindery-title {\n  padding: 20px;\n  font-size: 18px; }\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0, 0, 0, 0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  margin: 16px;\n  width: auto; }\n  .bindery-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .bindery-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .bindery-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n  .bindery-inProgress .bindery-btn {\n    opacity: 0.2;\n    pointer-events: none; }\n\n.bindery-btn-main {\n  background: navy;\n  color: white; }\n  .bindery-btn-main:hover {\n    background: navy;\n    opacity: 0.7; }\n  .bindery-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  z-index: 99;\n  width: 240px;\n  background: #f4f4f4; }\n\n.bindery-viewmode {\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 3px; }\n  .bindery-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .bindery-viewmode.selected {\n    color: navy; }\n  .bindery-viewmode .bindery-icon {\n    height: 32px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .bindery-viewmode.bindery-grid .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(29) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-flip .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(30) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-outline .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(31) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-print .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(32) + ") no-repeat 50% 50%; }\n\n.bindery-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 4px 8px;\n  cursor: pointer; }\n  .bindery-row select {\n    float: right;\n    border: none;\n    background: transparent;\n    padding: 12px;\n    width: 100px; }\n    .bindery-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .bindery-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    background: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white; }\n    .bindery-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .bindery-row input:invalid {\n      color: maroon; }\n\n.bindery-expand-row {\n  color: navy; }\n  .bindery-expand-row:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .bindery-expand-row::after {\n    content: '+';\n    font-size: 1.5em;\n    padding: 0;\n    position: absolute;\n    right: 20px;\n    top: 2px;\n    font-weight: 300; }\n  .bindery-expand-row.selected::after {\n    content: '\\2013'; }\n  .bindery-expand-row.selected + .bindery-expand-area {\n    display: block; }\n\n.bindery-expand-area {\n  display: none;\n  margin-bottom: 16px;\n  padding: 12px 0; }\n  .bindery-expand-area.selected {\n    margin-bottom: 0; }\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px; }\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px; }\n  .bindery-size div {\n    position: relative;\n    padding: 6px 12px;\n    color: #aaa; }\n\n.bindery-layout-control {\n  margin: 4px 20px 16px; }\n\n.bindery-margin {\n  overflow: hidden; }\n  .bindery-margin > div {\n    position: absolute;\n    width: 54px;\n    height: 24px;\n    z-index: 5; }\n    .bindery-margin > div:hover {\n      z-index: 99; }\n  .bindery-margin .top {\n    left: 0;\n    right: 0;\n    margin: auto;\n    top: 0; }\n  .bindery-margin .bottom {\n    left: 0;\n    right: 0;\n    margin: auto;\n    bottom: 0; }\n  .bindery-margin .inner {\n    left: 0;\n    text-align: left;\n    top: calc(50% - 12px); }\n    .bindery-margin .inner input {\n      text-align: left; }\n  .bindery-margin .outer {\n    right: 0;\n    text-align: right;\n    top: calc(50% - 12px); }\n    .bindery-margin .outer input {\n      text-align: right; }\n  .bindery-margin .bindery-preview {\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    border: 1px solid #a9a9ff;\n    height: auto;\n    width: auto;\n    z-index: 0;\n    pointer-events: none;\n    transition: border 0.2s; }\n\n.bindery-margin input {\n  text-align: center;\n  padding: 4px;\n  font-size: 12px; }\n  .bindery-margin input:focus {\n    background: none !important; }\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0, 0, 0, 0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  transition: all 0.2s;\n  position: relative; }\n\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px; }\n\n.bindery-row:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); }\n\n.bindery-row.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.6); }\n\n.bindery-row.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px; }\n", ""]);
+exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible; }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important; }\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    pointer-events: none;\n    z-index: 999; }\n  .bindery-zoom-wrap * {\n    transition: box-shadow 0.5s; }\n  .bindery-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .bindery-show-guides .bindery-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .bindery-show-guides .bindery-flowbox {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-footer {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .bindery-show-guides .bindery-bleed {\n    box-shadow: 0 0 0 1px yellow; } }\n\n.bindery-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.bindery-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.bindery-content {\n  /* hack to prevent margin collapse, leading to wrong height */\n  padding: 0.1px; }\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n.bindery-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt; }\n\n/*Old Bleed Stuff*/\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px; }\n\n.bindery-left.bleed .bindery-flowbox {\n  right: 0;\n  left: -20px; }\n\n.bindery-right.bleed .bindery-flowbox {\n  left: 0;\n  right: -20px; }\n\n/*Bleed as layer*/\n.bindery-bleed {\n  position: absolute;\n  top: -0.2in;\n  bottom: -0.2in;\n  z-index: 0; }\n  .bindery-left .bindery-bleed {\n    right: 0;\n    left: -0.2in; }\n  .bindery-right .bindery-bleed {\n    left: 0;\n    right: -0.2in; }\n\n.bindery-spread.bindery-left .bindery-content {\n  /*width: 200%;*/\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: -100%;\n  bottom: 0; }\n\n.bindery-spread.bindery-right .bindery-content {\n  position: absolute;\n  top: 0;\n  left: -100%;\n  right: 0;\n  bottom: 0; }\n\n.bindery-sup {\n  font-size: 0.667em; }\n\n.bindery-running-header, .bindery-footer {\n  font-size: 10pt; }\n\n.bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .bindery-left .bindery-running-header {\n    left: 18pt;\n    text-align: left; }\n  .bindery-right .bindery-running-header {\n    right: 18pt;\n    text-align: right; }\n\np.bindery-continuation {\n  text-indent: 0 !important; }\n\nli.bindery-continuation {\n  list-style: none !important; }\n\n.bindery-crop-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .bindery-show-crop .bindery-crop-wrap {\n    display: block; }\n  .bindery-crop-wrap > div {\n    position: absolute;\n    overflow: hidden; }\n    .bindery-crop-wrap > div::before, .bindery-crop-wrap > div:after {\n      content: \"\";\n      background: black;\n      width: 12pt;\n      height: 12pt;\n      display: block;\n      position: absolute; }\n    .bindery-crop-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .bindery-crop-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.bindery-show-crop .bindery-print-page .bindery-spread-wrapper {\n  margin: 30pt auto; }\n\n.bindery-crop-fold, .bindery-crop-left, .bindery-crop-right {\n  transform: scaleX(0.5);\n  top: -20pt;\n  bottom: -20pt;\n  width: 1px;\n  margin: auto; }\n\n.bindery-crop-fold {\n  right: 0;\n  left: 0; }\n\n.bindery-crop-left {\n  left: 0; }\n\n.bindery-crop-right {\n  right: 0; }\n\n.bindery-crop-top, .bindery-crop-bottom {\n  transform: scaleY(0.5);\n  left: -20pt;\n  right: -20pt;\n  height: 1px; }\n\n.bindery-crop-top {\n  top: 0; }\n\n.bindery-crop-bottom {\n  bottom: 0; }\n\n@media screen {\n  .bindery-viewing {\n    background: #f4f4f4 !important; }\n  .bindery-export {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .bindery-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    padding-right: 240px;\n    z-index: 99;\n    visibility: hidden;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0; }\n  .bindery-print-page {\n    margin: 0 auto; }\n  .bindery-spinner {\n    border: 2px solid transparent;\n    border-left-color: navy;\n    width: 32px;\n    height: 32px;\n    border-radius: 50%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    bottom: 0;\n    right: 0;\n    margin: auto;\n    z-index: 999;\n    opacity: 0; }\n  .bindery-inProgress .bindery-spinner {\n    opacity: 1;\n    animation: spin 0.6s linear infinite; }\n  .bindery-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    background: url(" + __webpack_require__(29) + ") no-repeat 0% 0%;\n    background-size: 48px;\n    padding-top: 64px; }\n    .bindery-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .bindery-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .bindery-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .bindery-show-bleed .bindery-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .bindery-letter-landscape {\n    width: 11in;\n    height: 8.5in; }\n  .bindery-letter-portrait {\n    width: 8.5in;\n    height: 11in; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .bindery-export {\n    -webkit-print-color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not(.bindery-export) {\n    display: none !important; }\n  .bindery-print-page {\n    margin: 20px; }\n  .bindery-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.bindery-viewing {\n  margin: 0; }\n\n.bindery-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.bindery-viewing > :not(.bindery-export):not(.bindery-controls):not(.bindery-measure-area) {\n  display: none !important; }\n\n.bindery-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden; }\n\n.bindery-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.bindery-print-page .bindery-spread-wrapper {\n  margin: 0 auto; }\n\n.bindery-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.bindery-stage3d {\n  perspective: 3000px;\n  transform-style: preserve-3d; }\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .bindery-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .bindery-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .bindery-page3d .bindery-page {\n    position: absolute;\n    backface-visibility: hidden; }\n  .bindery-page3d .bindery-page3d-front {\n    transform: rotateY(0); }\n    .bindery-page3d .bindery-page3d-front::after {\n      box-shadow: inset 12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n  .bindery-page3d .bindery-page3d-back {\n    transform: rotateY(-180deg); }\n    .bindery-page3d .bindery-page3d-back::after {\n      box-shadow: inset -12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n\n@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important; } }\n\n.bindery-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  padding-bottom: 100px; }\n\n.bindery-controls * {\n  font: inherit;\n  color: inherit;\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\n.bindery-title {\n  padding: 20px;\n  font-size: 18px; }\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0, 0, 0, 0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  margin: 16px;\n  width: auto; }\n  .bindery-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .bindery-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .bindery-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n  .bindery-inProgress .bindery-btn {\n    opacity: 0.2;\n    pointer-events: none; }\n\n.bindery-btn-main {\n  background: navy;\n  color: white; }\n  .bindery-btn-main:hover {\n    background: navy;\n    opacity: 0.7; }\n  .bindery-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  z-index: 99;\n  width: 240px;\n  background: #f4f4f4; }\n\n.bindery-viewmode {\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 3px; }\n  .bindery-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .bindery-viewmode .bindery-icon {\n    height: 32px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .bindery-viewmode.bindery-grid .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(30) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-flip .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(31) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-outline .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(32) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-print .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(33) + ") no-repeat 50% 50%; }\n\n[bindery-view-mode='grid'] .bindery-grid,\n[bindery-view-mode='interactive'] .bindery-flip,\n[bindery-view-mode='outline'] .bindery-outline,\n[bindery-view-mode='print'] .bindery-print {\n  color: navy; }\n\n.bindery-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 4px 8px;\n  cursor: pointer; }\n  .bindery-row select {\n    float: right;\n    border: none;\n    background: transparent;\n    padding: 12px;\n    width: 100px; }\n    .bindery-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .bindery-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    background: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white; }\n    .bindery-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .bindery-row input:invalid {\n      color: maroon; }\n\n.bindery-expand-row {\n  color: navy; }\n  .bindery-expand-row:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .bindery-expand-row::after {\n    content: '+';\n    font-size: 1.5em;\n    padding: 0;\n    position: absolute;\n    right: 20px;\n    top: 2px;\n    font-weight: 300; }\n  .bindery-expand-row.selected::after {\n    content: '\\2013'; }\n  .bindery-expand-row.selected + .bindery-expand-area {\n    display: block; }\n\n.bindery-expand-area {\n  display: none;\n  margin-bottom: 16px;\n  padding: 12px 0; }\n  .bindery-expand-area.selected {\n    margin-bottom: 0; }\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px; }\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px; }\n  .bindery-size div {\n    position: relative;\n    padding: 6px 12px;\n    color: #aaa; }\n\n.bindery-layout-control {\n  margin: 4px 20px 16px; }\n\n.bindery-margin {\n  overflow: hidden; }\n  .bindery-margin > div {\n    position: absolute;\n    width: 54px;\n    height: 24px;\n    z-index: 5; }\n    .bindery-margin > div:hover {\n      z-index: 99; }\n  .bindery-margin .top {\n    left: 0;\n    right: 0;\n    margin: auto;\n    top: 0; }\n  .bindery-margin .bottom {\n    left: 0;\n    right: 0;\n    margin: auto;\n    bottom: 0; }\n  .bindery-margin .inner {\n    left: 0;\n    text-align: left;\n    top: calc(50% - 12px); }\n    .bindery-margin .inner input {\n      text-align: left; }\n  .bindery-margin .outer {\n    right: 0;\n    text-align: right;\n    top: calc(50% - 12px); }\n    .bindery-margin .outer input {\n      text-align: right; }\n  .bindery-margin .bindery-preview {\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    border: 1px solid #a9a9ff;\n    height: auto;\n    width: auto;\n    z-index: 0;\n    pointer-events: none;\n    transition: border 0.2s; }\n\n.bindery-margin input {\n  text-align: center;\n  padding: 4px;\n  font-size: 12px; }\n  .bindery-margin input:focus {\n    background: none !important; }\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0, 0, 0, 0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  transition: all 0.2s;\n  position: relative; }\n\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px; }\n\n.bindery-row:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); }\n\n.bindery-row.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.6); }\n\n.bindery-row.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px; }\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
 /*
@@ -3414,37 +3485,37 @@ module.exports = function() {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='36' height='36' viewBox='0 0 36 36' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cdefs%3E%3Cpath id='a' d='M0 4H15V27H0z'/%3E%3Cpath id='b' d='M15 4H30V27H15z'/%3E%3Cpath id='c' d='M14 4.07147535L27 0 27 22.9285247 14 27z'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23a'/%3E%3Cpath stroke='%23000000' d='M0.5 4.5H14.5V26.5H0.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23b'/%3E%3Cpath stroke='%23000000' d='M15.5 4.5H29.5V26.5H15.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23c'/%3E%3Cpath stroke='%23000000' d='M14.5,4.43882867 L14.5,26.3194563 L26.5,22.5611713 L26.5,0.680543732 L14.5,4.43882867 Z'/%3E%3C/g%3E%3Cpath fill='%23000000' opacity='.3' d='M16.3241613 26.7071852L25.7154453 22.615177 26.1596848 4.74924377 28 4.30920273 28 27z' transform='translate(3 2)'/%3E%3Ccircle fill='%23000000' cx='11' cy='14' r='1'/%3E%3Ccircle fill='%23000000' cx='11' cy='21' r='1'/%3E%3Cpath d='M28.1793786,11.0743011 C24.667534,11.0743011 21.8206214,13.9212136 21.8206214,17.4330583' stroke='%23000000' transform='rotate(-45 25 14.254)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M0.5 0.5H11.5V15.5H0.5z' transform='translate(5 8)'/%3E%3Cpath d='M22.5,15.5 L22.5,0.5' stroke-linecap='square' transform='translate(5 8)'/%3E%3Cpath d='M16.5,8.5 L16.5,23.5 L16.9093327,23.5 L24.5,20.6534998 L24.5,5.72150023 L17.1755617,8.46816459 L17,8.5 L16.5,8.5 Z'/%3E%3Cpath d='M27.5 23.5L16.5 23.5M24.5 8.5L27.5 8.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23000000'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3Cpath stroke='%23000000' d='M8.5 13.5H13.5V20.5H8.5z'/%3E%3Cpath fill='%23000000' d='M8 11H14V12H8z'/%3E%3Cpath stroke='%23000000' d='M19.5 13.5H24.5V20.5H19.5z'/%3E%3Cpath fill='%23000000' d='M19 11H25V12H19z'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M4.5 5.5H28.5V24.5H4.5z'/%3E%3Cpath d='M7.5 8.5L9.5 8.5M14.5 8.5L16.5 8.5M14.5 21.5L16.5 21.5M16.5 8.5L18.5 8.5M16.5 21.5L18.5 21.5M23.5 8.5L25.5 8.5M23.5 21.5L25.5 21.5M7.5 21.5L9.5 21.5M7.5 8.5L7.5 10.5M25.5 8.5L25.5 10.5M16.5 8.5L16.5 10.5M7.5 19.5L7.5 21.5M25.5 19.5L25.5 21.5M16.5 19.5L16.5 21.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 /*
