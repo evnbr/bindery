@@ -138,41 +138,24 @@ class ControlPanel {
     } }, 'Update Layout');
 
 
-    let gridMode;
-    let printMode;
-    let outlineMode;
-    let flipMode;
-    let viewModes;
     const setGrid = () => {
-      viewModes.forEach(v => v.classList.remove('selected'));
-      gridMode.classList.add('selected');
       this.binder.viewer.setGrid();
     };
     const setOutline = () => {
-      viewModes.forEach(v => v.classList.remove('selected'));
-      outlineMode.classList.add('selected');
       this.binder.viewer.setOutline();
     };
     const setInteractive = () => {
-      viewModes.forEach(v => v.classList.remove('selected'));
-      flipMode.classList.add('selected');
       this.binder.viewer.setInteractive();
     };
     const setPrint = () => {
-      viewModes.forEach(v => v.classList.remove('selected'));
-      printMode.classList.add('selected');
       this.binder.viewer.setPrint();
     };
 
-    gridMode = viewMode('grid', setGrid, 'Preview');
-    outlineMode = viewMode('outline', setOutline, 'Outline');
-    flipMode = viewMode('flip', setInteractive, 'Flip');
-    printMode = viewMode('print', setPrint, 'Sheet');
-    viewModes = [
-      gridMode,
-      outlineMode,
-      flipMode,
-      printMode,
+    const viewModes = [
+      viewMode('grid', setGrid, 'Preview'),
+      viewMode('outline', setOutline, 'Outline'),
+      viewMode('flip', setInteractive, 'Flip'),
+      viewMode('print', setPrint, 'Sheet'),
     ];
 
     const viewSwitcher = h(prefixClass('viewswitcher'), ...viewModes);

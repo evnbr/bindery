@@ -109,10 +109,6 @@
     background: $hover;
   }
 
-  &.selected {
-    color: $accent;
-  }
-
   .bindery-icon {
     height: 32px;
     width: 32px;
@@ -133,6 +129,14 @@
     -webkit-mask: url('../_assets/icon-sheet.svg') no-repeat 50% 50%;
   }
 }
+
+[bindery-view-mode='grid'] .bindery-grid,
+[bindery-view-mode='interactive'] .bindery-flip,
+[bindery-view-mode='outline'] .bindery-outline,
+[bindery-view-mode='print'] .bindery-print {
+  color: $accent;
+}
+
 
 .bindery-row {
   position: relative;

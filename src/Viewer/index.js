@@ -309,6 +309,8 @@ class Viewer {
 
     this.flaps = [];
     document.body.classList.add('bindery-viewing');
+    document.body.setAttribute('bindery-view-mode', this.mode);
+
     const scrollPct = document.body.scrollTop / document.body.scrollHeight;
 
     if (this.mode === MODE_PREVIEW) {
@@ -341,6 +343,7 @@ class Viewer {
   }
 
   updateGuides() {
+    document.body.setAttribute('bindery-view-mode', this.mode);
     if (this.mode === MODE_OUTLINE) {
       this.export.classList.add('bindery-show-bleed');
       this.export.classList.add('bindery-show-guides');
