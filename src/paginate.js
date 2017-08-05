@@ -7,40 +7,6 @@ const SHOULD_DEBUG_TEXT = false;
 
 const last = arr => arr[arr.length - 1];
 
-// TODO: only do this if not double sided?
-const clonePath = (origPath) => {
-  const newPath = [];
-  for (let i = origPath.length - 1; i >= 0; i -= 1) {
-    const original = origPath[i];
-    const clone = original.cloneNode(false); // shallow
-    clone.innerHTML = '';
-    original.classList.add(prefix('continues'));
-    clone.classList.add(prefix('continuation'));
-    if (clone.id) {
-      // console.warn(`Bindery: Added a break to ${elToStr(clone)},
-      // so "${clone.id}" is no longer a unique ID.`);
-    }
-    if (clone.tagName === 'OL') {
-      // restart numbering
-      let prevStart = 1;
-      if (original.hasAttribute('start')) {
-        // the OL is also a continuation
-        prevStart = parseInt(original.getAttribute('start'), 10);
-      }
-      if (i < origPath.length - 1 && origPath[i + 1].tagName === 'LI') {
-        // the first list item is a continuation
-        prevStart -= 1;
-      }
-      const prevCount = original.children.length;
-      const newStart = prevStart + prevCount;
-      clone.setAttribute('start', newStart);
-    }
-    if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
-    newPath[i] = clone;
-  }
-  return newPath;
-};
-
 const reorderPages = (pages, makeNewPage) => {
   const orderedPages = pages;
 
@@ -118,6 +84,55 @@ const paginate = function (
     path: [], // Stack representing which element we're currently inside
     pages: [],
   };
+
+  const markAsContinues = (node) => {
+    node.classList.add(prefix('continues'));
+    rules
+      .filter(rule => rule.customContinuesClass)
+      .forEach(rule => node.classList.add(rule.customContinuesClass));
+  };
+
+  const markAsContinuation = (node) => {
+    node.classList.add(prefix('continuation'));
+    rules
+      .filter(rule => rule.customContinuationClass)
+      .forEach(rule => node.classList.add(rule.customContinuationClass));
+  };
+
+  // TODO: only do this if not double sided?
+  const clonePath = (origPath) => {
+    const newPath = [];
+    for (let i = origPath.length - 1; i >= 0; i -= 1) {
+      const original = origPath[i];
+      const clone = original.cloneNode(false); // shallow
+      clone.innerHTML = '';
+      markAsContinues(original);
+      markAsContinuation(clone);
+      if (clone.id) {
+        // console.warn(`Bindery: Added a break to ${elToStr(clone)},
+        // so "${clone.id}" is no longer a unique ID.`);
+      }
+      if (clone.tagName === 'OL') {
+        // restart numbering
+        let prevStart = 1;
+        if (original.hasAttribute('start')) {
+          // the OL is also a continuation
+          prevStart = parseInt(original.getAttribute('start'), 10);
+        }
+        if (i < origPath.length - 1 && origPath[i + 1].tagName === 'LI') {
+          // the first list item is a continuation
+          prevStart -= 1;
+        }
+        const prevCount = original.children.length;
+        const newStart = prevStart + prevCount;
+        clone.setAttribute('start', newStart);
+      }
+      if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
+      newPath[i] = clone;
+    }
+    return newPath;
+  };
+
 
   // Even when there is no debugDelay,
   // the throttler will occassionally use rAF

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+	<title>Bindery - Single Page</title>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+
+	<style>
+		.content {
+		  font-size: 20px;
+		}
+
+		p {
+		  margin: 2pt;
+		  padding: 4pt;
+		  border: 1px solid black;
+		  border-radius: 4pt;
+		}
+
+		p.my-continues {
+		  border-bottom-left-radius: 0;
+		  border-bottom-right-radius: 0;
+		  border-bottom: 4px dotted;
+			border-color: red;
+			background: #ffeeee;
+		}
+
+		p.my-from {
+		  border-top-left-radius: 0;
+		  border-top-right-radius: 0;
+		  border-top: 4px dotted;
+			border-color: blue;
+			background: #eeeeff;
+		}
+
+		p.my-continues.my-from {
+			border-color: magenta;
+			border-top: 4px dotted blue;
+			border-bottom: 4px dotted red;
+			background: #ffeeff;
+		}
+	</style>
+</head>
+
+<body>
+
+
+	<script type="text/javascript" src="../../build/bindery.js"></script>
+	<script>
+		Bindery.makeBook({
+			source: {
+				url: 'content.html',
+				selector: ".content",
+			},
+		  rules: [
+				Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+				Bindery.Continuation({
+					selector: 'p',
+					hasContinuationClass: 'my-continues',
+					isContinuationClass: 'my-from',
+				}),
+		  ],
+		});
+	</script>
+</body>
+</html>

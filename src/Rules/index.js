@@ -1,3 +1,4 @@
+import Continuation from './Continuation';
 import FullPage from './FullPage';
 import Footnote from './Footnote';
 import PageReference from './PageReference';
@@ -9,6 +10,9 @@ import PageBreak from './PageBreak';
 
 export default {
   Rule,
+  Continuation(options) {
+    return new Continuation(options);
+  },
   FullPage(options) {
     return new FullPage(options);
   },
