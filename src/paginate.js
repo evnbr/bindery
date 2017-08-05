@@ -4,6 +4,7 @@ import Book from './Book';
 import Page from './Page';
 
 const SHOULD_DEBUG_TEXT = false;
+const MAXIMUM_PAGE_LIMIT = 9999;
 
 const last = arr => arr[arr.length - 1];
 
@@ -179,6 +180,9 @@ const paginate = function (
       console.warn('Bindery: More than 500 pages, performance may be slow.');
     } else if (state.pages.length === 1000) {
       console.warn('Bindery: More than 1000 pages, performance may be slow.');
+    } else if (state.pages.length > MAXIMUM_PAGE_LIMIT) {
+      paginateErrorCallback('Maximum page limit exceeded');
+      throw Error('Bindery: Maximum page limit exceeded. Suspected runaway layout.');
     }
 
     state.path = clonePath(state.path);
