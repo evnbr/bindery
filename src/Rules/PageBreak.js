@@ -1,7 +1,7 @@
 import Rule from './Rule';
 
 // API:
-// position: 'before' (default) | 'after' | 'both'
+// position: 'before' (default) | 'after' | 'both' | 'avoid'
 // continue: | 'any' (default) | 'left' | 'right'
 
 class PageBreak extends Rule {

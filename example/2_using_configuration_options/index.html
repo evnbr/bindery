@@ -3,16 +3,15 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-	<title>Bindery - Single Page</title>
+	<title>Bindery Ex 2 — Using Configuration</title>
   <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
   <section class="content">
-		<h2>
+		<h1>
 			Bindery.js
-		</h2>
+		</h1>
 
 		<h2>
 			Table of Contents
@@ -128,19 +127,17 @@
 		  source: ".content",
 		  rules: [
 				Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+				Bindery.Footnote({ selector: 'p' }),
 				Bindery.Footnote({
 					selector: 'p > a',
 					render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.getAttribute('href')}</u>`,
 				}),
-				Bindery.Footnote({ selector: 'p' }),
 				Bindery.FullPage({ selector: '.med-figure' }),
 				Bindery.Spread({ selector: '.big-figure' }),
 				Bindery.RunningHeader({
 					render: (page) => {
-						if (page.isEmpty) return '';
-						else if (page.element.querySelector('h2')) return '';
-						else if (page.isLeft) return `${page.number} · ${page.heading.h2} `;
-						else if (page.isRight) return `${page.heading.h1} · ${page.number}`;
+						if (page.isLeft) return `${page.number} · ${page.heading.h1 || ''} `;
+						else if (page.isRight) return `${page.heading.h2 || ''} · ${page.number}`;
 					},
 				}),
 				Bindery.PageReference({
