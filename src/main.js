@@ -206,8 +206,9 @@ class Bindery {
         this.controls.updateProgress(pageCount);
       },
       // Error
-      () => {
-
+      (error) => {
+        document.body.classList.remove('bindery-inProgress');
+        this.viewer.displayError('Layout couldn\'t complete', error);
       },
       this.debugDelay
     );

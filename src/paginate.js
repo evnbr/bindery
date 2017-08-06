@@ -4,6 +4,7 @@ import Book from './Book';
 import Page from './Page';
 
 const SHOULD_DEBUG_TEXT = false;
+const MAXIMUM_PAGE_LIMIT = 9999;
 
 const last = arr => arr[arr.length - 1];
 
@@ -171,20 +172,25 @@ const paginate = function (
   // we were in when we overflowed the last page
   const continueOnNewPage = () => {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
-      console.warn(state.currentPage.element);
-      throw Error('Bindery: Moved to new page when last one is still overflowing');
+      console.warn('Bindery: Page overflowing', state.currentPage.element);
+      if (!state.currentPage.suppressErrors) {
+        throw Error('Bindery: Moved to new page when last one is still overflowing');
+      }
     }
 
     if (state.pages.length === 500) {
       console.warn('Bindery: More than 500 pages, performance may be slow.');
     } else if (state.pages.length === 1000) {
       console.warn('Bindery: More than 1000 pages, performance may be slow.');
+    } else if (state.pages.length > MAXIMUM_PAGE_LIMIT) {
+      paginateErrorCallback('Maximum page count exceeded');
+      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
     state.path = clonePath(state.path);
     const newPage = makeNewPage();
     state.pages.push(newPage);
-    state.currentPage = newPage; // TODO redundant
+    state.currentPage = newPage;
     if (state.path[0]) {
       newPage.flowContent.appendChild(state.path[0]);
     }
@@ -229,10 +235,10 @@ const paginate = function (
           // While this does catch overflows, it introduces a few new bugs.
           // It is pretty aggressive to move the entire node to the next page.
           // - 1. there is no guarentee it will fit on the new page
-          // - 2. if it has childNodes, those rules will not be invalidated,
-          // which means footnotes will get left ona previous page.
+          // - 2. if it has childNodes, those side effects will not be undone,
+          // which means footnotes will get left on previous page.
           // - 3. if it is a large paragraph, it will leave a large gap. the
-          // correct approach would be to only need to invalidate
+          // ideal approach would be to only need to invalidate
           // the last line of text.
             problemElement.parentNode.removeChild(problemElement);
             continueOnNewPage();
@@ -262,13 +268,13 @@ const paginate = function (
     .filter(rule => rule.avoidSplit)
     .map(rule => rule.selector);
 
-  console.log(selectorsNotToSplit);
-
   const isSplittable = (node) => {
     if (selectorsNotToSplit.some(sel => node.matches(sel))) {
       if (node.hasAttribute('data-bindery-did-move')) {
-        // don't split it again.
-        return true;
+        return true; // don't split it again.
+      }
+      if (node.classList.contains(prefix('continuation'))) {
+        return true; // don't split it again.
       }
       return false;
     }
@@ -313,6 +319,15 @@ const paginate = function (
       willMove.parentNode.removeChild(willMove);
     }
 
+    if (state.currentPage.isEmpty) {
+      // state.currentPage.element.style.background = 'red';
+      // nodeToMove.style.background = 'orange';
+      // willMove.style.background = 'yellow';
+      // console.log('moving node', nodeToMove);
+      // console.log('interpreted node', willMove);
+      // throw Error('moving from empty page');
+    }
+
     // create new page and clone context onto it
     continueOnNewPage();
 
@@ -326,14 +341,14 @@ const paginate = function (
     state.path.push(nodeToMove);
   };
 
-  const addTextNode = (originalNode, doneCallback, abortCallback) => {
+  const addTextNode = (originalNode, doneCallback, undoAddTextNode) => {
     const textNode = originalNode;
     last(state.path).appendChild(textNode);
 
     if (state.currentPage.hasOverflowed()) {
       // It doesnt fit
       textNode.parentNode.removeChild(textNode);
-      abortCallback();
+      undoAddTextNode();
     } else {
       // It fits
       throttle(doneCallback);
@@ -342,7 +357,7 @@ const paginate = function (
 
   // Adds an text node by incrementally adding words
   // until it just barely doesnt overflow
-  const addTextNodeIncremental = (originalNode, doneCallback, abortCallback) => {
+  const addTextNodeIncremental = (originalNode, doneCallback, undoAddTextNode) => {
     let originalText = originalNode.nodeValue;
     let textNode = originalNode;
     last(state.path).appendChild(textNode);
@@ -365,7 +380,7 @@ const paginate = function (
         if (pos < 1) {
           textNode.nodeValue = originalText;
           textNode.parentNode.removeChild(textNode);
-          abortCallback();
+          undoAddTextNode();
           return;
         }
 
@@ -430,31 +445,8 @@ const paginate = function (
 
     // Overflows when empty
     if (state.currentPage.hasOverflowed()) {
-      // console.error(`Bindery: Adding ${elToStr(node)} causes overflow even when empty`);
+      // console.error('Bindery: Adding node causes overflow even when empty', node);
       moveNodeToNextPage(node);
-    }
-
-    if (!isSplittable(node)) {
-      // // Try adding in one go
-      // childNodes.forEach((child) => {
-      //   node.appendChild(child);
-      // });
-      // // If it worked, go to next node
-      // if (!state.currentPage.hasOverflowed()) {
-      //   throttle(doneCallback);
-      //   return;
-      // }
-      // // Try moving to next page in one go
-      // moveNodeToNextPage(node);
-      //
-      // // If it worked, go to next node
-      // if (!state.currentPage.hasOverflowed()) {
-      //   throttle(doneCallback);
-      //   return;
-      // }
-      //
-      // // Sorry, we gotta break it
-      // node.innerHTML = '';
     }
 
     // 3. Try adding each child one by one
@@ -469,19 +461,24 @@ const paginate = function (
 
       switch (child.nodeType) {
       case Node.TEXT_NODE: {
+        const forceAddTextNode = () => {
+          last(state.path).appendChild(child);
+          state.currentPage.suppressErrors = true;
+          continueOnNewPage();
+          throttle(addNextChild);
+        };
         if (isSplittable(node)) {
-          const abortCallback = () => {
+          const undoAddTextNode = () => {
             moveNodeToNextPage(node);
-            addTextNodeIncremental(child, addNextChild, abortCallback);
+            addTextNodeIncremental(child, addNextChild, forceAddTextNode);
           };
-          addTextNodeIncremental(child, addNextChild, abortCallback);
+          addTextNodeIncremental(child, addNextChild, undoAddTextNode);
         } else {
-          const abortCallback = () => {
+          const undoAddTextNode = () => {
             moveNodeToNextPage(node);
-            node.outline = '1px solid red';
-            addTextNode(child, addNextChild, abortCallback);
+            addTextNode(child, addNextChild, forceAddTextNode);
           };
-          addTextNode(child, addNextChild, abortCallback);
+          addTextNode(child, addNextChild, undoAddTextNode);
         }
         break;
       }
@@ -499,11 +496,29 @@ const paginate = function (
             // so we pop up a level
             const addedChild = state.path.pop();
 
-            // TODO: AfterAdd rules may want to access original child, not split second half
-            afterAddRules(addedChild);
+            // If this child didn't fit any contents on this page,
+            // but did have contents on a previous page
+            // we should never have added it.
+            // TODO: Catch this earlier.
+            let cancelAdd = false;
+            if (addedChild.classList.contains(prefix('continuation'))) {
+              if (addedChild.children.length === 0) {
+                cancelAdd = true;
+              }
+            }
+
+            if (cancelAdd) {
+              addedChild.parentNode.removeChild(addedChild);
+            } else {
+              // TODO: AfterAdd rules may want to access original child, not split second half
+              afterAddRules(addedChild);
+            }
 
             if (state.currentPage.hasOverflowed()) {
-              console.log('wasn\'t really a success was it');
+              // console.log(
+              //   'Bindery: Added element despite overflowing ',
+              //   addedChild
+              // );
             }
             addNextChild();
           });
