@@ -1,13 +1,14 @@
 import h from 'hyperscript';
 import { parseVal } from './utils/convertUnits';
+import { prefix, prefixClass } from './utils/prefixClass';
 
 class Page {
   constructor() {
-    this.flowContent = h('.bindery-content');
-    this.flowBox = h('.bindery-flowbox', this.flowContent);
-    this.footer = h('footer.bindery-footer');
-    this.bleed = h('.bindery-bleed');
-    this.element = h('.bindery-page',
+    this.flowContent = h(prefixClass('content'));
+    this.flowBox = h(prefixClass('flowbox'), this.flowContent);
+    this.footer = h(prefixClass('footer'));
+    this.bleed = h(prefixClass('bleed'));
+    this.element = h(prefixClass('page'),
       { style: Page.sizeStyle() },
       this.bleed,
       this.flowBox,
@@ -16,10 +17,10 @@ class Page {
   }
   overflowAmount() {
     if (this.element.parentNode !== Page.measureArea) {
-      if (!Page.measureArea) Page.measureArea = document.body.appendChild(h('.bindery-measure-area'));
+      if (!Page.measureArea) Page.measureArea = document.body.appendChild(h(prefixClass('measure-area')));
 
       if (this.element.parentNode !== Page.measureArea) {
-        Page.measureArea.innerHTML = '';
+        // Page.measureArea.innerHTML = '';
         Page.measureArea.appendChild(this.element);
       }
       if (Page.measureArea.parentNode !== document.body) {
@@ -27,8 +28,6 @@ class Page {
       }
     }
 
-    // const contentH = this.flowContent.getBoundingClientRect().height;
-    // const boxH = this.flowBox.getBoundingClientRect().height;
     const contentH = this.flowContent.offsetHeight;
     const boxH = this.flowBox.offsetHeight;
 
@@ -46,8 +45,8 @@ class Page {
     document.body.classList.remove('bindery-viewing');
 
     const testPage = new Page();
-    let measureArea = document.querySelector('.bindery-measure-area');
-    if (!measureArea) measureArea = document.body.appendChild(h('.bindery-measure-area'));
+    let measureArea = document.querySelector(prefixClass('measure-area'));
+    if (!measureArea) measureArea = document.body.appendChild(h(prefixClass('measure-area')));
 
     measureArea.innerHTML = '';
     measureArea.appendChild(testPage.element);
@@ -61,14 +60,27 @@ class Page {
   setLeftRight(dir) {
     if (dir === 'left') {
       this.side = dir;
-      this.element.classList.remove('bindery-right');
-      this.element.classList.add('bindery-left');
+      this.element.classList.remove(prefix('right'));
+      this.element.classList.add(prefix('left'));
     } else if (dir === 'right') {
       this.side = dir;
-      this.element.classList.remove('bindery-left');
-      this.element.classList.add('bindery-right');
+      this.element.classList.remove(prefix('left'));
+      this.element.classList.add(prefix('right'));
     } else {
       throw Error(`Bindery: Setting page to invalid direction${dir}`);
+    }
+  }
+
+  get suppressErrors() {
+    return this.suppress || false;
+  }
+
+  set suppressErrors(newVal) {
+    this.suppress = newVal;
+    if (newVal) {
+      this.element.classList.add(prefix('is-overflowing'));
+    } else {
+      this.element.classList.remove(prefix('is-overflowing'));
     }
   }
 
@@ -88,6 +100,7 @@ class Page {
     if (dir === 'left') this.alwaysLeft = true;
     if (dir === 'right') this.alwaysRight = true;
   }
+
   setOutOfFlow(bool) {
     this.outOfFlow = bool;
   }
