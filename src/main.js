@@ -4,13 +4,13 @@ import Page from './Page';
 import Viewer from './Viewer';
 import Controls from './Controls';
 import { isValidSize } from './utils/convertUnits';
+import c from './utils/prefixClass';
 
 import Rules from './Rules/';
 
 require('./_style/main.scss');
 
 
-const DEFAULT_PAGE_UNIT = 'pt';
 const DEFAULT_PAGE_SIZE = {
   width: '288pt',
   height: '432pt',
@@ -35,9 +35,8 @@ class Bindery {
   constructor(opts) {
     console.log(`Bindery ${'[AIV]{version}[/AIV]'}`);
 
-    const pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
-    const pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
-    this.pageUnit = opts.pageUnit ? opts.pageUnit : DEFAULT_PAGE_UNIT;
+    const pageSize = opts.pageSize || DEFAULT_PAGE_SIZE;
+    const pageMargin = opts.pageMargin || DEFAULT_PAGE_MARGIN;
     this.setSize(pageSize);
     this.setMargin(pageMargin);
 
@@ -115,7 +114,7 @@ class Bindery {
   cancel() {
     this.stopCheckingLayout();
     this.viewer.cancel();
-    document.body.classList.remove('bindery-viewing');
+    document.body.classList.remove(c('viewing'));
     this.source.style.display = '';
   }
 
@@ -149,7 +148,7 @@ class Bindery {
 
   makeBook(doneBinding) {
     if (!this.source) {
-      document.body.classList.add('bindery-viewing');
+      document.body.classList.add(c('viewing'));
       return;
     }
 
@@ -177,8 +176,8 @@ class Bindery {
 
     // In case we're updating an existing layout
     this.viewer.clear();
-    document.body.classList.add('bindery-viewing');
-    document.body.classList.add('bindery-inProgress');
+    document.body.classList.add(c('viewing'));
+    document.body.classList.add(c('in-progress'));
 
     if (!this.controls) {
       this.controls = new Controls({ binder: this });
@@ -197,7 +196,7 @@ class Bindery {
 
           this.controls.setDone();
           if (doneBinding) doneBinding();
-          document.body.classList.remove('bindery-inProgress');
+          document.body.classList.remove(c('in-progress'));
           this.startCheckingLayout();
         }, 100);
       },
@@ -207,7 +206,7 @@ class Bindery {
       },
       // Error
       (error) => {
-        document.body.classList.remove('bindery-inProgress');
+        document.body.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
       },
       this.debugDelay

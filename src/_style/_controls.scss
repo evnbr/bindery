@@ -1,10 +1,10 @@
 @media screen {
-  .bindery-viewing .bindery-controls {
+  .#{$pre}-viewing .#{$pre}-controls {
     display: block !important;
   }
 }
 
-.bindery-controls {
+.#{$pre}-controls {
   font: 14px / 1.4 $system;
   position: fixed;
   top: 0;
@@ -17,26 +17,26 @@
   background: $background;
   overflow: scroll;
   padding-bottom: 100px;
+
+  .#{$pre}-in-progress & {
+    // pointer-events: none;
+  }
+
+  * {
+    font: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }
 
-.bindery-inProgress .bindery-controls {
-  // pointer-events: none;
-}
-
-.bindery-controls * {
-  font: inherit;
-  color: inherit;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.bindery-title {
+.#{$pre}-title {
   padding: 20px;
   font-size: 18px;
 }
 
-.bindery-btn {
+.#{$pre}-btn {
   -webkit-appearance: none;
   padding: 8px 16px;
   color: #444;
@@ -64,13 +64,13 @@
     background: rgba(0,0,0,0.14);
   }
 
-  .bindery-inProgress & {
+  .#{$pre}-inProgress & {
     opacity: 0.2;
     pointer-events: none;
   }
 }
 
-.bindery-btn-main {
+.#{$pre}-btn-main {
   background: $accent;
   color: white;
 
@@ -85,7 +85,7 @@
   }
 }
 
-.bindery-viewswitcher {
+.#{$pre}-viewswitcher {
   padding: 12px 8px;
   position: fixed;
   bottom: 0;
@@ -95,7 +95,7 @@
   background: $background;
 }
 
-.bindery-viewmode {
+.#{$pre}-viewmode {
   height: 54px;
   width: 25%;
   display: inline-block;
@@ -109,36 +109,36 @@
     background: $hover;
   }
 
-  .bindery-icon {
+  .#{$pre}-icon {
     height: 32px;
     width: 32px;
     background: currentColor;
     margin: 0 auto;
   }
 
-  &.bindery-grid .bindery-icon {
+  &.#{$pre}-grid .#{$pre}-icon {
     -webkit-mask: url('../_assets/icon-grid.svg') no-repeat 50% 50%;
   }
-  &.bindery-flip .bindery-icon {
+  &.#{$pre}-flip .#{$pre}-icon {
     -webkit-mask: url('../_assets/icon-flip.svg') no-repeat 50% 50%;
   }
-  &.bindery-outline .bindery-icon {
+  &.#{$pre}-outline .#{$pre}-icon {
     -webkit-mask: url('../_assets/icon-outline.svg') no-repeat 50% 50%;
   }
-  &.bindery-print .bindery-icon {
+  &.#{$pre}-print .#{$pre}-icon {
     -webkit-mask: url('../_assets/icon-sheet.svg') no-repeat 50% 50%;
   }
 }
 
-[bindery-view-mode='grid'] .bindery-grid,
-[bindery-view-mode='interactive'] .bindery-flip,
-[bindery-view-mode='outline'] .bindery-outline,
-[bindery-view-mode='print'] .bindery-print {
+[bindery-view-mode='grid'] .#{$pre}-grid,
+[bindery-view-mode='interactive'] .#{$pre}-flip,
+[bindery-view-mode='outline'] .#{$pre}-outline,
+[bindery-view-mode='print'] .#{$pre}-print {
   color: $accent;
 }
 
 
-.bindery-row {
+.#{$pre}-row {
   position: relative;
   display: block;
   padding: 8px 12px;
@@ -182,7 +182,7 @@
 }
 
 
-.bindery-expand-row {
+.#{$pre}-expand-row {
   color: $accent;
 
   &:hover {
@@ -203,13 +203,13 @@
     content: '–';
   }
 
-  &.selected + .bindery-expand-area {
+  &.selected + .#{$pre}-expand-area {
     display: block;
   }
 }
 
 
-.bindery-expand-area {
+.#{$pre}-expand-area {
   display: none;
   margin-bottom: 16px;
   padding: 12px 0;
@@ -219,7 +219,7 @@
   }
 }
 
-.bindery-size, .bindery-margin {
+.#{$pre}-size, .#{$pre}-margin {
   display: inline-block;
   vertical-align: middle;
   margin: 0;
@@ -230,7 +230,7 @@
   width: 100px;
 }
 
-.bindery-size {
+.#{$pre}-size {
   padding: 8px 0;
   font-size: 12px;
   div {
@@ -240,11 +240,11 @@
   }
 }
 
-.bindery-layout-control {
+.#{$pre}-layout-control {
   margin: 4px 20px 16px;
 }
 
-.bindery-margin {
+.#{$pre}-margin {
   overflow: hidden;
 
   > div {
@@ -285,7 +285,7 @@
       text-align: right;
     }
   }
-  .bindery-preview {
+  .#{$pre}-preview {
     top: 0;
     left: 0;
     right: 0;
@@ -299,7 +299,7 @@
   }
 }
 
-.bindery-margin input {
+.#{$pre}-margin input {
   text-align: center;
   padding: 4px;
   font-size: 12px;
@@ -309,7 +309,7 @@
   }
 }
 
-.bindery-switch {
+.#{$pre}-switch {
   width: 28px;
   height: 16px;
   background: rgba(0,0,0,0.2);
@@ -321,7 +321,7 @@
   position: relative;
 }
 
-.bindery-switch-handle {
+.#{$pre}-switch-handle {
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -333,15 +333,15 @@
   top: 0px;
 }
 
-.bindery-row:hover .bindery-switch-handle {
+.#{$pre}-row:hover .#{$pre}-switch-handle {
   box-shadow: 0 2px 3px rgba(0,0,0,0.3);
 }
 
-.bindery-row.selected .bindery-switch {
+.#{$pre}-row.selected .#{$pre}-switch {
   background: transparentize($accent, 0.4);
 }
 
-.bindery-row.selected .bindery-switch-handle {
+.#{$pre}-row.selected .#{$pre}-switch-handle {
   background: $accent;
   left: 12px;
 }

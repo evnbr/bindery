@@ -1,14 +1,15 @@
 import h from 'hyperscript';
 import { parseVal } from './utils/convertUnits';
-import { prefix, prefixClass } from './utils/prefixClass';
+import c from './utils/prefixClass';
+
 
 class Page {
   constructor() {
-    this.flowContent = h(prefixClass('content'));
-    this.flowBox = h(prefixClass('flowbox'), this.flowContent);
-    this.footer = h(prefixClass('footer'));
-    this.bleed = h(prefixClass('bleed'));
-    this.element = h(prefixClass('page'),
+    this.flowContent = h(c('.content'));
+    this.flowBox = h(c('.flowbox'), this.flowContent);
+    this.footer = h(c('.footer'));
+    this.bleed = h(c('.bleed'));
+    this.element = h(c('.page'),
       { style: Page.sizeStyle() },
       this.bleed,
       this.flowBox,
@@ -17,7 +18,7 @@ class Page {
   }
   overflowAmount() {
     if (this.element.parentNode !== Page.measureArea) {
-      if (!Page.measureArea) Page.measureArea = document.body.appendChild(h(prefixClass('measure-area')));
+      if (!Page.measureArea) Page.measureArea = document.body.appendChild(h(c('.measure-area')));
 
       if (this.element.parentNode !== Page.measureArea) {
         // Page.measureArea.innerHTML = '';
@@ -46,8 +47,8 @@ class Page {
     document.body.classList.remove('bindery-viewing');
 
     const testPage = new Page();
-    let measureArea = document.querySelector(prefixClass('measure-area'));
-    if (!measureArea) measureArea = document.body.appendChild(h(prefixClass('measure-area')));
+    let measureArea = document.querySelector(c('.measure-area'));
+    if (!measureArea) measureArea = document.body.appendChild(h(c('.measure-area')));
 
     measureArea.innerHTML = '';
     measureArea.appendChild(testPage.element);
@@ -61,12 +62,12 @@ class Page {
   setLeftRight(dir) {
     if (dir === 'left') {
       this.side = dir;
-      this.element.classList.remove(prefix('right'));
-      this.element.classList.add(prefix('left'));
+      this.element.classList.remove(c('right'));
+      this.element.classList.add(c('left'));
     } else if (dir === 'right') {
       this.side = dir;
-      this.element.classList.remove(prefix('left'));
-      this.element.classList.add(prefix('right'));
+      this.element.classList.remove(c('left'));
+      this.element.classList.add(c('right'));
     } else {
       throw Error(`Bindery: Setting page to invalid direction${dir}`);
     }
@@ -79,9 +80,9 @@ class Page {
   set suppressErrors(newVal) {
     this.suppress = newVal;
     if (newVal) {
-      this.element.classList.add(prefix('is-overflowing'));
+      this.element.classList.add(c('is-overflowing'));
     } else {
-      this.element.classList.remove(prefix('is-overflowing'));
+      this.element.classList.remove(c('is-overflowing'));
     }
   }
 
@@ -104,14 +105,6 @@ class Page {
 
   setOutOfFlow(bool) {
     this.outOfFlow = bool;
-  }
-
-  clone() {
-    const newPage = new Page();
-    newPage.flowContent.innerHTML = this.flowContent.cloneNode(true).innerHTML;
-    newPage.footer.innerHTML = this.footer.cloneNode(true).innerHTML;
-    newPage.flowContent.insertAdjacentHTML('beforeend', 'RESTORED');
-    return newPage;
   }
 
   static setSize(size) {
@@ -143,28 +136,26 @@ class Page {
       sheet.id = 'bindery-margin-stylesheet';
     }
     sheet.innerHTML = `
-      .bindery-flowbox,
-      .bindery-footer {
+      ${c('.flowbox')},
+      ${c('.footer')} {
         margin-left: ${margin.inner};
         margin-right: ${margin.outer};
       }
-      .bindery-left .bindery-flowbox,
-      .bindery-left .bindery-footer {
+      ${c('.left')} ${c('.flowbox')},
+      ${c('.left')} ${c('.footer')} {
         margin-left: ${margin.outer};
         margin-right: ${margin.inner};
       }
 
-      .bindery-left .bindery-num,
-      .bindery-left .bindery-running-header {
+      ${c('.left')} ${c('.running-header')} {
         left: ${margin.outer};
       }
-      .bindery-right .bindery-num,
-      .bindery-right .bindery-running-header {
+      ${c('.right')} ${c('.running-header')} {
         right: ${margin.outer};
       }
 
-      .bindery-flowbox { margin-top: ${margin.top}; }
-      .bindery-footer { margin-bottom: ${margin.bottom}; }
+      ${c('.flowbox')} { margin-top: ${margin.top}; }
+      ${c('.footer')}{ margin-bottom: ${margin.bottom}; }
     `;
     document.head.appendChild(sheet);
   }

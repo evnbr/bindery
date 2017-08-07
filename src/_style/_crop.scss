@@ -3,7 +3,7 @@ $markSpace: 8pt;
 $markOffset: $markLen + $markSpace;
 
 
-.bindery-crop-wrap {
+.#{$pre}-crop-wrap {
   display: none;
   position: absolute;
   pointer-events: none;
@@ -13,7 +13,7 @@ $markOffset: $markLen + $markSpace;
   right: 0;
   z-index: 999;
 
-  .bindery-show-crop & {
+  .#{$pre}-show-crop & {
     display: block;
   }
 
@@ -40,11 +40,11 @@ $markOffset: $markLen + $markSpace;
   }
 
 }
-.bindery-show-crop .bindery-print-page .bindery-spread-wrapper {
+.#{$pre}-show-crop .#{$pre}-print-page .#{$pre}-spread-wrapper {
   margin: 30pt auto;
 }
 
-.bindery-crop {
+.#{$pre}-crop {
   &-fold,
   &-left,
   &-right {

@@ -1,4 +1,14 @@
-const prefix = str => `bindery-${str}`;
+// const p = 'bindery-';
+const p = '📖-';
+
+const prefix = str => `${p}${str}`;
 const prefixClass = str => `.${prefix(str)}`;
 
-export { prefix, prefixClass };
+const c = (str) => {
+  if (str[0] === '.') {
+    return prefixClass(str.substr(1));
+  }
+  return prefix(str);
+};
+
+export default c;

@@ -1,4 +1,5 @@
 import h from 'hyperscript';
+import c from '../utils/prefixClass';
 
 import Page from '../Page';
 import errorView from './error';
@@ -13,28 +14,28 @@ const ARRANGE_SPREAD = 'arrange_two';
 const ARRANGE_BOOKLET = 'arrange_booklet';
 // const ARRANGE_SIGNATURE = 'arrange_signature';
 
-const cropMarksSingle = () => h('.bindery-crop-wrap',
-  h('.bindery-crop-top'),
-  h('.bindery-crop-bottom'),
-  h('.bindery-crop-left'),
-  h('.bindery-crop-right'),
+const cropMarksSingle = () => h(c('.crop-wrap'),
+  h(c('.crop-top')),
+  h(c('.crop-bottom')),
+  h(c('.crop-left')),
+  h(c('.crop-right')),
 );
-const cropMarksSpread = () => h('.bindery-crop-wrap',
-  h('.bindery-crop-top'),
-  h('.bindery-crop-bottom'),
-  h('.bindery-crop-left'),
-  h('.bindery-crop-right'),
-  h('.bindery-crop-fold'),
+const cropMarksSpread = () => h(c('.crop-wrap'),
+  h(c('.crop-top')),
+  h(c('.crop-bottom')),
+  h(c('.crop-left')),
+  h(c('.crop-right')),
+  h(c('.crop-fold')),
 );
 
 const spread = function (...arg) {
-  return h('.bindery-spread-wrapper', ...arg);
+  return h(c('.spread-wrapper'), ...arg);
 };
 
 const bookletMeta = (i, len) => {
   const isFront = i % 4 === 0;
   const sheetIndex = parseInt((i + 1) / 4, 10) + 1;
-  return h('.bindery-print-meta',
+  return h(c('.print-meta'),
     `Sheet ${sheetIndex} of ${len / 4}: ${isFront ? 'Outside' : 'Inside'}`);
 };
 
@@ -115,7 +116,7 @@ const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
   const cropMarks = isTwoUp ? cropMarksSpread : cropMarksSingle;
 
   const printSheet = function (...arg) {
-    return h(`.bindery-print-page.bindery-letter-${orient}`,
+    return h(c('.print-page') + c(`.letter-${orient}`),
       spread({ style: size }, ...arg, cropMarks())
     );
   };
@@ -143,9 +144,9 @@ class Viewer {
   constructor() {
     this.book = null;
 
-    this.zoomBox = h('.bindery-zoom-wrap');
-    const spinner = h('.bindery-spinner');
-    this.export = h('.bindery-export', this.zoomBox, spinner);
+    this.zoomBox = h(c('.zoom-wrap'));
+    const spinner = h(c('.spinner'));
+    this.export = h(c('.export'), this.zoomBox, spinner);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
@@ -187,14 +188,14 @@ class Viewer {
   }
 
   get isShowingCropMarks() {
-    return this.export.classList.contains('bindery-show-crop');
+    return this.export.classList.contains(c('show-crop'));
   }
 
   set isShowingCropMarks(newVal) {
     if (newVal) {
-      this.export.classList.add('bindery-show-crop');
+      this.export.classList.add(c('show-crop'));
     } else {
-      this.export.classList.remove('bindery-show-crop');
+      this.export.classList.remove(c('show-crop'));
     }
   }
 
@@ -240,10 +241,10 @@ class Viewer {
     }
   }
   toggleGuides() {
-    this.export.classList.toggle('bindery-show-guides');
+    this.export.classList.toggle(c('show-guides'));
   }
   toggleBleed() {
-    this.export.classList.add('bindery-show-bleed');
+    this.export.classList.add(c('show-bleed'));
   }
   toggleDouble() {
     this.doubleSided = !this.doubleSided;
@@ -308,7 +309,7 @@ class Viewer {
     }
 
     this.flaps = [];
-    document.body.classList.add('bindery-viewing');
+    document.body.classList.add(c('viewing'));
     document.body.setAttribute('bindery-view-mode', this.mode);
 
     const scrollPct = document.body.scrollTop / document.body.scrollHeight;
@@ -345,17 +346,17 @@ class Viewer {
   updateGuides() {
     document.body.setAttribute('bindery-view-mode', this.mode);
     if (this.mode === MODE_OUTLINE) {
-      this.export.classList.add('bindery-show-bleed');
-      this.export.classList.add('bindery-show-guides');
+      this.export.classList.add(c('show-bleed'));
+      this.export.classList.add(c('show-guides'));
     } else {
-      this.export.classList.remove('bindery-show-bleed');
-      this.export.classList.remove('bindery-show-guides');
+      this.export.classList.remove(c('show-bleed'));
+      this.export.classList.remove(c('show-guides'));
     }
   }
 
   renderPrint() {
-    this.export.classList.add('bindery-show-bleed');
-    this.export.classList.remove('bindery-show-guides');
+    this.export.classList.add(c('show-bleed'));
+    this.export.classList.remove(c('show-guides'));
 
     this.zoomBox.innerHTML = '';
 
@@ -392,8 +393,8 @@ class Viewer {
     this.zoomBox.innerHTML = '';
     this.flaps = [];
 
-    this.export.classList.remove('bindery-show-bleed');
-    this.export.classList.remove('bindery-show-guides');
+    this.export.classList.remove(c('show-bleed'));
+    this.export.classList.remove(c('show-guides'));
 
     const pages = padPages(this.book.pages.slice());
 
@@ -401,7 +402,7 @@ class Viewer {
     for (let i = 1; i < pages.length - 1; i += (this.doubleSided ? 2 : 1)) {
       leafIndex += 1;
       const li = leafIndex;
-      const flap = h('.bindery-page3d', {
+      const flap = h(c('.page3d'), {
         style: Page.sizeStyle(),
         onclick: () => {
           let newLeaf = li - 1;
@@ -409,21 +410,21 @@ class Viewer {
           this.setLeaf(newLeaf);
         },
       });
-      this.export.classList.add('bindery-stage3d');
+      this.export.classList.add(c('stage3d'));
       this.flaps.push(flap);
 
 
       const rightPage = pages[i].element;
       let leftPage;
-      rightPage.classList.add('bindery-page3d-front');
+      rightPage.classList.add(c('page3d-front'));
       flap.appendChild(rightPage);
       if (this.doubleSided) {
-        flap.classList.add('bindery-doubleSided');
+        flap.classList.add(c('doubleSided'));
         leftPage = pages[i + 1].element;
-        leftPage.classList.add('bindery-page3d-back');
+        leftPage.classList.add(c('page3d-back'));
         flap.appendChild(leftPage);
       } else {
-        leftPage = h('.bindery-page.bindery-page3d-back', {
+        leftPage = h(c('.page') + c('.page3d-back'), {
           style: Page.sizeStyle(),
         });
         flap.appendChild(leftPage);

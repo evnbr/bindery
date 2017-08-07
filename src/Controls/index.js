@@ -1,6 +1,6 @@
 import h from 'hyperscript';
 import { convertStrToPx } from '../utils/convertUnits';
-import { prefix, prefixClass } from '../utils/prefixClass';
+import c from '../utils/prefixClass';
 
 import {
   title,
@@ -65,13 +65,13 @@ class ControlPanel {
       height: inputNumberUnits(this.binder.pageSize.height),
     };
 
-    const sizeControl = h(`.${prefix('row')}.${prefix('size')}`,
+    const sizeControl = h(`.${c('row')}.${c('size')}`,
       h('div', 'W', unitInputs.width),
       h('div', 'H', unitInputs.height),
     );
 
-    const marginPreview = h(prefixClass('preview'));
-    const marginControl = h(`.${prefix('row')}.${prefix('margin')}`,
+    const marginPreview = h(c('.preview'));
+    const marginControl = h(`.${c('row')}.${c('margin')}`,
       h('.top', unitInputs.top),
       h('.inner', unitInputs.inner),
       h('.outer', unitInputs.outer),
@@ -79,7 +79,7 @@ class ControlPanel {
       marginPreview,
     );
 
-    layoutControl = h(prefixClass('layout-control'),
+    layoutControl = h(c('.layout-control'),
       sizeControl,
       marginControl
     );
@@ -158,7 +158,7 @@ class ControlPanel {
       viewMode('print', setPrint, 'Sheet'),
     ];
 
-    const viewSwitcher = h(prefixClass('viewswitcher'), ...viewModes);
+    const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
 
     const header = title('Loading...');
 
@@ -279,7 +279,7 @@ class ControlPanel {
     );
 
     this.holder = document.body.appendChild(
-      h(prefixClass('controls'),
+      h(c('.controls'),
         header,
         arrangement,
         paperSize,

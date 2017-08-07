@@ -1,5 +1,5 @@
 import elToStr from './utils/elementToString';
-import { prefix, prefixClass } from './utils/prefixClass';
+import c from './utils/prefixClass';
 import Book from './Book';
 import Scheduler from './Scheduler';
 import Page from './Page';
@@ -87,14 +87,14 @@ const paginate = function (
   };
 
   const markAsContinues = (node) => {
-    node.classList.add(prefix('continues'));
+    node.classList.add(c('continues'));
     rules
       .filter(rule => rule.customContinuesClass)
       .forEach(rule => node.classList.add(rule.customContinuesClass));
   };
 
   const markAsContinuation = (node) => {
-    node.classList.add(prefix('continuation'));
+    node.classList.add(c('continuation'));
     rules
       .filter(rule => rule.customContinuationClass)
       .forEach(rule => node.classList.add(rule.customContinuationClass));
@@ -254,7 +254,7 @@ const paginate = function (
       if (node.hasAttribute('data-bindery-did-move')) {
         return true; // don't split it again.
       }
-      if (node.classList.contains(prefix('continuation'))) {
+      if (node.classList.contains(c('continuation'))) {
         return true; // don't split it again.
       }
       return false;
@@ -482,7 +482,7 @@ const paginate = function (
             // we should never have added it.
             // TODO: Catch this earlier.
             let cancelAdd = false;
-            if (addedChild.classList.contains(prefix('continuation'))) {
+            if (addedChild.classList.contains(c('continuation'))) {
               if (addedChild.children.length === 0) {
                 cancelAdd = true;
               }
@@ -527,7 +527,7 @@ const paginate = function (
   const finish = () => {
     const end = window.performance.now();
     console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
-    const measureArea = document.querySelector(prefixClass('measure-area'));
+    const measureArea = document.querySelector(c('.measure-area'));
     document.body.removeChild(measureArea);
 
     const orderedPages = reorderPages(state.pages, makeNewPage);

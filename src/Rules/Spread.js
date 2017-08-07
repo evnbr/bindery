@@ -1,4 +1,5 @@
 import Rule from './Rule';
+import c from '../utils/prefixClass';
 
 class Spread extends Rule {
   constructor(options) {
@@ -23,12 +24,12 @@ class Spread extends Rule {
     rightPage.flowBox.appendChild(dupedContent);
     rightPage.flowContent = dupedContent;
 
-    leftPage.element.classList.add('bindery-spread');
+    leftPage.element.classList.add(c('spread'));
     leftPage.element.classList.add('bleed');
     leftPage.setPreference('left');
     leftPage.setOutOfFlow(true);
 
-    rightPage.element.classList.add('bindery-spread');
+    rightPage.element.classList.add(c('spread'));
     rightPage.element.classList.add('bleed');
     rightPage.setPreference('right');
     rightPage.setOutOfFlow(true);
