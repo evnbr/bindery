@@ -44,7 +44,7 @@ class Page {
   }
 
   static isSizeValid() {
-    document.body.classList.remove('bindery-viewing');
+    document.body.classList.remove(c('viewing'));
 
     const testPage = new Page();
     let measureArea = document.querySelector(c('.measure-area'));

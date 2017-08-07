@@ -35,6 +35,10 @@ class Bindery {
   constructor(opts) {
     console.log(`Bindery ${'[AIV]{version}[/AIV]'}`);
 
+    this.autorun = opts.autorun || true;
+    this.autoupdate = opts.autoupdate || false;
+    this.debug = opts.debug || false;
+
     const pageSize = opts.pageSize || DEFAULT_PAGE_SIZE;
     const pageMargin = opts.pageMargin || DEFAULT_PAGE_MARGIN;
     this.setSize(pageSize);
@@ -48,10 +52,6 @@ class Bindery {
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
 
-    if (opts.autorun) { this.autorun = true; }
-
-    this.autoupdate = opts.autoupdate ? opts.autoupdate : false;
-    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
     if (!opts.source) {
       this.viewer.displayError('Source not specified', 'You must include a source element, selector, or url');
@@ -209,7 +209,7 @@ class Bindery {
         document.body.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
       },
-      this.debugDelay
+      this.debug
     );
   }
 

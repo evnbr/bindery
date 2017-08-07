@@ -6,13 +6,14 @@
 const MAX_CALLS = 500;
 
 class Scheduler {
-  constructor({ delay, debuggable }) {
-    this.delay = delay;
+  constructor(debuggable) {
     this.numberOfCalls = 0;
     this.resumeLimit = Infinity;
     this.callsSinceResume = 0;
     this.queuedFunc = null;
     this.isPaused = false;
+    this.useDelay = debuggable;
+    this.delayTime = 100;
 
     if (debuggable) {
       // Only expose these
@@ -29,16 +30,13 @@ class Scheduler {
     this.callsSinceResume += 1;
 
     if (this.callsSinceResume > this.resumeLimit) {
-      console.log(`Paused after ${this.resumeLimit}`);
-      this.resumeLimit = Infinity;
-      this.callsSinceResume = 0;
-      this.pause();
+      this.endResume();
     }
 
     if (this.isPaused) {
       this.queuedFunc = func;
-    } else if (this.delay > 0) {
-      setTimeout(func, this.delay);
+    } else if (this.useDelay) {
+      setTimeout(func, this.delayTime);
     } else if (this.numberOfCalls < MAX_CALLS) {
       this.numberOfCalls += 1;
       func();
@@ -51,6 +49,14 @@ class Scheduler {
     if (this.isPaused) return 'Already paused';
     this.isPaused = true;
     return 'Paused';
+  }
+  resumeDelay() {
+    this.useDelay = true;
+    this.resume();
+  }
+  resumeFast() {
+    this.useDelay = false;
+    this.resume();
   }
   resume() {
     if (this.isPaused) {
@@ -81,6 +87,12 @@ class Scheduler {
     this.callsSinceResume = 0;
     this.resumeLimit = n;
     return this.resume();
+  }
+  endResume() {
+    console.log(`Paused after ${this.resumeLimit}`);
+    this.resumeLimit = Infinity;
+    this.callsSinceResume = 0;
+    this.pause();
   }
 }
 

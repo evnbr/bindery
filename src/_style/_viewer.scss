@@ -20,12 +20,16 @@
     padding: 50px 20px;
     padding-right: $sidebarWidth;
     z-index: 99;
-    //  visibility: hidden;
-    overflow: scroll;
+    visibility: hidden;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+
+    &.#{$pre}-debugging {
+      overflow: scroll;
+      visibility: visible;
+    }
 
     .#{$pre}-page {
       margin: 0 auto 50px;
