@@ -22,6 +22,7 @@ class Page {
       if (this.element.parentNode !== Page.measureArea) {
         // Page.measureArea.innerHTML = '';
         Page.measureArea.appendChild(this.element);
+        Page.measureArea.scrollTop = Page.measureArea.scrollHeight;
       }
       if (Page.measureArea.parentNode !== document.body) {
         document.body.appendChild(Page.measureArea);

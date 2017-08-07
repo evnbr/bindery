@@ -14,18 +14,23 @@
     min-height: 90vh;
   }
 
-   .bindery-measure-area {
-     position: fixed;
-     background: $background;
-     padding: 50px 20px;
-     padding-right: $sidebarWidth;
-     z-index: 99;
-     visibility: hidden;
-     top: 0;
-     left: 0;
-     right: 0;
-     bottom: 0;
-   }
+  .bindery-measure-area {
+    position: fixed;
+    background: $background;
+    padding: 50px 20px;
+    padding-right: $sidebarWidth;
+    z-index: 99;
+    //  visibility: hidden;
+    overflow: scroll;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    .bindery-page {
+      margin: 0 auto 50px;
+    }
+  }
 
    .bindery-print-page {
      margin: 0 auto;

@@ -19,11 +19,20 @@ class PageReference extends Replace {
 
       this.references[ref] = elmt;
 
+      // Temporary, to make sure it'll fit
+      const parent = elmt.parentNode;
+      const tempClone = elmt.cloneNode(true);
+      const temp = this.replace(tempClone, '⏱');
+      parent.replaceChild(temp, elmt);
+
       state.book.firstPageForSelector(ref, (number) => {
-        const parent = elmt.parentNode;
-        const newEl = this.replace(elmt, number);
-        parent.replaceChild(newEl, elmt);
+        const tempParent = temp.parentNode;
+        const finalClone = elmt.cloneNode(true);
+        const newEl = this.replace(finalClone, number);
+        tempParent.replaceChild(newEl, temp);
       });
+
+      return temp;
     }
     return elmt;
   }
