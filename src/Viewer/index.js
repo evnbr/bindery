@@ -20,19 +20,19 @@ const bleedMarks = () => [
   h(c('.bleed-left')),
   h(c('.bleed-right')),
 ];
-const cropMarksSingle = () => h(c('.crop-wrap'),
+const cropMarks = () => [
   h(c('.crop-top')),
   h(c('.crop-bottom')),
   h(c('.crop-left')),
   h(c('.crop-right')),
+];
+const printMarksSingle = () => h(c('.print-mark-wrap'),
+  ...cropMarks(),
   ...bleedMarks()
 );
-const cropMarksSpread = () => h(c('.crop-wrap'),
-  h(c('.crop-top')),
-  h(c('.crop-bottom')),
-  h(c('.crop-left')),
-  h(c('.crop-right')),
+const printMarksSpread = () => h(c('.print-mark-wrap'),
   h(c('.crop-fold')),
+  ...cropMarks(),
   ...bleedMarks()
 );
 
@@ -121,11 +121,11 @@ const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
   const printLayout = document.createDocumentFragment();
 
   const size = isTwoUp ? Page.spreadSizeStyle() : Page.sizeStyle();
-  const cropMarks = isTwoUp ? cropMarksSpread : cropMarksSingle;
+  const marks = isTwoUp ? printMarksSpread : printMarksSingle;
 
   const printSheet = function (...arg) {
     return h(c('.print-page') + c(`.letter-${orient}`),
-      spread({ style: size }, ...arg, cropMarks())
+      spread({ style: size }, ...arg, marks())
     );
   };
 
@@ -159,6 +159,7 @@ class Viewer {
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
     this.isShowingCropMarks = true;
+    this.isShowingBleedMarks = false;
     this.setOrientation('landscape');
 
     this.mode = MODE_PREVIEW;
@@ -206,6 +207,18 @@ class Viewer {
       this.export.classList.remove(c('show-crop'));
     }
   }
+  get isShowingBleedMarks() {
+    return this.export.classList.contains(c('show-bleed-marks'));
+  }
+
+  set isShowingBleedMarks(newVal) {
+    if (newVal) {
+      this.export.classList.add(c('show-bleed-marks'));
+    } else {
+      this.export.classList.remove(c('show-bleed-marks'));
+    }
+  }
+
 
   setOrientation(newVal) {
     if (newVal === this.orientation) return;

@@ -64,7 +64,7 @@
     background: rgba(0,0,0,0.14);
   }
 
-  .#{$pre}-inProgress & {
+  .#{$pre}-in-progress & {
     opacity: 0.2;
     pointer-events: none;
   }
@@ -184,6 +184,7 @@
 
 .#{$pre}-expand-row {
   color: $accent;
+  border-radius: 4px;
 
   &:hover {
     background: $hover;
@@ -194,28 +195,39 @@
     font-size: 1.5em;
     padding: 0;
     position: absolute;
-    right: 20px;
+    right: 12px;
     top: 2px;
     font-weight: 300;
   }
-
+  &.selected {
+    background: $hover;
+    border-radius: 4px 4px 0 0;
+  }
   &.selected::after {
     content: '–';
   }
 
   &.selected + .#{$pre}-expand-area {
-    display: block;
+    opacity: 1;
+    max-height: 300px;
+    margin-bottom: 12px;
   }
 }
 
 
 .#{$pre}-expand-area {
-  display: none;
-  margin-bottom: 16px;
-  padding: 12px 0;
+  // display: none;
+  background: $hover;
+  opacity: 0;
+  max-height: 0;
+  margin: -4px 8px;
+  padding: 4px 0;
+  border-radius: 0 0 4px 4px;
+  transition: all 0.2s;
+  overflow: hidden;
 
-  &.selected {
-    margin-bottom: 0;
+  .#{$pre}-row {
+    margin: 4px 0;
   }
 }
 
@@ -241,7 +253,7 @@
 }
 
 .#{$pre}-layout-control {
-  margin: 4px 20px 16px;
+  margin: 4px 12px 8px;
 }
 
 .#{$pre}-margin {
@@ -319,19 +331,20 @@
   float: right;
   transition: all 0.2s;
   position: relative;
+
+  &-handle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+  }
 }
 
-.#{$pre}-switch-handle {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  transition: all 0.2s;
-  position: absolute;
-  left: 0px;
-  top: 0px;
-}
 
 .#{$pre}-row:hover .#{$pre}-switch-handle {
   box-shadow: 0 2px 3px rgba(0,0,0,0.3);

@@ -32,11 +32,16 @@ class ControlPanel {
 
     let layoutControl;
     let cropToggle;
+    let bleedMarkToggle;
     let facingToggle;
 
     const toggleCrop = () => {
       this.binder.viewer.isShowingCropMarks = !this.binder.viewer.isShowingCropMarks;
       cropToggle.classList.toggle('selected');
+    };
+    const toggleBleedMarks = () => {
+      this.binder.viewer.isShowingBleedMarks = !this.binder.viewer.isShowingBleedMarks;
+      bleedMarkToggle.classList.toggle('selected');
     };
 
     const toggleFacing = () => {
@@ -47,6 +52,7 @@ class ControlPanel {
 
     cropToggle = switchRow({ onclick: toggleCrop }, 'Crop Marks');
     cropToggle.classList.add('selected');
+    bleedMarkToggle = switchRow({ onclick: toggleBleedMarks }, 'Bleed Marks');
     facingToggle = switchRow({ onclick: toggleFacing }, 'Facing Pages');
 
     facingToggle.classList.add('selected');
@@ -135,7 +141,7 @@ class ControlPanel {
           forceRefresh.style.display = 'block';
         }, 100);
       });
-    } }, 'Update Layout');
+    } }, 'Rebuild Layout');
 
 
     const setGrid = () => {
@@ -278,15 +284,32 @@ class ControlPanel {
       inProgress,
     );
 
+    let debugRow;
+    const toggleDebug = () => {
+      debugRow.classList.toggle('selected');
+      this.binder.debug = !this.binder.debug;
+    };
+    debugRow = switchRow({ onclick: toggleDebug }, 'Debug');
+    if (this.binder.debug) debugRow.classList.add('selected');
+
     this.holder = document.body.appendChild(
       h(c('.controls'),
         header,
         arrangement,
         paperSize,
         orientation,
-        cropToggle,
+        expandRow('Marks and Bleed'),
+        expandArea(
+          cropToggle,
+          bleedMarkToggle,
+        ),
+
         expandRow('Book Setup'),
-        expandArea(layoutControl, layoutState),
+        expandArea(
+          layoutControl,
+          debugRow,
+          layoutState,
+        ),
         doneBtn,
         printBtn,
         viewSwitcher,

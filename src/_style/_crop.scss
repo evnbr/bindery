@@ -4,7 +4,7 @@ $markOffset: $markLen + $markSpace;
 
 $bleedOffset: $markOffset;
 
-.#{$pre}-crop-wrap {
+.#{$pre}-print-mark-wrap {
   display: none;
   position: absolute;
   pointer-events: none;
@@ -14,11 +14,24 @@ $bleedOffset: $markOffset;
   right: 0;
   z-index: 999;
 
-  .#{$pre}-show-crop & {
+  .#{$pre}-show-crop &,
+  .#{$pre}-show-bleed-marks & {
     display: block;
   }
 
+  .#{$pre}-show-crop & {
+    > [class*='crop'] {
+      display: block;
+    }
+  }
+  .#{$pre}-show-bleed-marks & {
+    > [class*='bleed'] {
+      display: block;
+    }
+  }
+
   > div {
+    display: none;
     position: absolute;
     overflow: hidden;
 
@@ -41,7 +54,8 @@ $bleedOffset: $markOffset;
   }
 
 }
-.#{$pre}-show-crop .#{$pre}-print-page .#{$pre}-spread-wrapper {
+.#{$pre}-show-crop .#{$pre}-print-page .#{$pre}-spread-wrapper,
+.#{$pre}-show-bleed-marks .#{$pre}-print-page .#{$pre}-spread-wrapper {
   margin: 30pt auto;
 }
 
