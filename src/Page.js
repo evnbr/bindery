@@ -17,19 +17,6 @@ class Page {
     );
   }
   overflowAmount() {
-    if (this.element.parentNode !== Page.measureArea) {
-      if (!Page.measureArea) Page.measureArea = document.body.appendChild(h(c('.measure-area')));
-
-      if (this.element.parentNode !== Page.measureArea) {
-        // Page.measureArea.innerHTML = '';
-        Page.measureArea.appendChild(this.element);
-        Page.measureArea.scrollTop = Page.measureArea.scrollHeight;
-      }
-      if (Page.measureArea.parentNode !== document.body) {
-        document.body.appendChild(Page.measureArea);
-      }
-    }
-
     const contentH = this.flowContent.offsetHeight;
     const boxH = this.flowBox.offsetHeight;
 

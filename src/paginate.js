@@ -91,6 +91,8 @@ const paginate = function (
     book: new Book(),
   };
   const start = window.performance.now();
+  const measureArea = document.body.appendChild(h(c('.measure-area')));
+  if (debugging) measureArea.classList.add(c('debugging'));
 
   const markAsContinues = (node) => {
     node.classList.add(c('continues'));
@@ -152,6 +154,10 @@ const paginate = function (
 
   const makeNewPage = () => {
     const newPage = new Page();
+    const shouldScroll = debugging && scrollPct(measureArea) > 0.9;
+    measureArea.appendChild(newPage.element);
+    if (shouldScroll) scrollToBottom(measureArea);
+
     newPageRules(newPage);
     return newPage;
   };
@@ -510,7 +516,6 @@ const paginate = function (
   };
 
   const finish = () => {
-    const measureArea = document.querySelector(c('.measure-area'));
     document.body.removeChild(measureArea);
 
     const orderedPages = reorderPages(state.pages, makeNewPage);
