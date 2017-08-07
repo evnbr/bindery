@@ -1,9 +1,9 @@
 import elToStr from './utils/elementToString';
 import { prefix, prefixClass } from './utils/prefixClass';
 import Book from './Book';
+import Scheduler from './Scheduler';
 import Page from './Page';
 
-const SHOULD_DEBUG_TEXT = false;
 const MAXIMUM_PAGE_LIMIT = 9999;
 
 const last = arr => arr[arr.length - 1];
@@ -135,26 +135,7 @@ const paginate = function (
   };
 
 
-  // Even when there is no debugDelay,
-  // the throttler will occassionally use rAF
-  // to prevent the call stack from getting too big.
-  //
-  // There might be a better way to do this.
-  const MAX_CALLS = 100;
-  let numberOfCalls = 0;
-  const throttle = (func, shouldPause) => {
-    if (shouldPause) {
-      window.paginateStep = func;
-    } else if (DELAY > 0) {
-      setTimeout(func, DELAY);
-    } else if (numberOfCalls < MAX_CALLS) {
-      numberOfCalls += 1;
-      func();
-    } else {
-      numberOfCalls = 0;
-      window.requestAnimationFrame(func);
-    }
-  };
+  const scheduler = new Scheduler({ delay: DELAY, debuggable: true });
 
   const newPageRules = (pg) => {
     rules.forEach((rule) => {
@@ -351,7 +332,7 @@ const paginate = function (
       undoAddTextNode();
     } else {
       // It fits
-      throttle(doneCallback);
+      scheduler.throttle(doneCallback);
     }
   };
 
@@ -363,7 +344,7 @@ const paginate = function (
     last(state.path).appendChild(textNode);
 
     if (!state.currentPage.hasOverflowed()) {
-      throttle(doneCallback);
+      scheduler.throttle(doneCallback);
       return;
     }
 
@@ -401,15 +382,15 @@ const paginate = function (
         // If the remainder fits there, we're done
         if (!state.currentPage.hasOverflowed()) {
           // console.log("Fits entirely!");
-          throttle(doneCallback);
+          scheduler.throttle(doneCallback);
           return;
         }
 
-        throttle(splitTextStep);
+        scheduler.throttle(splitTextStep);
         return;
       }
       if (pos > originalText.length - 1) {
-        throttle(doneCallback);
+        scheduler.throttle(doneCallback);
         return;
       }
 
@@ -417,7 +398,7 @@ const paginate = function (
       while (originalText.charAt(pos) !== ' ' && pos < originalText.length) pos += 1;
 
 
-      throttle(splitTextStep, SHOULD_DEBUG_TEXT);
+      scheduler.throttle(splitTextStep);
     };
 
     splitTextStep();
@@ -465,7 +446,7 @@ const paginate = function (
           last(state.path).appendChild(child);
           state.currentPage.suppressErrors = true;
           continueOnNewPage();
-          throttle(addNextChild);
+          scheduler.throttle(addNextChild);
         };
         if (isSplittable(node)) {
           const undoAddTextNode = () => {
@@ -484,13 +465,13 @@ const paginate = function (
       }
       case Node.ELEMENT_NODE: {
         if (child.tagName === 'SCRIPT') {
-          addNextChild(); // skip
+          addNextChild(); // skips
           break;
         }
 
         beforeAddRules(child);
 
-        throttle(function addChildAsElement() {
+        scheduler.throttle(function addChildAsElement() {
           addElementNode(child, function addedChildSuccess() {
             // We're now done with this element and its children,
             // so we pop up a level
