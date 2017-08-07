@@ -1,7 +1,8 @@
 $markLen: 12pt;
-$markSpace: 8pt;
+$markSpace: $bleed;
 $markOffset: $markLen + $markSpace;
 
+$bleedOffset: $markOffset;
 
 .#{$pre}-crop-wrap {
   display: none;
@@ -72,5 +73,34 @@ $markOffset: $markLen + $markSpace;
   }
   &-bottom {
     bottom: 0;
+  }
+}
+
+.#{$pre}-bleed {
+  &-left,
+  &-right {
+    transform: scaleX(0.5);
+    top: -$bleedOffset;
+    bottom: -$bleedOffset;
+    width: 1px;
+    margin: auto;
+  }
+  &-left { left: -$bleed; }
+  &-right { right: -$bleed; }
+
+
+  &-top,
+  &-bottom {
+    transform: scaleY(0.5);
+    left: -$bleedOffset;
+    right: -$bleedOffset;
+    height: 1px;
+  }
+
+  &-top {
+    top: -$bleed;
+  }
+  &-bottom {
+    bottom: -$bleed;
   }
 }

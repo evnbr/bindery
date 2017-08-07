@@ -156,16 +156,16 @@
 /*Bleed as layer*/
 .#{$pre}-bleed {
   position: absolute;
-  top: -0.2in;
-  bottom: -0.2in;
+  top: -$bleed;
+  bottom: -$bleed;
   z-index: 0;
   .#{$pre}-left & {
     right: 0;
-    left: -0.2in;
+    left: -$bleed;
   }
   .#{$pre}-right & {
     left: 0;
-    right: -0.2in;
+    right: -$bleed;
   }
 }
 

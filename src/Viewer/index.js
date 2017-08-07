@@ -14,11 +14,18 @@ const ARRANGE_SPREAD = 'arrange_two';
 const ARRANGE_BOOKLET = 'arrange_booklet';
 // const ARRANGE_SIGNATURE = 'arrange_signature';
 
+const bleedMarks = () => [
+  h(c('.bleed-top')),
+  h(c('.bleed-bottom')),
+  h(c('.bleed-left')),
+  h(c('.bleed-right')),
+];
 const cropMarksSingle = () => h(c('.crop-wrap'),
   h(c('.crop-top')),
   h(c('.crop-bottom')),
   h(c('.crop-left')),
   h(c('.crop-right')),
+  ...bleedMarks()
 );
 const cropMarksSpread = () => h(c('.crop-wrap'),
   h(c('.crop-top')),
@@ -26,6 +33,7 @@ const cropMarksSpread = () => h(c('.crop-wrap'),
   h(c('.crop-left')),
   h(c('.crop-right')),
   h(c('.crop-fold')),
+  ...bleedMarks()
 );
 
 const spread = function (...arg) {
