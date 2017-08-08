@@ -188,7 +188,7 @@ class Bindery {
     // In case we're updating an existing layout
     this.viewer.clear();
     document.body.classList.add(c('viewing'));
-    document.body.classList.add(c('in-progress'));
+    this.viewer.element.classList.add(c('in-progress'));
 
     this.controls.setInProgress();
 
@@ -202,7 +202,7 @@ class Bindery {
 
           this.controls.setDone();
           if (doneBinding) doneBinding();
-          document.body.classList.remove(c('in-progress'));
+          this.viewer.element.classList.remove(c('in-progress'));
           this.startCheckingLayout();
         }, 100);
       },

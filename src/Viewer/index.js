@@ -341,7 +341,7 @@ class Viewer {
 
     this.element.classList.remove(c('show-bleed'));
     this.element.classList.remove(c('show-guides'));
-    this.element.classList.add(c('stage3d'));
+    this.zoomBox.classList.add(c('stage3d'));
 
     const pages = padPages(this.book.pages.slice());
 
