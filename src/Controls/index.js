@@ -19,7 +19,7 @@ import {
 class ControlPanel {
   constructor(opts) {
     this.binder = opts.binder;
-    const viewer = this.binder.viewer;
+    const viewer = opts.viewer;
 
     const done = () => {
       this.binder.cancel();
@@ -280,30 +280,28 @@ class ControlPanel {
     debugRow = switchRow({ onclick: toggleDebug }, 'Debug');
     if (this.binder.debug) debugRow.classList.add('selected');
 
-    this.holder = document.body.appendChild(
-      h(c('.controls'),
-        header,
-        arrangement,
-        paperSize,
-        orientation,
+    this.element = h(c('.controls'),
+      header,
+      arrangement,
+      paperSize,
+      orientation,
 
-        expandRow('Marks and Bleed'),
-        expandArea(
-          cropToggle,
-          bleedMarkToggle,
-        ),
+      expandRow('Marks and Bleed'),
+      expandArea(
+        cropToggle,
+        bleedMarkToggle,
+      ),
 
-        expandRow('Book Setup'),
-        expandArea(
-          layoutControl,
-          debugRow,
-          layoutState,
-        ),
+      expandRow('Book Setup'),
+      expandArea(
+        layoutControl,
+        debugRow,
+        layoutState,
+      ),
 
-        doneBtn,
-        printBtn,
-        viewSwitcher,
-      )
+      doneBtn,
+      printBtn,
+      viewSwitcher,
     );
   }
 

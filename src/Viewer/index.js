@@ -2,6 +2,7 @@ import h from 'hyperscript';
 import c from '../utils/prefixClass';
 
 import Page from '../Page';
+import Controls from '../Controls';
 
 import errorView from './error';
 import { gridLayout, printLayout, flipLayout } from '../Layouts';
@@ -67,12 +68,12 @@ const padPages = (pages) => {
 
 
 class Viewer {
-  constructor() {
+  constructor({ bindery }) {
     this.book = null;
 
     this.zoomBox = h(c('.zoom-wrap'));
     const spinner = h(c('.spinner'));
-    this.export = h(c('.export'), this.zoomBox, spinner);
+    this.element = h(c('.root'), this.zoomBox, spinner);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
@@ -86,12 +87,15 @@ class Viewer {
     this.listenForPrint();
     this.listenForResize();
 
-    document.body.appendChild(this.export);
-
     this.setGrid = this.setGrid.bind(this);
     this.setOutline = this.setOutline.bind(this);
     this.setPrint = this.setPrint.bind(this);
     this.setFlip = this.setFlip.bind(this);
+
+    this.controls = new Controls({ binder: bindery, viewer: this });
+
+    this.element.appendChild(this.controls.element);
+    document.body.appendChild(this.element);
   }
 
   // Automatically switch into print mode
@@ -120,25 +124,25 @@ class Viewer {
   }
 
   get isShowingCropMarks() {
-    return this.export.classList.contains(c('show-crop'));
+    return this.element.classList.contains(c('show-crop'));
   }
 
   set isShowingCropMarks(newVal) {
     if (newVal) {
-      this.export.classList.add(c('show-crop'));
+      this.element.classList.add(c('show-crop'));
     } else {
-      this.export.classList.remove(c('show-crop'));
+      this.element.classList.remove(c('show-crop'));
     }
   }
   get isShowingBleedMarks() {
-    return this.export.classList.contains(c('show-bleed-marks'));
+    return this.element.classList.contains(c('show-bleed-marks'));
   }
 
   set isShowingBleedMarks(newVal) {
     if (newVal) {
-      this.export.classList.add(c('show-bleed-marks'));
+      this.element.classList.add(c('show-bleed-marks'));
     } else {
-      this.export.classList.remove(c('show-bleed-marks'));
+      this.element.classList.remove(c('show-bleed-marks'));
     }
   }
 
@@ -165,8 +169,8 @@ class Viewer {
   }
 
   displayError(title, text) {
-    if (!this.export.parentNode) {
-      document.body.appendChild(this.export);
+    if (!this.element.parentNode) {
+      document.body.appendChild(this.element);
     }
     if (!this.error) {
       this.zoomBox.innerHTML = '';
@@ -180,15 +184,15 @@ class Viewer {
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
-    if (this.export.parentNode) {
-      this.export.parentNode.removeChild(this.export);
+    if (this.element.parentNode) {
+      this.element.parentNode.removeChild(this.element);
     }
   }
   toggleGuides() {
-    this.export.classList.toggle(c('show-guides'));
+    this.element.classList.toggle(c('show-guides'));
   }
   toggleBleed() {
-    this.export.classList.add(c('show-bleed'));
+    this.element.classList.add(c('show-bleed'));
   }
   toggleDouble() {
     this.doubleSided = !this.doubleSided;
@@ -248,8 +252,8 @@ class Viewer {
   }
   render() {
     if (!this.book) return;
-    if (!this.export.parentNode) {
-      document.body.appendChild(this.export);
+    if (!this.element.parentNode) {
+      document.body.appendChild(this.element);
     }
 
     this.flaps = [];
@@ -290,17 +294,17 @@ class Viewer {
   updateGuides() {
     document.body.setAttribute('bindery-view-mode', this.mode);
     if (this.mode === MODE_OUTLINE) {
-      this.export.classList.add(c('show-bleed'));
-      this.export.classList.add(c('show-guides'));
+      this.element.classList.add(c('show-bleed'));
+      this.element.classList.add(c('show-guides'));
     } else {
-      this.export.classList.remove(c('show-bleed'));
-      this.export.classList.remove(c('show-guides'));
+      this.element.classList.remove(c('show-bleed'));
+      this.element.classList.remove(c('show-guides'));
     }
   }
 
   renderPrint() {
-    this.export.classList.add(c('show-bleed'));
-    this.export.classList.remove(c('show-guides'));
+    this.element.classList.add(c('show-bleed'));
+    this.element.classList.remove(c('show-guides'));
 
     this.zoomBox.innerHTML = '';
 
@@ -335,9 +339,9 @@ class Viewer {
     this.zoomBox.innerHTML = '';
     this.flaps = [];
 
-    this.export.classList.remove(c('show-bleed'));
-    this.export.classList.remove(c('show-guides'));
-    this.export.classList.add(c('stage3d'));
+    this.element.classList.remove(c('show-bleed'));
+    this.element.classList.remove(c('show-guides'));
+    this.element.classList.add(c('stage3d'));
 
     const pages = padPages(this.book.pages.slice());
 

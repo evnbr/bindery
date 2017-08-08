@@ -2,7 +2,6 @@ import paginate from './paginate';
 
 import Page from './Page';
 import Viewer from './Viewer';
-import Controls from './Controls';
 import { isValidSize } from './utils/convertUnits';
 import c from './utils/prefixClass';
 
@@ -44,7 +43,9 @@ class Bindery {
     this.setSize(pageSize);
     this.setMargin(pageMargin);
 
-    this.viewer = new Viewer();
+    this.viewer = new Viewer({ bindery: this });
+    this.controls = this.viewer.controls;
+
     if (opts.startingView) {
       this.viewer.setMode(opts.startingView);
     }
@@ -188,10 +189,6 @@ class Bindery {
     this.viewer.clear();
     document.body.classList.add(c('viewing'));
     document.body.classList.add(c('in-progress'));
-
-    if (!this.controls) {
-      this.controls = new Controls({ binder: this });
-    }
 
     this.controls.setInProgress();
 
