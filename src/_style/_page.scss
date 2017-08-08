@@ -90,9 +90,15 @@
     }
     .#{$pre}-content {
       transition: none;
-      &:hover {
+      &:hover::after {
         box-shadow: inset 0 0 0 1px #ad0000;
         background: transparentize(#ad0000, 0.96);
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
       }
     }
   }
@@ -119,6 +125,7 @@
 .#{$pre}-content {
   /* hack to prevent margin collapse, leading to wrong height */
   padding: 0.1px;
+  position: relative;
 }
 
 .#{$pre}-footer {

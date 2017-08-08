@@ -19,12 +19,13 @@ import {
 class ControlPanel {
   constructor(opts) {
     this.binder = opts.binder;
+    const viewer = this.binder.viewer;
 
     const done = () => {
       this.binder.cancel();
     };
     const print = () => {
-      this.binder.viewer.setPrint();
+      viewer.setPrint();
       window.print();
     };
 
@@ -36,18 +37,19 @@ class ControlPanel {
     let facingToggle;
 
     const toggleCrop = () => {
-      this.binder.viewer.isShowingCropMarks = !this.binder.viewer.isShowingCropMarks;
+      viewer.isShowingCropMarks = !viewer.isShowingCropMarks;
       cropToggle.classList.toggle('selected');
     };
+
     const toggleBleedMarks = () => {
-      this.binder.viewer.isShowingBleedMarks = !this.binder.viewer.isShowingBleedMarks;
+      viewer.isShowingBleedMarks = !viewer.isShowingBleedMarks;
       bleedMarkToggle.classList.toggle('selected');
     };
 
     const toggleFacing = () => {
       facingToggle.classList.toggle('selected');
       layoutControl.classList.toggle('not-facing');
-      this.binder.viewer.toggleDouble();
+      viewer.toggleDouble();
     };
 
     cropToggle = switchRow({ onclick: toggleCrop }, 'Crop Marks');
@@ -112,7 +114,7 @@ class ControlPanel {
       option({ disabled: true }, 'Signatures'),
     );
     arrangeSelect.addEventListener('change', () => {
-      this.binder.viewer.setPrintArrange(arrangeSelect.value);
+      viewer.setPrintArrange(arrangeSelect.value);
     });
     const arrangement = row('Print', arrangeSelect);
 
@@ -121,7 +123,7 @@ class ControlPanel {
       option({ value: 'portrait' }, 'Portrait'),
     );
     orientationSelect.addEventListener('change', () => {
-      this.binder.viewer.setOrientation(orientationSelect.value);
+      viewer.setOrientation(orientationSelect.value);
     });
     const orientation = row('Orientation', orientationSelect);
 
@@ -139,29 +141,15 @@ class ControlPanel {
         this.binder.makeBook(() => {
           inProgress.style.display = 'none';
           forceRefresh.style.display = 'block';
-        }, 100);
+        }, 10);
       });
     } }, 'Rebuild Layout');
 
-
-    const setGrid = () => {
-      this.binder.viewer.setGrid();
-    };
-    const setOutline = () => {
-      this.binder.viewer.setOutline();
-    };
-    const setInteractive = () => {
-      this.binder.viewer.setInteractive();
-    };
-    const setPrint = () => {
-      this.binder.viewer.setPrint();
-    };
-
     const viewModes = [
-      viewMode('grid', setGrid, 'Preview'),
-      viewMode('outline', setOutline, 'Outline'),
-      viewMode('flip', setInteractive, 'Flip'),
-      viewMode('print', setPrint, 'Sheet'),
+      viewMode('grid', viewer.setGrid, 'Preview'),
+      viewMode('outline', viewer.setOutline, 'Outline'),
+      viewMode('flip', viewer.setFlip, 'Flip'),
+      viewMode('print', viewer.setPrint, 'Sheet'),
     ];
 
     const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
@@ -218,11 +206,11 @@ class ControlPanel {
     };
 
     this.updateProgress = (count) => {
-      header.innerText = `${count} Pages`;
+      header.innerText = `${count} Pages...`;
     };
 
     this.setDone = () => {
-      header.innerText = `${this.binder.viewer.book.pages.length} Pages`;
+      header.innerText = `${viewer.book.pages.length} Pages`;
       inProgress.style.display = 'none';
       forceRefresh.style.display = 'block';
       validCheck.style.display = 'none';
@@ -298,6 +286,7 @@ class ControlPanel {
         arrangement,
         paperSize,
         orientation,
+
         expandRow('Marks and Bleed'),
         expandArea(
           cropToggle,
@@ -310,6 +299,7 @@ class ControlPanel {
           debugRow,
           layoutState,
         ),
+
         doneBtn,
         printBtn,
         viewSwitcher,

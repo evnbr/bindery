@@ -1,152 +1,39 @@
 import h from 'hyperscript';
 
-import elToStr from './utils/elementToString';
-import c from './utils/prefixClass';
-import { scrollPct, scrollToBottom } from './utils/scrollElement';
-import Book from './Book';
+// Utils
+import elToStr from '../utils/elementToString';
+import c from '../utils/prefixClass';
+import { scrollPct, scrollToBottom } from '../utils/scrollElement';
+
+// Bindery
+import Book from '../Book';
+import Page from '../Page';
+
+// paginate
 import Scheduler from './Scheduler';
-import Page from './Page';
+import orderPages from './orderPages';
+import annotatePages from './annotatePages';
+import breadcrumbCloner from './breadcrumbCloner';
 
 const MAXIMUM_PAGE_LIMIT = 9999;
 
 const last = arr => arr[arr.length - 1];
 
-const reorderPages = (pages, makeNewPage) => {
-  const orderedPages = pages;
-
-  // TODO: this ignores the cover page, assuming its on the right
-  for (let i = 1; i < orderedPages.length - 1; i += 2) {
-    const left = orderedPages[i];
-
-    // TODO: Check more than once
-    if (left.alwaysRight) {
-      if (left.outOfFlow) {
-        orderedPages[i] = pages[i + 1];
-        orderedPages[i + 1] = left;
-      } else {
-        pages.splice(i, 0, makeNewPage());
-      }
-    }
-
-    const right = orderedPages[i + 1];
-
-    if (right.alwaysLeft) {
-      if (right.outOfFlow) {
-        // TODO: don't overflow, assumes that
-        // there are not multiple spreads in a row
-        orderedPages[i + 1] = pages[i + 3];
-        orderedPages[i + 3] = right;
-      } else {
-        pages.splice(i + 1, 0, new Page());
-      }
-    }
-  }
-
-  return orderedPages;
-};
-
-const annotatePages = (pages) => {
-  // Page numbers
-  const facingPages = true; // TODO: Pass in facingpages options
-  if (facingPages) {
-    pages.forEach((page, i) => {
-      page.number = i + 1;
-      page.setLeftRight((i % 2 === 0) ? 'right' : 'left');
-    });
-  } else {
-    pages.forEach((page) => { page.setLeftRight('right'); });
-  }
-
-  // Sections
-  const running = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
-  pages.forEach((page) => {
-    page.heading = {};
-    Object.keys(running).forEach((tagName, i) => {
-      const element = page.element.querySelector(tagName);
-      if (element) {
-        running[tagName] = element.textContent;
-        // clear remainder
-        Object.keys(running).forEach((tag, j) => {
-          if (j > i) running[tag] = '';
-        });
-      }
-      if (running[tagName] !== '') {
-        page.heading[tagName] = running[tagName];
-      }
-    });
-  });
-};
-
-const paginate = function (
-  content,
-  rules,
-  paginateDoneCallback,
-  paginateProgressCallback,
-  paginateErrorCallback,
-  debugging
-) {
+const paginate = ({ content, rules, success, progress, error, isDebuggable }) => {
+  // SETUP
+  const start = window.performance.now();
   const state = {
     breadcrumb: [], // Stack representing which element we're currently inside
     pages: [],
     book: new Book(),
   };
-  const start = window.performance.now();
+  const scheduler = new Scheduler(isDebuggable);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
-  if (debugging) measureArea.classList.add(c('debugging'));
+  if (isDebuggable) measureArea.classList.add(c('debug'));
 
-  const markAsContinues = (node) => {
-    node.classList.add(c('continues'));
-    rules
-      .filter(rule => rule.customContinuesClass)
-      .forEach(rule => node.classList.add(rule.customContinuesClass));
-  };
+  const cloneBreadcrumb = breadcrumbCloner(rules);
 
-  const markAsContinuation = (node) => {
-    node.classList.add(c('continuation'));
-    rules
-      .filter(rule => rule.customContinuationClass)
-      .forEach(rule => node.classList.add(rule.customContinuationClass));
-  };
-
-  // TODO: only do this if not double sided?
-  const cloneBreadcrumb = (origBreadcrumb) => {
-    const newBreadcrumb = [];
-
-    for (let i = origBreadcrumb.length - 1; i >= 0; i -= 1) {
-      const original = origBreadcrumb[i];
-      const clone = original.cloneNode(false); // shallow
-      clone.innerHTML = '';
-      markAsContinues(original);
-      markAsContinuation(clone);
-      if (clone.id) {
-        // console.warn(`Bindery: Added a break to ${elToStr(clone)},
-        // so "${clone.id}" is no longer a unique ID.`);
-      }
-      if (clone.tagName === 'OL') {
-        // restart numbering
-        let prevStart = 1;
-        if (original.hasAttribute('start')) {
-          // the OL is also a continuation
-          prevStart = parseInt(original.getAttribute('start'), 10);
-        }
-        if (i < origBreadcrumb.length - 1 && origBreadcrumb[i + 1].tagName === 'LI') {
-          // the first list item is a continuation
-          prevStart -= 1;
-        }
-        const prevCount = original.children.length;
-        const newStart = prevStart + prevCount;
-        clone.setAttribute('start', newStart);
-      }
-      if (i < origBreadcrumb.length - 1) clone.appendChild(newBreadcrumb[i + 1]);
-      newBreadcrumb[i] = clone;
-    }
-    return newBreadcrumb;
-  };
-
-
-  const scheduler = new Scheduler(debugging);
-
-  const newPageRules = (pg) => {
+  const applyNewPageRules = (pg) => {
     rules.forEach((rule) => {
       if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
     });
@@ -154,11 +41,11 @@ const paginate = function (
 
   const makeNewPage = () => {
     const newPage = new Page();
-    const shouldScroll = debugging && scrollPct(measureArea) > 0.9;
+    const shouldScroll = isDebuggable && scrollPct(measureArea) > 0.9;
     measureArea.appendChild(newPage.element);
     if (shouldScroll) scrollToBottom(measureArea);
 
-    newPageRules(newPage);
+    applyNewPageRules(newPage);
     return newPage;
   };
 
@@ -177,7 +64,7 @@ const paginate = function (
     } else if (state.pages.length === 1000) {
       console.warn('Bindery: More than 1000 pages, performance may be slow.');
     } else if (state.pages.length > MAXIMUM_PAGE_LIMIT) {
-      paginateErrorCallback('Maximum page count exceeded');
+      error('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
@@ -200,12 +87,12 @@ const paginate = function (
       }
     }
 
-    paginateProgressCallback(state.pages.length);
+    progress(state.pages.length);
 
     return newPage;
   };
 
-  const beforeAddRules = (element) => {
+  const applyBeforeAddRules = (element) => {
     let addedElement = element;
     rules.forEach((rule) => {
       if (!rule.selector) return;
@@ -391,7 +278,6 @@ const paginate = function (
 
         // If the remainder fits there, we're done
         if (!state.currentPage.hasOverflowed()) {
-          // console.log("Fits entirely!");
           scheduler.throttle(doneCallback);
           return;
         }
@@ -406,7 +292,6 @@ const paginate = function (
 
       pos += 1;
       while (originalText.charAt(pos) !== ' ' && pos < originalText.length) pos += 1;
-
 
       scheduler.throttle(splitTextStep);
     };
@@ -442,31 +327,33 @@ const paginate = function (
       return;
     }
 
-    beforeAddRules(child);
+    applyBeforeAddRules(child);
+
+    const addedChildrenSuccess = () => {
+      // We're now done with this element and its children,
+      // so we pop up a level
+      const addedChild = state.breadcrumb.pop();
+
+      // If this child didn't fit any contents on this page,
+      // but did have contents on a previous page
+      // we should never have added it.
+      // TODO: Catch this earlier.
+      if (addedChild.classList.contains(c('continuation'))
+        && addedChild.children.length === 0) {
+        addedChild.parentNode.removeChild(addedChild);
+      } else {
+        // TODO: AfterAdd rules may want to access original child, not split second half
+        applyAfterAddRules(addedChild);
+      }
+
+      if (state.currentPage.hasOverflowed()) {
+        // console.log('Bindery: Added element despite overflowing');
+      }
+      next();
+    };
 
     scheduler.throttle(() => {
-      addElementNode(child, function addedChildrenSuccess() {
-        // We're now done with this element and its children,
-        // so we pop up a level
-        const addedChild = state.breadcrumb.pop();
-
-        // If this child didn't fit any contents on this page,
-        // but did have contents on a previous page
-        // we should never have added it.
-        // TODO: Catch this earlier.
-        if (addedChild.classList.contains(c('continuation'))
-          && addedChild.children.length === 0) {
-          addedChild.parentNode.removeChild(addedChild);
-        } else {
-          // TODO: AfterAdd rules may want to access original child, not split second half
-          applyAfterAddRules(addedChild);
-        }
-
-        if (state.currentPage.hasOverflowed()) {
-          // console.log('Bindery: Added element despite overflowing');
-        }
-        next();
-      });
+      addElementNode(child, addedChildrenSuccess);
     });
   };
 
@@ -474,26 +361,25 @@ const paginate = function (
   // one by one recursively until thet overflow the page
   const addElementNode = (node, doneCallback) => {
     if (state.currentPage.hasOverflowed()) {
-      console.error('Bindery: Trying to add node to a page that\'s already overflowing');
+      // console.error('Bindery: Trying to add node to a page that\'s already overflowing');
+      state.currentPage.suppressErrors = true;
+      continueOnNewPage();
     }
 
     // Add this node to the current page or context
-    if (state.breadcrumb.length === 0) {
-      state.currentPage.flowContent.appendChild(node);
-    } else {
-      last(state.breadcrumb).appendChild(node);
-    }
+    if (!state.breadcrumb[0]) state.currentPage.flowContent.appendChild(node);
+    else last(state.breadcrumb).appendChild(node);
+
     state.breadcrumb.push(node);
 
-    const childNodes = [...node.childNodes];  // 1. Cache the children
-    node.innerHTML = '';                      // 2. Clear this node
+    const childNodes = [...node.childNodes];
+    node.innerHTML = '';
 
     // Overflows when empty
     if (state.currentPage.hasOverflowed()) {
       moveNodeToNextPage(node);
     }
 
-    // 3. Try adding each child one by one
     let index = 0;
     const addNext = () => {
       if (!(index < childNodes.length)) {
@@ -508,17 +394,17 @@ const paginate = function (
       } else if (child.nodeType === Node.ELEMENT_NODE) {
         addElementChild(node, child, addNext);
       } else {
-        addNext(); // Skip unknown nodes
+        addNext(); // Skip comments and unknown nodes
       }
     };
     // kick it off
     addNext();
   };
 
-  const finish = () => {
+  const finishPagination = () => {
     document.body.removeChild(measureArea);
 
-    const orderedPages = reorderPages(state.pages, makeNewPage);
+    const orderedPages = orderPages(state.pages, makeNewPage);
     annotatePages(orderedPages);
 
     state.book.pages = orderedPages;
@@ -529,13 +415,13 @@ const paginate = function (
     const end = window.performance.now();
     console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
 
-    paginateDoneCallback(state.book);
+    success(state.book);
   };
 
   content.style.margin = 0;
   content.style.padding = 0;
   continueOnNewPage();
-  addElementNode(content, finish);
+  addElementNode(content, finishPagination);
 };
 
 export default paginate;

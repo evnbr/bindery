@@ -69,32 +69,7 @@ class Bindery {
     } else if (typeof opts.source === 'object' && opts.source.url) {
       const url = opts.source.url;
       const selector = opts.source.selector;
-      fetch(opts.source.url).then((response) => {
-        if (response.status === 404) {
-          this.viewer.displayError('404', `Could not find file at "${url}"`);
-        } else if (response.status === 200) {
-          return response.text();
-        }
-        return '';
-      }).then((fetchedContent) => {
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = fetchedContent;
-        this.source = wrapper.querySelector(selector);
-        if (!(this.source instanceof HTMLElement)) {
-          this.viewer.displayError('Source not specified', `Could not find element that matches selector "${selector}"`);
-          console.error(`Bindery: Could not find element that matches selector "${selector}"`);
-          return;
-        }
-        if (this.autorun) {
-          this.makeBook();
-        }
-      }).catch((error) => {
-        console.error(error);
-        const scheme = window.location.href.split('://')[0];
-        if (scheme === 'file') {
-          this.viewer.displayError(`Can't fetch content from "${url}"`, 'Web pages can\'t fetch content unless they are on a server.');
-        }
-      });
+      this.fetchSource(url, selector);
     } else if (opts.source instanceof HTMLElement) {
       this.source = opts.source;
       if (this.autorun) {
@@ -109,6 +84,41 @@ class Bindery {
   static makeBook(opts = {}) {
     opts.autorun = opts.autorun ? opts.autorun : true;
     return new Bindery(opts);
+  }
+
+  fetchSource(url, selector) {
+    fetch(url).then((response) => {
+      if (response.status === 404) {
+        this.viewer.displayError('404', `Could not find file at "${url}"`);
+      } else if (response.status === 200) {
+        return response.text();
+      }
+      return '';
+    }).then((fetchedContent) => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = fetchedContent;
+      this.source = wrapper.querySelector(selector);
+      if (!(this.source instanceof HTMLElement)) {
+        this.viewer.displayError(
+          'Source not specified',
+          `Could not find element that matches selector "${selector}"`
+        );
+        console.error(`Bindery: Could not find element that matches selector "${selector}"`);
+        return;
+      }
+      if (this.autorun) {
+        this.makeBook();
+      }
+    }).catch((error) => {
+      console.error(error);
+      const scheme = window.location.href.split('://')[0];
+      if (scheme === 'file') {
+        this.viewer.displayError(
+          `Can't fetch content from "${url}"`,
+          'Web pages can\'t fetch content unless they are on a server.'
+        );
+      }
+    });
   }
 
   cancel() {
@@ -185,14 +195,13 @@ class Bindery {
 
     this.controls.setInProgress();
 
-    paginate(
+    paginate({
       content,
-      this.rules,
-      // Done
-      (book) => {
+      rules: this.rules,
+      success: (book) => {
         setTimeout(() => {
           this.viewer.book = book;
-          this.viewer.update();
+          this.viewer.render();
 
           this.controls.setDone();
           if (doneBinding) doneBinding();
@@ -200,17 +209,15 @@ class Bindery {
           this.startCheckingLayout();
         }, 100);
       },
-      // Progress
-      (pageCount) => {
+      progress: (pageCount) => {
         this.controls.updateProgress(pageCount);
       },
-      // Error
-      (error) => {
+      error: (error) => {
         document.body.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
       },
-      this.debug
-    );
+      isDebuggable: this.debug,
+    });
   }
 
   startCheckingLayout() {

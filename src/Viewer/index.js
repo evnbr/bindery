@@ -2,7 +2,9 @@ import h from 'hyperscript';
 import c from '../utils/prefixClass';
 
 import Page from '../Page';
+
 import errorView from './error';
+import { gridLayout, printLayout, flipLayout } from '../Layouts';
 
 const MODE_FLIP = 'interactive';
 const MODE_PREVIEW = 'grid';
@@ -13,40 +15,6 @@ const ARRANGE_ONE = 'arrange_one';
 const ARRANGE_SPREAD = 'arrange_two';
 const ARRANGE_BOOKLET = 'arrange_booklet';
 // const ARRANGE_SIGNATURE = 'arrange_signature';
-
-const bleedMarks = () => [
-  h(c('.bleed-top')),
-  h(c('.bleed-bottom')),
-  h(c('.bleed-left')),
-  h(c('.bleed-right')),
-];
-const cropMarks = () => [
-  h(c('.crop-top')),
-  h(c('.crop-bottom')),
-  h(c('.crop-left')),
-  h(c('.crop-right')),
-];
-const printMarksSingle = () => h(c('.print-mark-wrap'),
-  ...cropMarks(),
-  ...bleedMarks()
-);
-const printMarksSpread = () => h(c('.print-mark-wrap'),
-  h(c('.crop-fold')),
-  ...cropMarks(),
-  ...bleedMarks()
-);
-
-const spread = function (...arg) {
-  return h(c('.spread-wrapper'), ...arg);
-};
-
-const bookletMeta = (i, len) => {
-  const isFront = i % 4 === 0;
-  const sheetIndex = parseInt((i + 1) / 4, 10) + 1;
-  return h(c('.print-meta'),
-    `Sheet ${sheetIndex} of ${len / 4}: ${isFront ? 'Outside' : 'Inside'}`);
-};
-
 
 const ORIENTATION_STYLE_ID = 'bindery-orientation-stylesheet';
 
@@ -97,56 +65,6 @@ const padPages = (pages) => {
   return pages;
 };
 
-const renderGridLayout = (pages, isTwoUp) => {
-  const gridLayout = document.createDocumentFragment();
-  if (isTwoUp) {
-    for (let i = 0; i < pages.length; i += 2) {
-      const wrap = spread(
-        { style: Page.spreadSizeStyle() },
-        pages[i].element, pages[i + 1].element
-      );
-      gridLayout.appendChild(wrap);
-    }
-  } else {
-    pages.forEach((pg) => {
-      const wrap = spread({ style: Page.sizeStyle() }, pg.element);
-      gridLayout.appendChild(wrap);
-    });
-  }
-
-  return gridLayout;
-};
-
-const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
-  const printLayout = document.createDocumentFragment();
-
-  const size = isTwoUp ? Page.spreadSizeStyle() : Page.sizeStyle();
-  const marks = isTwoUp ? printMarksSpread : printMarksSingle;
-
-  const printSheet = function (...arg) {
-    return h(c('.print-page') + c(`.letter-${orient}`),
-      spread({ style: size }, ...arg, marks())
-    );
-  };
-
-  if (isTwoUp) {
-    for (let i = 0; i < pages.length; i += 2) {
-      const sheet = printSheet(pages[i].element, pages[i + 1].element);
-      printLayout.appendChild(sheet);
-      if (isBooklet) {
-        const meta = bookletMeta(i, pages.length);
-        sheet.appendChild(meta);
-      }
-    }
-  } else {
-    pages.forEach((pg) => {
-      const sheet = printSheet(pg.element);
-      printLayout.appendChild(sheet);
-    });
-  }
-
-  return printLayout;
-};
 
 class Viewer {
   constructor() {
@@ -169,6 +87,11 @@ class Viewer {
     this.listenForResize();
 
     document.body.appendChild(this.export);
+
+    this.setGrid = this.setGrid.bind(this);
+    this.setOutline = this.setOutline.bind(this);
+    this.setPrint = this.setPrint.bind(this);
+    this.setFlip = this.setFlip.bind(this);
   }
 
   // Automatically switch into print mode
@@ -225,7 +148,7 @@ class Viewer {
     this.orientation = newVal;
     setOrientationCSS(newVal);
     if (this.mode === MODE_SHEET) {
-      this.update();
+      this.render();
     } else {
       this.setPrint();
     }
@@ -235,7 +158,7 @@ class Viewer {
     if (newVal === this.printArrange) return;
     this.printArrange = newVal;
     if (this.mode === MODE_SHEET) {
-      this.update();
+      this.render();
     } else {
       this.setPrint();
     }
@@ -269,7 +192,7 @@ class Viewer {
   }
   toggleDouble() {
     this.doubleSided = !this.doubleSided;
-    this.update();
+    this.render();
   }
   setMode(newMode) {
     switch (newMode) {
@@ -301,7 +224,7 @@ class Viewer {
       this.updateGuides();
     } else {
       this.mode = MODE_PREVIEW;
-      this.update();
+      this.render();
     }
   }
   setOutline() {
@@ -311,19 +234,19 @@ class Viewer {
       this.updateGuides();
     } else {
       this.mode = MODE_OUTLINE;
-      this.update();
+      this.render();
     }
   }
   setPrint() {
     if (this.mode === MODE_SHEET) return;
     this.mode = MODE_SHEET;
-    this.update();
+    this.render();
   }
-  setInteractive() {
+  setFlip() {
     this.mode = MODE_FLIP;
-    this.update();
+    this.render();
   }
-  update() {
+  render() {
     if (!this.book) return;
     if (!this.export.parentNode) {
       document.body.appendChild(this.export);
@@ -392,8 +315,8 @@ class Viewer {
       pages = orderPagesBooklet(pages);
     }
 
-    const printLayout = renderPrintLayout(pages, isTwoUp, orient, isBooklet);
-    this.zoomBox.appendChild(printLayout);
+    const fragment = printLayout(pages, isTwoUp, orient, isBooklet);
+    this.zoomBox.appendChild(fragment);
   }
 
   renderGrid() {
@@ -402,12 +325,10 @@ class Viewer {
 
     let pages = this.book.pages.slice();
 
-    if (this.doubleSided) {
-      pages = padPages(pages);
-    }
+    if (this.doubleSided) pages = padPages(pages);
 
-    const gridLayout = renderGridLayout(pages, this.doubleSided);
-    this.zoomBox.appendChild(gridLayout);
+    const fragment = gridLayout(pages, this.doubleSided);
+    this.zoomBox.appendChild(fragment);
   }
 
   renderInteractive() {
@@ -416,51 +337,14 @@ class Viewer {
 
     this.export.classList.remove(c('show-bleed'));
     this.export.classList.remove(c('show-guides'));
+    this.export.classList.add(c('stage3d'));
 
     const pages = padPages(this.book.pages.slice());
 
-    let leafIndex = 0;
-    for (let i = 1; i < pages.length - 1; i += (this.doubleSided ? 2 : 1)) {
-      leafIndex += 1;
-      const li = leafIndex;
-      const flap = h(c('.page3d'), {
-        style: Page.sizeStyle(),
-        onclick: () => {
-          let newLeaf = li - 1;
-          if (newLeaf === this.currentLeaf) newLeaf += 1;
-          this.setLeaf(newLeaf);
-        },
-      });
-      this.export.classList.add(c('stage3d'));
-      this.flaps.push(flap);
+    const fragment = flipLayout(pages, this.doubleSided, this.setLeaf.bind(this));
+    this.flaps = [...fragment.children];
+    this.zoomBox.appendChild(fragment);
 
-
-      const rightPage = pages[i].element;
-      let leftPage;
-      rightPage.classList.add(c('page3d-front'));
-      flap.appendChild(rightPage);
-      if (this.doubleSided) {
-        flap.classList.add(c('doubleSided'));
-        leftPage = pages[i + 1].element;
-        leftPage.classList.add(c('page3d-back'));
-        flap.appendChild(leftPage);
-      } else {
-        leftPage = h(c('.page') + c('.page3d-back'), {
-          style: Page.sizeStyle(),
-        });
-        flap.appendChild(leftPage);
-      }
-      // TODO: Dynamically add/remove pages.
-      // Putting 1000s of elements onscreen
-      // locks up the browser.
-
-      let leftOffset = 4;
-      if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
-
-      flap.style.left = `${i * leftOffset}px`;
-
-      this.zoomBox.appendChild(flap);
-    }
     if (this.currentLeaf) {
       this.setLeaf(this.currentLeaf);
     } else {
@@ -469,7 +353,10 @@ class Viewer {
   }
 
   setLeaf(n) {
-    this.currentLeaf = n;
+    let newLeaf = n;
+    if (newLeaf === this.currentLeaf) newLeaf += 1;
+
+    this.currentLeaf = newLeaf;
     let zScale = 4;
     if (this.flaps.length * zScale > 200) zScale = 200 / this.flaps.length;
 
