@@ -2,8 +2,25 @@ import h from 'hyperscript';
 import c from '../utils/prefixClass';
 import Page from '../Page';
 
-const renderFlipLayout = (pages, doubleSided, pageClick) => {
+const renderFlipLayout = (pages, doubleSided) => {
   const flipLayout = document.createDocumentFragment();
+  const flaps = [];
+  let currentLeaf = 0;
+
+  const setLeaf = (n) => {
+    let newLeaf = n;
+    if (newLeaf === currentLeaf) newLeaf += 1;
+
+    currentLeaf = newLeaf;
+    let zScale = 4;
+    if (flaps.length * zScale > 200) zScale = 200 / flaps.length;
+
+    flaps.forEach((flap, i, arr) => {
+      // + 0.5 so left and right are even
+      const z = (arr.length - Math.abs((i - n) + 0.5)) * zScale;
+      flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${z}px) rotateY(${(i < n) ? -180 : 0}deg)`;
+    });
+  };
 
   let leafIndex = 0;
   for (let i = 1; i < pages.length - 1; i += (doubleSided ? 2 : 1)) {
@@ -13,7 +30,7 @@ const renderFlipLayout = (pages, doubleSided, pageClick) => {
       style: Page.sizeStyle(),
       onclick: () => {
         const newLeaf = li - 1;
-        pageClick(newLeaf);
+        setLeaf(newLeaf);
       },
     });
 
@@ -41,9 +58,11 @@ const renderFlipLayout = (pages, doubleSided, pageClick) => {
 
     flap.style.left = `${i * leftOffset}px`;
 
+    flaps.push(flap);
     flipLayout.appendChild(flap);
   }
 
+  setLeaf(0);
   return flipLayout;
 };
 

@@ -258,7 +258,7 @@ class Viewer {
 
     this.flaps = [];
     document.body.classList.add(c('viewing'));
-    document.body.setAttribute('bindery-view-mode', this.mode);
+    this.element.setAttribute('bindery-view-mode', this.mode);
 
     const scrollPct = document.body.scrollTop / document.body.scrollHeight;
 
@@ -292,7 +292,7 @@ class Viewer {
   }
 
   updateGuides() {
-    document.body.setAttribute('bindery-view-mode', this.mode);
+    this.element.setAttribute('bindery-view-mode', this.mode);
     if (this.mode === MODE_OUTLINE) {
       this.element.classList.add(c('show-bleed'));
       this.element.classList.add(c('show-guides'));
@@ -345,31 +345,10 @@ class Viewer {
 
     const pages = padPages(this.book.pages.slice());
 
-    const fragment = flipLayout(pages, this.doubleSided, this.setLeaf.bind(this));
-    this.flaps = [...fragment.children];
+    const fragment = flipLayout(pages, this.doubleSided);
     this.zoomBox.appendChild(fragment);
-
-    if (this.currentLeaf) {
-      this.setLeaf(this.currentLeaf);
-    } else {
-      this.setLeaf(0);
-    }
   }
 
-  setLeaf(n) {
-    let newLeaf = n;
-    if (newLeaf === this.currentLeaf) newLeaf += 1;
-
-    this.currentLeaf = newLeaf;
-    let zScale = 4;
-    if (this.flaps.length * zScale > 200) zScale = 200 / this.flaps.length;
-
-    this.flaps.forEach((flap, i, arr) => {
-      // + 0.5 so left and right are even
-      const z = (arr.length - Math.abs((i - n) + 0.5)) * zScale;
-      flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${z}px) rotateY(${(i < n) ? -180 : 0}deg)`;
-    });
-  }
 }
 
 export default Viewer;
