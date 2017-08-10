@@ -338,7 +338,7 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
       // but did have contents on a previous page
       // we should never have added it.
       // TODO: Catch this earlier.
-      if (addedChild.classList.contains(c('continuation'))
+      if (false && addedChild.classList.contains(c('continuation'))
         && addedChild.children.length === 0) {
         addedChild.parentNode.removeChild(addedChild);
       } else {

@@ -131,7 +131,7 @@ class ControlPanel {
       display: 'none',
       color: '#e2b200',
     } }, 'Too Small');
-    const inProgress = btn({ style: {
+    let inProgress = btn({ style: {
       display: 'none',
     } }, 'Updating...');
     const forceRefresh = btn({ onclick: () => {
@@ -266,19 +266,54 @@ class ControlPanel {
       unitInputs[k].addEventListener('keyup', throttledUpdate);
     });
 
+    let pause;
+    let playSlow;
+    let steps;
+    pause = btn('⏸ Pause', { onclick: () => {
+      pause.style.display = 'none';
+      playSlow.style.display = 'block';
+      steps.style.display = 'block';
+    } });
+    playSlow = btn('🐌 Resume', { onclick: () => {
+      playSlow.style.display = 'none';
+      pause.style.display = 'block';
+      steps.style.display = 'none';
+    } });
+    const step = btn('Step +1', { onclick: () => {
+    } });
+    const step10 = btn('+10', { onclick: () => {
+    } });
+    const step100 = btn('+100', { onclick: () => {
+    } });
+    steps = h('div',
+      { style: { display: 'none' } },
+      step, step10, step100
+    );
+
+
+    const debugControls = row(
+      pause,
+      playSlow,
+      steps
+    );
+    debugControls.classList.add(c('debug-controls'));
+    printBtn.classList.add(c('btn-print'));
+
+    inProgress = debugControls;
+
     const layoutState = h('div',
       forceRefresh,
       validCheck,
       inProgress,
     );
 
-    let debugRow;
+    let debugToggle;
     const toggleDebug = () => {
-      debugRow.classList.toggle('selected');
+      debugToggle.classList.toggle('selected');
       this.binder.debug = !this.binder.debug;
     };
-    debugRow = switchRow({ onclick: toggleDebug }, 'Debug');
-    if (this.binder.debug) debugRow.classList.add('selected');
+    debugToggle = switchRow({ onclick: toggleDebug }, 'Debug');
+    if (this.binder.debug) debugToggle.classList.add('selected');
 
     this.element = h(c('.controls'),
       header,
@@ -295,12 +330,11 @@ class ControlPanel {
       expandRow('Book Setup'),
       expandArea(
         layoutControl,
-        debugRow,
-        layoutState,
+        debugToggle,
+        row(layoutState),
       ),
 
-      doneBtn,
-      printBtn,
+      row(doneBtn, printBtn, debugControls),
       viewSwitcher,
     );
   }

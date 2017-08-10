@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.3 - Friday, August 4th, 2017, 7:11:11 PM  
+// [AIV]  Build version: 2.0.0-alpha.3.1 - Wednesday, August 9th, 2017, 5:20:58 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -69,10 +69,39 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var split = __webpack_require__(10)
-var ClassList = __webpack_require__(11)
+"use strict";
 
-var w = typeof window === 'undefined' ? __webpack_require__(13) : window
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+// const p = 'bindery-';
+var p = '📖-';
+
+var prefix = function prefix(str) {
+  return '' + p + str;
+};
+var prefixClass = function prefixClass(str) {
+  return '.' + prefix(str);
+};
+
+var c = function c(str) {
+  if (str[0] === '.') {
+    return prefixClass(str.substr(1));
+  }
+  return prefix(str);
+};
+
+exports.default = c;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var split = __webpack_require__(8)
+var ClassList = __webpack_require__(9)
+
+var w = typeof window === 'undefined' ? __webpack_require__(11) : window
 var document = w.document
 var Text = w.Text
 
@@ -232,7 +261,7 @@ function isArray (arr) {
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -260,7 +289,177 @@ var Rule = function Rule(options) {
 exports.default = Rule;
 
 /***/ }),
-/* 2 */
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _hyperscript = __webpack_require__(1);
+
+var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
+var _convertUnits = __webpack_require__(4);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Page = function () {
+  function Page() {
+    _classCallCheck(this, Page);
+
+    this.flowContent = (0, _hyperscript2.default)((0, _prefixClass2.default)('.content'));
+    this.flowBox = (0, _hyperscript2.default)((0, _prefixClass2.default)('.flowbox'), this.flowContent);
+    this.footer = (0, _hyperscript2.default)((0, _prefixClass2.default)('.footer'));
+    this.bleed = (0, _hyperscript2.default)((0, _prefixClass2.default)('.bleed'));
+    this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.page'), { style: Page.sizeStyle() }, this.bleed, this.flowBox, this.footer);
+  }
+
+  _createClass(Page, [{
+    key: 'overflowAmount',
+    value: function overflowAmount() {
+      var contentH = this.flowContent.offsetHeight;
+      var boxH = this.flowBox.offsetHeight;
+
+      if (boxH === 0) {
+        throw Error('Bindery: Trying to flow into a box of zero height.');
+      }
+
+      return contentH - boxH;
+    }
+  }, {
+    key: 'hasOverflowed',
+    value: function hasOverflowed() {
+      return this.overflowAmount() > -5;
+    }
+  }, {
+    key: 'setLeftRight',
+    value: function setLeftRight(dir) {
+      if (dir === 'left') {
+        this.side = dir;
+        this.element.classList.remove((0, _prefixClass2.default)('right'));
+        this.element.classList.add((0, _prefixClass2.default)('left'));
+      } else if (dir === 'right') {
+        this.side = dir;
+        this.element.classList.remove((0, _prefixClass2.default)('left'));
+        this.element.classList.add((0, _prefixClass2.default)('right'));
+      } else {
+        throw Error('Bindery: Setting page to invalid direction' + dir);
+      }
+    }
+  }, {
+    key: 'setPreference',
+    value: function setPreference(dir) {
+      if (dir === 'left') this.alwaysLeft = true;
+      if (dir === 'right') this.alwaysRight = true;
+    }
+  }, {
+    key: 'setOutOfFlow',
+    value: function setOutOfFlow(bool) {
+      this.outOfFlow = bool;
+    }
+  }, {
+    key: 'suppressErrors',
+    get: function get() {
+      return this.suppress || false;
+    },
+    set: function set(newVal) {
+      this.suppress = newVal;
+      if (newVal) {
+        this.element.classList.add((0, _prefixClass2.default)('is-overflowing'));
+      } else {
+        this.element.classList.remove((0, _prefixClass2.default)('is-overflowing'));
+      }
+    }
+  }, {
+    key: 'isEmpty',
+    get: function get() {
+      return this.element.textContent.trim() === '';
+    }
+  }, {
+    key: 'isLeft',
+    get: function get() {
+      return this.side === 'left';
+    }
+  }, {
+    key: 'isRight',
+    get: function get() {
+      return this.side === 'right';
+    }
+  }], [{
+    key: 'isSizeValid',
+    value: function isSizeValid() {
+      document.body.classList.remove((0, _prefixClass2.default)('viewing'));
+
+      var testPage = new Page();
+      var measureArea = document.querySelector((0, _prefixClass2.default)('.measure-area'));
+      if (!measureArea) measureArea = document.body.appendChild((0, _hyperscript2.default)((0, _prefixClass2.default)('.measure-area')));
+
+      measureArea.innerHTML = '';
+      measureArea.appendChild(testPage.element);
+      var box = testPage.flowBox.getBoundingClientRect();
+
+      measureArea.parentNode.removeChild(measureArea);
+
+      return box.height > 100 && box.width > 100; // TODO: Number is arbitrary
+    }
+  }, {
+    key: 'setSize',
+    value: function setSize(size) {
+      Page.W = size.width;
+      Page.H = size.height;
+    }
+  }, {
+    key: 'sizeStyle',
+    value: function sizeStyle() {
+      return {
+        height: Page.H,
+        width: Page.W
+      };
+    }
+  }, {
+    key: 'spreadSizeStyle',
+    value: function spreadSizeStyle() {
+      var w = (0, _convertUnits.parseVal)(Page.W);
+      return {
+        height: Page.H,
+        width: '' + w.val * 2 + w.unit
+      };
+    }
+  }, {
+    key: 'setMargin',
+    value: function setMargin(margin) {
+      var sheet = void 0;
+      var existing = document.querySelector('#bindery-margin-stylesheet');
+      if (existing) {
+        sheet = existing;
+      } else {
+        sheet = document.createElement('style');
+        sheet.id = 'bindery-margin-stylesheet';
+      }
+      sheet.innerHTML = '\n      ' + (0, _prefixClass2.default)('.flowbox') + ',\n      ' + (0, _prefixClass2.default)('.footer') + ' {\n        margin-left: ' + margin.inner + ';\n        margin-right: ' + margin.outer + ';\n      }\n      ' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.flowbox') + ',\n      ' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.footer') + ' {\n        margin-left: ' + margin.outer + ';\n        margin-right: ' + margin.inner + ';\n      }\n\n      ' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n        left: ' + margin.outer + ';\n      }\n      ' + (0, _prefixClass2.default)('.right') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n        right: ' + margin.outer + ';\n      }\n\n      ' + (0, _prefixClass2.default)('.flowbox') + ' { margin-top: ' + margin.top + '; }\n      ' + (0, _prefixClass2.default)('.footer') + '{ margin-bottom: ' + margin.bottom + '; }\n    ';
+      document.head.appendChild(sheet);
+    }
+  }]);
+
+  return Page;
+}();
+
+exports.default = Page;
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -342,202 +541,6 @@ exports.convertStrToStr = convertStrToStr;
 exports.convertStrToPx = convertStrToPx;
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var prefix = function prefix(str) {
-  return "bindery-" + str;
-};
-var prefixClass = function prefixClass(str) {
-  return "." + prefix(str);
-};
-
-exports.prefix = prefix;
-exports.prefixClass = prefixClass;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _hyperscript = __webpack_require__(0);
-
-var _hyperscript2 = _interopRequireDefault(_hyperscript);
-
-var _convertUnits = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Page = function () {
-  function Page() {
-    _classCallCheck(this, Page);
-
-    this.flowContent = (0, _hyperscript2.default)('.bindery-content');
-    this.flowBox = (0, _hyperscript2.default)('.bindery-flowbox', this.flowContent);
-    this.footer = (0, _hyperscript2.default)('footer.bindery-footer');
-    this.bleed = (0, _hyperscript2.default)('.bindery-bleed');
-    this.element = (0, _hyperscript2.default)('.bindery-page', { style: Page.sizeStyle() }, this.bleed, this.flowBox, this.footer);
-  }
-
-  _createClass(Page, [{
-    key: 'overflowAmount',
-    value: function overflowAmount() {
-      if (this.element.parentNode !== Page.measureArea) {
-        if (!Page.measureArea) Page.measureArea = document.body.appendChild((0, _hyperscript2.default)('.bindery-measure-area'));
-
-        if (this.element.parentNode !== Page.measureArea) {
-          Page.measureArea.innerHTML = '';
-          Page.measureArea.appendChild(this.element);
-        }
-        if (Page.measureArea.parentNode !== document.body) {
-          document.body.appendChild(Page.measureArea);
-        }
-      }
-
-      // const contentH = this.flowContent.getBoundingClientRect().height;
-      // const boxH = this.flowBox.getBoundingClientRect().height;
-      var contentH = this.flowContent.offsetHeight;
-      var boxH = this.flowBox.offsetHeight;
-
-      if (boxH === 0) {
-        throw Error('Bindery: Trying to flow into a box of zero height.');
-      }
-
-      return contentH - boxH;
-    }
-  }, {
-    key: 'hasOverflowed',
-    value: function hasOverflowed() {
-      return this.overflowAmount() > -5;
-    }
-  }, {
-    key: 'setLeftRight',
-    value: function setLeftRight(dir) {
-      if (dir === 'left') {
-        this.side = dir;
-        this.element.classList.remove('bindery-right');
-        this.element.classList.add('bindery-left');
-      } else if (dir === 'right') {
-        this.side = dir;
-        this.element.classList.remove('bindery-left');
-        this.element.classList.add('bindery-right');
-      } else {
-        throw Error('Bindery: Setting page to invalid direction' + dir);
-      }
-    }
-  }, {
-    key: 'setPreference',
-    value: function setPreference(dir) {
-      if (dir === 'left') this.alwaysLeft = true;
-      if (dir === 'right') this.alwaysRight = true;
-    }
-  }, {
-    key: 'setOutOfFlow',
-    value: function setOutOfFlow(bool) {
-      this.outOfFlow = bool;
-    }
-  }, {
-    key: 'clone',
-    value: function clone() {
-      var newPage = new Page();
-      newPage.flowContent.innerHTML = this.flowContent.cloneNode(true).innerHTML;
-      newPage.footer.innerHTML = this.footer.cloneNode(true).innerHTML;
-      newPage.flowContent.insertAdjacentHTML('beforeend', 'RESTORED');
-      return newPage;
-    }
-  }, {
-    key: 'isEmpty',
-    get: function get() {
-      return this.element.textContent.trim() === '';
-    }
-  }, {
-    key: 'isLeft',
-    get: function get() {
-      return this.side === 'left';
-    }
-  }, {
-    key: 'isRight',
-    get: function get() {
-      return this.side === 'right';
-    }
-  }], [{
-    key: 'isSizeValid',
-    value: function isSizeValid() {
-      document.body.classList.remove('bindery-viewing');
-
-      var testPage = new Page();
-      var measureArea = document.querySelector('.bindery-measure-area');
-      if (!measureArea) measureArea = document.body.appendChild((0, _hyperscript2.default)('.bindery-measure-area'));
-
-      measureArea.innerHTML = '';
-      measureArea.appendChild(testPage.element);
-      var box = testPage.flowBox.getBoundingClientRect();
-
-      measureArea.parentNode.removeChild(measureArea);
-
-      return box.height > 100 && box.width > 100; // TODO: Number is arbitrary
-    }
-  }, {
-    key: 'setSize',
-    value: function setSize(size) {
-      Page.W = size.width;
-      Page.H = size.height;
-    }
-  }, {
-    key: 'sizeStyle',
-    value: function sizeStyle() {
-      return {
-        height: Page.H,
-        width: Page.W
-      };
-    }
-  }, {
-    key: 'spreadSizeStyle',
-    value: function spreadSizeStyle() {
-      var w = (0, _convertUnits.parseVal)(Page.W);
-      return {
-        height: Page.H,
-        width: '' + w.val * 2 + w.unit
-      };
-    }
-  }, {
-    key: 'setMargin',
-    value: function setMargin(margin) {
-      var sheet = void 0;
-      var existing = document.querySelector('#bindery-margin-stylesheet');
-      if (existing) {
-        sheet = existing;
-      } else {
-        sheet = document.createElement('style');
-        sheet.id = 'bindery-margin-stylesheet';
-      }
-      sheet.innerHTML = '\n      .bindery-flowbox,\n      .bindery-footer {\n        margin-left: ' + margin.inner + ';\n        margin-right: ' + margin.outer + ';\n      }\n      .bindery-left .bindery-flowbox,\n      .bindery-left .bindery-footer {\n        margin-left: ' + margin.outer + ';\n        margin-right: ' + margin.inner + ';\n      }\n\n      .bindery-left .bindery-num,\n      .bindery-left .bindery-running-header {\n        left: ' + margin.outer + ';\n      }\n      .bindery-right .bindery-num,\n      .bindery-right .bindery-running-header {\n        right: ' + margin.outer + ';\n      }\n\n      .bindery-flowbox { margin-top: ' + margin.top + '; }\n      .bindery-footer { margin-bottom: ' + margin.bottom + '; }\n    ';
-      document.head.appendChild(sheet);
-    }
-  }]);
-
-  return Page;
-}();
-
-exports.default = Page;
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -550,7 +553,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Rule2 = __webpack_require__(1);
+var _Rule2 = __webpack_require__(2);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
@@ -624,21 +627,21 @@ var _paginate = __webpack_require__(7);
 
 var _paginate2 = _interopRequireDefault(_paginate);
 
-var _Page = __webpack_require__(4);
+var _Page = __webpack_require__(3);
 
 var _Page2 = _interopRequireDefault(_Page);
 
-var _Viewer = __webpack_require__(14);
+var _Viewer = __webpack_require__(19);
 
 var _Viewer2 = _interopRequireDefault(_Viewer);
 
-var _Controls = __webpack_require__(16);
+var _convertUnits = __webpack_require__(4);
 
-var _Controls2 = _interopRequireDefault(_Controls);
+var _prefixClass = __webpack_require__(0);
 
-var _convertUnits = __webpack_require__(2);
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _Rules = __webpack_require__(18);
+var _Rules = __webpack_require__(28);
 
 var _Rules2 = _interopRequireDefault(_Rules);
 
@@ -646,9 +649,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-__webpack_require__(26);
+__webpack_require__(36);
 
-var DEFAULT_PAGE_UNIT = 'pt';
 var DEFAULT_PAGE_SIZE = {
   width: '288pt',
   height: '432pt'
@@ -674,32 +676,28 @@ var arraysEqual = function arraysEqual(a, b) {
 
 var Bindery = function () {
   function Bindery(opts) {
-    var _this = this;
-
     _classCallCheck(this, Bindery);
 
-    console.log('Bindery ' + '2.0.0-alpha.3');
+    console.log('Bindery ' + '2.0.0-alpha.3.1');
 
-    var pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
-    var pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
-    this.pageUnit = opts.pageUnit ? opts.pageUnit : DEFAULT_PAGE_UNIT;
+    this.autorun = opts.autorun || true;
+    this.autoupdate = opts.autoupdate || false;
+    this.debug = opts.debug || false;
+
+    var pageSize = opts.pageSize || DEFAULT_PAGE_SIZE;
+    var pageMargin = opts.pageMargin || DEFAULT_PAGE_MARGIN;
     this.setSize(pageSize);
     this.setMargin(pageMargin);
 
-    this.viewer = new _Viewer2.default();
+    this.viewer = new _Viewer2.default({ bindery: this });
+    this.controls = this.viewer.controls;
+
     if (opts.startingView) {
       this.viewer.setMode(opts.startingView);
     }
 
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
-
-    if (opts.autorun) {
-      this.autorun = true;
-    }
-
-    this.autoupdate = opts.autoupdate ? opts.autoupdate : false;
-    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
     if (!opts.source) {
       this.viewer.displayError('Source not specified', 'You must include a source element, selector, or url');
@@ -717,7 +715,26 @@ var Bindery = function () {
     } else if (_typeof(opts.source) === 'object' && opts.source.url) {
       var url = opts.source.url;
       var selector = opts.source.selector;
-      fetch(opts.source.url).then(function (response) {
+      this.fetchSource(url, selector);
+    } else if (opts.source instanceof HTMLElement) {
+      this.source = opts.source;
+      if (this.autorun) {
+        this.makeBook();
+      }
+    } else {
+      console.error('Bindery: Source must be an element or selector');
+    }
+  }
+
+  // Convenience constructor
+
+
+  _createClass(Bindery, [{
+    key: 'fetchSource',
+    value: function fetchSource(url, selector) {
+      var _this = this;
+
+      fetch(url).then(function (response) {
         if (response.status === 404) {
           _this.viewer.displayError('404', 'Could not find file at "' + url + '"');
         } else if (response.status === 200) {
@@ -743,25 +760,13 @@ var Bindery = function () {
           _this.viewer.displayError('Can\'t fetch content from "' + url + '"', 'Web pages can\'t fetch content unless they are on a server.');
         }
       });
-    } else if (opts.source instanceof HTMLElement) {
-      this.source = opts.source;
-      if (this.autorun) {
-        this.makeBook();
-      }
-    } else {
-      console.error('Bindery: Source must be an element or selector');
     }
-  }
-
-  // Convenience constructor
-
-
-  _createClass(Bindery, [{
+  }, {
     key: 'cancel',
     value: function cancel() {
       this.stopCheckingLayout();
       this.viewer.cancel();
-      document.body.classList.remove('bindery-viewing');
+      document.body.classList.remove((0, _prefixClass2.default)('viewing'));
       this.source.style.display = '';
     }
   }, {
@@ -804,7 +809,7 @@ var Bindery = function () {
       var _this3 = this;
 
       if (!this.source) {
-        document.body.classList.add('bindery-viewing');
+        document.body.classList.add((0, _prefixClass2.default)('viewing'));
         return;
       }
 
@@ -830,34 +835,34 @@ var Bindery = function () {
 
       // In case we're updating an existing layout
       this.viewer.clear();
-      document.body.classList.add('bindery-viewing');
-      document.body.classList.add('bindery-inProgress');
-
-      if (!this.controls) {
-        this.controls = new _Controls2.default({ binder: this });
-      }
+      document.body.classList.add((0, _prefixClass2.default)('viewing'));
+      this.viewer.element.classList.add((0, _prefixClass2.default)('in-progress'));
 
       this.controls.setInProgress();
 
-      (0, _paginate2.default)(content, this.rules,
-      // Done
-      function (book) {
-        setTimeout(function () {
-          _this3.viewer.book = book;
-          _this3.viewer.update();
+      (0, _paginate2.default)({
+        content: content,
+        rules: this.rules,
+        success: function success(book) {
+          setTimeout(function () {
+            _this3.viewer.book = book;
+            _this3.viewer.render();
 
-          _this3.controls.setDone();
-          if (doneBinding) doneBinding();
-          document.body.classList.remove('bindery-inProgress');
-          _this3.startCheckingLayout();
-        }, 100);
-      },
-      // Progress
-      function (pageCount) {
-        _this3.controls.updateProgress(pageCount);
-      },
-      // Error
-      function () {}, this.debugDelay);
+            _this3.controls.setDone();
+            if (doneBinding) doneBinding();
+            _this3.viewer.element.classList.remove((0, _prefixClass2.default)('in-progress'));
+            _this3.startCheckingLayout();
+          }, 100);
+        },
+        progress: function progress(pageCount) {
+          _this3.controls.updateProgress(pageCount);
+        },
+        error: function error(_error) {
+          document.body.classList.remove((0, _prefixClass2.default)('in-progress'));
+          _this3.viewer.displayError('Layout couldn\'t complete', _error);
+        },
+        isDebuggable: this.debug
+      });
     }
   }, {
     key: 'startCheckingLayout',
@@ -940,178 +945,85 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _elementToString = __webpack_require__(8);
+var _hyperscript = __webpack_require__(1);
+
+var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
+var _elementToString = __webpack_require__(12);
 
 var _elementToString2 = _interopRequireDefault(_elementToString);
 
-var _prefixClass = __webpack_require__(3);
+var _prefixClass = __webpack_require__(0);
 
-var _Book = __webpack_require__(9);
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+var _scrollElement = __webpack_require__(13);
+
+var _Book = __webpack_require__(14);
 
 var _Book2 = _interopRequireDefault(_Book);
 
-var _Page = __webpack_require__(4);
+var _Page = __webpack_require__(3);
 
 var _Page2 = _interopRequireDefault(_Page);
+
+var _Scheduler = __webpack_require__(15);
+
+var _Scheduler2 = _interopRequireDefault(_Scheduler);
+
+var _orderPages = __webpack_require__(16);
+
+var _orderPages2 = _interopRequireDefault(_orderPages);
+
+var _annotatePages = __webpack_require__(17);
+
+var _annotatePages2 = _interopRequireDefault(_annotatePages);
+
+var _breadcrumbCloner = __webpack_require__(18);
+
+var _breadcrumbCloner2 = _interopRequireDefault(_breadcrumbCloner);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var SHOULD_DEBUG_TEXT = false;
+// Utils
+
+
+// Bindery
+
+
+// paginate
+
+
+var MAXIMUM_PAGE_LIMIT = 9999;
 
 var last = function last(arr) {
   return arr[arr.length - 1];
 };
 
-var reorderPages = function reorderPages(pages, makeNewPage) {
-  var orderedPages = pages;
+var paginate = function paginate(_ref) {
+  var content = _ref.content,
+      rules = _ref.rules,
+      success = _ref.success,
+      progress = _ref.progress,
+      error = _ref.error,
+      isDebuggable = _ref.isDebuggable;
 
-  // TODO: this ignores the cover page, assuming its on the right
-  for (var i = 1; i < orderedPages.length - 1; i += 2) {
-    var left = orderedPages[i];
-
-    // TODO: Check more than once
-    if (left.alwaysRight) {
-      if (left.outOfFlow) {
-        orderedPages[i] = pages[i + 1];
-        orderedPages[i + 1] = left;
-      } else {
-        pages.splice(i, 0, makeNewPage());
-      }
-    }
-
-    var right = orderedPages[i + 1];
-
-    if (right.alwaysLeft) {
-      if (right.outOfFlow) {
-        // TODO: don't overflow, assumes that
-        // there are not multiple spreads in a row
-        orderedPages[i + 1] = pages[i + 3];
-        orderedPages[i + 3] = right;
-      } else {
-        pages.splice(i + 1, 0, new _Page2.default());
-      }
-    }
-  }
-
-  return orderedPages;
-};
-
-var annotatePages = function annotatePages(pages) {
-  // Page numbers
-  var facingPages = true; // TODO: Pass in facingpages options
-  if (facingPages) {
-    pages.forEach(function (page, i) {
-      page.number = i + 1;
-      page.setLeftRight(i % 2 === 0 ? 'right' : 'left');
-    });
-  } else {
-    pages.forEach(function (page) {
-      page.setLeftRight('right');
-    });
-  }
-
-  // Sections
-  var running = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
-  pages.forEach(function (page) {
-    page.heading = {};
-    Object.keys(running).forEach(function (tagName, i) {
-      var element = page.element.querySelector(tagName);
-      if (element) {
-        running[tagName] = element.textContent;
-        // clear remainder
-        Object.keys(running).forEach(function (tag, j) {
-          if (j > i) running[tag] = '';
-        });
-      }
-      if (running[tagName] !== '') {
-        page.heading[tagName] = running[tagName];
-      }
-    });
-  });
-};
-
-var paginate = function paginate(content, rules, paginateDoneCallback, paginateProgressCallback, paginateErrorCallback, DELAY) {
+  // SETUP
+  var start = window.performance.now();
   var state = {
-    path: [], // Stack representing which element we're currently inside
-    pages: []
+    breadcrumb: [], // Stack representing which element we're currently inside
+    pages: [],
+    book: new _Book2.default()
   };
+  var scheduler = new _Scheduler2.default(isDebuggable);
+  var measureArea = document.body.appendChild((0, _hyperscript2.default)((0, _prefixClass2.default)('.measure-area')));
+  if (isDebuggable) measureArea.classList.add((0, _prefixClass2.default)('debug'));
 
-  var markAsContinues = function markAsContinues(node) {
-    node.classList.add((0, _prefixClass.prefix)('continues'));
-    rules.filter(function (rule) {
-      return rule.customContinuesClass;
-    }).forEach(function (rule) {
-      return node.classList.add(rule.customContinuesClass);
-    });
-  };
+  var cloneBreadcrumb = (0, _breadcrumbCloner2.default)(rules);
 
-  var markAsContinuation = function markAsContinuation(node) {
-    node.classList.add((0, _prefixClass.prefix)('continuation'));
-    rules.filter(function (rule) {
-      return rule.customContinuationClass;
-    }).forEach(function (rule) {
-      return node.classList.add(rule.customContinuationClass);
-    });
-  };
-
-  // TODO: only do this if not double sided?
-  var clonePath = function clonePath(origPath) {
-    var newPath = [];
-    for (var i = origPath.length - 1; i >= 0; i -= 1) {
-      var original = origPath[i];
-      var clone = original.cloneNode(false); // shallow
-      clone.innerHTML = '';
-      markAsContinues(original);
-      markAsContinuation(clone);
-      if (clone.id) {
-        // console.warn(`Bindery: Added a break to ${elToStr(clone)},
-        // so "${clone.id}" is no longer a unique ID.`);
-      }
-      if (clone.tagName === 'OL') {
-        // restart numbering
-        var prevStart = 1;
-        if (original.hasAttribute('start')) {
-          // the OL is also a continuation
-          prevStart = parseInt(original.getAttribute('start'), 10);
-        }
-        if (i < origPath.length - 1 && origPath[i + 1].tagName === 'LI') {
-          // the first list item is a continuation
-          prevStart -= 1;
-        }
-        var prevCount = original.children.length;
-        var newStart = prevStart + prevCount;
-        clone.setAttribute('start', newStart);
-      }
-      if (i < origPath.length - 1) clone.appendChild(newPath[i + 1]);
-      newPath[i] = clone;
-    }
-    return newPath;
-  };
-
-  // Even when there is no debugDelay,
-  // the throttler will occassionally use rAF
-  // to prevent the call stack from getting too big.
-  //
-  // There might be a better way to do this.
-  var MAX_CALLS = 100;
-  var numberOfCalls = 0;
-  var throttle = function throttle(func, shouldPause) {
-    if (shouldPause) {
-      window.paginateStep = func;
-    } else if (DELAY > 0) {
-      setTimeout(func, DELAY);
-    } else if (numberOfCalls < MAX_CALLS) {
-      numberOfCalls += 1;
-      func();
-    } else {
-      numberOfCalls = 0;
-      window.requestAnimationFrame(func);
-    }
-  };
-
-  var newPageRules = function newPageRules(pg) {
+  var applyNewPageRules = function applyNewPageRules(pg) {
     rules.forEach(function (rule) {
       if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
     });
@@ -1119,7 +1031,11 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
 
   var makeNewPage = function makeNewPage() {
     var newPage = new _Page2.default();
-    newPageRules(newPage);
+    var shouldScroll = isDebuggable && (0, _scrollElement.scrollPct)(measureArea) > 0.9;
+    measureArea.appendChild(newPage.element);
+    if (shouldScroll) (0, _scrollElement.scrollToBottom)(measureArea);
+
+    applyNewPageRules(newPage);
     return newPage;
   };
 
@@ -1127,27 +1043,32 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
   // we were in when we overflowed the last page
   var continueOnNewPage = function continueOnNewPage() {
     if (state.currentPage && state.currentPage.hasOverflowed()) {
-      console.warn(state.currentPage.element);
-      throw Error('Bindery: Moved to new page when last one is still overflowing');
+      console.warn('Bindery: Page overflowing', state.currentPage.element);
+      if (!state.currentPage.suppressErrors) {
+        throw Error('Bindery: Moved to new page when last one is still overflowing');
+      }
     }
 
     if (state.pages.length === 500) {
       console.warn('Bindery: More than 500 pages, performance may be slow.');
     } else if (state.pages.length === 1000) {
       console.warn('Bindery: More than 1000 pages, performance may be slow.');
+    } else if (state.pages.length > MAXIMUM_PAGE_LIMIT) {
+      error('Maximum page count exceeded');
+      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
-    state.path = clonePath(state.path);
+    state.breadcrumb = cloneBreadcrumb(state.breadcrumb);
     var newPage = makeNewPage();
     state.pages.push(newPage);
-    state.currentPage = newPage; // TODO redundant
-    if (state.path[0]) {
-      newPage.flowContent.appendChild(state.path[0]);
+    state.currentPage = newPage;
+    if (state.breadcrumb[0]) {
+      newPage.flowContent.appendChild(state.breadcrumb[0]);
     }
 
     // make sure the cloned page is valid.
     if (newPage.hasOverflowed()) {
-      var suspect = last(state.path);
+      var suspect = last(state.breadcrumb);
       if (suspect) {
         console.error('Bindery: NextPage already overflowing, probably due to a style set on ' + (0, _elementToString2.default)(suspect) + '. It may not fit on the page.');
         suspect.parentNode.removeChild(suspect);
@@ -1156,12 +1077,12 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
       }
     }
 
-    paginateProgressCallback(state.pages.length);
+    progress(state.pages.length);
 
     return newPage;
   };
 
-  var beforeAddRules = function beforeAddRules(element) {
+  var applyBeforeAddRules = function applyBeforeAddRules(element) {
     var addedElement = element;
     rules.forEach(function (rule) {
       if (!rule.selector) return;
@@ -1171,24 +1092,26 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
     });
   };
 
-  var afterAddRules = function afterAddRules(originalElement) {
+  var afterAddRules = rules.filter(function (r) {
+    return r.selector && r.afterAdd;
+  });
+  var applyAfterAddRules = function applyAfterAddRules(originalElement) {
     var addedElement = originalElement;
-    rules.forEach(function (rule) {
-      if (!rule.selector) return;
-      if (addedElement.matches(rule.selector) && rule.afterAdd) {
+    afterAddRules.forEach(function (rule) {
+      if (addedElement.matches(rule.selector)) {
         addedElement = rule.afterAdd(addedElement, state, continueOnNewPage, function overflowCallback(problemElement) {
           // TODO:
           // While this does catch overflows, it introduces a few new bugs.
           // It is pretty aggressive to move the entire node to the next page.
           // - 1. there is no guarentee it will fit on the new page
-          // - 2. if it has childNodes, those rules will not be invalidated,
-          // which means footnotes will get left ona previous page.
+          // - 2. if it has childNodes, those side effects will not be undone,
+          // which means footnotes will get left on previous page.
           // - 3. if it is a large paragraph, it will leave a large gap. the
-          // correct approach would be to only need to invalidate
+          // ideal approach would be to only need to invalidate
           // the last line of text.
           problemElement.parentNode.removeChild(problemElement);
           continueOnNewPage();
-          var lastEl = last(state.path);
+          var lastEl = last(state.breadcrumb);
           lastEl.appendChild(problemElement);
           return rule.afterAdd(problemElement, state, continueOnNewPage, function () {
             console.log('Couldn\'t apply ' + rule.name + ' to ' + (0, _elementToString2.default)(problemElement) + '. Caused overflows twice.');
@@ -1215,15 +1138,15 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
     return rule.selector;
   });
 
-  console.log(selectorsNotToSplit);
-
   var isSplittable = function isSplittable(node) {
     if (selectorsNotToSplit.some(function (sel) {
       return node.matches(sel);
     })) {
       if (node.hasAttribute('data-bindery-did-move')) {
-        // don't split it again.
-        return true;
+        return true; // don't split it again.
+      }
+      if (node.classList.contains((0, _prefixClass2.default)('continuation'))) {
+        return true; // don't split it again.
       }
       return false;
     }
@@ -1238,18 +1161,18 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
   // will trigger endlessly get shifted to the next page
   var moveNodeToNextPage = function moveNodeToNextPage(nodeToMove) {
     // So this node won't get cloned. TODO: this is unclear
-    state.path.pop();
+    state.breadcrumb.pop();
 
     // find the nearest splittable parent
     var willMove = nodeToMove;
     var pathToRestore = [];
-    while (!isSplittable(last(state.path))) {
-      // console.log('Not OK to split:', last(state.path));
-      willMove = state.path.pop();
+    while (!isSplittable(last(state.breadcrumb))) {
+      // console.log('Not OK to split:', last(state.breadcrumb));
+      willMove = state.breadcrumb.pop();
       pathToRestore.unshift(willMove);
     }
 
-    // console.log('OK to split:', last(state.path));
+    // console.log('OK to split:', last(state.breadcrumb));
     // console.log('Will move:', willMove);
     willMove.setAttribute('data-bindery-did-move', true);
 
@@ -1259,50 +1182,56 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
 
     // TODO: step back even further if the
     // to avoid leaving otherwise empty nodes behind
-    if (last(state.path).textContent.trim() === '') {
-      // console.log('Leaving empty node', last(state.path));
+    if (last(state.breadcrumb).textContent.trim() === '') {
+      // console.log('Leaving empty node', last(state.breadcrumb));
       parent.appendChild(willMove);
-      willMove = state.path.pop();
+      willMove = state.breadcrumb.pop();
       pathToRestore.unshift(willMove);
       willMove.parentNode.removeChild(willMove);
     }
+
+    if (state.currentPage.isEmpty) {}
+    // state.currentPage.element.style.background = 'red';
+    // nodeToMove.style.background = 'orange';
+    // willMove.style.background = 'yellow';
+    // console.log('moving node', nodeToMove);
+    // console.log('interpreted node', willMove);
+    // throw Error('moving from empty page');
+
 
     // create new page and clone context onto it
     continueOnNewPage();
 
     // append node as first in new page
-    last(state.path).appendChild(willMove);
+    last(state.breadcrumb).appendChild(willMove);
 
     // restore subpath
     pathToRestore.forEach(function (restore) {
-      state.path.push(restore);
+      state.breadcrumb.push(restore);
     });
-    state.path.push(nodeToMove);
+    state.breadcrumb.push(nodeToMove);
   };
 
-  var addTextNode = function addTextNode(originalNode, doneCallback, abortCallback) {
-    var textNode = originalNode;
-    last(state.path).appendChild(textNode);
+  var addTextNode = function addTextNode(textNode, doneCallback, undoAddTextNode) {
+    last(state.breadcrumb).appendChild(textNode);
 
     if (state.currentPage.hasOverflowed()) {
-      // It doesnt fit
       textNode.parentNode.removeChild(textNode);
-      abortCallback();
+      undoAddTextNode();
     } else {
-      // It fits
-      throttle(doneCallback);
+      scheduler.throttle(doneCallback);
     }
   };
 
   // Adds an text node by incrementally adding words
   // until it just barely doesnt overflow
-  var addTextNodeIncremental = function addTextNodeIncremental(originalNode, doneCallback, abortCallback) {
+  var addTextNodeIncremental = function addTextNodeIncremental(originalNode, doneCallback, undoAddTextNode) {
     var originalText = originalNode.nodeValue;
     var textNode = originalNode;
-    last(state.path).appendChild(textNode);
+    last(state.breadcrumb).appendChild(textNode);
 
     if (!state.currentPage.hasOverflowed()) {
-      throttle(doneCallback);
+      scheduler.throttle(doneCallback);
       return;
     }
 
@@ -1319,7 +1248,7 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
         }if (pos < 1) {
           textNode.nodeValue = originalText;
           textNode.parentNode.removeChild(textNode);
-          abortCallback();
+          undoAddTextNode();
           return;
         }
 
@@ -1335,84 +1264,112 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
 
         // Continue working with clone
         textNode = document.createTextNode(originalText);
-        last(state.path).appendChild(textNode);
+        last(state.breadcrumb).appendChild(textNode);
 
         // If the remainder fits there, we're done
         if (!state.currentPage.hasOverflowed()) {
-          // console.log("Fits entirely!");
-          throttle(doneCallback);
+          scheduler.throttle(doneCallback);
           return;
         }
 
-        throttle(splitTextStep);
+        scheduler.throttle(splitTextStep);
         return;
       }
       if (pos > originalText.length - 1) {
-        throttle(doneCallback);
+        scheduler.throttle(doneCallback);
         return;
       }
 
       pos += 1;
       while (originalText.charAt(pos) !== ' ' && pos < originalText.length) {
         pos += 1;
-      }throttle(splitTextStep, SHOULD_DEBUG_TEXT);
+      }scheduler.throttle(splitTextStep);
     };
 
     splitTextStep();
+  };
+
+  var addTextChild = function addTextChild(parent, child, next) {
+    var forceAddTextNode = function forceAddTextNode() {
+      last(state.breadcrumb).appendChild(child);
+      state.currentPage.suppressErrors = true;
+      continueOnNewPage();
+      scheduler.throttle(next);
+    };
+    if (isSplittable(parent)) {
+      var undoAddTextNode = function undoAddTextNode() {
+        moveNodeToNextPage(parent);
+        addTextNodeIncremental(child, next, forceAddTextNode);
+      };
+      addTextNodeIncremental(child, next, undoAddTextNode);
+    } else {
+      var _undoAddTextNode = function _undoAddTextNode() {
+        moveNodeToNextPage(parent);
+        addTextNode(child, next, forceAddTextNode);
+      };
+      addTextNode(child, next, _undoAddTextNode);
+    }
+  };
+
+  var addElementChild = function addElementChild(parent, child, next) {
+    if (child.tagName === 'SCRIPT') {
+      next(); // skips
+      return;
+    }
+
+    applyBeforeAddRules(child);
+
+    var addedChildrenSuccess = function addedChildrenSuccess() {
+      // We're now done with this element and its children,
+      // so we pop up a level
+      var addedChild = state.breadcrumb.pop();
+
+      // If this child didn't fit any contents on this page,
+      // but did have contents on a previous page
+      // we should never have added it.
+      // TODO: Catch this earlier.
+      if (false) {
+        addedChild.parentNode.removeChild(addedChild);
+      } else {
+        // TODO: AfterAdd rules may want to access original child, not split second half
+        applyAfterAddRules(addedChild);
+      }
+
+      if (state.currentPage.hasOverflowed()) {
+        // console.log('Bindery: Added element despite overflowing');
+      }
+      next();
+    };
+
+    scheduler.throttle(function () {
+      addElementNode(child, addedChildrenSuccess);
+    });
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
   var addElementNode = function addElementNode(node, doneCallback) {
     if (state.currentPage.hasOverflowed()) {
-      console.error('Bindery: Trying to add node to a page that\'s already overflowing');
+      // console.error('Bindery: Trying to add node to a page that\'s already overflowing');
+      state.currentPage.suppressErrors = true;
+      continueOnNewPage();
     }
 
     // Add this node to the current page or context
-    if (state.path.length === 0) {
-      state.currentPage.flowContent.appendChild(node);
-    } else {
-      last(state.path).appendChild(node);
-    }
-    state.path.push(node);
+    if (!state.breadcrumb[0]) state.currentPage.flowContent.appendChild(node);else last(state.breadcrumb).appendChild(node);
 
-    // 1. Cache the children
+    state.breadcrumb.push(node);
+
     var childNodes = [].concat(_toConsumableArray(node.childNodes));
-    // 2. Clear this node
     node.innerHTML = '';
 
     // Overflows when empty
     if (state.currentPage.hasOverflowed()) {
-      // console.error(`Bindery: Adding ${elToStr(node)} causes overflow even when empty`);
       moveNodeToNextPage(node);
     }
 
-    if (!isSplittable(node)) {}
-    // // Try adding in one go
-    // childNodes.forEach((child) => {
-    //   node.appendChild(child);
-    // });
-    // // If it worked, go to next node
-    // if (!state.currentPage.hasOverflowed()) {
-    //   throttle(doneCallback);
-    //   return;
-    // }
-    // // Try moving to next page in one go
-    // moveNodeToNextPage(node);
-    //
-    // // If it worked, go to next node
-    // if (!state.currentPage.hasOverflowed()) {
-    //   throttle(doneCallback);
-    //   return;
-    // }
-    //
-    // // Sorry, we gotta break it
-    // node.innerHTML = '';
-
-
-    // 3. Try adding each child one by one
     var index = 0;
-    var addNextChild = function addNextChild() {
+    var addNext = function addNext() {
       if (!(index < childNodes.length)) {
         doneCallback();
         return;
@@ -1420,207 +1377,45 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
       var child = childNodes[index];
       index += 1;
 
-      switch (child.nodeType) {
-        case Node.TEXT_NODE:
-          {
-            if (isSplittable(node)) {
-              var abortCallback = function abortCallback() {
-                moveNodeToNextPage(node);
-                addTextNodeIncremental(child, addNextChild, abortCallback);
-              };
-              addTextNodeIncremental(child, addNextChild, abortCallback);
-            } else {
-              var _abortCallback = function _abortCallback() {
-                moveNodeToNextPage(node);
-                node.outline = '1px solid red';
-                addTextNode(child, addNextChild, _abortCallback);
-              };
-              addTextNode(child, addNextChild, _abortCallback);
-            }
-            break;
-          }
-        case Node.ELEMENT_NODE:
-          {
-            if (child.tagName === 'SCRIPT') {
-              addNextChild(); // skip
-              break;
-            }
-
-            beforeAddRules(child);
-
-            throttle(function addChildAsElement() {
-              addElementNode(child, function addedChildSuccess() {
-                // We're now done with this element and its children,
-                // so we pop up a level
-                var addedChild = state.path.pop();
-
-                // TODO: AfterAdd rules may want to access original child, not split second half
-                afterAddRules(addedChild);
-
-                if (state.currentPage.hasOverflowed()) {
-                  console.log('wasn\'t really a success was it');
-                }
-                addNextChild();
-              });
-            });
-            break;
-          }
-        default:
-          // Skip unknown nodes
-          addNextChild();
+      if (child.nodeType === Node.TEXT_NODE) {
+        addTextChild(node, child, addNext);
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        addElementChild(node, child, addNext);
+      } else {
+        addNext(); // Skip comments and unknown nodes
       }
     };
-
     // kick it off
-    addNextChild();
+    addNext();
   };
 
-  var start = window.performance.now();
-  content.style.margin = 0;
-  content.style.padding = 0;
-
-  var book = new _Book2.default();
-  state.book = book;
-  continueOnNewPage();
-
-  var finish = function finish() {
-    var end = window.performance.now();
-    console.log('Bindery: Pages created in ' + (end - start) / 1000 + 's');
-    var measureArea = document.querySelector((0, _prefixClass.prefixClass)('measure-area'));
+  var finishPagination = function finishPagination() {
     document.body.removeChild(measureArea);
 
-    var orderedPages = reorderPages(state.pages, makeNewPage);
-    annotatePages(orderedPages);
+    var orderedPages = (0, _orderPages2.default)(state.pages, makeNewPage);
+    (0, _annotatePages2.default)(orderedPages);
 
-    book.pages = orderedPages;
-    book.setCompleted();
+    state.book.pages = orderedPages;
+    state.book.setCompleted();
 
-    afterBindRules(book);
-    paginateDoneCallback(book);
+    afterBindRules(state.book);
+
+    var end = window.performance.now();
+    console.log('Bindery: Pages created in ' + (end - start) / 1000 + 's');
+
+    success(state.book);
   };
 
-  addElementNode(content, finish);
+  content.style.margin = 0;
+  content.style.padding = 0;
+  continueOnNewPage();
+  addElementNode(content, finishPagination);
 };
 
 exports.default = paginate;
 
 /***/ }),
 /* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var elementToString = function elementToString(node) {
-  var tag = node.tagName.toLowerCase();
-  var id = node.id ? '#' + node.id : '';
-
-  var classes = '';
-  if (node.classList.length > 0) {
-    classes = '.' + [].concat(_toConsumableArray(node.classList)).join('.');
-  }
-
-  var text = '';
-  if (id.length < 1 && classes.length < 2) {
-    text = '("' + node.textContent.substr(0, 30).replace(/\s+/g, ' ') + '...")';
-  }
-  return tag + id + classes + text;
-};
-
-exports.default = elementToString;
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Book = function () {
-  function Book() {
-    _classCallCheck(this, Book);
-
-    this.pages = [];
-    this.queued = [];
-    this.isComplete = false;
-  }
-
-  _createClass(Book, [{
-    key: "pagesForSelector",
-
-
-    // arguments: selector : String
-    // return: pages : [ Int ]
-    // if no matches: []
-    value: function pagesForSelector(sel) {
-      var matches = [];
-      this.pages.forEach(function (page) {
-        if (page.element.querySelector(sel)) {
-          matches.push(page.number);
-        }
-      });
-      return matches;
-    }
-
-    // arguments: selector : String
-    // return: page : Int
-    // if no matches: null
-
-  }, {
-    key: "firstPageForSelector",
-    value: function firstPageForSelector(sel, callback) {
-      var _this = this;
-
-      this.onComplete(function () {
-        var page = _this.pagesForSelector(sel)[0];
-        callback(page);
-      });
-    }
-  }, {
-    key: "onComplete",
-    value: function onComplete(func) {
-      if (!this.isComplete) {
-        this.queued.push(func);
-      } else {
-        func();
-      }
-    }
-  }, {
-    key: "setCompleted",
-    value: function setCompleted() {
-      this.isComplete = true;
-      this.queued.forEach(function (func) {
-        func();
-      });
-    }
-  }, {
-    key: "pageCount",
-    get: function get() {
-      return this.pages.length;
-    }
-  }]);
-
-  return Book;
-}();
-
-exports.default = Book;
-
-/***/ }),
-/* 10 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1732,11 +1527,11 @@ module.exports = (function split(undef) {
 
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // contains, add, remove, toggle
-var indexof = __webpack_require__(12)
+var indexof = __webpack_require__(10)
 
 module.exports = ClassList
 
@@ -1837,7 +1632,7 @@ function isTruthy(value) {
 
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ (function(module, exports) {
 
 
@@ -1852,10 +1647,77 @@ module.exports = function(arr, obj){
 };
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var elementToString = function elementToString(node) {
+  var tag = node.tagName.toLowerCase();
+  var id = node.id ? '#' + node.id : '';
+
+  var classes = '';
+  if (node.classList.length > 0) {
+    classes = '.' + [].concat(_toConsumableArray(node.classList)).join('.');
+  }
+
+  var text = '';
+  if (id.length < 1 && classes.length < 2) {
+    text = '("' + node.textContent.substr(0, 30).replace(/\s+/g, ' ') + '...")';
+  }
+  return tag + id + classes + text;
+};
+
+exports.default = elementToString;
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+// eslint-disable-next-line no-confusing-arrow
+var easeInOutQuad = function easeInOutQuad(t) {
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+};
+
+var scrollPct = function scrollPct(el) {
+  return (el.scrollTop + el.offsetHeight) / el.scrollHeight;
+};
+
+var scrollToBottom = function scrollToBottom(el) {
+  var start = el.scrollTop;
+  var end = el.scrollHeight;
+  var dist = end - start;
+  var t = 0;
+  var step = function step() {
+    el.scrollTop = start + easeInOutQuad(t) * dist;
+    t += 0.05;
+    if (t < 1) requestAnimationFrame(step);
+  };
+  step();
+};
+
+exports.scrollToBottom = scrollToBottom;
+exports.scrollPct = scrollPct;
 
 /***/ }),
 /* 14 */
@@ -1870,17 +1732,447 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _hyperscript = __webpack_require__(0);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Book = function () {
+  function Book() {
+    _classCallCheck(this, Book);
+
+    this.pages = [];
+    this.queued = [];
+    this.isComplete = false;
+  }
+
+  _createClass(Book, [{
+    key: "pagesForSelector",
+
+
+    // arguments: selector : String
+    // return: pages : [ Int ]
+    // if no matches: []
+    value: function pagesForSelector(sel) {
+      var matches = [];
+      this.pages.forEach(function (page) {
+        if (page.element.querySelector(sel)) {
+          matches.push(page.number);
+        }
+      });
+      return matches;
+    }
+
+    // arguments: selector : String
+    // return: page : Int
+    // if no matches: null
+
+  }, {
+    key: "firstPageForSelector",
+    value: function firstPageForSelector(sel, callback) {
+      var _this = this;
+
+      this.onComplete(function () {
+        var page = _this.pagesForSelector(sel)[0];
+        callback(page);
+      });
+    }
+  }, {
+    key: "onComplete",
+    value: function onComplete(func) {
+      if (!this.isComplete) {
+        this.queued.push(func);
+      } else {
+        func();
+      }
+    }
+  }, {
+    key: "setCompleted",
+    value: function setCompleted() {
+      this.isComplete = true;
+      this.queued.forEach(function (func) {
+        func();
+      });
+    }
+  }, {
+    key: "pageCount",
+    get: function get() {
+      return this.pages.length;
+    }
+  }]);
+
+  return Book;
+}();
+
+exports.default = Book;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// Even when there is no debugDelay,
+// the throttler will occassionally use rAF
+// to prevent the call stack from getting too big.
+//
+// There might be a better way to do this.
+var MAX_CALLS = 500;
+
+var Scheduler = function () {
+  function Scheduler(debuggable) {
+    _classCallCheck(this, Scheduler);
+
+    this.numberOfCalls = 0;
+    this.resumeLimit = Infinity;
+    this.callsSinceResume = 0;
+    this.queuedFunc = null;
+    this.isPaused = false;
+    this.useDelay = debuggable;
+    this.delayTime = 100;
+
+    if (debuggable) {
+      // Only expose these
+      window.binderyDebug = {
+        pause: this.pause.bind(this),
+        resume: this.resume.bind(this),
+        resumeFor: this.resumeFor.bind(this),
+        step: this.step.bind(this)
+      };
+      console.log('Bindery: Debug layout with the following: \nbinderyDebug.pause() \nbinderyDebug.resume()\n binderyDebug.resumeFor(n) // pauses after n steps, \nbinderyDebug.step()');
+    }
+  }
+
+  _createClass(Scheduler, [{
+    key: 'throttle',
+    value: function throttle(func) {
+      this.callsSinceResume += 1;
+
+      if (this.callsSinceResume > this.resumeLimit) {
+        this.endResume();
+      }
+
+      if (this.isPaused) {
+        this.queuedFunc = func;
+      } else if (this.useDelay) {
+        setTimeout(func, this.delayTime);
+      } else if (this.numberOfCalls < MAX_CALLS) {
+        this.numberOfCalls += 1;
+        func();
+      } else {
+        this.numberOfCalls = 0;
+        requestAnimationFrame(func);
+      }
+    }
+  }, {
+    key: 'pause',
+    value: function pause() {
+      if (this.isPaused) return 'Already paused';
+      this.isPaused = true;
+      return 'Paused';
+    }
+  }, {
+    key: 'resumeDelay',
+    value: function resumeDelay() {
+      this.useDelay = true;
+      this.resume();
+    }
+  }, {
+    key: 'resumeFast',
+    value: function resumeFast() {
+      this.useDelay = false;
+      this.resume();
+    }
+  }, {
+    key: 'resume',
+    value: function resume() {
+      if (this.isPaused) {
+        this.isPaused = false;
+        if (this.queuedFunc) {
+          this.queuedFunc();
+          this.queuedFunc = null;
+        } else {
+          return 'Layout complete';
+        }
+        return 'Resuming';
+      }
+      return 'Already running';
+    }
+  }, {
+    key: 'step',
+    value: function step() {
+      if (!this.isPaused) {
+        this.pause();
+      }
+      if (this.queuedFunc) {
+        this.queuedFunc();
+        var n = this.queuedFunc.name;
+        this.queuedFunc = null;
+        return n;
+      }
+      return 'Layout complete';
+    }
+  }, {
+    key: 'resumeFor',
+    value: function resumeFor(n) {
+      this.callsSinceResume = 0;
+      this.resumeLimit = n;
+      return this.resume();
+    }
+  }, {
+    key: 'endResume',
+    value: function endResume() {
+      console.log('Paused after ' + this.resumeLimit);
+      this.resumeLimit = Infinity;
+      this.callsSinceResume = 0;
+      this.pause();
+    }
+  }]);
+
+  return Scheduler;
+}();
+
+exports.default = Scheduler;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var orderPages = function orderPages(pages, makeNewPage) {
+  var orderedPages = pages.slice();
+
+  // TODO: this ignores the cover page, assuming its on the right
+  for (var i = 1; i < orderedPages.length - 1; i += 2) {
+    var left = orderedPages[i];
+
+    // TODO: Check more than once
+    if (left.alwaysRight) {
+      if (left.outOfFlow) {
+        orderedPages[i] = pages[i + 1];
+        orderedPages[i + 1] = left;
+      } else {
+        pages.splice(i, 0, makeNewPage());
+      }
+    }
+
+    var right = orderedPages[i + 1];
+
+    if (right.alwaysLeft) {
+      if (right.outOfFlow) {
+        // TODO: don't overflow, assumes that
+        // there are not multiple spreads in a row
+        orderedPages[i + 1] = pages[i + 3];
+        orderedPages[i + 3] = right;
+      } else {
+        pages.splice(i + 1, 0, makeNewPage());
+      }
+    }
+  }
+
+  return orderedPages;
+};
+
+exports.default = orderPages;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var annotatePages = function annotatePages(pages) {
+  // ———
+  // NUMBERING
+
+  // TODO: Pass in facingpages options
+  var facingPages = true;
+  if (facingPages) {
+    pages.forEach(function (page, i) {
+      page.number = i + 1;
+      page.setLeftRight(i % 2 === 0 ? 'right' : 'left');
+    });
+  } else {
+    pages.forEach(function (page) {
+      page.setLeftRight('right');
+    });
+  }
+
+  // ———
+  // RUNNING HEADERS
+
+  // Sections to annotate with.
+  // This should be a hierarchical list of selectors.
+  // Every time one is selected, it annotates all following pages
+  // and clears any subselectors.
+  // TODO: Make this configurable
+  var running = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
+
+  pages.forEach(function (page) {
+    page.heading = {};
+    Object.keys(running).forEach(function (tagName, i) {
+      var element = page.element.querySelector(tagName);
+      if (element) {
+        running[tagName] = element.textContent;
+        // clear remainder
+        Object.keys(running).forEach(function (tag, j) {
+          if (j > i) running[tag] = '';
+        });
+      }
+      if (running[tagName] !== '') {
+        page.heading[tagName] = running[tagName];
+      }
+    });
+  });
+};
+
+exports.default = annotatePages;
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// @param rules: array of Bindery.Rules
+// @return: A new function that clones the given
+// breadcrumb according to those rules. (original : Array) => clone : Array
+//
+// The breadcrumb is an array of nested elments,
+// for example .content > article > p > a).
+//
+// It's shallowly cloned every time we move to the next page,
+// to create the illusion that nodes are continuing from page
+// to page.
+//
+// The transition can be customized by setting a Continuation rule,
+// which lets you add classes to the original and cloned element
+// to customize styling.
+
+var breadcrumbCloner = function breadcrumbCloner(rules) {
+  // METHODS
+  var markAsContinues = function markAsContinues(node) {
+    node.classList.add((0, _prefixClass2.default)('continues'));
+    rules.filter(function (rule) {
+      return rule.customContinuesClass;
+    }).forEach(function (rule) {
+      return node.classList.add(rule.customContinuesClass);
+    });
+  };
+
+  var markAsContinuation = function markAsContinuation(node) {
+    node.classList.add((0, _prefixClass2.default)('continuation'));
+    rules.filter(function (rule) {
+      return rule.customContinuationClass;
+    }).forEach(function (rule) {
+      return node.classList.add(rule.customContinuationClass);
+    });
+  };
+
+  return function (origBreadcrumb) {
+    var newBreadcrumb = [];
+
+    for (var i = origBreadcrumb.length - 1; i >= 0; i -= 1) {
+      var original = origBreadcrumb[i];
+      var clone = original.cloneNode(false); // shallow
+      clone.innerHTML = '';
+
+      markAsContinues(original);
+      markAsContinuation(clone);
+
+      // Special case for IDs
+      if (clone.id) {}
+      // console.warn(`Bindery: Added a break to ${elToStr(clone)},
+      // so "${clone.id}" is no longer a unique ID.`);
+
+
+      // Special case for ordered lists
+      if (clone.tagName === 'OL') {
+        // restart numbering
+        var prevStart = 1;
+        if (original.hasAttribute('start')) {
+          // the OL is also a continuation
+          prevStart = parseInt(original.getAttribute('start'), 10);
+        }
+        if (i < origBreadcrumb.length - 1 && origBreadcrumb[i + 1].tagName === 'LI') {
+          // the first list item is a continuation
+          prevStart -= 1;
+        }
+        var prevCount = original.children.length;
+        var newStart = prevStart + prevCount;
+        clone.setAttribute('start', newStart);
+      }
+
+      if (i < origBreadcrumb.length - 1) clone.appendChild(newBreadcrumb[i + 1]);
+      newBreadcrumb[i] = clone;
+    }
+
+    return newBreadcrumb;
+  };
+};
+
+exports.default = breadcrumbCloner;
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _Page = __webpack_require__(4);
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+var _Page = __webpack_require__(3);
 
 var _Page2 = _interopRequireDefault(_Page);
 
-var _error = __webpack_require__(15);
+var _Controls = __webpack_require__(20);
+
+var _Controls2 = _interopRequireDefault(_Controls);
+
+var _error = __webpack_require__(22);
 
 var _error2 = _interopRequireDefault(_error);
+
+var _Layouts = __webpack_require__(23);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1895,27 +2187,6 @@ var ARRANGE_ONE = 'arrange_one';
 var ARRANGE_SPREAD = 'arrange_two';
 var ARRANGE_BOOKLET = 'arrange_booklet';
 // const ARRANGE_SIGNATURE = 'arrange_signature';
-
-var cropMarksSingle = function cropMarksSingle() {
-  return (0, _hyperscript2.default)('.bindery-crop-wrap', (0, _hyperscript2.default)('.bindery-crop-top'), (0, _hyperscript2.default)('.bindery-crop-bottom'), (0, _hyperscript2.default)('.bindery-crop-left'), (0, _hyperscript2.default)('.bindery-crop-right'));
-};
-var cropMarksSpread = function cropMarksSpread() {
-  return (0, _hyperscript2.default)('.bindery-crop-wrap', (0, _hyperscript2.default)('.bindery-crop-top'), (0, _hyperscript2.default)('.bindery-crop-bottom'), (0, _hyperscript2.default)('.bindery-crop-left'), (0, _hyperscript2.default)('.bindery-crop-right'), (0, _hyperscript2.default)('.bindery-crop-fold'));
-};
-
-var spread = function spread() {
-  for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
-    arg[_key] = arguments[_key];
-  }
-
-  return _hyperscript2.default.apply(undefined, ['.bindery-spread-wrapper'].concat(arg));
-};
-
-var bookletMeta = function bookletMeta(i, len) {
-  var isFront = i % 4 === 0;
-  var sheetIndex = parseInt((i + 1) / 4, 10) + 1;
-  return (0, _hyperscript2.default)('.bindery-print-meta', 'Sheet ' + sheetIndex + ' of ' + len / 4 + ': ' + (isFront ? 'Outside' : 'Inside'));
-};
 
 var ORIENTATION_STYLE_ID = 'bindery-orientation-stylesheet';
 
@@ -1966,69 +2237,22 @@ var padPages = function padPages(pages) {
   return pages;
 };
 
-var renderGridLayout = function renderGridLayout(pages, isTwoUp) {
-  var gridLayout = document.createDocumentFragment();
-  if (isTwoUp) {
-    for (var i = 0; i < pages.length; i += 2) {
-      var wrap = spread({ style: _Page2.default.spreadSizeStyle() }, pages[i].element, pages[i + 1].element);
-      gridLayout.appendChild(wrap);
-    }
-  } else {
-    pages.forEach(function (pg) {
-      var wrap = spread({ style: _Page2.default.sizeStyle() }, pg.element);
-      gridLayout.appendChild(wrap);
-    });
-  }
-
-  return gridLayout;
-};
-
-var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBooklet) {
-  var printLayout = document.createDocumentFragment();
-
-  var size = isTwoUp ? _Page2.default.spreadSizeStyle() : _Page2.default.sizeStyle();
-  var cropMarks = isTwoUp ? cropMarksSpread : cropMarksSingle;
-
-  var printSheet = function printSheet() {
-    for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      arg[_key2] = arguments[_key2];
-    }
-
-    return (0, _hyperscript2.default)('.bindery-print-page.bindery-letter-' + orient, spread.apply(undefined, [{ style: size }].concat(arg, [cropMarks()])));
-  };
-
-  if (isTwoUp) {
-    for (var i = 0; i < pages.length; i += 2) {
-      var sheet = printSheet(pages[i].element, pages[i + 1].element);
-      printLayout.appendChild(sheet);
-      if (isBooklet) {
-        var meta = bookletMeta(i, pages.length);
-        sheet.appendChild(meta);
-      }
-    }
-  } else {
-    pages.forEach(function (pg) {
-      var sheet = printSheet(pg.element);
-      printLayout.appendChild(sheet);
-    });
-  }
-
-  return printLayout;
-};
-
 var Viewer = function () {
-  function Viewer() {
+  function Viewer(_ref) {
+    var bindery = _ref.bindery;
+
     _classCallCheck(this, Viewer);
 
     this.book = null;
 
-    this.zoomBox = (0, _hyperscript2.default)('.bindery-zoom-wrap');
-    var spinner = (0, _hyperscript2.default)('.bindery-spinner');
-    this.export = (0, _hyperscript2.default)('.bindery-export', this.zoomBox, spinner);
+    this.zoomBox = (0, _hyperscript2.default)((0, _prefixClass2.default)('.zoom-wrap'));
+    var spinner = (0, _hyperscript2.default)((0, _prefixClass2.default)('.spinner'));
+    this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.root'), this.zoomBox, spinner);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
     this.isShowingCropMarks = true;
+    this.isShowingBleedMarks = false;
     this.setOrientation('landscape');
 
     this.mode = MODE_PREVIEW;
@@ -2037,7 +2261,15 @@ var Viewer = function () {
     this.listenForPrint();
     this.listenForResize();
 
-    document.body.appendChild(this.export);
+    this.setGrid = this.setGrid.bind(this);
+    this.setOutline = this.setOutline.bind(this);
+    this.setPrint = this.setPrint.bind(this);
+    this.setFlip = this.setFlip.bind(this);
+
+    this.controls = new _Controls2.default({ binder: bindery, viewer: this });
+
+    this.element.appendChild(this.controls.element);
+    document.body.appendChild(this.element);
   }
 
   // Automatically switch into print mode
@@ -2080,7 +2312,7 @@ var Viewer = function () {
       this.orientation = newVal;
       setOrientationCSS(newVal);
       if (this.mode === MODE_SHEET) {
-        this.update();
+        this.render();
       } else {
         this.setPrint();
       }
@@ -2091,7 +2323,7 @@ var Viewer = function () {
       if (newVal === this.printArrange) return;
       this.printArrange = newVal;
       if (this.mode === MODE_SHEET) {
-        this.update();
+        this.render();
       } else {
         this.setPrint();
       }
@@ -2099,8 +2331,8 @@ var Viewer = function () {
   }, {
     key: 'displayError',
     value: function displayError(title, text) {
-      if (!this.export.parentNode) {
-        document.body.appendChild(this.export);
+      if (!this.element.parentNode) {
+        document.body.appendChild(this.element);
       }
       if (!this.error) {
         this.zoomBox.innerHTML = '';
@@ -2118,25 +2350,25 @@ var Viewer = function () {
     key: 'cancel',
     value: function cancel() {
       // TODO this doesn't work if the target is an existing node
-      if (this.export.parentNode) {
-        this.export.parentNode.removeChild(this.export);
+      if (this.element.parentNode) {
+        this.element.parentNode.removeChild(this.element);
       }
     }
   }, {
     key: 'toggleGuides',
     value: function toggleGuides() {
-      this.export.classList.toggle('bindery-show-guides');
+      this.element.classList.toggle((0, _prefixClass2.default)('show-guides'));
     }
   }, {
     key: 'toggleBleed',
     value: function toggleBleed() {
-      this.export.classList.add('bindery-show-bleed');
+      this.element.classList.add((0, _prefixClass2.default)('show-bleed'));
     }
   }, {
     key: 'toggleDouble',
     value: function toggleDouble() {
       this.doubleSided = !this.doubleSided;
-      this.update();
+      this.render();
     }
   }, {
     key: 'setMode',
@@ -2172,7 +2404,7 @@ var Viewer = function () {
         this.updateGuides();
       } else {
         this.mode = MODE_PREVIEW;
-        this.update();
+        this.render();
       }
     }
   }, {
@@ -2184,7 +2416,7 @@ var Viewer = function () {
         this.updateGuides();
       } else {
         this.mode = MODE_OUTLINE;
-        this.update();
+        this.render();
       }
     }
   }, {
@@ -2192,25 +2424,25 @@ var Viewer = function () {
     value: function setPrint() {
       if (this.mode === MODE_SHEET) return;
       this.mode = MODE_SHEET;
-      this.update();
+      this.render();
     }
   }, {
-    key: 'setInteractive',
-    value: function setInteractive() {
+    key: 'setFlip',
+    value: function setFlip() {
       this.mode = MODE_FLIP;
-      this.update();
+      this.render();
     }
   }, {
-    key: 'update',
-    value: function update() {
+    key: 'render',
+    value: function render() {
       if (!this.book) return;
-      if (!this.export.parentNode) {
-        document.body.appendChild(this.export);
+      if (!this.element.parentNode) {
+        document.body.appendChild(this.element);
       }
 
       this.flaps = [];
-      document.body.classList.add('bindery-viewing');
-      document.body.setAttribute('bindery-view-mode', this.mode);
+      document.body.classList.add((0, _prefixClass2.default)('viewing'));
+      this.element.setAttribute('bindery-view-mode', this.mode);
 
       var scrollPct = document.body.scrollTop / document.body.scrollHeight;
 
@@ -2246,20 +2478,20 @@ var Viewer = function () {
   }, {
     key: 'updateGuides',
     value: function updateGuides() {
-      document.body.setAttribute('bindery-view-mode', this.mode);
+      this.element.setAttribute('bindery-view-mode', this.mode);
       if (this.mode === MODE_OUTLINE) {
-        this.export.classList.add('bindery-show-bleed');
-        this.export.classList.add('bindery-show-guides');
+        this.element.classList.add((0, _prefixClass2.default)('show-bleed'));
+        this.element.classList.add((0, _prefixClass2.default)('show-guides'));
       } else {
-        this.export.classList.remove('bindery-show-bleed');
-        this.export.classList.remove('bindery-show-guides');
+        this.element.classList.remove((0, _prefixClass2.default)('show-bleed'));
+        this.element.classList.remove((0, _prefixClass2.default)('show-guides'));
       }
     }
   }, {
     key: 'renderPrint',
     value: function renderPrint() {
-      this.export.classList.add('bindery-show-bleed');
-      this.export.classList.remove('bindery-show-guides');
+      this.element.classList.add((0, _prefixClass2.default)('show-bleed'));
+      this.element.classList.remove((0, _prefixClass2.default)('show-guides'));
 
       this.zoomBox.innerHTML = '';
 
@@ -2274,8 +2506,8 @@ var Viewer = function () {
         pages = orderPagesBooklet(pages);
       }
 
-      var printLayout = renderPrintLayout(pages, isTwoUp, orient, isBooklet);
-      this.zoomBox.appendChild(printLayout);
+      var fragment = (0, _Layouts.printLayout)(pages, isTwoUp, orient, isBooklet);
+      this.zoomBox.appendChild(fragment);
     }
   }, {
     key: 'renderGrid',
@@ -2285,101 +2517,48 @@ var Viewer = function () {
 
       var pages = this.book.pages.slice();
 
-      if (this.doubleSided) {
-        pages = padPages(pages);
-      }
+      if (this.doubleSided) pages = padPages(pages);
 
-      var gridLayout = renderGridLayout(pages, this.doubleSided);
-      this.zoomBox.appendChild(gridLayout);
+      var fragment = (0, _Layouts.gridLayout)(pages, this.doubleSided);
+      this.zoomBox.appendChild(fragment);
     }
   }, {
     key: 'renderInteractive',
     value: function renderInteractive() {
-      var _this3 = this;
-
       this.zoomBox.innerHTML = '';
       this.flaps = [];
 
-      this.export.classList.remove('bindery-show-bleed');
-      this.export.classList.remove('bindery-show-guides');
+      this.element.classList.remove((0, _prefixClass2.default)('show-bleed'));
+      this.element.classList.remove((0, _prefixClass2.default)('show-guides'));
+      this.zoomBox.classList.add((0, _prefixClass2.default)('stage3d'));
 
       var pages = padPages(this.book.pages.slice());
 
-      var leafIndex = 0;
-
-      var _loop = function _loop(i) {
-        leafIndex += 1;
-        var li = leafIndex;
-        var flap = (0, _hyperscript2.default)('.bindery-page3d', {
-          style: _Page2.default.sizeStyle(),
-          onclick: function onclick() {
-            var newLeaf = li - 1;
-            if (newLeaf === _this3.currentLeaf) newLeaf += 1;
-            _this3.setLeaf(newLeaf);
-          }
-        });
-        _this3.export.classList.add('bindery-stage3d');
-        _this3.flaps.push(flap);
-
-        var rightPage = pages[i].element;
-        var leftPage = void 0;
-        rightPage.classList.add('bindery-page3d-front');
-        flap.appendChild(rightPage);
-        if (_this3.doubleSided) {
-          flap.classList.add('bindery-doubleSided');
-          leftPage = pages[i + 1].element;
-          leftPage.classList.add('bindery-page3d-back');
-          flap.appendChild(leftPage);
-        } else {
-          leftPage = (0, _hyperscript2.default)('.bindery-page.bindery-page3d-back', {
-            style: _Page2.default.sizeStyle()
-          });
-          flap.appendChild(leftPage);
-        }
-        // TODO: Dynamically add/remove pages.
-        // Putting 1000s of elements onscreen
-        // locks up the browser.
-
-        var leftOffset = 4;
-        if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
-
-        flap.style.left = i * leftOffset + 'px';
-
-        _this3.zoomBox.appendChild(flap);
-      };
-
-      for (var i = 1; i < pages.length - 1; i += this.doubleSided ? 2 : 1) {
-        _loop(i);
-      }
-      if (this.currentLeaf) {
-        this.setLeaf(this.currentLeaf);
-      } else {
-        this.setLeaf(0);
-      }
-    }
-  }, {
-    key: 'setLeaf',
-    value: function setLeaf(n) {
-      this.currentLeaf = n;
-      var zScale = 4;
-      if (this.flaps.length * zScale > 200) zScale = 200 / this.flaps.length;
-
-      this.flaps.forEach(function (flap, i, arr) {
-        // + 0.5 so left and right are even
-        var z = (arr.length - Math.abs(i - n + 0.5)) * zScale;
-        flap.style.transform = 'translate3d(' + (i < n ? 4 : 0) + 'px,0,' + z + 'px) rotateY(' + (i < n ? -180 : 0) + 'deg)';
-      });
+      var fragment = (0, _Layouts.flipLayout)(pages, this.doubleSided);
+      this.zoomBox.appendChild(fragment);
     }
   }, {
     key: 'isShowingCropMarks',
     get: function get() {
-      return this.export.classList.contains('bindery-show-crop');
+      return this.element.classList.contains((0, _prefixClass2.default)('show-crop'));
     },
     set: function set(newVal) {
       if (newVal) {
-        this.export.classList.add('bindery-show-crop');
+        this.element.classList.add((0, _prefixClass2.default)('show-crop'));
       } else {
-        this.export.classList.remove('bindery-show-crop');
+        this.element.classList.remove((0, _prefixClass2.default)('show-crop'));
+      }
+    }
+  }, {
+    key: 'isShowingBleedMarks',
+    get: function get() {
+      return this.element.classList.contains((0, _prefixClass2.default)('show-bleed-marks'));
+    },
+    set: function set(newVal) {
+      if (newVal) {
+        this.element.classList.add((0, _prefixClass2.default)('show-bleed-marks'));
+      } else {
+        this.element.classList.remove((0, _prefixClass2.default)('show-bleed-marks'));
       }
     }
   }]);
@@ -2390,7 +2569,7 @@ var Viewer = function () {
 exports.default = Viewer;
 
 /***/ }),
-/* 15 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2400,36 +2579,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-exports.default = function (title, text) {
-  return (0, _hyperscript2.default)('.bindery-error', (0, _hyperscript2.default)('.bindery-error-title', title), (0, _hyperscript2.default)('.bindery-error-text', text), (0, _hyperscript2.default)('.bindery-error-footer', 'Bindery ' + '2.0.0-alpha.3'));
-};
-
-var _hyperscript = __webpack_require__(0);
+var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _convertUnits = __webpack_require__(4);
 
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
+var _prefixClass = __webpack_require__(0);
 
-"use strict";
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _hyperscript = __webpack_require__(0);
-
-var _hyperscript2 = _interopRequireDefault(_hyperscript);
-
-var _convertUnits = __webpack_require__(2);
-
-var _prefixClass = __webpack_require__(3);
-
-var _components = __webpack_require__(17);
+var _components = __webpack_require__(21);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2441,12 +2601,13 @@ var ControlPanel = function ControlPanel(opts) {
   _classCallCheck(this, ControlPanel);
 
   this.binder = opts.binder;
+  var viewer = opts.viewer;
 
   var done = function done() {
     _this.binder.cancel();
   };
   var print = function print() {
-    _this.binder.viewer.setPrint();
+    viewer.setPrint();
     window.print();
   };
 
@@ -2454,21 +2615,28 @@ var ControlPanel = function ControlPanel(opts) {
 
   var layoutControl = void 0;
   var cropToggle = void 0;
+  var bleedMarkToggle = void 0;
   var facingToggle = void 0;
 
   var toggleCrop = function toggleCrop() {
-    _this.binder.viewer.isShowingCropMarks = !_this.binder.viewer.isShowingCropMarks;
+    viewer.isShowingCropMarks = !viewer.isShowingCropMarks;
     cropToggle.classList.toggle('selected');
+  };
+
+  var toggleBleedMarks = function toggleBleedMarks() {
+    viewer.isShowingBleedMarks = !viewer.isShowingBleedMarks;
+    bleedMarkToggle.classList.toggle('selected');
   };
 
   var toggleFacing = function toggleFacing() {
     facingToggle.classList.toggle('selected');
     layoutControl.classList.toggle('not-facing');
-    _this.binder.viewer.toggleDouble();
+    viewer.toggleDouble();
   };
 
   cropToggle = (0, _components.switchRow)({ onclick: toggleCrop }, 'Crop Marks');
   cropToggle.classList.add('selected');
+  bleedMarkToggle = (0, _components.switchRow)({ onclick: toggleBleedMarks }, 'Bleed Marks');
   facingToggle = (0, _components.switchRow)({ onclick: toggleFacing }, 'Facing Pages');
 
   facingToggle.classList.add('selected');
@@ -2487,24 +2655,24 @@ var ControlPanel = function ControlPanel(opts) {
     height: (0, _components.inputNumberUnits)(this.binder.pageSize.height)
   };
 
-  var sizeControl = (0, _hyperscript2.default)('.' + (0, _prefixClass.prefix)('row') + '.' + (0, _prefixClass.prefix)('size'), (0, _hyperscript2.default)('div', 'W', unitInputs.width), (0, _hyperscript2.default)('div', 'H', unitInputs.height));
+  var sizeControl = (0, _hyperscript2.default)('.' + (0, _prefixClass2.default)('row') + '.' + (0, _prefixClass2.default)('size'), (0, _hyperscript2.default)('div', 'W', unitInputs.width), (0, _hyperscript2.default)('div', 'H', unitInputs.height));
 
-  var marginPreview = (0, _hyperscript2.default)((0, _prefixClass.prefixClass)('preview'));
-  var marginControl = (0, _hyperscript2.default)('.' + (0, _prefixClass.prefix)('row') + '.' + (0, _prefixClass.prefix)('margin'), (0, _hyperscript2.default)('.top', unitInputs.top), (0, _hyperscript2.default)('.inner', unitInputs.inner), (0, _hyperscript2.default)('.outer', unitInputs.outer), (0, _hyperscript2.default)('.bottom', unitInputs.bottom), marginPreview);
+  var marginPreview = (0, _hyperscript2.default)((0, _prefixClass2.default)('.preview'));
+  var marginControl = (0, _hyperscript2.default)('.' + (0, _prefixClass2.default)('row') + '.' + (0, _prefixClass2.default)('margin'), (0, _hyperscript2.default)('.top', unitInputs.top), (0, _hyperscript2.default)('.inner', unitInputs.inner), (0, _hyperscript2.default)('.outer', unitInputs.outer), (0, _hyperscript2.default)('.bottom', unitInputs.bottom), marginPreview);
 
-  layoutControl = (0, _hyperscript2.default)((0, _prefixClass.prefixClass)('layout-control'), sizeControl, marginControl);
+  layoutControl = (0, _hyperscript2.default)((0, _prefixClass2.default)('.layout-control'), sizeControl, marginControl);
 
   var paperSize = (0, _components.row)('Paper Size', (0, _components.select)((0, _components.option)('Letter'), (0, _components.option)({ disabled: true }, '8.5 x 11'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)({ disabled: true }, 'Legal'), (0, _components.option)({ disabled: true }, '8.5 x 14'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)({ disabled: true }, 'Tabloid'), (0, _components.option)({ disabled: true }, '11 x 17'), (0, _components.option)({ disabled: true }, ''), (0, _components.option)({ disabled: true }, 'A4'), (0, _components.option)({ disabled: true }, 'mm x mm')));
 
   var arrangeSelect = (0, _components.select)((0, _components.option)({ value: 'arrange_one' }, 'Pages'), (0, _components.option)({ value: 'arrange_two', selected: true }, 'Spreads'), (0, _components.option)({ value: 'arrange_booklet' }, 'Booklet'), (0, _components.option)({ disabled: true }, 'Grid'), (0, _components.option)({ disabled: true }, 'Signatures'));
   arrangeSelect.addEventListener('change', function () {
-    _this.binder.viewer.setPrintArrange(arrangeSelect.value);
+    viewer.setPrintArrange(arrangeSelect.value);
   });
   var arrangement = (0, _components.row)('Print', arrangeSelect);
 
   var orientationSelect = (0, _components.select)((0, _components.option)({ value: 'landscape' }, 'Landscape'), (0, _components.option)({ value: 'portrait' }, 'Portrait'));
   orientationSelect.addEventListener('change', function () {
-    _this.binder.viewer.setOrientation(orientationSelect.value);
+    viewer.setOrientation(orientationSelect.value);
   });
   var orientation = (0, _components.row)('Orientation', orientationSelect);
 
@@ -2522,26 +2690,13 @@ var ControlPanel = function ControlPanel(opts) {
         _this.binder.makeBook(function () {
           inProgress.style.display = 'none';
           forceRefresh.style.display = 'block';
-        }, 100);
+        }, 10);
       });
-    } }, 'Update Layout');
+    } }, 'Rebuild Layout');
 
-  var setGrid = function setGrid() {
-    _this.binder.viewer.setGrid();
-  };
-  var setOutline = function setOutline() {
-    _this.binder.viewer.setOutline();
-  };
-  var setInteractive = function setInteractive() {
-    _this.binder.viewer.setInteractive();
-  };
-  var setPrint = function setPrint() {
-    _this.binder.viewer.setPrint();
-  };
+  var viewModes = [(0, _components.viewMode)('grid', viewer.setGrid, 'Preview'), (0, _components.viewMode)('outline', viewer.setOutline, 'Outline'), (0, _components.viewMode)('flip', viewer.setFlip, 'Flip'), (0, _components.viewMode)('print', viewer.setPrint, 'Sheet')];
 
-  var viewModes = [(0, _components.viewMode)('grid', setGrid, 'Preview'), (0, _components.viewMode)('outline', setOutline, 'Outline'), (0, _components.viewMode)('flip', setInteractive, 'Flip'), (0, _components.viewMode)('print', setPrint, 'Sheet')];
-
-  var viewSwitcher = _hyperscript2.default.apply(undefined, [(0, _prefixClass.prefixClass)('viewswitcher')].concat(viewModes));
+  var viewSwitcher = _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.viewswitcher')].concat(viewModes));
 
   var header = (0, _components.title)('Loading...');
 
@@ -2595,11 +2750,11 @@ var ControlPanel = function ControlPanel(opts) {
   };
 
   this.updateProgress = function (count) {
-    header.innerText = count + ' Pages';
+    header.innerText = count + ' Pages...';
   };
 
   this.setDone = function () {
-    header.innerText = _this.binder.viewer.book.pages.length + ' Pages';
+    header.innerText = viewer.book.pages.length + ' Pages';
     inProgress.style.display = 'none';
     forceRefresh.style.display = 'block';
     validCheck.style.display = 'none';
@@ -2659,15 +2814,47 @@ var ControlPanel = function ControlPanel(opts) {
     unitInputs[k].addEventListener('keyup', throttledUpdate);
   });
 
+  var pause = void 0;
+  var playSlow = void 0;
+  var steps = void 0;
+  pause = (0, _components.btn)('⏸ Pause', { onclick: function onclick() {
+      pause.style.display = 'none';
+      playSlow.style.display = 'block';
+      steps.style.display = 'block';
+    } });
+  playSlow = (0, _components.btn)('🐌 Resume', { onclick: function onclick() {
+      playSlow.style.display = 'none';
+      pause.style.display = 'block';
+      steps.style.display = 'none';
+    } });
+  var step = (0, _components.btn)('Step +1', { onclick: function onclick() {} });
+  var step10 = (0, _components.btn)('+10', { onclick: function onclick() {} });
+  var step100 = (0, _components.btn)('+100', { onclick: function onclick() {} });
+  steps = (0, _hyperscript2.default)('div', { style: { display: 'none' } }, step, step10, step100);
+
+  var debugControls = (0, _components.row)(pause, playSlow, steps);
+  debugControls.classList.add((0, _prefixClass2.default)('debug-controls'));
+  printBtn.classList.add((0, _prefixClass2.default)('btn-print'));
+
+  inProgress = debugControls;
+
   var layoutState = (0, _hyperscript2.default)('div', forceRefresh, validCheck, inProgress);
 
-  this.holder = document.body.appendChild((0, _hyperscript2.default)((0, _prefixClass.prefixClass)('controls'), header, arrangement, paperSize, orientation, cropToggle, (0, _components.expandRow)('Book Setup'), (0, _components.expandArea)(layoutControl, layoutState), doneBtn, printBtn, viewSwitcher));
+  var debugToggle = void 0;
+  var toggleDebug = function toggleDebug() {
+    debugToggle.classList.toggle('selected');
+    _this.binder.debug = !_this.binder.debug;
+  };
+  debugToggle = (0, _components.switchRow)({ onclick: toggleDebug }, 'Debug');
+  if (this.binder.debug) debugToggle.classList.add('selected');
+
+  this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.controls'), header, arrangement, paperSize, orientation, (0, _components.expandRow)('Marks and Bleed'), (0, _components.expandArea)(cropToggle, bleedMarkToggle), (0, _components.expandRow)('Book Setup'), (0, _components.expandArea)(layoutControl, debugToggle, (0, _components.row)(layoutState)), (0, _components.row)(doneBtn, printBtn, debugControls), viewSwitcher);
 };
 
 exports.default = ControlPanel;
 
 /***/ }),
-/* 17 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2678,13 +2865,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.viewMode = exports.inputNumberUnits = exports.switchRow = exports.option = exports.select = exports.btnMain = exports.btn = exports.heading = exports.expandArea = exports.expandRow = exports.row = exports.title = undefined;
 
-var _hyperscript = __webpack_require__(0);
+var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _prefixClass = __webpack_require__(3);
+var _prefixClass = __webpack_require__(0);
 
-var _convertUnits = __webpack_require__(2);
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+var _convertUnits = __webpack_require__(4);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2693,7 +2882,7 @@ var title = function title() {
     arg[_key] = arguments[_key];
   }
 
-  return _hyperscript2.default.apply(undefined, [(0, _prefixClass.prefixClass)('title')].concat(arg));
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.title')].concat(arg));
 };
 
 // Structure
@@ -2702,7 +2891,7 @@ var heading = function heading() {
     arg[_key2] = arguments[_key2];
   }
 
-  return _hyperscript2.default.apply(undefined, [(0, _prefixClass.prefixClass)('heading')].concat(arg));
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.heading')].concat(arg));
 };
 
 var row = function row() {
@@ -2710,7 +2899,7 @@ var row = function row() {
     arg[_key3] = arguments[_key3];
   }
 
-  return _hyperscript2.default.apply(undefined, [(0, _prefixClass.prefixClass)('row')].concat(arg));
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.row')].concat(arg));
 };
 
 var expandRow = function expandRow() {
@@ -2718,7 +2907,7 @@ var expandRow = function expandRow() {
     arg[_key4] = arguments[_key4];
   }
 
-  return _hyperscript2.default.apply(undefined, ['.' + (0, _prefixClass.prefix)('row') + '.' + (0, _prefixClass.prefix)('expand-row'), {
+  return _hyperscript2.default.apply(undefined, ['.' + (0, _prefixClass2.default)('row') + '.' + (0, _prefixClass2.default)('expand-row'), {
     onclick: function onclick() {
       this.classList.toggle('selected');
     }
@@ -2729,7 +2918,7 @@ var expandArea = function expandArea() {
     arg[_key5] = arguments[_key5];
   }
 
-  return _hyperscript2.default.apply(undefined, [(0, _prefixClass.prefixClass)('expand-area')].concat(arg));
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.expand-area')].concat(arg));
 };
 
 // Button
@@ -2738,7 +2927,7 @@ var btn = function btn() {
     arg[_key6] = arguments[_key6];
   }
 
-  return _hyperscript2.default.apply(undefined, ['button.' + (0, _prefixClass.prefix)('btn')].concat(arg));
+  return _hyperscript2.default.apply(undefined, ['button.' + (0, _prefixClass2.default)('btn')].concat(arg));
 };
 
 var btnMain = function btnMain() {
@@ -2746,7 +2935,7 @@ var btnMain = function btnMain() {
     arg[_key7] = arguments[_key7];
   }
 
-  return _hyperscript2.default.apply(undefined, ['button.' + (0, _prefixClass.prefix)('btn') + '.' + (0, _prefixClass.prefix)('btn-main')].concat(arg));
+  return _hyperscript2.default.apply(undefined, ['button.' + (0, _prefixClass2.default)('btn') + '.' + (0, _prefixClass2.default)('btn-main')].concat(arg));
 };
 
 // Menu
@@ -2777,7 +2966,7 @@ var inputNumberUnits = function inputNumberUnits(val) {
 
 // Switch
 var toggleSwitch = function toggleSwitch() {
-  return (0, _hyperscript2.default)((0, _prefixClass.prefixClass)('switch'), (0, _hyperscript2.default)((0, _prefixClass.prefixClass)('switch-handle')));
+  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.switch'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.switch-handle')));
 };
 
 var switchRow = function switchRow() {
@@ -2785,13 +2974,13 @@ var switchRow = function switchRow() {
     arg[_key10] = arguments[_key10];
   }
 
-  return _hyperscript2.default.apply(undefined, [(0, _prefixClass.prefixClass)('row')].concat(arg, [toggleSwitch]));
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.row')].concat(arg, [toggleSwitch]));
 };
 
 // View Swithcer
 var viewMode = function viewMode(id, action, text) {
-  var sel = '.' + (0, _prefixClass.prefix)('viewmode') + '.' + (0, _prefixClass.prefix)(id);
-  return (0, _hyperscript2.default)(sel, { onclick: action }, (0, _hyperscript2.default)((0, _prefixClass.prefixClass)('icon')), text);
+  var sel = '.' + (0, _prefixClass2.default)('viewmode') + '.' + (0, _prefixClass2.default)(id);
+  return (0, _hyperscript2.default)(sel, { onclick: action }, (0, _hyperscript2.default)((0, _prefixClass2.default)('.icon')), text);
 };
 
 exports.title = title;
@@ -2808,7 +2997,7 @@ exports.inputNumberUnits = inputNumberUnits;
 exports.viewMode = viewMode;
 
 /***/ }),
-/* 18 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2818,23 +3007,343 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _Continuation2 = __webpack_require__(19);
+exports.default = function (title, text) {
+  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.3.1'));
+};
+
+var _hyperscript = __webpack_require__(1);
+
+var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.flipLayout = exports.printLayout = exports.gridLayout = undefined;
+
+var _gridLayout = __webpack_require__(24);
+
+var _gridLayout2 = _interopRequireDefault(_gridLayout);
+
+var _printLayout = __webpack_require__(25);
+
+var _printLayout2 = _interopRequireDefault(_printLayout);
+
+var _flipLayout = __webpack_require__(27);
+
+var _flipLayout2 = _interopRequireDefault(_flipLayout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.gridLayout = _gridLayout2.default;
+exports.printLayout = _printLayout2.default;
+exports.flipLayout = _flipLayout2.default;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _hyperscript = __webpack_require__(1);
+
+var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+var _Page = __webpack_require__(3);
+
+var _Page2 = _interopRequireDefault(_Page);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var spread = function spread() {
+  for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
+    arg[_key] = arguments[_key];
+  }
+
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.spread-wrapper')].concat(arg));
+};
+
+var renderGridLayout = function renderGridLayout(pages, isTwoUp) {
+  var gridLayout = document.createDocumentFragment();
+  if (isTwoUp) {
+    for (var i = 0; i < pages.length; i += 2) {
+      var wrap = spread({ style: _Page2.default.spreadSizeStyle() }, pages[i].element, pages[i + 1].element);
+      gridLayout.appendChild(wrap);
+    }
+  } else {
+    pages.forEach(function (pg) {
+      var wrap = spread({ style: _Page2.default.sizeStyle() }, pg.element);
+      gridLayout.appendChild(wrap);
+    });
+  }
+
+  return gridLayout;
+};
+
+exports.default = renderGridLayout;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _hyperscript = __webpack_require__(1);
+
+var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+var _Page = __webpack_require__(3);
+
+var _Page2 = _interopRequireDefault(_Page);
+
+var _printMarks = __webpack_require__(26);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var spread = function spread() {
+  for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
+    arg[_key] = arguments[_key];
+  }
+
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.spread-wrapper')].concat(arg));
+};
+
+var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBooklet) {
+  var printLayout = document.createDocumentFragment();
+
+  var size = isTwoUp ? _Page2.default.spreadSizeStyle() : _Page2.default.sizeStyle();
+  var marks = isTwoUp ? _printMarks.printMarksSpread : _printMarks.printMarksSingle;
+
+  var printSheet = function printSheet() {
+    for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      arg[_key2] = arguments[_key2];
+    }
+
+    return (0, _hyperscript2.default)((0, _prefixClass2.default)('.print-page') + (0, _prefixClass2.default)('.letter-' + orient), spread.apply(undefined, [{ style: size }].concat(arg, [marks()])));
+  };
+
+  if (isTwoUp) {
+    for (var i = 0; i < pages.length; i += 2) {
+      var sheet = printSheet(pages[i].element, pages[i + 1].element);
+      printLayout.appendChild(sheet);
+      if (isBooklet) {
+        var meta = (0, _printMarks.bookletMeta)(i, pages.length);
+        sheet.appendChild(meta);
+      }
+    }
+  } else {
+    pages.forEach(function (pg) {
+      var sheet = printSheet(pg.element);
+      printLayout.appendChild(sheet);
+    });
+  }
+
+  return printLayout;
+};
+
+exports.default = renderPrintLayout;
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.bookletMeta = exports.printMarksSpread = exports.printMarksSingle = undefined;
+
+var _hyperscript = __webpack_require__(1);
+
+var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var bleedMarks = function bleedMarks() {
+  return [(0, _hyperscript2.default)((0, _prefixClass2.default)('.bleed-top')), (0, _hyperscript2.default)((0, _prefixClass2.default)('.bleed-bottom')), (0, _hyperscript2.default)((0, _prefixClass2.default)('.bleed-left')), (0, _hyperscript2.default)((0, _prefixClass2.default)('.bleed-right'))];
+};
+var cropMarks = function cropMarks() {
+  return [(0, _hyperscript2.default)((0, _prefixClass2.default)('.crop-top')), (0, _hyperscript2.default)((0, _prefixClass2.default)('.crop-bottom')), (0, _hyperscript2.default)((0, _prefixClass2.default)('.crop-left')), (0, _hyperscript2.default)((0, _prefixClass2.default)('.crop-right'))];
+};
+var printMarksSingle = function printMarksSingle() {
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.print-mark-wrap')].concat(_toConsumableArray(cropMarks()), _toConsumableArray(bleedMarks())));
+};
+var printMarksSpread = function printMarksSpread() {
+  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.print-mark-wrap'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.crop-fold'))].concat(_toConsumableArray(cropMarks()), _toConsumableArray(bleedMarks())));
+};
+
+var bookletMeta = function bookletMeta(i, len) {
+  var isFront = i % 4 === 0;
+  var sheetIndex = parseInt((i + 1) / 4, 10) + 1;
+  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.print-meta'), 'Sheet ' + sheetIndex + ' of ' + len / 4 + ': ' + (isFront ? 'Outside' : 'Inside'));
+};
+
+exports.printMarksSingle = printMarksSingle;
+exports.printMarksSpread = printMarksSpread;
+exports.bookletMeta = bookletMeta;
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _hyperscript = __webpack_require__(1);
+
+var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+var _Page = __webpack_require__(3);
+
+var _Page2 = _interopRequireDefault(_Page);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
+  var flipLayout = document.createDocumentFragment();
+  var flaps = [];
+  var currentLeaf = 0;
+
+  var setLeaf = function setLeaf(n) {
+    var newLeaf = n;
+    if (newLeaf === currentLeaf) newLeaf += 1;
+
+    currentLeaf = newLeaf;
+    var zScale = 4;
+    if (flaps.length * zScale > 200) zScale = 200 / flaps.length;
+
+    flaps.forEach(function (flap, i, arr) {
+      // + 0.5 so left and right are even
+      var z = (arr.length - Math.abs(i - n + 0.5)) * zScale;
+      flap.style.transform = 'translate3d(' + (i < n ? 4 : 0) + 'px,0,' + z + 'px) rotateY(' + (i < n ? -180 : 0) + 'deg)';
+    });
+  };
+
+  var leafIndex = 0;
+
+  var _loop = function _loop(i) {
+    leafIndex += 1;
+    var li = leafIndex;
+    var flap = (0, _hyperscript2.default)((0, _prefixClass2.default)('.page3d'), {
+      style: _Page2.default.sizeStyle(),
+      onclick: function onclick() {
+        var newLeaf = li - 1;
+        setLeaf(newLeaf);
+      }
+    });
+
+    var rightPage = pages[i].element;
+    var leftPage = void 0;
+    rightPage.classList.add((0, _prefixClass2.default)('page3d-front'));
+    flap.appendChild(rightPage);
+    if (doubleSided) {
+      flap.classList.add((0, _prefixClass2.default)('doubleSided'));
+      leftPage = pages[i + 1].element;
+      leftPage.classList.add((0, _prefixClass2.default)('page3d-back'));
+      flap.appendChild(leftPage);
+    } else {
+      leftPage = (0, _hyperscript2.default)((0, _prefixClass2.default)('.page') + (0, _prefixClass2.default)('.page3d-back'), {
+        style: _Page2.default.sizeStyle()
+      });
+      flap.appendChild(leftPage);
+    }
+    // TODO: Dynamically add/remove pages.
+    // Putting 1000s of elements onscreen
+    // locks up the browser.
+
+    var leftOffset = 4;
+    if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
+
+    flap.style.left = i * leftOffset + 'px';
+
+    flaps.push(flap);
+    flipLayout.appendChild(flap);
+  };
+
+  for (var i = 1; i < pages.length - 1; i += doubleSided ? 2 : 1) {
+    _loop(i);
+  }
+
+  setLeaf(0);
+  return flipLayout;
+};
+
+exports.default = renderFlipLayout;
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Continuation2 = __webpack_require__(29);
 
 var _Continuation3 = _interopRequireDefault(_Continuation2);
 
-var _FullPage2 = __webpack_require__(20);
+var _FullPage2 = __webpack_require__(30);
 
 var _FullPage3 = _interopRequireDefault(_FullPage2);
 
-var _Footnote2 = __webpack_require__(21);
+var _Footnote2 = __webpack_require__(31);
 
 var _Footnote3 = _interopRequireDefault(_Footnote2);
 
-var _PageReference2 = __webpack_require__(22);
+var _PageReference2 = __webpack_require__(32);
 
 var _PageReference3 = _interopRequireDefault(_PageReference2);
 
-var _RunningHeader2 = __webpack_require__(23);
+var _RunningHeader2 = __webpack_require__(33);
 
 var _RunningHeader3 = _interopRequireDefault(_RunningHeader2);
 
@@ -2842,15 +3351,15 @@ var _Replace2 = __webpack_require__(5);
 
 var _Replace3 = _interopRequireDefault(_Replace2);
 
-var _Rule = __webpack_require__(1);
+var _Rule = __webpack_require__(2);
 
 var _Rule2 = _interopRequireDefault(_Rule);
 
-var _Spread2 = __webpack_require__(24);
+var _Spread2 = __webpack_require__(34);
 
 var _Spread3 = _interopRequireDefault(_Spread2);
 
-var _PageBreak2 = __webpack_require__(25);
+var _PageBreak2 = __webpack_require__(35);
 
 var _PageBreak3 = _interopRequireDefault(_PageBreak2);
 
@@ -2888,7 +3397,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 19 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2900,7 +3409,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Rule2 = __webpack_require__(1);
+var _Rule2 = __webpack_require__(2);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
@@ -2946,7 +3455,7 @@ var Continuation = function (_Rule) {
 exports.default = Continuation;
 
 /***/ }),
-/* 20 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2958,7 +3467,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Rule2 = __webpack_require__(1);
+var _Rule2 = __webpack_require__(2);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
@@ -3015,7 +3524,7 @@ var FullPage = function (_Rule) {
 exports.default = FullPage;
 
 /***/ }),
-/* 21 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3029,7 +3538,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _hyperscript = __webpack_require__(0);
+var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
@@ -3096,7 +3605,7 @@ var Footnote = function (_Replace) {
 exports.default = Footnote;
 
 /***/ }),
-/* 22 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3151,11 +3660,20 @@ var PageReference = function (_Replace) {
 
         this.references[ref] = elmt;
 
+        // Temporary, to make sure it'll fit
+        var parent = elmt.parentNode;
+        var tempClone = elmt.cloneNode(true);
+        var temp = this.replace(tempClone, '⏱');
+        parent.replaceChild(temp, elmt);
+
         state.book.firstPageForSelector(ref, function (number) {
-          var parent = elmt.parentNode;
-          var newEl = _this2.replace(elmt, number);
-          parent.replaceChild(newEl, elmt);
+          var tempParent = temp.parentNode;
+          var finalClone = elmt.cloneNode(true);
+          var newEl = _this2.replace(finalClone, number);
+          tempParent.replaceChild(newEl, temp);
         });
+
+        return temp;
       }
       return elmt;
     }
@@ -3173,7 +3691,7 @@ var PageReference = function (_Replace) {
 exports.default = PageReference;
 
 /***/ }),
-/* 23 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3185,13 +3703,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _hyperscript = __webpack_require__(0);
+var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _Rule2 = __webpack_require__(1);
+var _Rule2 = __webpack_require__(2);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3214,7 +3736,7 @@ var RunningHeader = function (_Rule) {
   _createClass(RunningHeader, [{
     key: 'afterBind',
     value: function afterBind(page) {
-      var el = (0, _hyperscript2.default)('.bindery-running-header');
+      var el = (0, _hyperscript2.default)((0, _prefixClass2.default)('.running-header'));
       el.innerHTML = this.render(page);
       page.element.appendChild(el);
     }
@@ -3231,7 +3753,7 @@ var RunningHeader = function (_Rule) {
 exports.default = RunningHeader;
 
 /***/ }),
-/* 24 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3243,9 +3765,13 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Rule2 = __webpack_require__(1);
+var _Rule2 = __webpack_require__(2);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3289,12 +3815,12 @@ var Spread = function (_Rule) {
       rightPage.flowBox.appendChild(dupedContent);
       rightPage.flowContent = dupedContent;
 
-      leftPage.element.classList.add('bindery-spread');
+      leftPage.element.classList.add((0, _prefixClass2.default)('spread'));
       leftPage.element.classList.add('bleed');
       leftPage.setPreference('left');
       leftPage.setOutOfFlow(true);
 
-      rightPage.element.classList.add('bindery-spread');
+      rightPage.element.classList.add((0, _prefixClass2.default)('spread'));
       rightPage.element.classList.add('bleed');
       rightPage.setPreference('right');
       rightPage.setOutOfFlow(true);
@@ -3312,7 +3838,7 @@ var Spread = function (_Rule) {
 exports.default = Spread;
 
 /***/ }),
-/* 25 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3324,7 +3850,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Rule2 = __webpack_require__(1);
+var _Rule2 = __webpack_require__(2);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
@@ -3389,16 +3915,16 @@ var PageBreak = function (_Rule) {
 exports.default = PageBreak;
 
 /***/ }),
-/* 26 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(27);
+var content = __webpack_require__(37);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(34)(content, {});
+var update = __webpack_require__(44)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -3415,21 +3941,21 @@ if(false) {
 }
 
 /***/ }),
-/* 27 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(28)();
+exports = module.exports = __webpack_require__(38)();
 // imports
 
 
 // module
-exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .bindery-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n  .bindery-show-bleed .bindery-page {\n    box-shadow: none;\n    outline: none;\n    overflow: visible; }\n  .bindery-page3d .bindery-page {\n    overflow: hidden !important; }\n  .bindery-page::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    pointer-events: none;\n    z-index: 999; }\n  .bindery-zoom-wrap * {\n    transition: box-shadow 0.5s; }\n  .bindery-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .bindery-show-guides .bindery-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .bindery-show-guides .bindery-flowbox {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-footer {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .bindery-show-guides .bindery-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .bindery-show-guides .bindery-bleed {\n    box-shadow: 0 0 0 1px yellow; } }\n\n.bindery-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.bindery-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.bindery-content {\n  /* hack to prevent margin collapse, leading to wrong height */\n  padding: 0.1px; }\n\n.bindery-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n.bindery-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt; }\n\n/*Old Bleed Stuff*/\n.bindery-page.bleed .bindery-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px; }\n\n.bindery-left.bleed .bindery-flowbox {\n  right: 0;\n  left: -20px; }\n\n.bindery-right.bleed .bindery-flowbox {\n  left: 0;\n  right: -20px; }\n\n/*Bleed as layer*/\n.bindery-bleed {\n  position: absolute;\n  top: -0.2in;\n  bottom: -0.2in;\n  z-index: 0; }\n  .bindery-left .bindery-bleed {\n    right: 0;\n    left: -0.2in; }\n  .bindery-right .bindery-bleed {\n    left: 0;\n    right: -0.2in; }\n\n.bindery-spread.bindery-left .bindery-content {\n  /*width: 200%;*/\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: -100%;\n  bottom: 0; }\n\n.bindery-spread.bindery-right .bindery-content {\n  position: absolute;\n  top: 0;\n  left: -100%;\n  right: 0;\n  bottom: 0; }\n\n.bindery-sup {\n  font-size: 0.667em; }\n\n.bindery-running-header, .bindery-footer {\n  font-size: 10pt; }\n\n.bindery-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .bindery-left .bindery-running-header {\n    left: 18pt;\n    text-align: left; }\n  .bindery-right .bindery-running-header {\n    right: 18pt;\n    text-align: right; }\n\np.bindery-continuation {\n  text-indent: 0 !important; }\n\nli.bindery-continuation {\n  list-style: none !important; }\n\n.bindery-crop-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .bindery-show-crop .bindery-crop-wrap {\n    display: block; }\n  .bindery-crop-wrap > div {\n    position: absolute;\n    overflow: hidden; }\n    .bindery-crop-wrap > div::before, .bindery-crop-wrap > div:after {\n      content: \"\";\n      background: black;\n      width: 12pt;\n      height: 12pt;\n      display: block;\n      position: absolute; }\n    .bindery-crop-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .bindery-crop-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.bindery-show-crop .bindery-print-page .bindery-spread-wrapper {\n  margin: 30pt auto; }\n\n.bindery-crop-fold, .bindery-crop-left, .bindery-crop-right {\n  transform: scaleX(0.5);\n  top: -20pt;\n  bottom: -20pt;\n  width: 1px;\n  margin: auto; }\n\n.bindery-crop-fold {\n  right: 0;\n  left: 0; }\n\n.bindery-crop-left {\n  left: 0; }\n\n.bindery-crop-right {\n  right: 0; }\n\n.bindery-crop-top, .bindery-crop-bottom {\n  transform: scaleY(0.5);\n  left: -20pt;\n  right: -20pt;\n  height: 1px; }\n\n.bindery-crop-top {\n  top: 0; }\n\n.bindery-crop-bottom {\n  bottom: 0; }\n\n@media screen {\n  .bindery-viewing {\n    background: #f4f4f4 !important; }\n  .bindery-export {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .bindery-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    padding-right: 240px;\n    z-index: 99;\n    visibility: hidden;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0; }\n  .bindery-print-page {\n    margin: 0 auto; }\n  .bindery-spinner {\n    border: 2px solid transparent;\n    border-left-color: navy;\n    width: 32px;\n    height: 32px;\n    border-radius: 50%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    bottom: 0;\n    right: 0;\n    margin: auto;\n    z-index: 999;\n    opacity: 0; }\n  .bindery-inProgress .bindery-spinner {\n    opacity: 1;\n    animation: spin 0.6s linear infinite; }\n  .bindery-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    background: url(" + __webpack_require__(29) + ") no-repeat 0% 0%;\n    background-size: 48px;\n    padding-top: 64px; }\n    .bindery-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .bindery-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .bindery-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .bindery-show-bleed .bindery-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .bindery-letter-landscape {\n    width: 11in;\n    height: 8.5in; }\n  .bindery-letter-portrait {\n    width: 8.5in;\n    height: 11in; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .bindery-export {\n    -webkit-print-color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .bindery-viewing > :not(.bindery-export) {\n    display: none !important; }\n  .bindery-print-page {\n    margin: 20px; }\n  .bindery-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.bindery-viewing {\n  margin: 0; }\n\n.bindery-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.bindery-viewing > :not(.bindery-export):not(.bindery-controls):not(.bindery-measure-area) {\n  display: none !important; }\n\n.bindery-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden; }\n\n.bindery-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.bindery-print-page .bindery-spread-wrapper {\n  margin: 0 auto; }\n\n.bindery-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.bindery-stage3d {\n  perspective: 3000px;\n  transform-style: preserve-3d; }\n\n.bindery-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .bindery-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .bindery-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .bindery-page3d .bindery-page {\n    position: absolute;\n    backface-visibility: hidden; }\n  .bindery-page3d .bindery-page3d-front {\n    transform: rotateY(0); }\n    .bindery-page3d .bindery-page3d-front::after {\n      box-shadow: inset 12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n  .bindery-page3d .bindery-page3d-back {\n    transform: rotateY(-180deg); }\n    .bindery-page3d .bindery-page3d-back::after {\n      box-shadow: inset -12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n\n@media screen {\n  .bindery-viewing .bindery-controls {\n    display: block !important; } }\n\n.bindery-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  padding-bottom: 100px; }\n\n.bindery-controls * {\n  font: inherit;\n  color: inherit;\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\n.bindery-title {\n  padding: 20px;\n  font-size: 18px; }\n\n.bindery-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0, 0, 0, 0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  margin: 16px;\n  width: auto; }\n  .bindery-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .bindery-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .bindery-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n  .bindery-inProgress .bindery-btn {\n    opacity: 0.2;\n    pointer-events: none; }\n\n.bindery-btn-main {\n  background: navy;\n  color: white; }\n  .bindery-btn-main:hover {\n    background: navy;\n    opacity: 0.7; }\n  .bindery-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.bindery-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  z-index: 99;\n  width: 240px;\n  background: #f4f4f4; }\n\n.bindery-viewmode {\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 3px; }\n  .bindery-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .bindery-viewmode .bindery-icon {\n    height: 32px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .bindery-viewmode.bindery-grid .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(30) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-flip .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(31) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-outline .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(32) + ") no-repeat 50% 50%; }\n  .bindery-viewmode.bindery-print .bindery-icon {\n    -webkit-mask: url(" + __webpack_require__(33) + ") no-repeat 50% 50%; }\n\n[bindery-view-mode='grid'] .bindery-grid,\n[bindery-view-mode='interactive'] .bindery-flip,\n[bindery-view-mode='outline'] .bindery-outline,\n[bindery-view-mode='print'] .bindery-print {\n  color: navy; }\n\n.bindery-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 4px 8px;\n  cursor: pointer; }\n  .bindery-row select {\n    float: right;\n    border: none;\n    background: transparent;\n    padding: 12px;\n    width: 100px; }\n    .bindery-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .bindery-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    background: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white; }\n    .bindery-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .bindery-row input:invalid {\n      color: maroon; }\n\n.bindery-expand-row {\n  color: navy; }\n  .bindery-expand-row:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .bindery-expand-row::after {\n    content: '+';\n    font-size: 1.5em;\n    padding: 0;\n    position: absolute;\n    right: 20px;\n    top: 2px;\n    font-weight: 300; }\n  .bindery-expand-row.selected::after {\n    content: '\\2013'; }\n  .bindery-expand-row.selected + .bindery-expand-area {\n    display: block; }\n\n.bindery-expand-area {\n  display: none;\n  margin-bottom: 16px;\n  padding: 12px 0; }\n  .bindery-expand-area.selected {\n    margin-bottom: 0; }\n\n.bindery-size, .bindery-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px; }\n\n.bindery-size {\n  padding: 8px 0;\n  font-size: 12px; }\n  .bindery-size div {\n    position: relative;\n    padding: 6px 12px;\n    color: #aaa; }\n\n.bindery-layout-control {\n  margin: 4px 20px 16px; }\n\n.bindery-margin {\n  overflow: hidden; }\n  .bindery-margin > div {\n    position: absolute;\n    width: 54px;\n    height: 24px;\n    z-index: 5; }\n    .bindery-margin > div:hover {\n      z-index: 99; }\n  .bindery-margin .top {\n    left: 0;\n    right: 0;\n    margin: auto;\n    top: 0; }\n  .bindery-margin .bottom {\n    left: 0;\n    right: 0;\n    margin: auto;\n    bottom: 0; }\n  .bindery-margin .inner {\n    left: 0;\n    text-align: left;\n    top: calc(50% - 12px); }\n    .bindery-margin .inner input {\n      text-align: left; }\n  .bindery-margin .outer {\n    right: 0;\n    text-align: right;\n    top: calc(50% - 12px); }\n    .bindery-margin .outer input {\n      text-align: right; }\n  .bindery-margin .bindery-preview {\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    border: 1px solid #a9a9ff;\n    height: auto;\n    width: auto;\n    z-index: 0;\n    pointer-events: none;\n    transition: border 0.2s; }\n\n.bindery-margin input {\n  text-align: center;\n  padding: 4px;\n  font-size: 12px; }\n  .bindery-margin input:focus {\n    background: none !important; }\n\n.bindery-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0, 0, 0, 0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  transition: all 0.2s;\n  position: relative; }\n\n.bindery-switch-handle {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  transition: all 0.2s;\n  position: absolute;\n  left: 0px;\n  top: 0px; }\n\n.bindery-row:hover .bindery-switch-handle {\n  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); }\n\n.bindery-row.selected .bindery-switch {\n  background: rgba(0, 0, 128, 0.6); }\n\n.bindery-row.selected .bindery-switch-handle {\n  background: navy;\n  left: 12px; }\n", ""]);
+exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .📖-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n    .📖-show-bleed .📖-page {\n      box-shadow: none;\n      outline: none;\n      overflow: visible; }\n    .📖-page3d .📖-page {\n      overflow: hidden !important; }\n    .📖-page::after {\n      content: \"\";\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      pointer-events: none;\n      z-index: 999; }\n  .📖-zoom-wrap * {\n    transition: box-shadow 0.2s; }\n  .📖-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .📖-show-guides .📖-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .📖-show-guides .📖-flowbox {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-footer {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .📖-show-guides .📖-bleed {\n    box-shadow: 0 0 0 1px yellow; }\n  .📖-is-overflowing {\n    overflow: visible; }\n    .📖-is-overflowing::before {\n      transition: none;\n      content: \"+\";\n      position: absolute;\n      bottom: 0;\n      display: block;\n      margin: 0 auto -10px;\n      left: 0;\n      right: 0;\n      text-align: center;\n      font: 8px/1.3 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      font-weight: 500;\n      text-transform: uppercase;\n      letter-spacing: 0.1em;\n      color: #ad0000;\n      width: 12px;\n      background: white;\n      z-index: 999;\n      border-radius: 2px;\n      padding: 4px;\n      overflow: hidden;\n      border: 1px solid currentColor; }\n    .📖-is-overflowing:hover::before {\n      content: \"Overflow\";\n      width: 54px; }\n    .📖-is-overflowing .📖-content {\n      transition: none; }\n      .📖-is-overflowing .📖-content:hover::after {\n        box-shadow: inset 0 0 0 1px #ad0000;\n        background: rgba(173, 0, 0, 0.04);\n        content: '';\n        position: absolute;\n        top: 0;\n        left: 0;\n        right: 0;\n        bottom: 0; } }\n\n.📖-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.📖-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.📖-content {\n  /* hack to prevent margin collapse, leading to wrong height */\n  padding: 0.1px;\n  position: relative; }\n\n.📖-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n.📖-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt; }\n\n/*Old Bleed Stuff*/\n.📖-page.bleed .📖-flowbox {\n  margin: 0;\n  position: absolute;\n  top: -20px;\n  bottom: -20px; }\n\n.📖-left.bleed .📖-flowbox {\n  right: 0;\n  left: -20px; }\n\n.📖-right.bleed .📖-flowbox {\n  left: 0;\n  right: -20px; }\n\n/*Bleed as layer*/\n.📖-bleed {\n  position: absolute;\n  top: -0.25in;\n  bottom: -0.25in;\n  z-index: 0; }\n  .📖-left .📖-bleed {\n    right: 0;\n    left: -0.25in; }\n  .📖-right .📖-bleed {\n    left: 0;\n    right: -0.25in; }\n\n.📖-spread.📖-left .📖-content {\n  /*width: 200%;*/\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: -100%;\n  bottom: 0; }\n\n.📖-spread.📖-right .📖-content {\n  position: absolute;\n  top: 0;\n  left: -100%;\n  right: 0;\n  bottom: 0; }\n\n.📖-sup {\n  font-size: 0.667em; }\n\n.📖-running-header, .📖-footer {\n  font-size: 10pt; }\n\n.📖-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .📖-left .📖-running-header {\n    left: 18pt;\n    text-align: left; }\n  .📖-right .📖-running-header {\n    right: 18pt;\n    text-align: right; }\n\np.📖-continuation {\n  text-indent: 0 !important; }\n\nli.📖-continuation {\n  list-style: none !important; }\n\n.📖-print-mark-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .📖-show-crop .📖-print-mark-wrap,\n  .📖-show-bleed-marks .📖-print-mark-wrap {\n    display: block; }\n  .📖-show-crop .📖-print-mark-wrap > [class*='crop'] {\n    display: block; }\n  .📖-show-bleed-marks .📖-print-mark-wrap > [class*='bleed'] {\n    display: block; }\n  .📖-print-mark-wrap > div {\n    display: none;\n    position: absolute;\n    overflow: hidden; }\n    .📖-print-mark-wrap > div::before, .📖-print-mark-wrap > div:after {\n      content: \"\";\n      background: black;\n      width: 12pt;\n      height: 12pt;\n      display: block;\n      position: absolute; }\n    .📖-print-mark-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .📖-print-mark-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.📖-show-crop .📖-print-page .📖-spread-wrapper,\n.📖-show-bleed-marks .📖-print-page .📖-spread-wrapper {\n  margin: 30pt auto; }\n\n.📖-crop-fold, .📖-crop-left, .📖-crop-right {\n  transform: scaleX(0.5);\n  top: -30pt;\n  bottom: -30pt;\n  width: 1px;\n  margin: auto; }\n\n.📖-crop-fold {\n  right: 0;\n  left: 0; }\n\n.📖-crop-left {\n  left: 0; }\n\n.📖-crop-right {\n  right: 0; }\n\n.📖-crop-top, .📖-crop-bottom {\n  transform: scaleY(0.5);\n  left: -30pt;\n  right: -30pt;\n  height: 1px; }\n\n.📖-crop-top {\n  top: 0; }\n\n.📖-crop-bottom {\n  bottom: 0; }\n\n.📖-bleed-left, .📖-bleed-right {\n  transform: scaleX(0.5);\n  top: -30pt;\n  bottom: -30pt;\n  width: 1px;\n  margin: auto; }\n\n.📖-bleed-left {\n  left: -0.25in; }\n\n.📖-bleed-right {\n  right: -0.25in; }\n\n.📖-bleed-top, .📖-bleed-bottom {\n  transform: scaleY(0.5);\n  left: -30pt;\n  right: -30pt;\n  height: 1px; }\n\n.📖-bleed-top {\n  top: -0.25in; }\n\n.📖-bleed-bottom {\n  bottom: -0.25in; }\n\n@media screen {\n  .📖-viewing {\n    background: #f4f4f4 !important; }\n  .📖-root {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .📖-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    z-index: 99;\n    visibility: hidden;\n    top: 0;\n    left: 0;\n    right: 240px;\n    bottom: 0; }\n    .📖-measure-area.📖-debug {\n      overflow: scroll;\n      visibility: visible; }\n    .📖-measure-area .📖-page {\n      margin: 0 auto 50px; }\n  .📖-print-page {\n    margin: 0 auto; }\n  .📖-spinner {\n    border: 2px solid transparent;\n    border-left-color: #0000c3;\n    width: 32px;\n    height: 32px;\n    border-radius: 50%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    bottom: 0;\n    right: 0;\n    margin: auto;\n    z-index: 999;\n    opacity: 0; }\n  .📖-in-progress .📖-spinner {\n    opacity: 1;\n    animation: spin 0.6s linear infinite; }\n  .📖-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    background: url(" + __webpack_require__(39) + ") no-repeat 0% 0%;\n    background-size: 48px;\n    padding-top: 64px; }\n    .📖-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .📖-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .📖-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .📖-show-bleed .📖-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .📖-letter-landscape {\n    width: 11in;\n    height: 8.5in; }\n  .📖-letter-portrait {\n    width: 8.5in;\n    height: 11in; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .📖-root {\n    -webkit-print-color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .📖-viewing > :not(.📖-root) {\n    display: none !important; }\n  .📖-controls {\n    display: none !important; }\n  .📖-print-page {\n    margin: 20px; }\n  .📖-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.📖-viewing {\n  margin: 0; }\n\n.📖-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.📖-viewing > :not(.📖-root):not(.📖-measure-area) {\n  display: none !important; }\n\n.📖-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden; }\n\n.📖-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.📖-print-page .📖-spread-wrapper {\n  margin: 0 auto; }\n\n.📖-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.📖-stage3d {\n  perspective: 3000px;\n  transform-style: preserve-3d; }\n\n.📖-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .📖-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .📖-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .📖-page3d .📖-page {\n    position: absolute;\n    backface-visibility: hidden; }\n  .📖-page3d .📖-page3d-front {\n    transform: rotateY(0); }\n    .📖-page3d .📖-page3d-front::after {\n      box-shadow: inset 12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n  .📖-page3d .📖-page3d-back {\n    transform: rotateY(-180deg); }\n    .📖-page3d .📖-page3d-back::after {\n      box-shadow: inset -12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n\n@media screen {\n  .📖-viewing .📖-controls {\n    display: block !important; } }\n\n.📖-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  padding-bottom: 100px; }\n  .📖-controls * {\n    font: inherit;\n    color: inherit;\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box; }\n\n.📖-title {\n  padding: 20px;\n  font-size: 18px; }\n\n.📖-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0, 0, 0, 0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  width: auto; }\n  .📖-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .📖-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .📖-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n\n.📖-btn-main {\n  background: #0000c3;\n  color: white; }\n  .📖-btn-main:hover {\n    background: #0000c3;\n    opacity: 0.7; }\n  .📖-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.📖-in-progress .📖-btn-print {\n  display: none; }\n\n.📖-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  z-index: 99;\n  width: 240px;\n  background: #f4f4f4; }\n\n.📖-viewmode {\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 3px; }\n  .📖-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-viewmode .📖-icon {\n    height: 32px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .📖-viewmode.📖-grid .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(40) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-flip .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(41) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-outline .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(42) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-print .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(43) + ") no-repeat 50% 50%; }\n\n[bindery-view-mode='grid'] .📖-grid,\n[bindery-view-mode='interactive'] .📖-flip,\n[bindery-view-mode='outline'] .📖-outline,\n[bindery-view-mode='print'] .📖-print {\n  color: #0000c3; }\n\n.📖-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 4px 8px;\n  cursor: pointer; }\n  .📖-row select {\n    float: right;\n    border: none;\n    background: transparent;\n    padding: 12px;\n    width: 100px; }\n    .📖-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .📖-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    background: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white; }\n    .📖-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .📖-row input:invalid {\n      color: maroon; }\n\n.📖-expand-row {\n  color: #0000c3;\n  border-radius: 4px; }\n  .📖-expand-row:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-expand-row::after {\n    content: '+';\n    font-size: 1.5em;\n    padding: 0;\n    position: absolute;\n    right: 12px;\n    top: 2px;\n    font-weight: 300; }\n  .📖-expand-row.selected {\n    background: rgba(0, 0, 0, 0.04);\n    border-radius: 4px 4px 0 0; }\n  .📖-expand-row.selected::after {\n    content: '\\2013'; }\n  .📖-expand-row.selected + .📖-expand-area {\n    opacity: 1;\n    max-height: 600px;\n    margin-bottom: 12px; }\n\n.📖-expand-area {\n  background: rgba(0, 0, 0, 0.04);\n  opacity: 0;\n  max-height: 0;\n  margin: -4px 8px;\n  padding: 4px 0;\n  border-radius: 0 0 4px 4px;\n  transition: all 0.2s;\n  overflow: hidden; }\n  .📖-expand-area .📖-row {\n    margin: 4px 0; }\n\n.📖-size, .📖-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px; }\n\n.📖-size {\n  padding: 8px 0;\n  font-size: 12px; }\n  .📖-size div {\n    position: relative;\n    padding: 6px 12px;\n    color: #aaa; }\n\n.📖-layout-control {\n  margin: 4px 12px 8px; }\n\n.📖-margin {\n  overflow: hidden; }\n  .📖-margin > div {\n    position: absolute;\n    width: 54px;\n    height: 24px;\n    z-index: 5; }\n    .📖-margin > div:hover {\n      z-index: 99; }\n  .📖-margin .top {\n    left: 0;\n    right: 0;\n    margin: auto;\n    top: 0; }\n  .📖-margin .bottom {\n    left: 0;\n    right: 0;\n    margin: auto;\n    bottom: 0; }\n  .📖-margin .inner {\n    left: 0;\n    text-align: left;\n    top: calc(50% - 12px); }\n    .📖-margin .inner input {\n      text-align: left; }\n  .📖-margin .outer {\n    right: 0;\n    text-align: right;\n    top: calc(50% - 12px); }\n    .📖-margin .outer input {\n      text-align: right; }\n  .📖-margin .📖-preview {\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    border: 1px solid #a9a9ff;\n    height: auto;\n    width: auto;\n    z-index: 0;\n    pointer-events: none;\n    transition: border 0.2s; }\n\n.📖-margin input {\n  text-align: center;\n  padding: 4px;\n  font-size: 12px; }\n  .📖-margin input:focus {\n    background: none !important; }\n\n.📖-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0, 0, 0, 0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  transition: all 0.2s;\n  position: relative; }\n  .📖-switch-handle {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    background: white;\n    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n    transition: all 0.2s;\n    position: absolute;\n    left: 0px;\n    top: 0px; }\n  .📖-switch:hover .📖-switch-handle {\n    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); }\n  .📖-switch:active .📖-switch-handle {\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); }\n\n.📖-row.selected .📖-switch {\n  background: rgba(0, 0, 195, 0.6); }\n\n.📖-row.selected .📖-switch-handle {\n  background: #0000c3;\n  left: 12px; }\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 28 */
+/* 38 */
 /***/ (function(module, exports) {
 
 /*
@@ -3485,37 +4011,37 @@ module.exports = function() {
 
 
 /***/ }),
-/* 29 */
+/* 39 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='36' height='36' viewBox='0 0 36 36' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cdefs%3E%3Cpath id='a' d='M0 4H15V27H0z'/%3E%3Cpath id='b' d='M15 4H30V27H15z'/%3E%3Cpath id='c' d='M14 4.07147535L27 0 27 22.9285247 14 27z'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23a'/%3E%3Cpath stroke='%23000000' d='M0.5 4.5H14.5V26.5H0.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23b'/%3E%3Cpath stroke='%23000000' d='M15.5 4.5H29.5V26.5H15.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23c'/%3E%3Cpath stroke='%23000000' d='M14.5,4.43882867 L14.5,26.3194563 L26.5,22.5611713 L26.5,0.680543732 L14.5,4.43882867 Z'/%3E%3C/g%3E%3Cpath fill='%23000000' opacity='.3' d='M16.3241613 26.7071852L25.7154453 22.615177 26.1596848 4.74924377 28 4.30920273 28 27z' transform='translate(3 2)'/%3E%3Ccircle fill='%23000000' cx='11' cy='14' r='1'/%3E%3Ccircle fill='%23000000' cx='11' cy='21' r='1'/%3E%3Cpath d='M28.1793786,11.0743011 C24.667534,11.0743011 21.8206214,13.9212136 21.8206214,17.4330583' stroke='%23000000' transform='rotate(-45 25 14.254)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 30 */
+/* 40 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 31 */
+/* 41 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M0.5 0.5H11.5V15.5H0.5z' transform='translate(5 8)'/%3E%3Cpath d='M22.5,15.5 L22.5,0.5' stroke-linecap='square' transform='translate(5 8)'/%3E%3Cpath d='M16.5,8.5 L16.5,23.5 L16.9093327,23.5 L24.5,20.6534998 L24.5,5.72150023 L17.1755617,8.46816459 L17,8.5 L16.5,8.5 Z'/%3E%3Cpath d='M27.5 23.5L16.5 23.5M24.5 8.5L27.5 8.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 32 */
+/* 42 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23000000'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3Cpath stroke='%23000000' d='M8.5 13.5H13.5V20.5H8.5z'/%3E%3Cpath fill='%23000000' d='M8 11H14V12H8z'/%3E%3Cpath stroke='%23000000' d='M19.5 13.5H24.5V20.5H19.5z'/%3E%3Cpath fill='%23000000' d='M19 11H25V12H19z'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 33 */
+/* 43 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M4.5 5.5H28.5V24.5H4.5z'/%3E%3Cpath d='M7.5 8.5L9.5 8.5M14.5 8.5L16.5 8.5M14.5 21.5L16.5 21.5M16.5 8.5L18.5 8.5M16.5 21.5L18.5 21.5M23.5 8.5L25.5 8.5M23.5 21.5L25.5 21.5M7.5 21.5L9.5 21.5M7.5 8.5L7.5 10.5M25.5 8.5L25.5 10.5M16.5 8.5L16.5 10.5M7.5 19.5L7.5 21.5M25.5 19.5L25.5 21.5M16.5 19.5L16.5 21.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 34 */
+/* 44 */
 /***/ (function(module, exports) {
 
 /*

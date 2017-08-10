@@ -48,7 +48,6 @@
   font-weight: 500;
   display: inline-block;
   border-radius: 3px;
-  margin: 16px;
   width: auto;
 
   &:focus {
@@ -64,10 +63,10 @@
     background: rgba(0,0,0,0.14);
   }
 
-  .#{$pre}-in-progress & {
-    opacity: 0.2;
-    pointer-events: none;
-  }
+  // .#{$pre}-in-progress & {
+  //   opacity: 0.2;
+  //   pointer-events: none;
+  // }
 }
 
 .#{$pre}-btn-main {
@@ -82,6 +81,12 @@
   &:active {
     background: black;
     opacity: 1;
+  }
+}
+
+.#{$pre}-btn-print {
+  .#{$pre}-in-progress & {
+    display: none;
   }
 }
 
@@ -209,7 +214,7 @@
 
   &.selected + .#{$pre}-expand-area {
     opacity: 1;
-    max-height: 300px;
+    max-height: 600px;
     margin-bottom: 12px;
   }
 }
@@ -343,11 +348,13 @@
     left: 0px;
     top: 0px;
   }
-}
 
-
-.#{$pre}-row:hover .#{$pre}-switch-handle {
-  box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+  &:hover .#{$pre}-switch-handle {
+    box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+  }
+  &:active .#{$pre}-switch-handle {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
 }
 
 .#{$pre}-row.selected .#{$pre}-switch {
