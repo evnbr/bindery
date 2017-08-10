@@ -4,31 +4,19 @@ import Page from './Page';
 import Viewer from './Viewer';
 import { isValidSize } from './utils/convertUnits';
 import c from './utils/prefixClass';
+import { arraysEqual } from './utils';
 
 import Rules from './Rules/';
 
 require('./_style/main.scss');
 
-
-const DEFAULT_PAGE_SIZE = {
-  width: '288pt',
-  height: '432pt',
-};
+const DEFAULT_PAGE_SIZE = { width: '288pt', height: '432pt' };
 const DEFAULT_PAGE_MARGIN = {
   inner: '24pt',
   outer: '32pt',
   bottom: '54pt',
   top: '48pt',
 };
-
-const arraysEqual = (a, b) => {
-  if (a.length !== b.length) { return false; }
-  for (let i = 0; i < a.length; i += 1) {
-    if (a[i] !== b[i]) { return false; }
-  }
-  return true;
-};
-
 
 class Bindery {
   constructor(opts) {
@@ -164,16 +152,8 @@ class Bindery {
     }
 
     if (!this.isSizeValid()) {
-      const w = this.pageSize.width;
-      const h = this.pageSize.height;
-      const size = `{ width: ${w}, height: ${h} }`;
-      const i = this.pageMargin.inner;
-      const o = this.pageMargin.outer;
-      const t = this.pageMargin.top;
-      const b = this.pageMargin.bottom;
-      const margin = `{ top: ${t}, inner: ${i}, outer: ${o}, bottom: ${b} }`;
       this.viewer.displayError(
-        'Page is too small', `Size: ${size} \n Margin: ${margin} \n Try adjusting the sizes or units.`
+        'Page is too small', `Size: ${JSON.stringify(this.pageSize)} \n Margin: ${JSON.stringify(this.pageMargin)} \n Try adjusting the sizes or units.`
       );
       console.error('Bindery: Cancelled pagination. Page is too small.');
       return;

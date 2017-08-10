@@ -4,6 +4,7 @@ import h from 'hyperscript';
 import elToStr from '../utils/elementToString';
 import c from '../utils/prefixClass';
 import { scrollPct, scrollToBottom } from '../utils/scrollElement';
+import { last } from '../utils';
 
 // Bindery
 import Book from '../Book';
@@ -16,8 +17,6 @@ import annotatePages from './annotatePages';
 import breadcrumbCloner from './breadcrumbCloner';
 
 const MAXIMUM_PAGE_LIMIT = 9999;
-
-const last = arr => arr[arr.length - 1];
 
 const paginate = ({ content, rules, success, progress, error, isDebuggable }) => {
   // SETUP
@@ -201,11 +200,6 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
     }
 
     if (state.currentPage.isEmpty) {
-      // state.currentPage.element.style.background = 'red';
-      // nodeToMove.style.background = 'orange';
-      // willMove.style.background = 'yellow';
-      // console.log('moving node', nodeToMove);
-      // console.log('interpreted node', willMove);
       // throw Error('moving from empty page');
     }
 
