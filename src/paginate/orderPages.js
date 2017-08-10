@@ -11,7 +11,7 @@ const orderPages = (pages, makeNewPage) => {
         orderedPages[i] = pages[i + 1];
         orderedPages[i + 1] = left;
       } else {
-        pages.splice(i, 0, makeNewPage());
+        orderedPages.splice(i, 0, makeNewPage());
       }
     }
 
@@ -24,7 +24,7 @@ const orderPages = (pages, makeNewPage) => {
         orderedPages[i + 1] = pages[i + 3];
         orderedPages[i + 3] = right;
       } else {
-        pages.splice(i + 1, 0, makeNewPage());
+        orderedPages.splice(i + 1, 0, makeNewPage());
       }
     }
   }
