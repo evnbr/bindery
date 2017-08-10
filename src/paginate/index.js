@@ -327,6 +327,16 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
       return;
     }
 
+    if (child.tagName === 'IMG') {
+      if (!child.complete) {
+        console.log(`Bindery: Waiting for image '${child.src}'`);
+        child.addEventListener('load', () => {
+          addElementChild(parent, child, next);
+        });
+        return;
+      }
+    }
+
     applyBeforeAddRules(child);
 
     const addedChildrenSuccess = () => {
