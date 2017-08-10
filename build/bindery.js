@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.3.1 - Sunday, August 6th, 2017, 4:43:04 PM  
+// [AIV]  Build version: 2.0.0-alpha.3.2 - Wednesday, August 9th, 2017, 5:27:37 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -691,7 +691,7 @@ var Bindery = function () {
 
     _classCallCheck(this, Bindery);
 
-    console.log('Bindery ' + '2.0.0-alpha.3.1');
+    console.log('Bindery ' + '2.0.0-alpha.3.2');
 
     var pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
     var pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
@@ -1472,11 +1472,13 @@ var paginate = function paginate(content, rules, paginateDoneCallback, paginateP
                 // we should never have added it.
                 // TODO: Catch this earlier.
                 var cancelAdd = false;
-                if (addedChild.classList.contains((0, _prefixClass.prefix)('continuation'))) {
-                  if (addedChild.children.length === 0) {
-                    cancelAdd = true;
-                  }
-                }
+
+                // TODO: This doesn't work
+                // if (addedChild.classList.contains(prefix('continuation'))) {
+                //   if (addedChild.children.length === 0) {
+                //     cancelAdd = true;
+                //   }
+                // }
 
                 if (cancelAdd) {
                   addedChild.parentNode.removeChild(addedChild);
@@ -2432,7 +2434,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function (title, text) {
-  return (0, _hyperscript2.default)('.bindery-error', (0, _hyperscript2.default)('.bindery-error-title', title), (0, _hyperscript2.default)('.bindery-error-text', text), (0, _hyperscript2.default)('.bindery-error-footer', 'Bindery ' + '2.0.0-alpha.3.1'));
+  return (0, _hyperscript2.default)('.bindery-error', (0, _hyperscript2.default)('.bindery-error-title', title), (0, _hyperscript2.default)('.bindery-error-text', text), (0, _hyperscript2.default)('.bindery-error-footer', 'Bindery ' + '2.0.0-alpha.3.2'));
 };
 
 var _hyperscript = __webpack_require__(0);

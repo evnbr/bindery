@@ -501,11 +501,13 @@ const paginate = function (
             // we should never have added it.
             // TODO: Catch this earlier.
             let cancelAdd = false;
-            if (addedChild.classList.contains(prefix('continuation'))) {
-              if (addedChild.children.length === 0) {
-                cancelAdd = true;
-              }
-            }
+
+            // TODO: This doesn't work
+            // if (addedChild.classList.contains(prefix('continuation'))) {
+            //   if (addedChild.children.length === 0) {
+            //     cancelAdd = true;
+            //   }
+            // }
 
             if (cancelAdd) {
               addedChild.parentNode.removeChild(addedChild);
