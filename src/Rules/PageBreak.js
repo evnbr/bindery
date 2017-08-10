@@ -1,8 +1,8 @@
 import Rule from './Rule';
 
-// API:
-// position: 'before' (default) | 'after' | 'both' | 'avoid'
-// continue: | 'any' (default) | 'left' | 'right'
+// Options:
+// position: String ( 'before' (default) | 'after' | 'both' | 'avoid' )
+// continue: String ( 'any' (default) | 'left' | 'right' )
 
 class PageBreak extends Rule {
   constructor(options) {

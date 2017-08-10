@@ -3,6 +3,12 @@ import Rule from './Rule';
 let prevPage;
 let prevElementPath;
 
+// Options:
+// selector: String
+
+// TODO: Redesign to add entire element in one go, ignoring bleed and any
+// internal rules.
+
 class FullPage extends Rule {
   constructor(options) {
     options.name = 'Full Page Spread';

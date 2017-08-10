@@ -2,6 +2,11 @@ import h from 'hyperscript';
 import Rule from './Rule';
 import c from '../utils/prefixClass';
 
+// Options:
+// selector: String
+// render: function (Page) => HTMLElement
+// TODO selectorHierarchy: [ String ], ie [ 'h1', 'h2', 'h3.chapter' ]
+
 class RunningHeader extends Rule {
   constructor(options) {
     options.name = 'Running Header';

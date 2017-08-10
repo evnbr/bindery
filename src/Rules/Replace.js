@@ -1,5 +1,9 @@
 import Rule from './Rule';
 
+// Options:
+// selector: String
+// replace: function (HTMLElement) => HTMLElement
+
 class Replace extends Rule {
   constructor(options) {
     options.name = 'Footnote';

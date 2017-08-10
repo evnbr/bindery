@@ -1,5 +1,9 @@
 import Replace from './Replace';
 
+// Options:
+// selector: String
+// replace: function (HTMLElement, number) => HTMLElement
+
 class PageReference extends Replace {
   constructor(options) {
     options.name = 'Page Reference';

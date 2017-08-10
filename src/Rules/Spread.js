@@ -1,6 +1,9 @@
 import Rule from './Rule';
 import c from '../utils/prefixClass';
 
+// Options:
+// selector: String
+
 class Spread extends Rule {
   constructor(options) {
     options.name = 'Spread';

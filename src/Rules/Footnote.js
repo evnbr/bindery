@@ -1,6 +1,11 @@
 import h from 'hyperscript';
 import Replace from './Replace';
 
+// Options:
+// selector: String
+// replace: function (HTMLElement, number) => HTMLElement
+// render: function (Page) => HTMLElement
+
 class Footnote extends Replace {
   constructor(options) {
     options.name = 'Footnote';

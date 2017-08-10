@@ -1,8 +1,9 @@
 import Rule from './Rule';
 
-// API:
-// position: 'before' (default) | 'after' | 'both' | 'avoid'
-// continue: | 'any' (default) | 'left' | 'right'
+// Options:
+// selector: String
+// isContinuationClass: String
+// hasContinuationClass: String
 
 class Continuation extends Rule {
   constructor(options) {
