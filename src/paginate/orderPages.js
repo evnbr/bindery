@@ -1,30 +1,34 @@
+const indexOfNextInFlowPage = (pages, startIndex) => {
+  for (let i = startIndex; i < pages.length; i += 1) {
+    if (!pages[i].outOfFlow) {
+      return i;
+    }
+  }
+  return startIndex;
+};
+
 const orderPages = (pages, makeNewPage) => {
   const orderedPages = pages.slice();
 
-  // TODO: this ignores the cover page, assuming its on the right
-  for (let i = 1; i < orderedPages.length - 1; i += 2) {
-    const left = orderedPages[i];
+  for (let i = 0; i < orderedPages.length; i += 1) {
+    const page = orderedPages[i];
+    const isLeft = i % 2 !== 0;
 
-    // TODO: Check more than once
-    if (left.alwaysRight) {
-      if (left.outOfFlow) {
-        orderedPages[i] = pages[i + 1];
-        orderedPages[i + 1] = left;
+    if (isLeft && page.alwaysRight) {
+      if (page.outOfFlow) {
+        const indexToSwap = indexOfNextInFlowPage(pages, i);
+        orderedPages[i] = orderedPages[indexToSwap];
+        orderedPages[indexToSwap] = page;
       } else {
         orderedPages.splice(i, 0, makeNewPage());
       }
-    }
-
-    const right = orderedPages[i + 1];
-
-    if (right.alwaysLeft) {
-      if (right.outOfFlow) {
-        // TODO: don't overflow, assumes that
-        // there are not multiple spreads in a row
-        orderedPages[i + 1] = pages[i + 3];
-        orderedPages[i + 3] = right;
+    } else if (!isLeft && page.alwaysLeft) {
+      if (page.outOfFlow) {
+        const indexToSwap = indexOfNextInFlowPage(pages, i);
+        orderedPages[i] = orderedPages[indexToSwap];
+        orderedPages[indexToSwap] = page;
       } else {
-        orderedPages.splice(i + 1, 0, makeNewPage());
+        orderedPages.splice(i, 0, makeNewPage());
       }
     }
   }
