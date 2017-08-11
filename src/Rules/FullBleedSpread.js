@@ -21,12 +21,12 @@ class FullBleedSpread extends OutOfFlow {
     leftPage.background.appendChild(elmt);
     leftPage.element.classList.add(c('spread'));
     leftPage.setPreference('left');
-    leftPage.setOutOfFlow(true);
+    leftPage.isOutOfFlow = true;
 
     rightPage.background.appendChild(elmt.cloneNode(true));
     rightPage.element.classList.add(c('spread'));
     rightPage.setPreference('right');
-    rightPage.setOutOfFlow(true);
+    rightPage.isOutOfFlow = true;
 
     state.pages.push(leftPage);
     state.pages.push(rightPage);

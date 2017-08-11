@@ -90,10 +90,6 @@ class Page {
     if (dir === 'right') this.alwaysRight = true;
   }
 
-  setOutOfFlow(bool) {
-    this.outOfFlow = bool;
-  }
-
   static setSize(size) {
     Page.W = size.width;
     Page.H = size.height;

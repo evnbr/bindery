@@ -1,6 +1,6 @@
 const indexOfNextInFlowPage = (pages, startIndex) => {
   for (let i = startIndex; i < pages.length; i += 1) {
-    if (!pages[i].outOfFlow) {
+    if (!pages[i].isOutOfFlow) {
       return i;
     }
   }
@@ -15,24 +15,25 @@ const orderPages = (pages, makeNewPage) => {
     const isLeft = i % 2 !== 0;
 
     if (isLeft && page.alwaysRight) {
-      if (page.outOfFlow) {
-        const indexToSwap = indexOfNextInFlowPage(pages, i);
-        orderedPages[i] = orderedPages[indexToSwap];
-        orderedPages[indexToSwap] = page;
+      if (page.isOutOfFlow) {
+        const indexToSwap = indexOfNextInFlowPage(orderedPages, i + 1);
+        const pageToMoveUp = orderedPages[indexToSwap];
+        orderedPages.splice(indexToSwap, 1);
+        orderedPages.splice(i, 0, pageToMoveUp);
       } else {
         orderedPages.splice(i, 0, makeNewPage());
       }
     } else if (!isLeft && page.alwaysLeft) {
-      if (page.outOfFlow) {
-        const indexToSwap = indexOfNextInFlowPage(pages, i);
-        orderedPages[i] = orderedPages[indexToSwap];
-        orderedPages[indexToSwap] = page;
+      if (page.isOutOfFlow) {
+        const indexToSwap = indexOfNextInFlowPage(orderedPages, i + 1);
+        const pageToMoveUp = orderedPages[indexToSwap];
+        orderedPages.splice(indexToSwap, 1);
+        orderedPages.splice(i, 0, pageToMoveUp);
       } else {
         orderedPages.splice(i, 0, makeNewPage());
       }
     }
   }
-
   return orderedPages;
 };
 

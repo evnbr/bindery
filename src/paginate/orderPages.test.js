@@ -46,8 +46,8 @@ test('Doesn\'t add padding when left/right works out', () => {
 const outOfFlowPages = [
   { num: 1 },
   { num: 2 },
-  { num: 3, alwaysLeft: true, outOfFlow: true },
-  { num: 4, alwaysRight: true, outOfFlow: true },
+  { num: 3, alwaysLeft: true, isOutOfFlow: true },
+  { num: 4, alwaysRight: true, isOutOfFlow: true },
   { num: 5 },
   { num: 6 },
 ];
@@ -55,8 +55,8 @@ const outOfFlowPagesIntended = [
   { num: 1 },
   { num: 2 },
   { num: 5 },
-  { num: 3, alwaysLeft: true, outOfFlow: true },
-  { num: 4, alwaysRight: true, outOfFlow: true },
+  { num: 3, alwaysLeft: true, isOutOfFlow: true },
+  { num: 4, alwaysRight: true, isOutOfFlow: true },
   { num: 6 },
 ];
 
