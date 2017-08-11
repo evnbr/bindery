@@ -17,13 +17,14 @@
 			beforeAdd: function(element) {
 				element.style.fontSize = 16 + this.enlargeBy + "px";
 				this.enlargeBy = this.enlargeBy * 0.9;
+				return element;
 			},
 		});
 
 		let rainbowRule = Bindery.createRule({
 			afterBind: function(page, book) {
 				let pct = page.number / book.pageCount;
-				page.bleed.style.backgroundColor = "hsl(" + (pct * 360) + ", 80%, 80%)";
+				page.background.style.backgroundColor = "hsl(" + (pct * 360) + ", 80%, 80%)";
 			}
 		});
 
