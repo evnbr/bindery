@@ -132,8 +132,8 @@
 					selector: 'p > a',
 					render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.getAttribute('href')}</u>`,
 				}),
-				Bindery.FullPage({ selector: '.med-figure' }),
-				Bindery.Spread({ selector: '.big-figure' }),
+				Bindery.FullBleedPage({ selector: '.med-figure' }),
+				Bindery.FullBleedSpread({ selector: '.big-figure' }),
 				Bindery.RunningHeader({
 					render: (page) => {
 						if (page.isLeft) return `${page.number} · ${page.heading.h1 || ''} `;

@@ -6,8 +6,8 @@ import Rule from './Rule';
 
 class Replace extends Rule {
   constructor(options) {
-    options.name = 'Footnote';
     super(options);
+    this.name = 'Replace';
   }
   afterAdd(element, state, requestNewPage, overflowCallback) {
     const parent = element.parentNode;

@@ -19,7 +19,6 @@ figure {
 
 figure img {
   /* make it even bigger, for bleed */
-  width: calc(100% + 40pt);
   height: calc(100% + 40pt);
   margin: -20pt;
 }

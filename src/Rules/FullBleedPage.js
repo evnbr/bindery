@@ -7,21 +7,21 @@ import RuleOption from './RuleOption';
 // TODO: Redesign to add entire element in one go, ignoring bleed and any
 // internal rules.
 
-class FullPage extends OutOfFlow {
+class FullBleedPage extends OutOfFlow {
   constructor(options) {
     super(options);
-    this.name = 'Full Page';
+    this.name = 'Full Bleed Page';
     this.validate(options, {
       selector: RuleOption.string,
+      continue: RuleOption.enum('new-page', 'same-page'),
     });
   }
 
   addElementOutOfFlow(elmt, state, makeNewPage) {
     const outOfFlowPage = makeNewPage();
-    outOfFlowPage.background.style.background = 'red';
     outOfFlowPage.background.appendChild(elmt);
     state.pages.push(outOfFlowPage);
   }
 }
 
-export default FullPage;
+export default FullBleedPage;

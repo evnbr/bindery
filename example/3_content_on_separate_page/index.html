@@ -22,7 +22,7 @@
 						selector: 'a',
 						render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.getAttribute('href')}</u>`,
 					}),
-					Bindery.Spread({ selector: ".big-figure" }),
+					Bindery.FullBleedSpread({ selector: ".big-figure" }),
 					Bindery.RunningHeader({
 						render: (page) => {
 							if (page.isEmpty) return '';

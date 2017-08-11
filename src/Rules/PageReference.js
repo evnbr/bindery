@@ -1,4 +1,5 @@
 import Replace from './Replace';
+import RuleOption from './RuleOption';
 
 // Options:
 // selector: String
@@ -6,9 +7,12 @@ import Replace from './Replace';
 
 class PageReference extends Replace {
   constructor(options) {
-    options.name = 'Page Reference';
     super(options);
-    this.references = {};
+    this.name = 'Page Reference';
+    this.validate(options, {
+      selector: RuleOption.string,
+      replace: RuleOption.func,
+    });
   }
   afterAdd(elmt, state) {
     let ref = elmt.getAttribute('href');
@@ -20,8 +24,6 @@ class PageReference extends Replace {
       }
       ref = ref.replace('#', '');
       ref = `[id="${ref}"]`; // in case it starts with a number
-
-      this.references[ref] = elmt;
 
       // Temporary, to make sure it'll fit
       const parent = elmt.parentNode;
