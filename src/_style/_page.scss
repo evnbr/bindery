@@ -51,7 +51,7 @@
     .#{$pre}-content {
       box-shadow: inset 0 0 0 1px blue;
     }
-    .#{$pre}-bleed {
+    .#{$pre}-background {
       box-shadow: 0 0 0 1px yellow;
     }
   }
@@ -144,35 +144,30 @@
   margin-bottom: 8pt;
 }
 
-/*Old Bleed Stuff*/
-.#{$pre}-page.bleed .#{$pre}-flowbox {
-  margin: 0;
-  position: absolute;
-  top: -20px;
-  bottom: -20px;
-}
-.#{$pre}-left.bleed .#{$pre}-flowbox {
-  right: 0;
-  left: -20px;
-}
-.#{$pre}-right.bleed .#{$pre}-flowbox {
-  left: 0;
-  right: -20px;
-}
-
 /*Bleed as layer*/
-.#{$pre}-bleed {
+.#{$pre}-background {
   position: absolute;
   top: -$bleed;
   bottom: -$bleed;
+  padding-top: $bleed;
+  padding-bottom: $bleed;
   z-index: 0;
+  overflow: hidden;
   .#{$pre}-left & {
     right: 0;
     left: -$bleed;
+    padding-left: $bleed;
   }
   .#{$pre}-right & {
     left: 0;
     right: -$bleed;
+    padding-right: $bleed;
+  }
+  .#{$pre}-spread.#{$pre}-left & {
+    right: -100%;
+  }
+  .#{$pre}-spread.#{$pre}-right & {
+    left: -100%;
   }
 }
 
@@ -185,6 +180,7 @@
   right: -100%;
   bottom: 0;
 }
+
 .#{$pre}-spread.#{$pre}-right .#{$pre}-content {
   position: absolute;
   top: 0;

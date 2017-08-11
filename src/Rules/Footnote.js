@@ -1,5 +1,6 @@
 import h from 'hyperscript';
 import Replace from './Replace';
+import RuleOption from './RuleOption';
 
 // Options:
 // selector: String
@@ -8,8 +9,13 @@ import Replace from './Replace';
 
 class Footnote extends Replace {
   constructor(options) {
-    options.name = 'Footnote';
     super(options);
+    this.name = 'Footnote';
+    this.validate(options, {
+      selector: RuleOption.string,
+      replace: RuleOption.func,
+      render: RuleOption.func,
+    });
   }
   afterAdd(element, state, requestNewPage, overflowCallback) {
     const number = state.currentPage.footer.children.length + 1;

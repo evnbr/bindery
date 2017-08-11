@@ -8,10 +8,10 @@ class Page {
     this.flowContent = h(c('.content'));
     this.flowBox = h(c('.flowbox'), this.flowContent);
     this.footer = h(c('.footer'));
-    this.bleed = h(c('.bleed'));
+    this.background = h(c('.background'));
     this.element = h(c('.page'),
       { style: Page.sizeStyle() },
-      this.bleed,
+      this.background,
       this.flowBox,
       this.footer,
     );

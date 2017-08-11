@@ -1,46 +1,36 @@
-import Rule from './Rule';
+import OutOfFlow from './OutOfFlow';
+import RuleOption from './RuleOption';
 import c from '../utils/prefixClass';
 
 // Options:
 // selector: String
 
-class Spread extends Rule {
+class Spread extends OutOfFlow {
   constructor(options) {
-    options.name = 'Spread';
     super(options);
-
-    this.prevPage = null;
-    this.prevElementPath = null;
+    this.name = 'Spread';
+    this.validate(options, {
+      selector: RuleOption.string,
+    });
   }
-  beforeAdd(elmt, state, requestNewPage) {
-    this.prevPage = state.currentPage;
-    this.prevElementPath = state.path;
+  addElementOutOfFlow(elmt, state, makeNewPage) {
+    const leftPage = makeNewPage();
+    const rightPage = makeNewPage();
 
-    requestNewPage();
-    return elmt;
-  }
-  afterAdd(elmt, state, requestNewPage) {
-    const leftPage = state.currentPage;
-    const dupedContent = leftPage.flowContent.cloneNode(true);
-    const rightPage = requestNewPage();
-    rightPage.flowBox.innerHTML = '';
-    rightPage.flowBox.appendChild(dupedContent);
-    rightPage.flowContent = dupedContent;
-
+    leftPage.background.style.background = 'lime';
+    leftPage.background.appendChild(elmt);
     leftPage.element.classList.add(c('spread'));
-    leftPage.element.classList.add('bleed');
     leftPage.setPreference('left');
     leftPage.setOutOfFlow(true);
 
+    rightPage.background.style.background = 'lime';
+    rightPage.background.appendChild(elmt.cloneNode(true));
     rightPage.element.classList.add(c('spread'));
-    rightPage.element.classList.add('bleed');
     rightPage.setPreference('right');
     rightPage.setOutOfFlow(true);
 
-    state.currentPage = this.prevPage;
-    state.path = this.prevElementPath;
-
-    return elmt;
+    state.pages.push(leftPage);
+    state.pages.push(rightPage);
   }
 }
 

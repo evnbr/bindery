@@ -1,7 +1,5 @@
-import Rule from './Rule';
-
-let prevPage;
-let prevElementPath;
+import OutOfFlow from './OutOfFlow';
+import RuleOption from './RuleOption';
 
 // Options:
 // selector: String
@@ -9,30 +7,20 @@ let prevElementPath;
 // TODO: Redesign to add entire element in one go, ignoring bleed and any
 // internal rules.
 
-class FullPage extends Rule {
+class FullPage extends OutOfFlow {
   constructor(options) {
-    options.name = 'Full Page Spread';
     super(options);
+    this.name = 'Full Page';
+    this.validate(options, {
+      selector: RuleOption.string,
+    });
   }
-  beforeAdd(elmt, state, requestNewPage) {
-    prevPage = state.currentPage;
-    prevElementPath = state.path;
 
-    requestNewPage();
-
-    // TODO: Rather than just add padding,
-    // put full-bleed content on a separate
-    // out-of-flow background layer
-    if (elmt.classList.contains('bleed')) {
-      state.currentPage.element.classList.add('bleed');
-    }
-
-    return elmt;
-  }
-  afterAdd(elmt, state) {
-    state.currentPage = prevPage;
-    state.path = prevElementPath;
-    return elmt;
+  addElementOutOfFlow(elmt, state, makeNewPage) {
+    const outOfFlowPage = makeNewPage();
+    outOfFlowPage.background.style.background = 'red';
+    outOfFlowPage.background.appendChild(elmt);
+    state.pages.push(outOfFlowPage);
   }
 }
 

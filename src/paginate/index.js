@@ -91,14 +91,15 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
     return newPage;
   };
 
+  const beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
   const applyBeforeAddRules = (element) => {
     let addedElement = element;
-    rules.forEach((rule) => {
-      if (!rule.selector) return;
-      if (addedElement.matches(rule.selector) && rule.beforeAdd) {
-        addedElement = rule.beforeAdd(addedElement, state, continueOnNewPage);
+    beforeAddRules.forEach((rule) => {
+      if (addedElement.matches(rule.selector)) {
+        addedElement = rule.beforeAdd(addedElement, state, continueOnNewPage, makeNewPage);
       }
     });
+    return addedElement;
   };
 
   const afterAddRules = rules.filter(r => r.selector && r.afterAdd);
@@ -131,6 +132,7 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
         );
       }
     });
+    return addedElement;
   };
   const afterBindRules = (book) => {
     rules.forEach((rule) => {
@@ -315,7 +317,8 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
     }
   };
 
-  const addElementChild = (parent, child, next) => {
+  const addElementChild = (parent, childToAdd, next) => {
+    let child = childToAdd;
     if (child.tagName === 'SCRIPT') {
       next(); // skips
       return;
@@ -325,13 +328,19 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
       if (!child.complete) {
         console.log(`Bindery: Waiting for image '${child.src}'`);
         child.addEventListener('load', () => {
+          console.log(`Bindery: Image '${child.src}' loaded.`);
           addElementChild(parent, child, next);
         });
+        child.addEventListener('error', () => {
+          console.error(`Bindery: Image '${child.src}' failed to load.`);
+          addElementChild(parent, child, next);
+        });
+        child.src = child.src;
         return;
       }
     }
 
-    applyBeforeAddRules(child);
+    child = applyBeforeAddRules(child);
 
     const addedChildrenSuccess = () => {
       // We're now done with this element and its children,
@@ -342,13 +351,15 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
       // but did have contents on a previous page
       // we should never have added it.
       // TODO: Catch this earlier.
-      if (false && addedChild.classList.contains(c('continuation'))
-        && addedChild.children.length === 0) {
-        addedChild.parentNode.removeChild(addedChild);
-      } else {
-        // TODO: AfterAdd rules may want to access original child, not split second half
-        applyAfterAddRules(addedChild);
-      }
+      // if (addedChild.classList.contains(c('continuation'))
+      //   && addedChild.children.length === 0) {
+      //   addedChild.parentNode.removeChild(addedChild);
+      // } else {
+      //   // TODO: AfterAdd rules may want to access original child, not split second half
+      //   applyAfterAddRules(addedChild);
+      // }
+      applyAfterAddRules(addedChild);
+
 
       if (state.currentPage.hasOverflowed()) {
         // console.log('Bindery: Added element despite overflowing');
