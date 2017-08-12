@@ -20,8 +20,8 @@ const pxToUnit = (pixelVal, unit) => pixelVal / pxInOne[unit];
 const convert = (val, from, to) => pxToUnit(unitToPx(val, from), to);
 
 // const isValidRegEx = /^[+-]?[0-9]+.?([0-9]+)?(px|em|ex|%|in|cm|mm|pt|pc)$/;
-const cssNumberRegEx = /^([+-]?[0-9]+.?([0-9]+)?)(px|in|cm|mm|pt|pc)$/;
-const cssNumberPattern = '^([+-]?[0-9]+.?([0-9]+)?)(px|in|cm|mm|pt|pc)$';
+const cssNumberRegEx = /^([+-]?[0-9]+(.?[0-9]+)?)(px|in|cm|mm|pt|pc)$/;
+const cssNumberPattern = '^([+-]?[0-9]+(.?[0-9]+)?)(px|in|cm|mm|pt|pc)$';
 
 const isValidLength = str => cssNumberRegEx.test(str);
 const isValidSize = (size) => {
