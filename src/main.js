@@ -1,8 +1,7 @@
 import paginate from './paginate';
 
-import Page from './Page';
+import Styler from './Styler';
 import Viewer from './Viewer';
-import { isValidSize } from './utils/convertUnits';
 import c from './utils/prefixClass';
 import { arraysEqual } from './utils';
 
@@ -26,10 +25,11 @@ class Bindery {
     this.autoupdate = opts.autoupdate || false;
     this.debug = opts.debug || false;
 
-    const pageSize = opts.pageSize || DEFAULT_PAGE_SIZE;
-    const pageMargin = opts.pageMargin || DEFAULT_PAGE_MARGIN;
-    this.setSize(pageSize);
-    this.setMargin(pageMargin);
+    this.styler = new Styler();
+    this.styler.setSize(opts.pageSize || DEFAULT_PAGE_SIZE);
+    this.styler.setMargin(opts.pageMargin || DEFAULT_PAGE_MARGIN);
+    this.styler.setBleed('0.2in');
+
 
     this.viewer = new Viewer({ bindery: this });
     this.controls = this.viewer.controls;
@@ -117,24 +117,6 @@ class Bindery {
     this.source.style.display = '';
   }
 
-  setSize(size) {
-    isValidSize(size);
-
-    this.pageSize = size;
-    Page.setSize(size);
-  }
-
-  setMargin(margin) {
-    isValidSize(margin);
-
-    this.pageMargin = margin;
-    Page.setMargin(margin);
-  }
-
-  isSizeValid() {
-    return Page.isSizeValid();
-  }
-
   addRules(newRules) {
     newRules.forEach((rule) => {
       if (rule instanceof Rules.Rule) {
@@ -151,7 +133,7 @@ class Bindery {
       return;
     }
 
-    if (!this.isSizeValid()) {
+    if (!this.styler.isSizeValid()) {
       this.viewer.displayError(
         'Page is too small', `Size: ${JSON.stringify(this.pageSize)} \n Margin: ${JSON.stringify(this.pageMargin)} \n Try adjusting the sizes or units.`
       );
@@ -169,6 +151,7 @@ class Bindery {
     this.viewer.clear();
     document.body.classList.add(c('viewing'));
     this.viewer.element.classList.add(c('in-progress'));
+    this.styler.updateStylesheet();
 
     this.controls.setInProgress();
 

@@ -65,12 +65,13 @@ class ControlPanel {
     }
 
     const unitInputs = {
-      top: inputNumberUnits(this.binder.pageMargin.top),
-      inner: inputNumberUnits(this.binder.pageMargin.inner),
-      outer: inputNumberUnits(this.binder.pageMargin.outer),
-      bottom: inputNumberUnits(this.binder.pageMargin.bottom),
-      width: inputNumberUnits(this.binder.pageSize.width),
-      height: inputNumberUnits(this.binder.pageSize.height),
+      top: inputNumberUnits(this.binder.styler.margin.top),
+      inner: inputNumberUnits(this.binder.styler.margin.inner),
+      outer: inputNumberUnits(this.binder.styler.margin.outer),
+      bottom: inputNumberUnits(this.binder.styler.margin.bottom),
+      width: inputNumberUnits(this.binder.styler.size.width),
+      height: inputNumberUnits(this.binder.styler.size.height),
+      bleed: inputNumberUnits(this.binder.styler.bleed),
     };
 
     const sizeControl = h(`.${c('row')}.${c('size')}`,
@@ -91,6 +92,9 @@ class ControlPanel {
       sizeControl,
       marginControl
     );
+
+    const bleedAmount = row('Bleed Amount', unitInputs.bleed);
+
 
     const paperSize = row('Paper Size', select(
       option('Letter'),
@@ -196,7 +200,7 @@ class ControlPanel {
       marginPreview.style.left = `${i}px`;
       marginPreview.style.right = `${o}px`;
     };
-    updateLayoutPreview(this.binder.pageSize, this.binder.pageMargin);
+    updateLayoutPreview(this.binder.styler.size, this.binder.styler.margin);
 
     this.setInProgress = () => {
       header.innerText = 'Paginating...';
@@ -233,21 +237,20 @@ class ControlPanel {
         height: unitInputs.height.value,
         width: unitInputs.width.value,
       };
+      const newBleed = unitInputs.bleed.value;
 
-      let needsUpdate = false;
-      Object.keys(newMargin).forEach((k) => {
-        if (this.binder.pageMargin[k] !== newMargin[k]) { needsUpdate = true; }
-      });
-      Object.keys(newSize).forEach((k) => {
-        if (this.binder.pageSize[k] !== newSize[k]) { needsUpdate = true; }
-      });
+      const needsUpdate =
+        Object.keys(newMargin).some(k => this.binder.styler.margin[k] !== newMargin[k])
+        || Object.keys(newSize).some(k => this.binder.styler.size[k] !== newSize[k])
+        || this.binder.bleed !== newBleed;
 
-      if (needsUpdate) {
+      if (needsUpdate && this.binder.autoupdate) {
         updateLayoutPreview(newSize, newMargin);
-        this.binder.setSize(newSize);
-        this.binder.setMargin(newMargin);
+        this.binder.styler.setSize(newSize);
+        this.binder.styler.setMargin(newMargin);
+        this.binder.styler.setBleed(newBleed);
 
-        if (this.binder.isSizeValid()) {
+        if (this.binder.styler.isSizeValid()) {
           this.binder.makeBook();
         } else {
           this.setInvalid();
@@ -266,10 +269,9 @@ class ControlPanel {
       unitInputs[k].addEventListener('keyup', throttledUpdate);
     });
 
-    let pause;
     let playSlow;
     let steps;
-    pause = btn('⏸ Pause', { onclick: () => {
+    const pause = btn('⏸ Pause', { onclick: () => {
       pause.style.display = 'none';
       playSlow.style.display = 'block';
       steps.style.display = 'block';
@@ -321,7 +323,7 @@ class ControlPanel {
       paperSize,
       orientation,
 
-      expandRow('Marks and Bleed'),
+      expandRow('Print Marks'),
       expandArea(
         cropToggle,
         bleedMarkToggle,
@@ -330,11 +332,13 @@ class ControlPanel {
       expandRow('Book Setup'),
       expandArea(
         layoutControl,
+        bleedAmount,
         debugToggle,
         row(layoutState),
       ),
 
-      row(doneBtn, printBtn, debugControls),
+      debugControls,
+      row(doneBtn, printBtn),
       viewSwitcher,
     );
   }

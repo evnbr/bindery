@@ -1,21 +1,24 @@
 import h from 'hyperscript';
 import c from '../utils/prefixClass';
-import Page from '../Page';
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 
-const spread = function (...arg) {
-  return h(c('.spread-wrapper'), ...arg);
+const twoPageSpread = function (...arg) {
+  return h(c('.spread-wrapper') + c('.two-page-size'), ...arg);
 };
+const onePageSpread = function (...arg) {
+  return h(c('.spread-wrapper') + c('.page-size'), ...arg);
+};
+
 
 const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
   const printLayout = document.createDocumentFragment();
 
-  const size = isTwoUp ? Page.spreadSizeStyle() : Page.sizeStyle();
   const marks = isTwoUp ? printMarksSpread : printMarksSingle;
+  const spread = isTwoUp ? twoPageSpread : onePageSpread;
 
   const printSheet = function (...arg) {
     return h(c('.print-page') + c(`.letter-${orient}`),
-      spread({ style: size }, ...arg, marks())
+      spread(...arg, marks())
     );
   };
 
