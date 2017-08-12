@@ -17,6 +17,15 @@ figure {
   position: relative;
 }
 
+.med-figure {
+  background: blue;
+}
+
+.big-figure {
+  background: green;
+}
+
+
 figure img {
   /* make it even bigger, for bleed */
   height: calc(100% + 40pt);

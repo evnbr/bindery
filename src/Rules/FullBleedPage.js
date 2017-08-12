@@ -9,18 +9,23 @@ import RuleOption from './RuleOption';
 
 class FullBleedPage extends OutOfFlow {
   constructor(options) {
+    options.continue = options.continue || 'same';
     super(options);
     this.name = 'Full Bleed Page';
     this.validate(options, {
       selector: RuleOption.string,
-      continue: RuleOption.enum('new-page', 'same-page'),
+      continue: RuleOption.enum('next', 'same', 'left', 'right'),
     });
   }
 
   addElementOutOfFlow(elmt, state, makeNewPage) {
-    const outOfFlowPage = makeNewPage();
-    outOfFlowPage.background.appendChild(elmt);
-    state.pages.push(outOfFlowPage);
+    if (state.currentPage.isEmpty) {
+      state.currentPage.background.appendChild(elmt);
+    } else {
+      const outOfFlowPage = makeNewPage();
+      outOfFlowPage.background.appendChild(elmt);
+      state.pages.push(outOfFlowPage);
+    }
   }
 }
 

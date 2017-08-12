@@ -19,8 +19,8 @@
 			  rules: [
 					Bindery.RunningHeader(),
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-					Bindery.FullBleedPage({ selector: '.fullpage' }),
-					Bindery.FullBleedSpread({ selector: '.spread' }),
+					Bindery.FullBleedPage({ selector: '.fullpage', continue: 'same' }),
+					Bindery.FullBleedSpread({ selector: '.spread', continue: 'same' }),
 			  ],
 			});
 

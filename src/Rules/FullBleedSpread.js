@@ -7,29 +7,35 @@ import c from '../utils/prefixClass';
 
 class FullBleedSpread extends OutOfFlow {
   constructor(options) {
+    options.continue = options.continue || 'same';
     super(options);
     this.name = 'Full Bleed Spread';
     this.validate(options, {
       selector: RuleOption.string,
-      continue: RuleOption.enum('new-page', 'same-page'),
+      continue: RuleOption.enum('next', 'same', 'left', 'right'),
     });
   }
   addElementOutOfFlow(elmt, state, makeNewPage) {
-    const leftPage = makeNewPage();
+    let leftPage;
+    if (state.currentPage.isEmpty) {
+      leftPage = state.currentPage;
+    } else {
+      leftPage = makeNewPage();
+      state.pages.push(leftPage);
+    }
+
     const rightPage = makeNewPage();
+    state.pages.push(rightPage);
 
     leftPage.background.appendChild(elmt);
     leftPage.element.classList.add(c('spread'));
     leftPage.setPreference('left');
-    leftPage.isOutOfFlow = true;
+    leftPage.isOutOfFlow = this.continue === 'same';
 
     rightPage.background.appendChild(elmt.cloneNode(true));
     rightPage.element.classList.add(c('spread'));
     rightPage.setPreference('right');
-    rightPage.isOutOfFlow = true;
-
-    state.pages.push(leftPage);
-    state.pages.push(rightPage);
+    rightPage.isOutOfFlow = this.continue === 'same';
   }
 }
 

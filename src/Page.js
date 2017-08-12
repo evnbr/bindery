@@ -72,7 +72,7 @@ class Page {
   }
 
   get isEmpty() {
-    return this.element.textContent.trim() === '';
+    return this.flowContent.textContent.trim() === '';
   }
 
   get isLeft() {

@@ -3,8 +3,8 @@ import RuleOption from './RuleOption';
 
 class PageBreak extends Rule {
   constructor(options) {
-    options.position = options.position ? options.position : 'before';
-    options.continue = options.continue ? options.continue : 'any';
+    options.position = options.position || 'before';
+    options.continue = options.continue || 'any';
     super(options);
 
     this.name = 'Page Break';
