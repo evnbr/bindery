@@ -199,7 +199,8 @@
 }
 
 .#{$pre}-expand-row {
-  color: $accent;
+  color: transparentize($text, 0.6);
+  font-weight: 500;
   border-radius: 4px;
 
   &:hover {
@@ -216,8 +217,8 @@
     font-weight: 300;
   }
   &.selected {
-    background: $hover;
-    border-radius: 4px 4px 0 0;
+    // background: $hover;
+    // border-radius: 4px 4px 0 0;
   }
   &.selected::after {
     content: '–';
@@ -225,7 +226,7 @@
 
   &.selected + .#{$pre}-expand-area {
     opacity: 1;
-    max-height: 600px;
+    max-height: 400px;
     margin-bottom: 12px;
   }
 }
@@ -233,11 +234,10 @@
 
 .#{$pre}-expand-area {
   // display: none;
-  background: $hover;
+  // background: $hover;
   opacity: 0;
   max-height: 0;
-  margin: -4px 8px;
-  padding: 4px 0;
+  margin: -4px 8px 0;
   border-radius: 0 0 4px 4px;
   transition: all 0.2s;
   overflow: hidden;

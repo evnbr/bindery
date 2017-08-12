@@ -17,16 +17,15 @@ const ARRANGE_SPREAD = 'arrange_two';
 const ARRANGE_BOOKLET = 'arrange_booklet';
 // const ARRANGE_SIGNATURE = 'arrange_signature';
 
-const ORIENTATION_STYLE_ID = 'bindery-orientation-stylesheet';
 
 const setOrientationCSS = (newValue) => {
   let sheet;
-  const existing = document.querySelector(`#${ORIENTATION_STYLE_ID}`);
+  const existing = document.querySelector('#binderyPrintSetup');
   if (existing) {
     sheet = existing;
   } else {
     sheet = document.createElement('style');
-    sheet.id = ORIENTATION_STYLE_ID;
+    sheet.id = 'binderyPrintSetup';
   }
   sheet.innerHTML = `@page { size: ${newValue}; }`;
   document.head.appendChild(sheet);
