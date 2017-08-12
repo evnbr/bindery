@@ -1,7 +1,5 @@
 $markLen: 12pt;
-$markSpace: $bleed;
-$markOffset: $markLen + $markSpace;
-
+$markOffset: $markLen + $bleed;
 $bleedOffset: $markOffset;
 
 .#{$pre}-print-mark-wrap {
@@ -64,8 +62,6 @@ $bleedOffset: $markOffset;
   &-left,
   &-right {
     transform: scaleX(0.5);
-    top: -$markOffset;
-    bottom: -$markOffset;
     width: 1px;
     margin: auto;
   }
@@ -77,8 +73,6 @@ $bleedOffset: $markOffset;
   &-top,
   &-bottom {
     transform: scaleY(0.5);
-    left: -$markOffset;
-    right: -$markOffset;
     height: 1px;
   }
 
@@ -94,27 +88,14 @@ $bleedOffset: $markOffset;
   &-left,
   &-right {
     transform: scaleX(0.5);
-    top: -$bleedOffset;
-    bottom: -$bleedOffset;
     width: 1px;
     margin: auto;
   }
-  &-left { left: -$bleed; }
-  &-right { right: -$bleed; }
 
 
   &-top,
   &-bottom {
     transform: scaleY(0.5);
-    left: -$bleedOffset;
-    right: -$bleedOffset;
     height: 1px;
-  }
-
-  &-top {
-    top: -$bleed;
-  }
-  &-bottom {
-    bottom: -$bleed;
   }
 }

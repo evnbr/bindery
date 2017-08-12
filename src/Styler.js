@@ -71,6 +71,29 @@ class Styler {
 
       ${c('.flowbox')} { margin-top: ${this.margin.top}; }
       ${c('.footer')}{ margin-bottom: ${this.margin.bottom}; }
+
+
+      ${c('.bleed-left')},
+      ${c('.bleed-right')},
+      ${c('.crop-left')},
+      ${c('.crop-right')},
+      ${c('.crop-fold')} {
+        top: calc( -12pt - ${this.bleed} );
+        bottom: calc( -12pt - ${this.bleed} );
+      }
+
+      ${c('.bleed-top')},
+      ${c('.bleed-bottom')},
+      ${c('.crop-top')},
+      ${c('.crop-bottom')} {
+        left: calc( -12pt - ${this.bleed} );
+        right: calc( -12pt - ${this.bleed} );
+      }
+      ${c('.bleed-left')}   { left: -${this.bleed}; }
+      ${c('.bleed-right')}  { right: -${this.bleed}; }
+      ${c('.bleed-top')}    { top: -${this.bleed}; }
+      ${c('.bleed-bottom')} { bottom: -${this.bleed}; }
+
     `;
     document.head.appendChild(sheet);
   }
