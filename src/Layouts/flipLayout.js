@@ -1,6 +1,5 @@
 import h from 'hyperscript';
 import c from '../utils/prefixClass';
-import Page from '../Page';
 
 const renderFlipLayout = (pages, doubleSided) => {
   const flipLayout = document.createDocumentFragment();
@@ -27,7 +26,6 @@ const renderFlipLayout = (pages, doubleSided) => {
     leafIndex += 1;
     const li = leafIndex;
     const flap = h(c('.page3d'), {
-      style: Page.sizeStyle(),
       onclick: () => {
         const newLeaf = li - 1;
         setLeaf(newLeaf);
@@ -44,9 +42,7 @@ const renderFlipLayout = (pages, doubleSided) => {
       leftPage.classList.add(c('page3d-back'));
       flap.appendChild(leftPage);
     } else {
-      leftPage = h(c('.page') + c('.page3d-back'), {
-        style: Page.sizeStyle(),
-      });
+      leftPage = h(c('.page') + c('.page3d-back'));
       flap.appendChild(leftPage);
     }
     // TODO: Dynamically add/remove pages.

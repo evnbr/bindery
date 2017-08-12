@@ -22,6 +22,7 @@ class Scheduler {
         resume: this.resume.bind(this),
         resumeFor: this.resumeFor.bind(this),
         step: this.step.bind(this),
+        finish: this.finish.bind(this),
       };
       console.log('Bindery: Debug layout with the following: \nbinderyDebug.pause() \nbinderyDebug.resume()\n binderyDebug.resumeFor(n) // pauses after n steps, \nbinderyDebug.step()');
     }
@@ -54,7 +55,7 @@ class Scheduler {
     this.useDelay = true;
     this.resume();
   }
-  resumeFast() {
+  finish() {
     this.useDelay = false;
     this.resume();
   }
@@ -73,12 +74,13 @@ class Scheduler {
   }
   step() {
     if (!this.isPaused) {
-      this.pause();
+      return this.pause();
     }
     if (this.queuedFunc) {
-      this.queuedFunc();
-      const n = this.queuedFunc.name;
+      const queued = this.queuedFunc;
+      const n = queued.name;
       this.queuedFunc = null;
+      queued();
       return n;
     }
     return 'Layout complete';

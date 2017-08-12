@@ -25,7 +25,7 @@
     right: $sidebarWidth;
     bottom: 0;
 
-    &.#{$pre}-debug {
+    .#{$pre}-debug & {
       overflow: scroll;
       visibility: visible;
     }

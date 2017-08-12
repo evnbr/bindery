@@ -151,6 +151,8 @@ class Bindery {
     this.viewer.clear();
     document.body.classList.add(c('viewing'));
     this.viewer.element.classList.add(c('in-progress'));
+    if (this.debug) document.body.classList.add(c('debug'));
+
     this.styler.updateStylesheet();
 
     this.controls.setInProgress();
@@ -166,6 +168,7 @@ class Bindery {
           this.controls.setDone();
           if (doneBinding) doneBinding();
           this.viewer.element.classList.remove(c('in-progress'));
+          document.body.classList.remove(c('debug'));
           this.startCheckingLayout();
         }, 100);
       },
@@ -176,7 +179,7 @@ class Bindery {
         document.body.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
       },
-      isDebuggable: this.debug,
+      isDebugging: this.debug,
     });
   }
 

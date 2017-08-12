@@ -18,7 +18,7 @@ import breadcrumbCloner from './breadcrumbCloner';
 
 const MAXIMUM_PAGE_LIMIT = 9999;
 
-const paginate = ({ content, rules, success, progress, error, isDebuggable }) => {
+const paginate = ({ content, rules, success, progress, error, isDebugging }) => {
   // SETUP
   const start = window.performance.now();
   const state = {
@@ -26,9 +26,8 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
     pages: [],
     book: new Book(),
   };
-  const scheduler = new Scheduler(isDebuggable);
+  const scheduler = new Scheduler(isDebugging);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
-  if (isDebuggable) measureArea.classList.add(c('debug'));
 
   const cloneBreadcrumb = breadcrumbCloner(rules);
 
@@ -40,7 +39,7 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
 
   const makeNewPage = () => {
     const newPage = new Page();
-    const shouldScroll = isDebuggable && scrollPct(measureArea) > 0.9;
+    const shouldScroll = isDebugging && scrollPct(measureArea) > 0.9;
     measureArea.appendChild(newPage.element);
     if (shouldScroll) scrollToBottom(measureArea);
 
@@ -428,7 +427,9 @@ const paginate = ({ content, rules, success, progress, error, isDebuggable }) =>
     afterBindRules(state.book);
 
     const end = window.performance.now();
-    console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
+    if (!isDebugging) {
+      console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
+    }
 
     success(state.book);
   };

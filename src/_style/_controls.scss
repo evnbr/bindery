@@ -49,6 +49,7 @@
   display: inline-block;
   border-radius: 3px;
   width: auto;
+  margin-right: 8px;
 
   &:focus {
     outline: none;
@@ -67,6 +68,10 @@
   //   opacity: 0.2;
   //   pointer-events: none;
   // }
+}
+
+.#{$pre}-btn-light {
+  background: none;
 }
 
 .#{$pre}-btn-main {
@@ -166,14 +171,13 @@
     padding: 4px 6px 4px 8px;
     text-align: right;
     border: none;
-    background: none;
     position: absolute;
     top: 0;
     right: 0;
     height: 100%;
     width: 100%;
     color: black;
-    text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;
+    background: none;
 
     &:focus {
       outline: none;
@@ -181,11 +185,18 @@
     }
 
     &:invalid {
-      color: maroon;
+      color: $invalid;
     }
   }
 }
 
+
+.#{$pre}-row.#{$pre}-debug-controls {
+  display: none;
+  .#{$pre}-debug .#{$pre}-in-progress & {
+    display: block;
+  }
+}
 
 .#{$pre}-expand-row {
   color: $accent;
@@ -320,6 +331,7 @@
   text-align: center;
   padding: 4px;
   font-size: 12px;
+  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;
 
   &:focus {
     background: none !important;

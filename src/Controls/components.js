@@ -33,6 +33,10 @@ const btn = function (...arg) {
   return h(`button.${c('btn')}`, ...arg);
 };
 
+const btnLight = function (...arg) {
+  return h(`button.${c('btn')}.${c('btn-light')}`, ...arg);
+};
+
 const btnMain = function (...arg) {
   return h(`button.${c('btn')}.${c('btn-main')}`, ...arg);
 };
@@ -79,6 +83,7 @@ export {
   expandArea,
   heading,
   btn,
+  btnLight,
   btnMain,
   select,
   option,

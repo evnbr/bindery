@@ -8,6 +8,7 @@ import {
   option,
   btn,
   btnMain,
+  btnLight,
   switchRow,
   row,
   viewMode,
@@ -16,7 +17,7 @@ import {
   inputNumberUnits,
 } from './components';
 
-class ControlPanel {
+class Controls {
   constructor(opts) {
     this.binder = opts.binder;
     const viewer = opts.viewer;
@@ -135,19 +136,26 @@ class ControlPanel {
       display: 'none',
       color: '#e2b200',
     } }, 'Too Small');
-    let inProgress = btn({ style: {
+    const inProgress = btnLight({ style: {
       display: 'none',
+      'pointer-events': 'none',
     } }, 'Updating...');
-    const forceRefresh = btn({ onclick: () => {
-      inProgress.style.display = 'block';
+
+
+    const paginate = () => {
+      inProgress.style.display = '';
       forceRefresh.style.display = 'none';
-      setTimeout(() => {
-        this.binder.makeBook(() => {
-          inProgress.style.display = 'none';
-          forceRefresh.style.display = 'block';
-        }, 10);
+      forceRefreshDebug.style.display = 'none';
+      this.binder.makeBook(() => {
+        inProgress.style.display = 'none';
+        forceRefresh.style.display = '';
+        forceRefreshDebug.style.display = '';
       });
-    } }, 'Rebuild Layout');
+    }
+    const forceRefresh = btn({ onclick: () => {
+      this.binder.debug = false;
+      paginate();
+    } }, 'Update');
 
     const viewModes = [
       viewMode('grid', viewer.setGrid, 'Preview'),
@@ -203,26 +211,26 @@ class ControlPanel {
     updateLayoutPreview(this.binder.styler.size, this.binder.styler.margin);
 
     this.setInProgress = () => {
-      header.innerText = 'Paginating...';
+      header.textContent = 'Paginating...';
       validCheck.style.display = 'none';
-      inProgress.style.display = 'block';
+      inProgress.style.display = '';
       forceRefresh.style.display = 'none';
     };
 
     this.updateProgress = (count) => {
-      header.innerText = `${count} Pages...`;
+      header.textContent = `${count} Pages...`;
     };
 
     this.setDone = () => {
-      header.innerText = `${viewer.book.pages.length} Pages`;
+      header.textContent = `${viewer.book.pages.length} Pages`;
       inProgress.style.display = 'none';
-      forceRefresh.style.display = 'block';
+      forceRefresh.style.display = '';
       validCheck.style.display = 'none';
     };
 
     this.setInvalid = () => {
-      validCheck.style.display = 'block';
-      forceRefresh.style.display = 'block';
+      validCheck.style.display = '';
+      forceRefresh.style.display = '';
       inProgress.style.display = 'none';
     };
 
@@ -242,18 +250,21 @@ class ControlPanel {
       const needsUpdate =
         Object.keys(newMargin).some(k => this.binder.styler.margin[k] !== newMargin[k])
         || Object.keys(newSize).some(k => this.binder.styler.size[k] !== newSize[k])
-        || this.binder.bleed !== newBleed;
+        || this.binder.styler.bleed !== newBleed;
 
-      if (needsUpdate && this.binder.autoupdate) {
+      if (needsUpdate) {
         updateLayoutPreview(newSize, newMargin);
         this.binder.styler.setSize(newSize);
         this.binder.styler.setMargin(newMargin);
         this.binder.styler.setBleed(newBleed);
+        this.binder.styler.updateStylesheet();
 
-        if (this.binder.styler.isSizeValid()) {
-          this.binder.makeBook();
-        } else {
-          this.setInvalid();
+        if (this.binder.autoupdate) {
+          if (this.binder.styler.isSizeValid()) {
+            this.binder.makeBook();
+          } else {
+            this.setInvalid();
+          }
         }
       }
     };
@@ -261,7 +272,7 @@ class ControlPanel {
     let updateDelay;
     const throttledUpdate = () => {
       clearTimeout(updateDelay);
-      updateDelay = setTimeout(updateLayout, 700);
+      updateDelay = setTimeout(updateLayout, 200);
     };
 
     Object.keys(unitInputs).forEach((k) => {
@@ -270,52 +281,66 @@ class ControlPanel {
     });
 
     let playSlow;
-    let steps;
-    const pause = btn('⏸ Pause', { onclick: () => {
-      pause.style.display = 'none';
-      playSlow.style.display = 'block';
-      steps.style.display = 'block';
-    } });
-    playSlow = btn('🐌 Resume', { onclick: () => {
-      playSlow.style.display = 'none';
-      pause.style.display = 'block';
-      steps.style.display = 'none';
-    } });
-    const step = btn('Step +1', { onclick: () => {
-    } });
-    const step10 = btn('+10', { onclick: () => {
-    } });
-    const step100 = btn('+100', { onclick: () => {
-    } });
-    steps = h('div',
-      { style: { display: 'none' } },
-      step, step10, step100
-    );
+    const step = btn('→', {
+      style: { display: 'none' },
+      onclick: () => window.binderyDebug.step(),
+    });
+    const pause = btn('❙❙', {
+      onclick: () => {
+        window.binderyDebug.pause();
+        pause.style.display = 'none';
+        playSlow.style.display = '';
+        step.style.display = '';
+      },
+    });
+    playSlow = btn('▶️', {
+      style: { display: 'none' },
+      onclick: () => {
+        window.binderyDebug.resume();
+        playSlow.style.display = 'none';
+        pause.style.display = '';
+        step.style.display = 'none';
+      },
+    });
+    const debugDone = btn('Done', {
+      onclick: () => {
+        window.binderyDebug.finish();
+      },
+    });
+    const forceRefreshDebug = btnLight('Debug', {
+      onclick: () => {
+        playSlow.style.display = 'none';
+        step.style.display = 'none';
+        pause.style.display = '';
+        this.binder.debug = true;
+        paginate();
+      },
+    });
 
 
     const debugControls = row(
       pause,
       playSlow,
-      steps
+      step,
+      debugDone,
     );
     debugControls.classList.add(c('debug-controls'));
     printBtn.classList.add(c('btn-print'));
 
-    inProgress = debugControls;
-
     const layoutState = h('div',
       forceRefresh,
+      forceRefreshDebug,
       validCheck,
       inProgress,
     );
 
-    let debugToggle;
-    const toggleDebug = () => {
-      debugToggle.classList.toggle('selected');
-      this.binder.debug = !this.binder.debug;
-    };
-    debugToggle = switchRow({ onclick: toggleDebug }, 'Debug');
-    if (this.binder.debug) debugToggle.classList.add('selected');
+    // let debugToggle;
+    // const toggleDebug = () => {
+    //   debugToggle.classList.toggle('selected');
+    //   this.binder.debug = !this.binder.debug;
+    // };
+    // debugToggle = switchRow({ onclick: toggleDebug }, 'Debug');
+    // if (this.binder.debug) debugToggle.classList.add('selected');
 
     this.element = h(c('.controls'),
       header,
@@ -323,21 +348,21 @@ class ControlPanel {
       paperSize,
       orientation,
 
-      expandRow('Print Marks'),
+      expandRow('Marks and Bleed'),
       expandArea(
         cropToggle,
         bleedMarkToggle,
+        bleedAmount,
       ),
 
-      expandRow('Book Setup'),
+      expandRow('Pagination'),
       expandArea(
         layoutControl,
-        bleedAmount,
-        debugToggle,
         row(layoutState),
       ),
 
       debugControls,
+
       row(doneBtn, printBtn),
       viewSwitcher,
     );
@@ -345,4 +370,4 @@ class ControlPanel {
 
 }
 
-export default ControlPanel;
+export default Controls;
