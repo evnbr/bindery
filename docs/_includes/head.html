@@ -3,7 +3,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.full_title | escape }}{% endif %}</title>
+  <title>{{ site.title | escape }}{% if page.title %} · {{ page.title | escape }}{% endif %}</title>
   <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
 
   <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
@@ -11,6 +11,7 @@
 
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | relative_url }}">
+  <link href="https://fonts.googleapis.com/css?family=Spectral:200,300,400" rel="stylesheet">
 
   <script>
   let starCount;

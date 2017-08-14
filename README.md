@@ -1,4 +1,4 @@
-## Bindery.js - [Docs](http://evanbrooks.info/bindery/)
+## Bindery.js - [Docs](http://evanbrooks.info/bindery/docs)
 
 ### About
 
@@ -58,11 +58,11 @@ When contributing, keep the following in mind: The goal of bindery.js is to prov
 - `npm run-script build` - Webpack —> build/bindery.js
 - `npm run-script minify` - Webpack —> build/bindery.min.js
 - `npm run-script lint` - ESLints, using the [Airbnb style guide](https://github.com/airbnb/javascript)
+- `npm test` - Runs Jest
 
 #### To Do
 
 - [ ] Test Coverage
-- [ ] Page Number references (Tables of Contents, Indexes)
 - [ ] More control over spreads, ordering, booklet printing
 - [ ] Examples for use with blogging platforms
 - [ ] Examples for use with React

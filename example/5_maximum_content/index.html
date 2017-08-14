@@ -22,7 +22,7 @@
 						selector: 'p > a',
 						render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.href}</u>`,
 					}),
-					Bindery.Spread({ selector: ".big-figure" }),
+					Bindery.FullBleedSpread({ selector: ".big-figure" }),
 					Bindery.RunningHeader({
 						render: (page) => {
 							if (page.isEmpty) return '';
@@ -33,7 +33,7 @@
 					}),
 					Bindery.PageReference({
 						selector: ".toc a",
-						updateReference: (element, number) => {
+						replace: (element, number) => {
 							element.insertAdjacentHTML(
 								"afterend",
 								`<i style="float:right;">${number}</i>`
