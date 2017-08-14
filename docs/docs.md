@@ -107,9 +107,9 @@ Bindery.makeBook({
 
 ##### `Bindery.Continuation`
 If you want to customize the design when an element splits across two pages.
-- `selector`: Which elements to apply class. *Required*
-- `hasContinuationClass`: Applied to elements that continue onto the next page. *Optional*
-- `isContinuationClass`: Applied to elements that start on a previous page. *Optional*
+- `selector`: Which elements the rule should be applied to.
+- `hasContinuationClass`: Applied to elements that continue onto the next page. `Optional`
+- `isContinuationClass`: Applied to elements that start on a previous page. `Optional`
 
 {% highlight js %}
 Bindery.makeBook({
@@ -126,10 +126,10 @@ Bindery.makeBook({
 
 ##### `Bindery.PageBreak`
 Adds or avoids page breaks for the selected element.
-- `selector`: Which elements. Required.
-- `position`: `'before', 'after', 'both', 'avoid'`— Where to insert the break. Required.
+- `selector`: Which elements the rule should be applied to.
+- `position`: `'before', 'after', 'both', 'avoid'`— Where to insert the break.
 - `continue`: `'left', 'right', 'any'` — Whether to continue flowing contents after the break on a
-specific page. Optional.
+specific page. `Optional`
 
 {% highlight js %}
 // Make sure chapter titles always start on a righthand page.
@@ -144,8 +144,10 @@ Bindery.PageBreak({
 ##### `Bindery.FullBleedPage`
 Removes the selected element from the ordinary flow of the book and places it on its own
 page. Good for displaying figures and imagery.
-- `selector`: Which elements. Required.
-- `continue`: `'same', 'left', 'right', 'any'` — Whether to continue flowing contents after the break on a
+- `selector`: Which elements the rule should be applied to.
+- `continue`: `'same', 'left', 'right', 'next'` — Where to resume the book flow after adding the
+full bleed element. Left, right, and next continue after the element. `same` will
+continue the flow where it left off, so there's not a blank gap before the image.
 
 {% highlight js %}
 Bindery.FullBleedPage({
@@ -161,7 +163,7 @@ The same as `Bindery.FullBleedPage`, but places the element across two pages.
 If you want to customize the design when an element splits across two pages.
 - `render`: A function that takes a `Page` and returns a string of HTML. You'll
 probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
-of the `Page`.
+of the `Page`. `Optional`
 
 {% highlight js %}
 Bindery.RunningHeader({
@@ -178,13 +180,16 @@ Bindery.RunningHeader({
 {% endhighlight %}
 
 ##### `Bindery.Footnote`
-Desc.
-- `selector`: Which elements. Required.
+Add a footnote to the bottom of the flow area. Footnotes cut into the area for
+text, so note that very large footnotes may bump the entire element to the
+next page.
+- `selector`: Which elements the rule should be applied to.
 - `render`: A function that takes an element and number, and returns the
-footnote for that element.
-- `replace`: A function that takes an element and number, and must return
-a new element. Optional. By default, Bindery will simply insert the footnote
-superscript after the original element.
+footnote for that element. This footnote will be inserted at the bottom of the flow
+area.
+- `replace`: A function that takes the selected element and number, and returns
+an new element with a footnote indicator. By default, Bindery will simply insert
+the number as a superscript after the original element. `Optional`
 
 {% highlight js %}
 Bindery.Footnote({
@@ -201,14 +206,14 @@ Bindery.Footnote({
 ##### `Bindery.PageReference`
 Use PageReference to create a table of contents, index, endnotes, or anywhere
 you might otherwise use anchor links or in-page navigation on the web.
-- `selector`: Which elements. Required.
+- `selector`: Which elements the rule should be applied to.
 - `replace`: A function that takes an element and a page range, and must return
-a new element. Optional. By default, Bindery will simply insert the page range
-after the original element.
+a new element. By default, Bindery will simply insert the page range
+after the original element. `Optional`
 - `createTest`: A function that takes an element and returns a test function.
 The test function receives an element, and should return true if the
 element can be found. By default, the test function will see if the page contains
-the anchor tag in the original elements `href` property.
+the anchor tag in the original elements `href` property. `Optional`
 
 #### Table of Contents
 By default, PageReference will look for anchor links. To create a table of
