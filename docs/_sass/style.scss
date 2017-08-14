@@ -8,7 +8,7 @@ $accent-dark: navy;
 
 $sidebar-width: 20rem;
 
-$roomForDocsSideNav: 70rem;
+$roomForDocsSideNav: 80rem;
 $narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
@@ -43,7 +43,7 @@ em {
 }
 
 .post-content {
-  font: 24px / 1.35 Times, Times New Roman, serif;
+  font: 24px / 1.4 Times, Times New Roman, serif;
   // font: 20px / 1.4 Minion Pro, Times, Times New Roman, serif;
 }
 
@@ -168,29 +168,34 @@ $accent-light: rgba(5, 0, 154, 0.4);
 }
 
 .docs-content li {
-  margin: 0 0 0 2rem;
-  text-indent: -2rem;
+  margin: 0 0 1rem 8rem;
+  position: relative;
+}
+
+.docs-content li code:first-child {
+  // color: #008080;
+  font-weight: 500;
+  width: 7.5rem;
+  display: inline-block;
+  position: absolute;
+  left: -8rem;
+  line-height: 2rem;
 }
 
 .docs-nav-item {
   position: relative;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 .docs-nav-subitem {
+  font-weight: 400;
   margin-bottom: 0 !important;
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
   &:last-child {
-    margin-bottom: 1rem !important;
+    // margin-bottom: 1rem !important;
     padding-bottom: 0;
   }
 
-}
-
-.docs-nav-head {
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  font-size: 12px;
-  font-weight: 500;
 }
 
 .docs-nav {
@@ -284,6 +289,15 @@ blockquote {
   h1 {
     font-size: 3.5rem;
   }
+  .docs-content li code:first-child {
+    position: relative;
+    left: -3rem;
+    display: block;
+  }
+  .docs-content li {
+    margin: 0 0 1rem 3rem;
+    position: relative;
+  }
 }
 
 @media (min-width: $narrow) {
@@ -337,11 +351,12 @@ blockquote {
     width: $sidebar-width;
   }
   .docs-nav-subitem {
-    border-left: 1px solid gray;
-    padding-left: 1rem;
+    // border-left: 1px solid gray;
+    // padding-left: 1rem;
   }
   .nav-sub {
-    padding-top: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
   }
 }
 
