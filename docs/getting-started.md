@@ -145,5 +145,5 @@ Bindery.makeBook({
 
 ### Next Steps
 
-To learn more about available rules and options, check out the [Docs](#)
-or the [Examples](#)
+To learn more about available rules and options, check out the [Docs](/bindery/docs)
+or the [Examples](/bindery/examples)

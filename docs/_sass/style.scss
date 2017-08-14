@@ -8,8 +8,8 @@ $accent-dark: navy;
 
 $sidebar-width: 20rem;
 
-$wide: 50rem;
-$narrow: 30rem;
+$roomForDocsSideNav: 70rem;
+$narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
 
@@ -132,6 +132,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
   display: inline-block;
   position: relative;
   margin-right: 1.5rem;
+  font-weight: 600;
 
   &:last-child {
     margin-right: 0;
@@ -156,13 +157,6 @@ $accent-light: rgba(5, 0, 154, 0.4);
 }
 
 .docs-nav {
-  position: fixed;
-  bottom: 0;
-  max-height: 100%;
-  overflow-y: scroll;
-  right: 0;
-  padding: 2rem;
-  width: $sidebar-width;
   a {
     color: $black;
   }
@@ -182,12 +176,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
   position: relative;
   margin-bottom: 1rem;
 }
-
-
 .docs-nav-subitem {
-  opacity: 0.5;
-  border-left: 1px solid gray;
-  padding-left: 1rem;
   margin-bottom: 0 !important;
   padding-bottom: 1rem;
   &:last-child {
@@ -265,7 +254,7 @@ h3 {
 h4 {
   font: 1rem/1.5 $system;
   font-weight: 600;
-  padding-top: 1rem;
+  padding-top: 3rem;
   padding-bottom: 1rem;
 }
 
@@ -282,12 +271,18 @@ blockquote {
 
 
 @media (max-width: $narrow) {
+  html {
+    font-size: 12px;
+  }
   .site-nav {
     margin: 2rem 0;
     float: none;
   }
   .post-content {
     font-size: 18px;
+  }
+  h1 {
+    font-size: 3.5rem;
   }
 }
 
@@ -298,11 +293,59 @@ blockquote {
   .site-nav {
     position: absolute;
     right: 1rem;
-    top: 0.3rem;
+    top: 0.8rem;
+  }
+  .logo {
+    height: 48px;
+    width: 48px;
+  }
+
+}
+
+@media (max-width: $roomForDocsSideNav) {
+  .docs-nav-item {
+    // border-top: 1px solid #aaa;
+    // padding-top: 1em;
+    font-weight: 600;
+  }
+  .docs-nav-item > a {
+    display: inline-block;
+    width: 12em;
+  }
+  .nav-sub {
+    display: inline-block;
+    vertical-align: top;
+  }
+  .docs-nav-subitem {
+    font-weight: 400;
+    padding-top: 0;
+    border: none;
+    display: block;
+    width: auto;
   }
 }
 
-// @media (min-width: $wide) {
+
+@media (min-width: $roomForDocsSideNav) {
+  .docs-nav {
+    position: fixed;
+    bottom: 0;
+    max-height: 100%;
+    overflow-y: scroll;
+    right: 0;
+    padding: 2rem;
+    width: $sidebar-width;
+  }
+  .docs-nav-subitem {
+    border-left: 1px solid gray;
+    padding-left: 1rem;
+  }
+  .nav-sub {
+    padding-top: 1rem;
+  }
+}
+
+// @media (min-width: $roomForDocsSideNav) {
 //   .site-header {
 //     position: fixed;
 //     top: 0;

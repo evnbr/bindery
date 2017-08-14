@@ -5,9 +5,6 @@ permalink: /docs/
 order: 2
 ---
 
-
-## Docs
-
 ### Setup
 
 ##### `Bindery.makeBook(options)`
@@ -210,13 +207,13 @@ you might otherwise use anchor links or in-page navigation on the web.
 - `replace`: A function that takes an element and a page range, and must return
 a new element. By default, Bindery will simply insert the page range
 after the original element. `Optional`
-- `createTest`: A function that takes an element and returns a test function.
-The test function receives an element, and should return true if the
-element can be found. By default, the test function will see if the page contains
-the anchor tag in the original elements `href` property. `Optional`
+- `createTest`: A function that takes your reference element and returns a test function.
+The test function receives a page element, and should return true if the
+reference can be found. By default, the test function will look for
+the anchor tag of the reference element's `href` property. `Optional`
 
-#### Table of Contents
-By default, PageReference will look for anchor links. To create a table of
+#### Creating a Table of Contents
+A table of contents is a reference that points to a specific page. By default, PageReference will look for anchor links. To create a table of
 contents, do this:
 
 {% highlight js %}
@@ -251,9 +248,9 @@ This will transform these anchor links as below:
 {% endhighlight %}
 
 
-#### Index
-In the following example, rather than checking the href, Bindery will search
-the text of each page to see if contains the test of the list item.
+#### Creating an Index
+An index is a reference that points to content on a range of pages. There are many way you might create an index. In the following example, rather than
+checking the `href`, Bindery will search the entire text of each page to see if contains the text of your reference element.
 
 {% highlight js %}
 Bindery.PageReference({
@@ -282,7 +279,35 @@ This will transform the list items as below:
 </ul>
 {% endhighlight %}
 
+If you
+didn't want to match on the exact string, you could use other selectors or attribute, or use a fuzzier method of searching.
+
+{% highlight js %}
+Bindery.PageReference({
+  selector: '[data-index-reference]',
+  createTest: (el) => {
+    let id = el.getAttribute('data-index-reference');
+    let selector = '[data-index-id=' + id + ']'
+    return (pageEl) => {
+      return pageEl.querySelector(selector);
+    }
+  },
+})
+{% endhighlight %}
+
+{% highlight html %}
+<!-- In your book markup -->
+<p data-index-id='perfectBind'>
+  Most books are perfect bound.
+</p>
+
+<!-- In your index markup -->
+<ul>
+  <li data-index-reference='perfectBind'>Perfect Binding</li>
+</ul>
+{% endhighlight %}
+
 
 Note that we can't know what page something will end up on until the book layout
-is complete, so make sure that however you display your page reference doesn't
-change the layout significantly.
+is complete, so make sure that your `replace` function doesn't
+change the layout drastically.
