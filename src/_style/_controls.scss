@@ -239,7 +239,7 @@
   max-height: 0;
   margin: -4px 8px 0;
   border-radius: 0 0 4px 4px;
-  transition: all 0.2s;
+  transition: max-height 0.3s, margin 0.3s, opacity 0.5s;
   overflow: hidden;
 
   .#{$pre}-row {
