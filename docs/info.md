@@ -11,7 +11,7 @@ order: 4
 
 Computer printers predate computer screens.
 
-#### Bindery is Not Trying to be...
+#### Bindery is not trying to be...
 
 1. [InDesign](#) — Bindery is for people who are interested in creating layouts
 programmatically. It's not a graphical user interface (though you could build one around it).

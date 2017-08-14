@@ -159,6 +159,10 @@ $accent-light: rgba(5, 0, 154, 0.4);
 .docs-nav {
   a {
     color: $black;
+    &:hover {
+      color: $accent;
+      opacity: 1;
+    }
   }
 }
 
@@ -213,7 +217,6 @@ $accent-light: rgba(5, 0, 154, 0.4);
   vertical-align: middle;
   margin-right: 1rem;
   display: inline-block;
-  transition: all 0.15s;
 }
 
 .site-title {
@@ -223,6 +226,10 @@ $accent-light: rgba(5, 0, 154, 0.4);
 .site-header a {
   color: $black;
   font-weight: 500;
+  &:hover {
+    color: $accent;
+    opacity: 1;
+  }
 }
 
 img {
@@ -272,12 +279,24 @@ blockquote {
   font-style: italic;
 }
 
+/**
+ * Code formatting
+ */
+pre, code {
+  line-height: 1.5rem;
+  font-family: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+  font-size: 1.1rem;
+}
 
 
 
 @media (max-width: $narrow) {
   html {
-    font-size: 12px;
+    // font-size: 12px;
+  }
+  pre, code {
+    font-size: 0.8rem;
+    line-height: 1.3rem;
   }
   .site-nav {
     margin: 2rem 0;
@@ -318,13 +337,16 @@ blockquote {
 
 @media (max-width: $roomForDocsSideNav) {
   .docs-nav-item {
-    // border-top: 1px solid #aaa;
-    // padding-top: 1em;
+    box-shadow: inset 0 0.5px grey;
+    padding: 0.6rem 0 0.7rem;
+    margin: 0;
     font-weight: 600;
+    max-width: 30rem;
   }
-  .docs-nav-item > a {
+  .docs-nav-item a {
     display: inline-block;
-    width: 12em;
+    width: 45%;
+    max-width: 16em;
   }
   .nav-sub {
     display: inline-block;
@@ -333,9 +355,12 @@ blockquote {
   .docs-nav-subitem {
     font-weight: 400;
     padding-top: 0;
-    border: none;
+    box-shadow: none;
     display: block;
     width: auto;
+    a {
+      width: auto;
+    }
   }
 }
 
@@ -400,18 +425,6 @@ blockquote {
 
 
 
-
-/**
- * Code formatting
- */
-pre,
-code {
-  // border-radius: 3px;
-  // background-color: #f5f5ff;
-  line-height: 1.5rem;
-  font-family: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-  font-size: 1.1rem;
-}
 
 .highlight pre {
   // background-color: #f5f5ff;
