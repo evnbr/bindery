@@ -1,9 +1,13 @@
 import Rule from './Rule';
 
+// Options:
+// selector: String
+// replace: function (HTMLElement) => HTMLElement
+
 class Replace extends Rule {
   constructor(options) {
-    options.name = 'Footnote';
     super(options);
+    this.name = 'Replace';
   }
   afterAdd(element, state, requestNewPage, overflowCallback) {
     const parent = element.parentNode;

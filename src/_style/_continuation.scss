@@ -1,7 +1,7 @@
-p.bindery-continuation {
+p.#{$pre}-continuation {
   text-indent: 0 !important;
 }
 
-li.bindery-continuation {
+li.#{$pre}-continuation {
   list-style: none !important;
 }

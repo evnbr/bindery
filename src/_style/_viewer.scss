@@ -1,8 +1,8 @@
 @media screen {
-  .bindery-viewing {
+  .#{$pre}-viewing {
     background: $background !important;
   }
-  .bindery-export {
+  .#{$pre}-root {
     transition: opacity 0.2s;
     opacity: 1;
     background: $background;
@@ -14,24 +14,32 @@
     min-height: 90vh;
   }
 
-   .bindery-measure-area {
-     position: fixed;
-     background: $background;
-     padding: 50px 20px;
-     padding-right: $sidebarWidth;
-     z-index: 99;
-     visibility: hidden;
-     top: 0;
-     left: 0;
-     right: 0;
-     bottom: 0;
-   }
+  .#{$pre}-measure-area {
+    position: fixed;
+    background: $background;
+    padding: 50px 20px;
+    z-index: 99;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+    right: $sidebarWidth;
+    bottom: 0;
 
-   .bindery-print-page {
+    .#{$pre}-debug & {
+      overflow: scroll;
+      visibility: visible;
+    }
+
+    .#{$pre}-page {
+      margin: 0 auto 50px;
+    }
+  }
+
+   .#{$pre}-print-page {
      margin: 0 auto;
    }
 
-   .bindery-spinner {
+   .#{$pre}-spinner {
      border: 2px solid transparent;
      border-left-color: $accent;
      width: 32px;
@@ -47,12 +55,12 @@
      opacity: 0;
    }
 
-   .bindery-inProgress .bindery-spinner {
+   .#{$pre}-in-progress .#{$pre}-spinner {
      opacity: 1;
      animation: spin 0.6s linear infinite;
    }
 
-   .bindery-error {
+   .#{$pre}-error {
      font: 16px / 1.4 $system;
      margin: 15vh 15vw;
      max-width: 500px;
@@ -76,14 +84,14 @@
      }
    }
 
-   .bindery-show-bleed .bindery-print-page {
+   .#{$pre}-show-bleed .#{$pre}-print-page {
      background: white;
      outline: 1px solid rgba(0,0,0,0.1);
      box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
      margin: 20px auto;
    }
 
-   .bindery-letter {
+   .#{$pre}-letter {
      &-landscape {
        width: 11in;
        height: 8.5in;
@@ -110,30 +118,34 @@
 }
 
 @media print {
-  .bindery-export {
+  .#{$pre}-root {
     -webkit-print-color-adjust: exact;
   }
 
   /* Don't print anything that hasn't been exported. This hides extra controls/ */
-  .bindery-viewing > :not(.bindery-export) {
+  .#{$pre}-viewing > :not(.#{$pre}-root) {
     display: none !important;
   }
 
-  .bindery-print-page {
-    margin: 20px;
+  .#{$pre}-controls {
+    display: none !important;
   }
 
-  .bindery-zoom-wrap[style] {
+  .#{$pre}-print-page {
+    margin: 0;
+  }
+
+  .#{$pre}-zoom-wrap[style] {
     transform: none !important;
   }
 
 }
 
-body.bindery-viewing {
+body.#{$pre}-viewing {
   margin: 0;
 }
 
-.bindery-zoom-wrap {
+.#{$pre}-zoom-wrap {
   transform-origin: top left;
   transform-style: preserve-3d;
   height: calc(100vh - 40px); /* adjust scrollheight on scaled down */
@@ -141,40 +153,40 @@ body.bindery-viewing {
 
 /* Don't print anything that hasn't been exported. This hides extra controls */
 /* TODO: make selectors more reasonable */
-.bindery-viewing > :not(.bindery-export):not(.bindery-controls):not(.bindery-measure-area) {
+.#{$pre}-viewing > :not(.#{$pre}-root):not(.#{$pre}-measure-area) {
   display: none !important;
 }
 
-.bindery-print-page {
+.#{$pre}-print-page {
   page-break-after: always;
   position: relative;
   overflow: hidden;
 }
 
-.bindery-spread-wrapper {
+.#{$pre}-spread-wrapper {
   position: relative;
   display: flex;
   width: 800px;
   margin: 0 auto 50px;
 }
 
-.bindery-print-page .bindery-spread-wrapper {
+.#{$pre}-print-page .#{$pre}-spread-wrapper {
   margin: 0 auto;
 }
 
-.bindery-print-meta {
+.#{$pre}-print-meta {
   padding: 12pt;
   text-align: center;
   font-family: $system;
   font-size: 8pt;
 }
 
-.bindery-stage3d {
+.#{$pre}-stage3d {
   perspective: 3000px;
   transform-style: preserve-3d;
 }
 
-.bindery-page3d {
+.#{$pre}-page3d {
   margin: auto;
   width: 400px;
   height: 600px;
@@ -196,19 +208,19 @@ body.bindery-viewing {
     transform: rotateY(-180deg);
   }
 
-  .bindery-page {
+  .#{$pre}-page {
     position: absolute;
     backface-visibility: hidden;
   }
 
-  .bindery-page3d-front {
+  .#{$pre}-page3d-front {
     transform: rotateY(0);
     &::after {
       box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)
     }
   }
 
-  .bindery-page3d-back {
+  .#{$pre}-page3d-back {
     transform: rotateY(-180deg);
     &::after {
       box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)

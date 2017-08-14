@@ -1,11 +1,11 @@
 import Continuation from './Continuation';
-import FullPage from './FullPage';
+import FullBleedSpread from './FullBleedSpread';
+import FullBleedPage from './FullBleedPage';
 import Footnote from './Footnote';
 import PageReference from './PageReference';
 import RunningHeader from './RunningHeader';
 import Replace from './Replace';
 import Rule from './Rule';
-import Spread from './Spread';
 import PageBreak from './PageBreak';
 
 export default {
@@ -13,8 +13,8 @@ export default {
   Continuation(options) {
     return new Continuation(options);
   },
-  FullPage(options) {
-    return new FullPage(options);
+  FullBleedPage(options) {
+    return new FullBleedPage(options);
   },
   Footnote(options) {
     return new Footnote(options);
@@ -25,8 +25,8 @@ export default {
   Replace(options) {
     return new Replace(options);
   },
-  Spread(options) {
-    return new Spread(options);
+  FullBleedSpread(options) {
+    return new FullBleedSpread(options);
   },
   PageBreak(options) {
     return new PageBreak(options);

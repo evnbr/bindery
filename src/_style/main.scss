@@ -1,15 +1,18 @@
 
-$prefix: "bindery";
+$pre: "📖";
 
 // $accent: white;
 // $text: gray;
 // $background: black;
-$accent: navy;
+$accent: #1b00ff; //navy;
+$invalid: #bf5656;
 $text: black;
 $background: #f4f4f4;
 $hover: rgba(0,0,0,0.04);
 
 $sidebarWidth: 240px;
+
+$bleed: 0.25in;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
 

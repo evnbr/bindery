@@ -1,14 +1,13 @@
 ---
-layout: post
-title:  "Examples"
-date:   2017-07-22 16:29:06 -0700
+layout: page
+title:  Examples
+permalink: /examples/
+order: 3
 ---
 
 ## Examples
 
-<!-- With just a couple lines of code, you can annotate `<a>` tags with [<span class="sc">url</span>s as footnotes](https://github.com/evnbr/bindery/tree/master/example), transform your `<nav>` into [a table of contents](#), create painless [fore-edge printing](https://github.com/evnbr/bindery/tree/master/example), making the type [smaller each page](https://github.com/evnbr/bindery/tree/master/example) (à la [Boom](http://www.nytimes.com/2007/03/18/style/18iht-DESIGN19.4945906.html)), display a video [as a flipbook](https://github.com/evnbr/bindery/tree/master/example), and more. -->
-
-### Simple
+#### Simple
 
 - [Load remote content](#) ([Source](#))
 - [Set page size](#) ([Source](#))
@@ -17,7 +16,7 @@ date:   2017-07-22 16:29:06 -0700
 - [Turn `<a>` tags into <span class="sc">url</span>s as footnotes](https://github.com/evnbr/bindery/tree/master/example)
 - [Turn your `<nav>` into a table of contents](#)
 
-### Advanced
+#### Advanced
 
 - [Dynamic background color](https://github.com/evnbr/bindery/tree/master/example)
 - [Type that starts out big and gets smaller](https://github.com/evnbr/bindery/tree/master/example) (à la [Irma Boom](http://www.nytimes.com/2007/03/18/style/18iht-DESIGN19.4945906.html))

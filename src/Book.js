@@ -12,31 +12,18 @@ class Book {
   // return: pages : [ Int ]
   // if no matches: []
   pagesForSelector(sel) {
-    const matches = [];
-    this.pages.forEach((page) => {
-      if (page.element.querySelector(sel)) {
-        matches.push(page.number);
-      }
-    });
-    return matches;
+    return this.pagesForTest(page => page.element.querySelector(sel));
   }
-
-  // arguments: selector : String
-  // return: page : Int
-  // if no matches: null
-  firstPageForSelector(sel, callback) {
-    this.onComplete(() => {
-      const page = this.pagesForSelector(sel)[0];
-      callback(page);
-    });
+  // arguments: testFunc : (element) => bool
+  // return: pages : [ Int ]
+  // if no matches: []
+  pagesForTest(testFunc) {
+    return this.pages.filter(pg => testFunc(pg.element)).map(pg => pg.number);
   }
 
   onComplete(func) {
-    if (!this.isComplete) {
-      this.queued.push(func);
-    } else {
-      func();
-    }
+    if (!this.isComplete) this.queued.push(func);
+    else func();
   }
 
   setCompleted() {

@@ -1,20 +1,15 @@
 import paginate from './paginate';
 
-import Page from './Page';
+import Styler from './Styler';
 import Viewer from './Viewer';
-import Controls from './Controls';
-import { isValidSize } from './utils/convertUnits';
+import c from './utils/prefixClass';
+import { arraysEqual } from './utils';
 
 import Rules from './Rules/';
 
 require('./_style/main.scss');
 
-
-const DEFAULT_PAGE_UNIT = 'pt';
-const DEFAULT_PAGE_SIZE = {
-  width: '288pt',
-  height: '432pt',
-};
+const DEFAULT_PAGE_SIZE = { width: '288pt', height: '432pt' };
 const DEFAULT_PAGE_MARGIN = {
   inner: '24pt',
   outer: '32pt',
@@ -22,26 +17,23 @@ const DEFAULT_PAGE_MARGIN = {
   top: '48pt',
 };
 
-const arraysEqual = (a, b) => {
-  if (a.length !== b.length) { return false; }
-  for (let i = 0; i < a.length; i += 1) {
-    if (a[i] !== b[i]) { return false; }
-  }
-  return true;
-};
-
-
 class Bindery {
   constructor(opts) {
     console.log(`Bindery ${'[AIV]{version}[/AIV]'}`);
 
-    const pageSize = opts.pageSize ? opts.pageSize : DEFAULT_PAGE_SIZE;
-    const pageMargin = opts.pageMargin ? opts.pageMargin : DEFAULT_PAGE_MARGIN;
-    this.pageUnit = opts.pageUnit ? opts.pageUnit : DEFAULT_PAGE_UNIT;
-    this.setSize(pageSize);
-    this.setMargin(pageMargin);
+    this.autorun = opts.autorun || true;
+    this.autoupdate = opts.autoupdate || false;
+    this.debug = opts.debug || false;
 
-    this.viewer = new Viewer();
+    this.styler = new Styler();
+    this.styler.setSize(opts.pageSize || DEFAULT_PAGE_SIZE);
+    this.styler.setMargin(opts.pageMargin || DEFAULT_PAGE_MARGIN);
+    this.styler.setBleed('0.2in');
+
+
+    this.viewer = new Viewer({ bindery: this });
+    this.controls = this.viewer.controls;
+
     if (opts.startingView) {
       this.viewer.setMode(opts.startingView);
     }
@@ -49,10 +41,6 @@ class Bindery {
     this.rules = [];
     if (opts.rules) this.addRules(opts.rules);
 
-    if (opts.autorun) { this.autorun = true; }
-
-    this.autoupdate = opts.autoupdate ? opts.autoupdate : false;
-    this.debugDelay = opts.debugDelay ? opts.debugDelay : 0;
 
     if (!opts.source) {
       this.viewer.displayError('Source not specified', 'You must include a source element, selector, or url');
@@ -70,32 +58,7 @@ class Bindery {
     } else if (typeof opts.source === 'object' && opts.source.url) {
       const url = opts.source.url;
       const selector = opts.source.selector;
-      fetch(opts.source.url).then((response) => {
-        if (response.status === 404) {
-          this.viewer.displayError('404', `Could not find file at "${url}"`);
-        } else if (response.status === 200) {
-          return response.text();
-        }
-        return '';
-      }).then((fetchedContent) => {
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = fetchedContent;
-        this.source = wrapper.querySelector(selector);
-        if (!(this.source instanceof HTMLElement)) {
-          this.viewer.displayError('Source not specified', `Could not find element that matches selector "${selector}"`);
-          console.error(`Bindery: Could not find element that matches selector "${selector}"`);
-          return;
-        }
-        if (this.autorun) {
-          this.makeBook();
-        }
-      }).catch((error) => {
-        console.error(error);
-        const scheme = window.location.href.split('://')[0];
-        if (scheme === 'file') {
-          this.viewer.displayError(`Can't fetch content from "${url}"`, 'Web pages can\'t fetch content unless they are on a server.');
-        }
-      });
+      this.fetchSource(url, selector);
     } else if (opts.source instanceof HTMLElement) {
       this.source = opts.source;
       if (this.autorun) {
@@ -112,29 +75,46 @@ class Bindery {
     return new Bindery(opts);
   }
 
+  fetchSource(url, selector) {
+    fetch(url).then((response) => {
+      if (response.status === 404) {
+        this.viewer.displayError('404', `Could not find file at "${url}"`);
+      } else if (response.status === 200) {
+        return response.text();
+      }
+      return '';
+    }).then((fetchedContent) => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = fetchedContent;
+      this.source = wrapper.querySelector(selector);
+      if (!(this.source instanceof HTMLElement)) {
+        this.viewer.displayError(
+          'Source not specified',
+          `Could not find element that matches selector "${selector}"`
+        );
+        console.error(`Bindery: Could not find element that matches selector "${selector}"`);
+        return;
+      }
+      if (this.autorun) {
+        this.makeBook();
+      }
+    }).catch((error) => {
+      console.error(error);
+      const scheme = window.location.href.split('://')[0];
+      if (scheme === 'file') {
+        this.viewer.displayError(
+          `Can't fetch content from "${url}"`,
+          'Web pages can\'t fetch content unless they are on a server.'
+        );
+      }
+    });
+  }
+
   cancel() {
     this.stopCheckingLayout();
     this.viewer.cancel();
-    document.body.classList.remove('bindery-viewing');
+    document.body.classList.remove(c('viewing'));
     this.source.style.display = '';
-  }
-
-  setSize(size) {
-    isValidSize(size);
-
-    this.pageSize = size;
-    Page.setSize(size);
-  }
-
-  setMargin(margin) {
-    isValidSize(margin);
-
-    this.pageMargin = margin;
-    Page.setMargin(margin);
-  }
-
-  isSizeValid() {
-    return Page.isSizeValid();
   }
 
   addRules(newRules) {
@@ -149,21 +129,13 @@ class Bindery {
 
   makeBook(doneBinding) {
     if (!this.source) {
-      document.body.classList.add('bindery-viewing');
+      document.body.classList.add(c('viewing'));
       return;
     }
 
-    if (!this.isSizeValid()) {
-      const w = this.pageSize.width;
-      const h = this.pageSize.height;
-      const size = `{ width: ${w}, height: ${h} }`;
-      const i = this.pageMargin.inner;
-      const o = this.pageMargin.outer;
-      const t = this.pageMargin.top;
-      const b = this.pageMargin.bottom;
-      const margin = `{ top: ${t}, inner: ${i}, outer: ${o}, bottom: ${b} }`;
+    if (!this.styler.isSizeValid()) {
       this.viewer.displayError(
-        'Page is too small', `Size: ${size} \n Margin: ${margin} \n Try adjusting the sizes or units.`
+        'Page is too small', `Size: ${JSON.stringify(this.pageSize)} \n Margin: ${JSON.stringify(this.pageMargin)} \n Try adjusting the sizes or units.`
       );
       console.error('Bindery: Cancelled pagination. Page is too small.');
       return;
@@ -177,41 +149,38 @@ class Bindery {
 
     // In case we're updating an existing layout
     this.viewer.clear();
-    document.body.classList.add('bindery-viewing');
-    document.body.classList.add('bindery-inProgress');
+    document.body.classList.add(c('viewing'));
+    this.viewer.element.classList.add(c('in-progress'));
+    if (this.debug) document.body.classList.add(c('debug'));
 
-    if (!this.controls) {
-      this.controls = new Controls({ binder: this });
-    }
+    this.styler.updateStylesheet();
 
     this.controls.setInProgress();
 
-    paginate(
+    paginate({
       content,
-      this.rules,
-      // Done
-      (book) => {
+      rules: this.rules,
+      success: (book) => {
         setTimeout(() => {
           this.viewer.book = book;
-          this.viewer.update();
+          this.viewer.render();
 
           this.controls.setDone();
           if (doneBinding) doneBinding();
-          document.body.classList.remove('bindery-inProgress');
+          this.viewer.element.classList.remove(c('in-progress'));
+          document.body.classList.remove(c('debug'));
           this.startCheckingLayout();
         }, 100);
       },
-      // Progress
-      (pageCount) => {
+      progress: (pageCount) => {
         this.controls.updateProgress(pageCount);
       },
-      // Error
-      (error) => {
-        document.body.classList.remove('bindery-inProgress');
+      error: (error) => {
+        document.body.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
       },
-      this.debugDelay
-    );
+      isDebugging: this.debug,
+    });
   }
 
   startCheckingLayout() {

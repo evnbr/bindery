@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Bindery Ex 9 — Spreads and Images</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+
+	<script type="text/javascript" src="../../build/bindery.js"></script>
+	<script>
+			Bindery.makeBook({
+			  source: {
+					url: './content.html',
+					selector: ".content",
+				},
+			  rules: [
+					Bindery.RunningHeader(),
+					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+					Bindery.FullBleedPage({ selector: '.fullpage', continue: 'same' }),
+					Bindery.FullBleedSpread({ selector: '.spread', continue: 'same' }),
+			  ],
+			});
+
+	</script>
+</body>
+</html>

@@ -1,9 +1,8 @@
 $markLen: 12pt;
-$markSpace: 8pt;
-$markOffset: $markLen + $markSpace;
+$markOffset: $markLen + $bleed;
+$bleedOffset: $markOffset;
 
-
-.bindery-crop-wrap {
+.#{$pre}-print-mark-wrap {
   display: none;
   position: absolute;
   pointer-events: none;
@@ -13,11 +12,24 @@ $markOffset: $markLen + $markSpace;
   right: 0;
   z-index: 999;
 
-  .bindery-show-crop & {
+  .#{$pre}-show-crop &,
+  .#{$pre}-show-bleed-marks & {
     display: block;
   }
 
+  .#{$pre}-show-crop & {
+    > [class*='crop'] {
+      display: block;
+    }
+  }
+  .#{$pre}-show-bleed-marks & {
+    > [class*='bleed'] {
+      display: block;
+    }
+  }
+
   > div {
+    display: none;
     position: absolute;
     overflow: hidden;
 
@@ -40,17 +52,16 @@ $markOffset: $markLen + $markSpace;
   }
 
 }
-.bindery-show-crop .bindery-print-page .bindery-spread-wrapper {
+.#{$pre}-show-crop .#{$pre}-print-page .#{$pre}-spread-wrapper,
+.#{$pre}-show-bleed-marks .#{$pre}-print-page .#{$pre}-spread-wrapper {
   margin: 30pt auto;
 }
 
-.bindery-crop {
+.#{$pre}-crop {
   &-fold,
   &-left,
   &-right {
     transform: scaleX(0.5);
-    top: -$markOffset;
-    bottom: -$markOffset;
     width: 1px;
     margin: auto;
   }
@@ -62,8 +73,6 @@ $markOffset: $markLen + $markSpace;
   &-top,
   &-bottom {
     transform: scaleY(0.5);
-    left: -$markOffset;
-    right: -$markOffset;
     height: 1px;
   }
 
@@ -72,5 +81,21 @@ $markOffset: $markLen + $markSpace;
   }
   &-bottom {
     bottom: 0;
+  }
+}
+
+.#{$pre}-bleed {
+  &-left,
+  &-right {
+    transform: scaleX(0.5);
+    width: 1px;
+    margin: auto;
+  }
+
+
+  &-top,
+  &-bottom {
+    transform: scaleY(0.5);
+    height: 1px;
   }
 }

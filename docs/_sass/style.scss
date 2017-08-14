@@ -3,7 +3,7 @@
 // Define defaults for each variable.
 
 $black: black;
-$accent: #05009A;
+$accent: blue;
 $accent-dark: navy;
 
 $sidebar-width: 20rem;
@@ -11,6 +11,7 @@ $sidebar-width: 20rem;
 $wide: 50rem;
 $narrow: 30rem;
 
+$system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
 
 * {
   margin: 0;
@@ -20,7 +21,7 @@ $narrow: 30rem;
 }
 
 html {
-  font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+  font: 16px/1.4 $system;
 }
 
 body {
@@ -37,21 +38,24 @@ body {
 strong {
   font-weight: 600;
 }
+em {
+  font-style: italic;
+}
 
 .post-content {
-  font: 22px / 1.35 Times, Times New Roman, serif;
+  font: 24px / 1.35 Times, Times New Roman, serif;
   // font: 20px / 1.4 Minion Pro, Times, Times New Roman, serif;
 }
 
 
 .sc {
-  font-feature-settings: "smcp";
-  // text-transform: uppercase;
-  // font-size: 0.9em;
+  // font-feature-settings: "smcp";
+  text-transform: uppercase;
+  font-size: 0.9em;
 }
 
 .post-content .btn {
-  font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+  font: 14px/1.4 $system;
   display: inline-block;
   padding: 0.6rem 0.8rem;
   border-radius: 2px;
@@ -108,13 +112,13 @@ $accent-light: rgba(5, 0, 154, 0.4);
 
 .site-header, .page-content, .site-footer {
   margin: 0 auto;
-  max-width: 50rem;
+  max-width: 45rem;
   padding: 0 1rem;
 }
 
 .site-header {
   position: relative;
-  padding-top: 1rem;
+  margin-top: 1rem;
   font-weight: 400;
 }
 
@@ -126,13 +130,61 @@ $accent-light: rgba(5, 0, 154, 0.4);
 
 .nav-item {
   display: inline-block;
-  margin-right: 1rem;
+  position: relative;
+  margin-right: 1.5rem;
+
   &:last-child {
     margin-right: 0;
   }
+
+  &.nav-active a {
+    // color: $accent;
+
+    &::after {
+      content: '';
+      background: currentColor;
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      left: 0;
+      right: 0;
+      margin: auto;
+      top: 120%;
+      border-radius: 50%;
+    }
+  }
 }
 
-.nav-subitem {
+.docs-nav {
+  position: fixed;
+  bottom: 0;
+  max-height: 100%;
+  overflow-y: scroll;
+  right: 0;
+  padding: 2rem;
+  width: $sidebar-width;
+  a {
+    color: $black;
+  }
+}
+
+.docs-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.docs-content li {
+  margin: 0 0 0 2rem;
+  text-indent: -2rem;
+}
+
+.docs-nav-item {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+
+.docs-nav-subitem {
   opacity: 0.5;
   border-left: 1px solid gray;
   padding-left: 1rem;
@@ -145,7 +197,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
 
 }
 
-.nav-head {
+.docs-nav-head {
   text-transform: uppercase;
   letter-spacing: 0.02em;
   font-size: 12px;
@@ -153,7 +205,6 @@ $accent-light: rgba(5, 0, 154, 0.4);
 }
 
 .docs-nav {
-  display: none;
 }
 
 .page-content {
@@ -172,19 +223,12 @@ $accent-light: rgba(5, 0, 154, 0.4);
 }
 
 .site-title {
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  font-size: 0.9rem;
-}
-.warn {
-  color: $accent;
-  font-weight: 400;
-  text-transform: none;
+  font-weight: 500;
 }
 
 .site-header a {
   color: $black;
+  font-weight: 500;
 }
 
 img {
@@ -197,19 +241,38 @@ figure > img {
 }
 
 h1 {
-  font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
-  font-weight: 500;
-  // font-size: 2rem;
+  // font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+  // font-weight: 500;
+  font-size: 5.5rem;
+  line-height: 1;
+  // letter-spacing: -0.005em;
   margin-bottom: 2rem;
 }
 
 h2 {
-  font: 1rem/1.5 -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+  font-size: 4rem;
+  line-height: 1;
+  margin: 2rem 0 1rem;
+}
+
+h3 {
+  font: 2rem/1.5 $system;
   font-weight: 500;
-  padding-top: 4rem;
+  padding-top: 3rem;
   padding-bottom: 1.5rem;
 }
 
+h4 {
+  font: 1rem/1.5 $system;
+  font-weight: 600;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+h5 {
+  padding-top: 1.5rem;
+  font-weight: 600;
+}
 
 blockquote {
   font-style: italic;
@@ -228,51 +291,54 @@ blockquote {
   }
 }
 
-@media (min-width: $narrow) and (max-width: $wide) {
+@media (min-width: $narrow) {
+  .site-header {
+    margin-top: 2rem;
+  }
   .site-nav {
     position: absolute;
     right: 1rem;
-    top: 1.32rem;
+    top: 0.3rem;
   }
 }
 
-@media (min-width: $wide) {
-  .site-header {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    overflow-y: scroll;
-    left: 0;
-    padding: 2rem;
-    width: $sidebar-width;
-  }
-  .page-content {
-    margin-top: 4rem;
-  }
-  .page-content, .site-footer {
-    margin-left: $sidebar-width;
-  }
-  .site-nav {
-    // margin-left: calc(34px + 1rem);
-    margin-top: 3rem;
-    float: none;
-  }
-  .nav-item {
-    display: block;
-    margin-bottom: 1rem;
-  }
-
-  .docs-nav {
-    display: block;
-  }
-
-  .logo {
-    display: block;
-    height: 48px;
-    width: 48px;
-    margin-bottom: 1rem;
-  }
-}
+// @media (min-width: $wide) {
+//   .site-header {
+//     position: fixed;
+//     top: 0;
+//     bottom: 0;
+//     overflow-y: scroll;
+//     left: 0;
+//     padding: 2rem;
+//     width: $sidebar-width;
+//   }
+//   .page-content {
+//     margin-top: 4rem;
+//   }
+//   .page-content, .site-footer {
+//     margin-left: $sidebar-width;
+//   }
+//   .site-nav {
+//     // margin-left: calc(34px + 1rem);
+//     margin-top: 3rem;
+//     float: none;
+//   }
+//   .nav-item {
+//     display: block;
+//     margin-bottom: 1rem;
+//   }
+//
+//   .docs-nav {
+//     display: block;
+//   }
+//
+//   .logo {
+//     display: block;
+//     height: 48px;
+//     width: 48px;
+//     margin-bottom: 1rem;
+//   }
+// }
 
 
 
@@ -284,14 +350,17 @@ pre,
 code {
   // border-radius: 3px;
   // background-color: #f5f5ff;
-  line-height: 1.4rem;
+  line-height: 1.5rem;
   font-family: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
   font-size: 1.1rem;
 }
 
 .highlight pre {
-  background-color: #f5f5ff;
-  padding: 1rem;
+  // background-color: #f5f5ff;
+  // padding: 1rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid #c0c0c0;
+  margin: 1.5rem 0;
 }
 
 code {

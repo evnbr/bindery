@@ -4,45 +4,54 @@
 <head>
 	<meta charset="utf-8">
 	<title>Bindery Ex 8 — Creating an Index</title>
-	<link rel="stylesheet" type="text/css" href="style.css" />
+		<style>
+		.content, .intro {
+		  margin: 20px auto;
+		  max-width: 900px;
+		  padding: 20px;
+		}
+
+		p {
+		  text-indent: 1rem;
+		  margin: 0;
+		}
+
+		.index-content ul, li {
+		  margin: 0;
+		  padding: 0;
+		  list-style: none;
+		}
+
+		.index-content li {
+		  text-indent: -1em;
+		  padding-left: 1em;
+		}
+	</style>
 </head>
 
 <body>
 
 	<script type="text/javascript" src="../../build/bindery.js"></script>
 	<script>
-
-			let indexRule = Bindery.createRule({
-				afterBind: function(page, book) {
-					let indexRows = page.element.querySelectorAll('[data-index-id]');
-					indexRows.forEach((row) => {
-						let id = row.getAttribute('data-index-id');
-						let pages = book.pagesForSelector(`[data-index-marker=${id}]`)
-						console.log(`${id}: ${pages}`);
-					});
-				}
-			});
-
-			let binder = Bindery.makeBook({
+			Bindery.makeBook({
 			  source: {
 					url: 'content.html',
 					selector: ".content",
 				},
 			  rules: [
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-					Bindery.RunningHeader({
-						render: (page) => {
-							if (page.isEmpty) return '';
-							else if (page.element.querySelector('h2')) return `${page.number}`;
-							else if (page.isLeft) return `${page.number} · ${page.heading.h1} `;
-							else if (page.isRight) {
-								let section = Object.values(page.heading).slice(1).join(' ‣ ');
-								if (section !== '') return `${section} · ${page.number}`;
-								else return `${page.number}`;
+					Bindery.RunningHeader(),
+					Bindery.PageReference({
+						selector: '.index-content li',
+						createTest: (element) => {
+							let term = element.textContent.toLowerCase().trim();
+							return (page) => {
+								let txt = page.querySelector('.book-content');
+								if (txt) return txt.textContent.toLowerCase().includes(term);
+								return false;
 							}
 						},
-					}),
-					indexRule,
+					})
 			  ],
 			});
 

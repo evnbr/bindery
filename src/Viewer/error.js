@@ -1,9 +1,10 @@
 import h from 'hyperscript';
+import c from '../utils/prefixClass';
 
 export default function (title, text) {
-  return h('.bindery-error',
-    h('.bindery-error-title', title),
-    h('.bindery-error-text', text),
-    h('.bindery-error-footer', `Bindery ${'[AIV]{version}[/AIV]'}`),
+  return h(c('.error'),
+    h(c('.error-title'), title),
+    h(c('.error-text'), text),
+    h(c('.error-footer'), `Bindery ${'[AIV]{version}[/AIV]'}`),
   );
 }

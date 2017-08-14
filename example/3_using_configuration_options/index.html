@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Bindery Ex 3 — Using Configuration</title>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+
+	<script type="text/javascript" src="../../build/bindery.js"></script>
+	<script>
+		Bindery.makeBook({
+			source: {
+				url: '../example_shared/content.html',
+				selector: ".content",
+			},
+		  rules: [
+				Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+				Bindery.Footnote({ selector: 'p' }),
+				Bindery.Footnote({
+					selector: 'p > a',
+					render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.getAttribute('href')}</u>`,
+				}),
+				Bindery.FullBleedPage({ selector: '.med-figure' }),
+				Bindery.FullBleedSpread({ selector: '.big-figure' }),
+				Bindery.RunningHeader({
+					render: (page) => {
+						if (page.isLeft) return `${page.number} · ${page.heading.h1 || ''} `;
+						else if (page.isRight) return `${page.heading.h2 || ''} · ${page.number}`;
+					},
+				}),
+				Bindery.PageReference({
+					selector: ".toc a",
+					replace: (element, number) => {
+						let row = document.createElement('div');
+						row.innerHTML = `${element.textContent}`;
+						row.innerHTML += `<span style='float: right;'>${number}</span>`;
+						return row;
+					}
+				}),
+		  ],
+		});
+	</script>
+</body>
+</html>

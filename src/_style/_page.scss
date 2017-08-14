@@ -1,61 +1,79 @@
 @media screen {
-  .bindery-page {
+  .#{$pre}-page {
     background: white;
     outline: 1px solid rgba(0,0,0,0.1);
     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
     overflow: hidden;
+
+    .#{$pre}-show-bleed & {
+      box-shadow: none;
+      outline: none;
+      overflow: visible;
+    }
+
+    .#{$pre}-page3d & {
+      overflow: hidden !important;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
   }
 
-  .bindery-show-bleed .bindery-page {
-    box-shadow: none;
-    outline: none;
-    overflow: visible;
-  }
 
-  .bindery-page3d .bindery-page {
-    overflow: hidden !important;
-  }
-
-
-  .bindery-page::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 999;
-  }
-
-  .bindery-zoom-wrap * {
+  .#{$pre}-zoom-wrap * {
     transition: box-shadow 0.2s;
   }
 
-  .bindery-show-guides {
+  .#{$pre}-show-guides {
     .bindery-zoom-wrap * {
       box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2);
     }
-    .bindery-page::after {
+    .#{$pre}-page::after {
       box-shadow: 0 0 0 1px magenta;
     }
-    .bindery-flowbox {
+    .#{$pre}-flowbox {
       box-shadow: 0 0 0 1px cyan;
     }
-    .bindery-footer {
+    .#{$pre}-footer {
       box-shadow: 0 0 0 1px cyan;
     }
-    .bindery-running-header {
+    .#{$pre}-running-header {
       box-shadow: 0 0 0 1px cyan;
     }
-    .bindery-content {
+    .#{$pre}-content {
       box-shadow: inset 0 0 0 1px blue;
     }
-    .bindery-bleed {
+    .#{$pre}-background {
       box-shadow: 0 0 0 1px yellow;
     }
+    .#{$pre}-out-of-flow {
+      display: block;
+      outline: 1px solid cyan;
+      &::after {
+        font: 10px / 1.4 $system;
+        content: attr(data-bindery);
+        position: absolute;
+        background: transparentize(cyan, 0.5);
+        padding: 4px;
+      }
+    }
+    .#{$pre}-right .#{$pre}-out-of-flow::after {
+      left: 100%;
+    }
+    .#{$pre}-left .#{$pre}-out-of-flow::after {
+      right: 100%;
+    }
   }
-  .bindery-is-overflowing {
+
+  .#{$pre}-is-overflowing {
     overflow: visible;
 
     // .bindery-flowbox {
@@ -88,18 +106,27 @@
       content: "Overflow";
       width: 54px;
     }
-    .bindery-content {
+    .#{$pre}-content {
       transition: none;
+      &:hover::after {
+        box-shadow: inset 0 0 0 1px #ad0000;
+        background: transparentize(#ad0000, 0.96);
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
     }
-    .bindery-content:hover {
-      box-shadow: inset 0 0 0 1px #ad0000;
-      background: transparentize(#ad0000, 0.96);
-    }
-
   }
 }
 
-.bindery-page {
+.#{$pre}-out-of-flow {
+  display: none;
+}
+
+.#{$pre}-page {
   width: 200px;
   height: 300px;
   position: relative;
@@ -109,7 +136,7 @@
   margin: auto;
 }
 
-.bindery-flowbox {
+.#{$pre}-flowbox {
   position: relative;
   margin: 60px 40px;
   margin-bottom: 0;
@@ -117,19 +144,20 @@
   min-height: 0;
 }
 
-.bindery-content {
+.#{$pre}-content {
   /* hack to prevent margin collapse, leading to wrong height */
   padding: 0.1px;
+  position: relative;
 }
 
-.bindery-footer {
+.#{$pre}-footer {
   margin: 60px 40px;
   margin-top: 8pt;
   flex: 0 1 auto;
   z-index: 2;
 }
 
-.bindery-footer > :first-child:before {
+.#{$pre}-footer > :first-child:before {
   content: "";
   display: block;
   width: 24pt;
@@ -138,40 +166,35 @@
   margin-bottom: 8pt;
 }
 
-/*Old Bleed Stuff*/
-.bindery-page.bleed .bindery-flowbox {
-  margin: 0;
-  position: absolute;
-  top: -20px;
-  bottom: -20px;
-}
-.bindery-left.bleed .bindery-flowbox {
-  right: 0;
-  left: -20px;
-}
-.bindery-right.bleed .bindery-flowbox {
-  left: 0;
-  right: -20px;
-}
-
 /*Bleed as layer*/
-.bindery-bleed {
+.#{$pre}-background {
   position: absolute;
-  top: -0.2in;
-  bottom: -0.2in;
+  top: -$bleed;
+  bottom: -$bleed;
+  padding-top: $bleed;
+  padding-bottom: $bleed;
   z-index: 0;
-  .bindery-left & {
+  overflow: hidden;
+  .#{$pre}-left & {
     right: 0;
-    left: -0.2in;
+    left: -$bleed;
+    padding-left: $bleed;
   }
-  .bindery-right & {
+  .#{$pre}-right & {
     left: 0;
-    right: -0.2in;
+    right: -$bleed;
+    padding-right: $bleed;
+  }
+  .#{$pre}-spread.#{$pre}-left & {
+    right: -100%;
+  }
+  .#{$pre}-spread.#{$pre}-right & {
+    left: -100%;
   }
 }
 
 
-.bindery-spread.bindery-left .bindery-content {
+.#{$pre}-spread.#{$pre}-left .#{$pre}-content {
   /*width: 200%;*/
   position: absolute;
   top: 0;
@@ -179,7 +202,8 @@
   right: -100%;
   bottom: 0;
 }
-.bindery-spread.bindery-right .bindery-content {
+
+.#{$pre}-spread.#{$pre}-right .#{$pre}-content {
   position: absolute;
   top: 0;
   left: -100%;
@@ -187,24 +211,24 @@
   bottom: 0;
 }
 
-.bindery-sup {
+.#{$pre}-sup {
   font-size: 0.667em;
 }
 
-.bindery-running-header, .bindery-footer {
+.#{$pre}-running-header, .#{$pre}-footer {
   font-size: 10pt;
 }
 
-.bindery-running-header {
+.#{$pre}-running-header {
   position: absolute;
   text-align: center;
   top: 0.25in;
 
-  .bindery-left & {
+  .#{$pre}-left & {
     left: 18pt;
     text-align: left;
   }
-  .bindery-right & {
+  .#{$pre}-right & {
     right: 18pt;
     text-align: right;
   }
