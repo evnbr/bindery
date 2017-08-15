@@ -27,9 +27,7 @@ figure {
 
 
 figure img {
-  /* make it even bigger, for bleed */
-  height: calc(100% + 40pt);
-  margin: -20pt;
+  height: 100%;
 }
 
 figcaption {

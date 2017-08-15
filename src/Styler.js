@@ -94,6 +94,17 @@ class Styler {
       ${c('.bleed-top')}    { top: -${this.bleed}; }
       ${c('.bleed-bottom')} { bottom: -${this.bleed}; }
 
+      ${c('.background')} {
+        top: -${this.bleed};
+        bottom: -${this.bleed};
+      }
+      ${c('.left')} ${c('.background')} {
+        left: -${this.bleed};
+      }
+      ${c('.right')} ${c('.background')} {
+        right: -${this.bleed};
+      }
+
     `;
     document.head.appendChild(sheet);
   }

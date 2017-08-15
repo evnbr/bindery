@@ -169,21 +169,21 @@
 /*Bleed as layer*/
 .#{$pre}-background {
   position: absolute;
-  top: -$bleed;
-  bottom: -$bleed;
-  padding-top: $bleed;
-  padding-bottom: $bleed;
+  // top: -$bleed;
+  // bottom: -$bleed;
+  // padding-top: $bleed;
+  // padding-bottom: $bleed;
   z-index: 0;
   overflow: hidden;
   .#{$pre}-left & {
     right: 0;
-    left: -$bleed;
-    padding-left: $bleed;
+    // left: -$bleed;
+    // padding-left: $bleed;
   }
   .#{$pre}-right & {
     left: 0;
-    right: -$bleed;
-    padding-right: $bleed;
+    // right: -$bleed;
+    // padding-right: $bleed;
   }
   .#{$pre}-spread.#{$pre}-left & {
     right: -100%;
