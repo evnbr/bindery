@@ -232,7 +232,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
 }
 
 .page-content {
-  padding-top: 2rem;
+  // padding-top: 1rem;
 }
 
 .logo {
@@ -273,13 +273,13 @@ h1 {
   font-size: 5.5rem;
   line-height: 1;
   // letter-spacing: -0.005em;
-  margin-bottom: 2rem;
+  margin: 2rem 0;
 }
 
 h2 {
   font-size: 4rem;
   line-height: 1;
-  margin: 2rem 0 1rem;
+  padding: 2rem 0 1rem;
 }
 
 h3 {
@@ -325,7 +325,7 @@ pre, code {
     line-height: 1.4rem;
   }
   .site-nav {
-    margin: 2rem 0;
+    margin: 1rem 0;
     float: none;
   }
   .post-content {
