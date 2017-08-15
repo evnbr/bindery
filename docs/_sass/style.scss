@@ -57,7 +57,7 @@ em {
 .post-content .btn {
   font: 14px/1.4 $system;
   display: inline-block;
-  padding: 0.6rem 0.8rem;
+  padding: 0.6rem 1rem;
   border-radius: 2px;
   border: 1px solid $black;
   color: $black;
@@ -156,7 +156,33 @@ $accent-light: rgba(5, 0, 154, 0.4);
   }
 }
 
+.docs-scroll-back {
+  display: block;
+  position: sticky;
+  top: 1rem;
+  text-align: right;
+  z-index: 99;
+  float: right;
+  a {
+    color: black;
+    font-size: 1.5rem;
+    text-align: center;
+    display: inline-block;
+    line-height: 3rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    &:hover {
+      background: #eee;
+      opacity: 1;
+    }
+  }
+}
+
 .docs-nav {
+  background: white;
+  z-index: 999;
+  position: relative;
   a {
     color: $black;
     &:hover {
@@ -295,8 +321,8 @@ pre, code {
     // font-size: 12px;
   }
   pre, code {
-    font-size: 0.8rem;
-    line-height: 1.3rem;
+    font-size: 0.9rem;
+    line-height: 1.4rem;
   }
   .site-nav {
     margin: 2rem 0;
@@ -306,15 +332,21 @@ pre, code {
     font-size: 18px;
   }
   h1 {
-    font-size: 3.5rem;
+    font-size: 3rem;
   }
+  h2 {
+    font-size: 3rem;
+    line-height: 1;
+    margin: 1rem 0 1rem;
+  }
+
   .docs-content li code:first-child {
     position: relative;
-    left: -3rem;
+    left: -1.5rem;
     display: block;
   }
   .docs-content li {
-    margin: 0 0 1rem 3rem;
+    margin: 0 0 1rem 1.5rem;
     position: relative;
   }
 }
@@ -337,18 +369,20 @@ pre, code {
 
 @media (max-width: $roomForDocsSideNav) {
   .docs-nav-item {
-    box-shadow: inset 0 0.5px grey;
+    // box-shadow: inset 0 0.5px grey;
     padding: 0.6rem 0 0.7rem;
     margin: 0;
     font-weight: 600;
     max-width: 30rem;
   }
   .docs-nav-item a {
-    display: inline-block;
-    width: 45%;
-    max-width: 16em;
+    display: block;
+    // display: inline-block;
+    // width: 45%;
+    // max-width: 16em;
   }
   .nav-sub {
+    padding-top: 0.5rem;
     display: inline-block;
     vertical-align: top;
   }
@@ -358,6 +392,8 @@ pre, code {
     box-shadow: none;
     display: block;
     width: auto;
+    display: inline-block;
+    margin-right: 1rem;
     a {
       width: auto;
     }
@@ -367,6 +403,7 @@ pre, code {
 
 @media (min-width: $roomForDocsSideNav) {
   .docs-nav {
+    background: transparent;
     position: fixed;
     bottom: 0;
     max-height: 100%;
@@ -383,46 +420,10 @@ pre, code {
     padding-top: 0.5rem;
     padding-bottom: 1rem;
   }
+  .docs-scroll-back {
+    display: none;
+  }
 }
-
-// @media (min-width: $roomForDocsSideNav) {
-//   .site-header {
-//     position: fixed;
-//     top: 0;
-//     bottom: 0;
-//     overflow-y: scroll;
-//     left: 0;
-//     padding: 2rem;
-//     width: $sidebar-width;
-//   }
-//   .page-content {
-//     margin-top: 4rem;
-//   }
-//   .page-content, .site-footer {
-//     margin-left: $sidebar-width;
-//   }
-//   .site-nav {
-//     // margin-left: calc(34px + 1rem);
-//     margin-top: 3rem;
-//     float: none;
-//   }
-//   .nav-item {
-//     display: block;
-//     margin-bottom: 1rem;
-//   }
-//
-//   .docs-nav {
-//     display: block;
-//   }
-//
-//   .logo {
-//     display: block;
-//     height: 48px;
-//     width: 48px;
-//     margin-bottom: 1rem;
-//   }
-// }
-
 
 
 
