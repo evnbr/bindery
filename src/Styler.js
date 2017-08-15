@@ -105,6 +105,12 @@ class Styler {
         right: -${this.bleed};
       }
 
+      ${c('.spread')}${c('.right')} ${c('.background')} {
+        left: calc(-100% - ${this.bleed});
+      }
+      ${c('.spread')}${c('.left')} ${c('.background')} {
+        right: calc(-100% - ${this.bleed});
+      }
     `;
     document.head.appendChild(sheet);
   }
