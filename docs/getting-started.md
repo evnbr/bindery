@@ -30,10 +30,10 @@ Just include the script in the same file as your content, and you're ready to go
 
 {% endhighlight %}
 
-Use your usual web CSS however you choose— just keep in mind that 96px = 1in.
-Or add book-specific styles, and note that CSS supports print measurements
+Use your usual web CSS however you choose. When printing, `96px = 1in`.
+If you add book-specific styles, note that CSS supports print measurements
 like points (`pt`), pica (`pc`), inches (`in`), and millimeters (`mm`).
-(You'll want to steer clear of viewport-specific units like `vh` or `vw`).
+You'll want to steer clear of viewport-specific units like `vh` or `vw`.
 
 ### Fetching Content
 
@@ -87,10 +87,11 @@ it might look something like this.
 ### Using Rules
 
 You've now got content flowing across your pages. Next, you'll probably want
-to add components and rules to make your content usable as a book.
+to add page breaks, running headers, and the other elements of a usable book.
 
-You can use rules to give special book properties to selectors,
-like you might with CSS.
+You can create rules for selectors, like you might with CSS,
+to apply special book properties to your markup.
+
 
 {% highlight javascript %}
 Bindery.makeBook({
@@ -101,7 +102,6 @@ Bindery.makeBook({
   rules: [
     Bindery.PageBreak({ selector: 'h2', position: 'before' }),
     Bindery.FullBleedSpread({ selector: '.big-figure' }),
-    Bindery.RunningHeader(),
   ]
 });
 
@@ -110,40 +110,35 @@ Bindery.makeBook({
 ### Rules and Options
 
 Rules have options that customize their behavior. Sometimes the options
-are simple, like passing the string 'before' to PageBreak.
+are simple, like passing the string `'before'` to `PageBreak`.
 
-For rules that create new elements on the page, you can pass in your own function
-to create the element. You can use whatever tools you like as long as you
-return an HTML element.
+For rules that create new elements on the page, you can pass in your own function.
+You can use whatever tools you like as long as you return an HTML element, or
+the text to display.
 
 
 {% highlight javascript %}
+
+let linksAsFootnotes = Bindery.Footnote({
+  selector: 'p > a',
+  render: function(element, number) {
+    return number + ': Link to ' + element.href;
+  }
+});
+
+let runningHeaders = Bindery.RunningHeader({
+  render: function(page) {
+    if (page.isLeft) { return page.number + ' · Roland Barthes'; }
+    else { return 'Mythologies · ' + page.number; }
+  },
+});
+
 Bindery.makeBook({
   source: {
     selector: '.content'
     url: '/content.html',
   },
-  rules: [
-    // Show a footnote for links inside paragraphs
-    Bindery.Footnote({
-      selector: 'p > a',
-      render: function(element, number) {
-        return '<i>' + number + '</i>: Link to ' + element.href;
-      }
-    }),
-    // Show a running header next to the page number
-    Bindery.RunningHeader({
-      render: (page) => {
-        if (page.isLeft) {
-          //  23 · Book Title,
-          return page.number + '·' + page.heading.h1;
-        } else {
-          // Chapter Title · 24
-          return page.heading.h2 + '·' + page.number;
-        }
-      },
-    }),
-  ]
+  rules: [ linksAsFootnotes, runningHeaders ]
 });
 
 {% endhighlight %}

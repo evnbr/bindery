@@ -170,10 +170,10 @@ Bindery.FullBleedPage({
 The same as `Bindery.FullBleedPage`, but places the element across two pages.
 
 ##### `Bindery.RunningHeader`
-If you want to customize the design when an element splits across two pages.
+The.
 - `render` A function that takes a `Page` and returns a string of HTML. You'll
 probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
-of the `Page`. `Optional`
+of the `Page` — see [Page](#page) for details. `Optional`
 
 {% highlight js %}
 Bindery.RunningHeader({
@@ -324,3 +324,27 @@ Bindery.PageReference({
 Note that we can't know what page something will end up on until the book layout
 is complete, so make sure that your `replace` function doesn't
 change the layout drastically.
+
+### Advanced
+
+##### `Page`
+You may receive instances of `Page` when using custom rules,
+but will not create them yourself.
+- `number` the page number, with the first page being 1
+- `heading` The current hierarchy of headings from previous pages, in the form of `{ h1: String, h2: String, ... h6: String }`
+- `isEmpty` `Bool` Whether the page includes flow content
+- `isLeft` `Bool` The page is on the left (verso)
+- `isRight` `Bool` The page is on the right (recto)
+- `element` top-level `HTMLElement`
+- `background` `HTMLElement` that covers the full bleed area
+- `footer` `HTMLElement` that contains footnotes
+
+##### `Book`
+You may receive instances of `Book` when using custom rules,
+but will not create them yourself.
+- `pages` Array of `Page`s
+- `isComplete` Whether layout has completed
+<!-- - `pagesForTest` Used internally by `PageReference`. Function with arguments
+`testFunc` and `callback`, will call callback after layout is completed
+with a string of all the
+page ranges where `testFunc` return true. -->
