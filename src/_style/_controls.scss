@@ -17,6 +17,7 @@
   background: $background;
   overflow: scroll;
   padding-bottom: 100px;
+  transition: 0.2s;
 
   .#{$pre}-in-progress & {
     // pointer-events: none;
@@ -376,4 +377,27 @@
 .#{$pre}-row.selected .#{$pre}-switch-handle {
   background: $accent;
   left: 12px;
+}
+
+@media (max-width: 500px) {
+  .#{$pre}-root {
+    padding-right: 0;
+  }
+  .#{$pre}-controls {
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    left: 0;
+    width: unset;
+    padding-bottom: 2em;
+    top: unset;
+  }
+  .#{$pre}-viewswitcher {
+    right: unset;
+  }
+  .#{$pre}-measure-area {
+    right: 0;
+  }
+  .#{$pre}-btn-main {
+    float: right;
+  }
+
 }
