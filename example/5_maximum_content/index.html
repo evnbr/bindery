@@ -35,9 +35,10 @@
 						selector: ".toc a",
 						replace: (element, number) => {
 							element.insertAdjacentHTML(
-								"afterend",
+								"beforeend",
 								`<i style="float:right;">${number}</i>`
 							);
+							return element;
 						}
 					}),
 			  ],
