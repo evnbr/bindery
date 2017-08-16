@@ -15,6 +15,7 @@ If you have web design experience, bindery.js lets you think of print as an exte
 
 Just include the script in the same file as your content, and you're ready to go.
 
+
 {% highlight html %}
 <body>
   <div class="content">
@@ -29,9 +30,14 @@ Just include the script in the same file as your content, and you're ready to go
 
 {% endhighlight %}
 
+Use your usual web CSS however you choose— just keep in mind that 96px = 1in.
+Or add book-specific styles, and note that CSS supports print measurements
+like points (`pt`), pica (`pc`), inches (`in`), and millimeters (`mm`).
+(You'll want to steer clear of viewport-specific units like `vh` or `vw`).
+
 ### Fetching Content
 
-Your book is probably pretty long, so you may want to keep it in a separate
+Your book content is probably pretty long, so you may want to keep it in a separate
 file. You can fetch it by passing in the URL, like this.
 
 {% highlight html %}

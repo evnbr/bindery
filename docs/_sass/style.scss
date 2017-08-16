@@ -3,7 +3,7 @@
 // Define defaults for each variable.
 
 $black: black;
-$accent: blue;
+$accent: #0000d0;
 $accent-dark: navy;
 
 $sidebar-width: 20rem;
@@ -84,7 +84,7 @@ em {
   // }
 }
 a {
-  color: $accent;
+  color: black;
   text-decoration: none;
   &:hover {
     opacity: 0.6;
@@ -195,6 +195,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
 .docs-content ul {
   list-style: none;
   padding: 0;
+  margin-bottom: 2rem;
 }
 
 .docs-content li {

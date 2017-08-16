@@ -87,7 +87,7 @@ Bindery.makeBook({
 
 
 ##### `rules`
-An array of Rules. See below for details
+An array of Rules. See the [Rules section](#rules-1) for available options.
 
 {% highlight js %}
 Bindery.makeBook({
@@ -99,34 +99,47 @@ Bindery.makeBook({
 });
 {% endhighlight %}
 
+You may prefer to create rules separately:
+{% highlight js %}
+let breakRule = Bindery.PageBreak({
+  selector: 'h2',
+  position: 'before',
+});
+
+let spreadRule = Bindery.FullBleedSpread({
+  selector: '.big-figure',
+});
+
+Bindery.makeBook({
+  source: '#content',
+  rules: [ breakRule, spreadRule ],
+});
+{% endhighlight %}
 
 ### Rules
 
 ##### `Bindery.Continuation`
-If you want to customize the design when an element splits across two pages.
+If you want to customize the design when an element splits across two pages. [See example](#).
 - `selector` Which elements the rule should be applied to.
-- `hasContinuationClass` <br> Applied to elements that continue onto the next page. `Optional`
-- `isContinuationClass` <br> Applied to elements that start on a previous page. `Optional`
+- `hasContinuationClass` <br> Applied to elements that will continue onto the next page. `Optional`
+- `isContinuationClass` <br> Applied to elements that started on a previous page. `Optional`
 
 {% highlight js %}
-Bindery.makeBook({
-  source: '#content',
-  rules: [
-    Bindery.Continuation({
-      selector: 'p',
-      hasContinuationClass: 'my-continues',
-      isContinuationClass: 'my-from',
-    }),
-  ],
-});
+Bindery.Continuation({
+  selector: 'p',
+  hasContinuationClass: 'my-continues',
+  isContinuationClass: 'my-from',
+}),
 {% endhighlight %}
+
 
 ##### `Bindery.PageBreak`
 Adds or avoids page breaks for the selected element.
 - `selector` Which elements the rule should be applied to.
-- `position` `'before', 'after', 'both', 'avoid'`— Where to insert the break.
-- `continue` `'left', 'right', 'any'` — Whether to continue flowing contents after the break on a
-specific page. `Optional`
+- `position` `'before'`, `'after'`, or `'both'` will insert breaks before and after the element. `'avoid'` will
+prevent the element from breaking in the middle, by pushing it to the next page.
+- `continue` `'left'` or `'right'` will insert an extra break when appropriate so that the flow will resume
+on a specific page. `Optional`
 
 {% highlight js %}
 // Make sure chapter titles always start on a righthand page.

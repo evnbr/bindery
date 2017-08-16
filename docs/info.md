@@ -7,19 +7,19 @@ order: 4
 
 ## Info
 
-#### A Brief History of Web to Print
+#### Print to Web to Print
 
 Computer printers predate computer screens.
 
 #### Bindery is not trying to be...
 
-1. [InDesign](#) — Bindery is for people who are interested in creating layouts
+1. InDesign — Bindery is for people who are interested in creating layouts
 programmatically. It's not a graphical user interface (though you could build one around it).
-2. [A PDF generator](#) — Bindery assumes you're printing straight from
+2. A PDF generator — Bindery assumes you're printing straight from
   the browser. If you want to adjust a PDF setting, your browser must support it—for
   example, you must use a page size provided by your browser's print dialog.
-3. [LaTeX](#) — Bindery is intended to let everyone who knows web standards (or is learning)
-  to make books. It takes advantage of all the existing tools and documentation—browsers, text editor, web inspectors,
+3. [LaTeX](https://www.latex-project.org/) — Bindery is intended to let everyone who knows web standards (or is learning)
+  to design books. It takes advantage of all the existing tools and documentation—browsers, text editor, web inspectors,
   etc. LaTeX is its own layout system and language for technical users.
 
 
