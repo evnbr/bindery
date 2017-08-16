@@ -4,20 +4,20 @@ import c from '../utils/prefixClass';
 const renderFlipLayout = (pages, doubleSided) => {
   const flipLayout = document.createDocumentFragment();
   const flaps = [];
-  let currentLeaf = 0;
+  let currentLeaf = -1;
 
   const setLeaf = (n) => {
     let newLeaf = n;
     if (newLeaf === currentLeaf) newLeaf += 1;
-
     currentLeaf = newLeaf;
+
     let zScale = 4;
     if (flaps.length * zScale > 200) zScale = 200 / flaps.length;
 
     flaps.forEach((flap, i, arr) => {
       // + 0.5 so left and right are even
-      const z = (arr.length - Math.abs((i - n) + 0.5)) * zScale;
-      flap.style.transform = `translate3d(${(i < n) ? 4 : 0}px,0,${z}px) rotateY(${(i < n) ? -180 : 0}deg)`;
+      const z = (arr.length - Math.abs((i - newLeaf) + 0.5)) * zScale;
+      flap.style.transform = `translate3d(${(i < newLeaf) ? 4 : 0}px,0,${z}px) rotateY(${(i < newLeaf) ? -180 : 0}deg)`;
     });
   };
 
@@ -25,7 +25,7 @@ const renderFlipLayout = (pages, doubleSided) => {
   for (let i = 1; i < pages.length - 1; i += (doubleSided ? 2 : 1)) {
     leafIndex += 1;
     const li = leafIndex;
-    const flap = h(c('.page3d'), {
+    const flap = h(c('.page3d') + c('.page-size'), {
       onclick: () => {
         const newLeaf = li - 1;
         setLeaf(newLeaf);
