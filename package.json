@@ -1,6 +1,6 @@
 {
   "name": "bindery",
-  "version": "2.0.0-alpha.4.1",
+  "version": "2.0.0-alpha.4.2",
   "description": "",
   "main": "build/bindery.js",
   "repository": {

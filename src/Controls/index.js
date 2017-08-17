@@ -345,7 +345,7 @@ class Controls {
     this.element = h(c('.controls'),
       header,
       arrangement,
-      paperSize,
+      // paperSize,
       orientation,
 
       expandRow('Marks and Bleed'),
