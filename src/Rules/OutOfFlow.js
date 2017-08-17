@@ -15,7 +15,8 @@ class OutOfFlow extends Rule {
 
     this.addElementOutOfFlow(elmt, state, makeNewPage);
 
-    if (this.continue !== 'same') {
+    // Catches cases when we didn't need to create a new page. but unclear
+    if (this.continue !== 'same' || state.currentPage.hasOutOfFlowContent) {
       continueOnNewPage();
       if (this.continue === 'left' || this.continue === 'right') {
         state.currentPage.setPreference(this.continue);

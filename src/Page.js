@@ -73,8 +73,9 @@ class Page {
 
   get isEmpty() {
     return (
-      this.flowContent.textContent.trim() === ''
-      && this.flowBox.offsetHeight < 1
+      !this.hasOutOfFlowContent
+      && this.flowContent.textContent.trim() === ''
+      && this.flowContent.offsetHeight < 1
     );
   }
 

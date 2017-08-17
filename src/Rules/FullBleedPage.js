@@ -21,10 +21,12 @@ class FullBleedPage extends OutOfFlow {
   addElementOutOfFlow(elmt, state, makeNewPage) {
     if (state.currentPage.isEmpty) {
       state.currentPage.background.appendChild(elmt);
+      state.currentPage.hasOutOfFlowContent = true;
     } else {
       const outOfFlowPage = makeNewPage();
       outOfFlowPage.background.appendChild(elmt);
       state.pages.push(outOfFlowPage);
+      outOfFlowPage.hasOutOfFlowContent = true;
     }
   }
 }

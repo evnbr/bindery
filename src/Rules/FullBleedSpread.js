@@ -31,11 +31,13 @@ class FullBleedSpread extends OutOfFlow {
     leftPage.element.classList.add(c('spread'));
     leftPage.setPreference('left');
     leftPage.isOutOfFlow = this.continue === 'same';
+    leftPage.hasOutOfFlowContent = true;
 
     rightPage.background.appendChild(elmt.cloneNode(true));
     rightPage.element.classList.add(c('spread'));
     rightPage.setPreference('right');
     rightPage.isOutOfFlow = this.continue === 'same';
+    rightPage.hasOutOfFlowContent = true;
   }
 }
 
