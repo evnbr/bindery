@@ -3,13 +3,13 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>Bindery Ex 9 — Spreads and Images</title>
+	<title>Spreads and Images</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
 
-	<script type="text/javascript" src="../../build/bindery.js"></script>
+	<script type="text/javascript" src="/bindery/js/bindery.js"></script>
 	<script>
 			Bindery.makeBook({
 			  source: {
@@ -19,7 +19,7 @@
 			  rules: [
 					Bindery.RunningHeader(),
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-					Bindery.FullBleedPage({ selector: '.fullpage', continue: 'same' }),
+					Bindery.FullBleedPage({ selector: '.fullpage', continue: 'next' }),
 					Bindery.FullBleedSpread({ selector: '.spread', continue: 'same' }),
 			  ],
 			});

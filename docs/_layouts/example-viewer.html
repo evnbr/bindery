@@ -7,11 +7,13 @@
 
     <header class="example-header" role="banner">
 
-      <div class="example-title">
+        <a href="{{ "/" | relative_url }}">
+          <div class="logo"></div>
+        </a>
+
+      <div class="example-item">
         <a href="{{ "/examples" | relative_url }}">
-          <!-- <div class="logo"></div> -->
           ← Examples
-          <!-- {{ site.title | escape }} -->
         </a>
       </div>
       <div class="example-item">
@@ -29,9 +31,12 @@
       let viewSource = document.querySelector('#viewSource');
       let hash = window.location.hash;
       if (hash) {
+        frame.addEventListener("load", () => {
+          let title = frame.contentWindow.document.title;
+          document.title = "Bindery.js · Example · " + title;
+        });
         frame.src = "/bindery/examples/" + hash.replace('#', '');
         viewSource.href = "https://github.com/evnbr/bindery/tree/master/docs/examples/" + hash.replace('#', '');
-        console.log(window.location.hash);
       }
     </script>
 

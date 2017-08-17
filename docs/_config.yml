@@ -17,6 +17,8 @@ exampleList:
   - title: Using Rules
     id: 3_using_configuration_options
     desc: Page breaks, full-bleed images, table of contents
+  - title: Spreads and Images
+    id: 9_spreads_and_images
 
 # Build settings
 markdown: kramdown
