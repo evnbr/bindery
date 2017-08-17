@@ -8,7 +8,7 @@ $accent-dark: navy;
 
 $sidebar-width: 20rem;
 
-$roomForDocsSideNav: 80rem;
+$roomForDocsSideNav: 50rem;
 $narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
@@ -115,6 +115,11 @@ $accent-light: rgba(5, 0, 154, 0.4);
   max-width: 45rem;
   padding: 0 1rem;
 }
+// .docs-content {
+//   max-width: 80rem;
+//   padding-left: $sidebar-width;
+//   margin: 0;
+// }
 
 .site-header {
   position: relative;
@@ -199,7 +204,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
 }
 
 .docs-content li {
-  margin: 0 0 1rem 8rem;
+  margin: 0 0 1rem 1.5rem;
   position: relative;
 }
 
@@ -207,11 +212,12 @@ $accent-light: rgba(5, 0, 154, 0.4);
   // color: #008080;
   font-weight: 500;
   width: 7.5rem;
-  display: inline-block;
-  position: absolute;
-  left: -8rem;
   line-height: 2rem;
+  position: relative;
+  left: -1.5rem;
+  display: block;
 }
+
 
 .docs-nav-item {
   position: relative;
@@ -269,11 +275,8 @@ figure > img {
 }
 
 h1 {
-  // font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
-  // font-weight: 500;
   font-size: 5.5rem;
   line-height: 1;
-  // letter-spacing: -0.005em;
   margin: 2rem 0;
 }
 
@@ -340,16 +343,6 @@ pre, code {
     line-height: 1;
     margin: 1rem 0 1rem;
   }
-
-  .docs-content li code:first-child {
-    position: relative;
-    left: -1.5rem;
-    display: block;
-  }
-  .docs-content li {
-    margin: 0 0 1rem 1.5rem;
-    position: relative;
-  }
 }
 
 @media (min-width: $narrow) {
@@ -365,7 +358,6 @@ pre, code {
     height: 48px;
     width: 48px;
   }
-
 }
 
 @media (max-width: $roomForDocsSideNav) {
@@ -401,7 +393,6 @@ pre, code {
   }
 }
 
-
 @media (min-width: $roomForDocsSideNav) {
   .docs-nav {
     background: transparent;
@@ -426,8 +417,6 @@ pre, code {
   }
 }
 
-
-
 .highlight pre {
   // background-color: #f5f5ff;
   // padding: 1rem;
@@ -449,6 +438,55 @@ pre {
     padding-right: 0;
     padding-left: 0;
   }
+}
+
+.example-header {
+  z-index: 99;
+  max-width: unset;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 40px;
+  padding: 1rem 1.5rem;
+  .logo {
+    height: 32px;
+    width: 32px;
+  }
+}
+.example-title,
+.example-item {
+  display: inline-block;
+  font-size: 14px;
+  margin-right: 1em;
+  font-weight: 500;
+  a {
+    display: inline-block;
+    background: white;
+    padding: 0.5em 1em;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    border-radius: 3px;
+    &:hover {
+      opacity: 1;
+      background: $accent;
+      color: white;
+    }
+    &:active {
+      opacity: 1;
+      background: darken($accent, 10);
+    }
+  }
+}
+
+.example-frame {
+  position: absolute;
+  border: none;
+  background: white;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 // Import partials.

@@ -9,6 +9,18 @@ order: 3
 
 #### Simple
 
+<ul>
+{% for ex in site.exampleList %}
+  <li>
+      <a href="/bindery/example-viewer/#{{ ex.id }}">{{ ex.title | escape }}</a>
+      <!-- <a href="https://github.com/evnbr/bindery/tree/master/docs/{{ ex.id }}">Source</a> -->
+      {{ ex.desc | escape }}
+  </li>
+{% endfor %}
+</ul>
+
+<!-- #### Simple
+
 - [Load remote content](#) ([Source](#))
 - [Set page size](#) ([Source](#))
 - [Customize running headers](#) ([Source](#))
@@ -21,4 +33,4 @@ order: 3
 - [Dynamic background color](https://github.com/evnbr/bindery/tree/master/example)
 - [Type that starts out big and gets smaller](https://github.com/evnbr/bindery/tree/master/example) (à la [Irma Boom](http://www.nytimes.com/2007/03/18/style/18iht-DESIGN19.4945906.html))
 - [Fore-edge printing](https://github.com/evnbr/bindery/tree/master/example)
-- [Convert a video into a flipbook](https://github.com/evnbr/bindery/tree/master/example)
+- [Convert a video into a flipbook](https://github.com/evnbr/bindery/tree/master/example) -->

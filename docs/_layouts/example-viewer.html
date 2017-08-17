@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+  {% include head.html %}
+
+  <body>
+
+    <header class="example-header" role="banner">
+
+      <div class="example-title">
+        <a href="{{ "/examples" | relative_url }}">
+          <!-- <div class="logo"></div> -->
+          ← Examples
+          <!-- {{ site.title | escape }} -->
+        </a>
+      </div>
+      <div class="example-item">
+          <a id="viewSource" href="#">View Source ↗</a>
+      </div>
+
+    </header>
+
+    <iframe id="exampleFrame" class="example-frame" src="{{ page.frame | relative_url }}">
+
+    </iframe>
+
+    <script>
+      let frame = document.querySelector('#exampleFrame');
+      let viewSource = document.querySelector('#viewSource');
+      let hash = window.location.hash;
+      if (hash) {
+        frame.src = "/bindery/examples/" + hash.replace('#', '');
+        viewSource.href = "https://github.com/evnbr/bindery/tree/master/docs/examples/" + hash.replace('#', '');
+        console.log(window.location.hash);
+      }
+    </script>
+
+  </body>
+
+</html>

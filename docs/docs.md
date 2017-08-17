@@ -121,8 +121,8 @@ Bindery.makeBook({
 ##### `Bindery.Continuation`
 If you want to customize the design when an element splits across two pages. [See example](#).
 - `selector` Which elements the rule should be applied to.
-- `hasContinuationClass` <br> Applied to elements that will continue onto the next page. `Optional`
-- `isContinuationClass` <br> Applied to elements that started on a previous page. `Optional`
+- `hasContinuationClass` Applied to elements that will continue onto the next page. `Optional`
+- `isContinuationClass` Applied to elements that started on a previous page. `Optional`
 
 {% highlight js %}
 Bindery.Continuation({
