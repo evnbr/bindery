@@ -8,18 +8,6 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: evnbr
 github_username:  evnbr
 
-exampleList:
-  - title: Getting Started
-    id: 1_getting_started
-  - title: Content on Separate Page
-    id: 2_content_on_separate_page
-    desc: Load content from a separate file
-  - title: Using Rules
-    id: 3_using_configuration_options
-    desc: Page breaks, full-bleed images, table of contents
-  - title: Spreads and Images
-    id: 9_spreads_and_images
-
 # Build settings
 markdown: kramdown
 plugins:

@@ -10,7 +10,19 @@ order: 3
 #### Simple
 
 <ul>
-{% for ex in site.exampleList %}
+{% for ex in site.data.examples.simple %}
+  <li>
+      <a href="/bindery/example-viewer/#{{ ex.id }}">{{ ex.title | escape }}</a>
+      <!-- <a href="https://github.com/evnbr/bindery/tree/master/docs/{{ ex.id }}">Source</a> -->
+      {{ ex.desc | escape }}
+  </li>
+{% endfor %}
+</ul>
+
+#### Complicated
+
+<ul>
+{% for ex in site.data.examples.advanced %}
   <li>
       <a href="/bindery/example-viewer/#{{ ex.id }}">{{ ex.title | escape }}</a>
       <!-- <a href="https://github.com/evnbr/bindery/tree/master/docs/{{ ex.id }}">Source</a> -->

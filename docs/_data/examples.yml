@@ -1,0 +1,25 @@
+simple:
+  - title: Getting Started
+    id: 1_getting_started
+  - title: Content on Separate Page
+    id: 2_content_on_separate_page
+    desc: Load content from a separate file
+  - title: Using Rules
+    id: 3_using_configuration_options
+    desc: Add page breaks and a table of contents
+  - title: Spreads and Images
+    id: 9_spreads_and_images
+
+advanced:
+  - title: Use existing markup
+    id: 6_wikipedia
+    desc: Format a wikipedia article for print without writing HTML
+  - title: Too much content
+    id: 5_maximum_content
+  - title: Creating an Index
+    id: 8_index
+  - title: Customize how elements split
+    id: 7_custom_continuation
+  - title: Create your own rules
+    id: 4_custom_rules
+    desc: Change the background color per page, add fore-edge graphics
