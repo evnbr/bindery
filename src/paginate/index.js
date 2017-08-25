@@ -324,12 +324,17 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
 
     if (child.tagName === 'IMG') {
-      if (!child.complete) {
-        console.log(`Bindery: Waiting for image '${child.src}'`);
-        child.addEventListener('load', () => {
-          console.log(`Bindery: Image '${child.src}' loaded.`);
-          addElementChild(parent, child, next);
-        });
+      if (!child.naturalWidth) {
+        console.log(`Bindery: Waiting for image '${child.src}' size to load`);
+
+        const pollForSize = setInterval(() => {
+          if (child.naturalWidth) {
+            clearInterval(pollForSize);
+            console.log(`Bindery: Image '${child.src}' size loaded.`);
+            addElementChild(parent, child, next);
+          }
+        }, 10);
+
         child.addEventListener('error', () => {
           console.error(`Bindery: Image '${child.src}' failed to load.`);
           addElementChild(parent, child, next);
