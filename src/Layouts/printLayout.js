@@ -3,7 +3,7 @@ import c from '../utils/prefixClass';
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 
 const twoPageSpread = function (...arg) {
-  return h(c('.spread-wrapper') + c('.two-page-size'), ...arg);
+  return h(c('.spread-wrapper') + c('.spread-size'), ...arg);
 };
 const onePageSpread = function (...arg) {
   return h(c('.spread-wrapper') + c('.page-size'), ...arg);

@@ -47,9 +47,17 @@ class Styler {
         height: ${this.size.height};
         width: ${this.size.width};
       }
-      ${c('.two-page-size')} {
+      ${c('.page-size-rotated')} {
+        height: ${this.size.width};
+        width: ${this.size.height};
+      }
+      ${c('.spread-size')} {
         height: ${this.size.height};
         width: ${w.val * 2}${w.unit};
+      }
+      ${c('.spread-size-rotated')} {
+        height: ${w.val * 2}${w.unit};
+        width: ${this.size.height};
       }
       ${c('.flowbox')},
       ${c('.footer')} {
@@ -97,18 +105,14 @@ class Styler {
       ${c('.background')} {
         top: -${this.bleed};
         bottom: -${this.bleed};
-      }
-      ${c('.left')} ${c('.background')} {
         left: -${this.bleed};
-      }
-      ${c('.right')} ${c('.background')} {
         right: -${this.bleed};
       }
 
-      ${c('.spread')}${c('.right')} ${c('.background')} {
+      ${c('.spread')}${c('.right')} > ${c('.background')} {
         left: calc(-100% - ${this.bleed});
       }
-      ${c('.spread')}${c('.left')} ${c('.background')} {
+      ${c('.spread')}${c('.left')} > ${c('.background')} {
         right: calc(-100% - ${this.bleed});
       }
     `;

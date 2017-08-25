@@ -166,15 +166,92 @@
   margin-bottom: 8pt;
 }
 
+@mixin rotate-face-right {
+  transform: rotate(-90deg) translate3d(-100%, 0, 0);
+  transform-origin: top left;
+}
+
+@mixin rotate-face-left {
+  transform: rotate(90deg) translate3d(0, -100%, 0);
+  transform-origin: top left;
+}
+
+.#{$pre}-rotate-container {
+  position: absolute;
+
+  &.#{$pre}-rotate-clockwise {
+    @include rotate-face-left
+    .#{$pre}-left & {
+      .#{$pre}-background { bottom: 0; }
+    }
+    .#{$pre}-right & {
+      .#{$pre}-background { top: 0; }
+    }
+  }
+
+  &.#{$pre}-rotate-counterclockwise {
+    @include rotate-face-right
+    .#{$pre}-left & {
+      .#{$pre}-background { top: 0; }
+    }
+    .#{$pre}-right & {
+      .#{$pre}-background { bottom: 0; }
+    }
+  }
+
+  &.#{$pre}-rotate-inward {
+    .#{$pre}-background { bottom: 0; }
+    .#{$pre}-left & {
+      @include rotate-face-right
+    }
+    .#{$pre}-right & {
+      @include rotate-face-left
+    }
+  }
+
+  &.#{$pre}-rotate-outward {
+    .#{$pre}-background { top: 0; }
+    .#{$pre}-left & {
+      @include rotate-face-left
+    }
+    .#{$pre}-right & {
+      @include rotate-face-right
+    }
+  }
+
+  &.#{$pre}-rotate-spread-clockwise {
+    .#{$pre}-left & {
+      transform: rotate(90deg) translate3d(0, -100%, 0);
+      transform-origin: top left;
+    }
+    .#{$pre}-right & {
+      transform: rotate(90deg) translate3d(0, -50%, 0);
+      transform-origin: top left;
+    }
+  }
+
+  &.#{$pre}-rotate-spread-counterclockwise {
+    .#{$pre}-left & {
+      transform: rotate(-90deg) translate3d(-100%, 0%, 0);
+      transform-origin: top left;
+    }
+    .#{$pre}-right & {
+      transform: rotate(-90deg) translate3d(-100%, -50%, 0);
+      transform-origin: top left;
+    }
+  }
+}
+
 /*Bleed as layer*/
 .#{$pre}-background {
   position: absolute;
   z-index: 0;
   overflow: hidden;
-  .#{$pre}-left & {
+  // '>' So this doesn't apply to rotated pages
+  .#{$pre}-left > & {
     right: 0;
   }
-  .#{$pre}-right & {
+  .#{$pre}-right > & {
     left: 0;
   }
 }
