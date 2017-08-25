@@ -84,10 +84,22 @@ Bindery.makeBook({
 });
 {% endhighlight %}
 
+##### `bleed`
+Amount of bleed, with absolute CSS units. This sets the position of bleed and
+crop marks, and will affect the size of [full-bleed pages](#binderyfullbleedpage)
+and [spreads](#binderyfullbleedspread)
+if they are set to `width: 100%; height: 100%;`
+
+{% highlight js %}
+Bindery.makeBook({
+  source: '#content',
+  bleed: '12pt',
+});
+{% endhighlight %}
 
 
 ##### `rules`
-An array of Rules. See the [Rules section](#rules-1) for available options.
+An array of Rules. See the [`Rules` section](#rules-1) for available options.
 
 {% highlight js %}
 Bindery.makeBook({
@@ -137,10 +149,10 @@ Bindery.Continuation({
 Adds or avoids page breaks for the selected element.
 - `selector:` Which elements the rule should be applied to.
 - `position:`
-  - `'before'`
-  - `'after'`
+  - `'before'` insert a break before the element, so it starts on a new page
+  - `'after'` insert a break after the element
   - `'both'` insert breaks before and after the element
-  - `'avoid'` prevent the element from breaking in the middle, by pushing it to the next page.
+  - `'avoid'` prevents the element from breaking in the middle, by pushing it to the next page.
 - `continue:` will insert an extra break when appropriate so that the flow will resume
 on a specific page. `Optional`
   - `'left'`
@@ -162,10 +174,10 @@ page. Good for displaying figures and imagery.
 - `selector:` Which elements the rule should be applied to.
 - `continue:` Where to resume the book flow after adding the
 full bleed element
-  - `'same'` `default` Continue Where it left off, so there's not a blank gap before the image.
-  - `'next'` Continues on a new page after the full-bleed page
-  - `'left'` Continues on the next left page after the full-bleed page
-  - `'right'` Continues on the next right page after the full-bleed page
+  - `'same'` `default` Continues back where the element was, so there's not a blank gap before the page.
+  - `'next'` Continues on a new page
+  - `'left'` Continues on the next left page, inserting another page when appropriate
+  - `'right'` Continues on the next right page, inserting another page when appropriate
 - `rotate:` Optionally add a rotation the full-bleed content
   - `'none'` `default`
   - `'clockwise'` The top will become the left edge
@@ -175,19 +187,44 @@ full bleed element
 
 {% highlight js %}
 Bindery.FullBleedPage({
-  selector: '.fullpage',
+  selector: '.big-figure',
   continue: 'same'
 }),
 {% endhighlight %}
 
 ##### `Bindery.FullBleedSpread`
 The same as `Bindery.FullBleedPage`, but places the element across two pages.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed element
+  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
+  - `'next'` Continues on a new page after the spread.
+  - `'left'` Continues on the next left page after the spread
+  - `'right'` Continues on the next right page after the spread
+- `rotate:` Optionally add a rotation the full-bleed content
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+
+{% highlight js %}
+Bindery.FullBleedSpread({
+  selector: '.wide-figure',
+  continue: 'next',
+  rotate: 'clockwise',
+}),
+{% endhighlight %}
+
+
 
 ##### `Bindery.RunningHeader`
-The.
+An element added to each page. By default it will add a page number
+at the top right of each page, but you can use `render` to generate running
+headers using your section titles. Keep in mind you can also use multiple
+`RunningHeaders` to create multiple elements— for example, to add both a page number
+at the bottom and a chapter title at the top.
 - `render:` A function that takes a `Page` and returns a string of HTML. You'll
 probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
-of the `Page` — see [Page](#page) for details. `Optional`
+of the `Page` — see [`Page`](#page) for details. `Optional`
 
 {% highlight js %}
 Bindery.RunningHeader({
@@ -285,8 +322,8 @@ Bindery.PageReference({
   selector: '.index-content li',
   createTest: (el) => {
     let searchTerm = el.textContent.toLowerCase().trim();
-    return (pageEl) => {
-      let textToSearch = pageEl.textContent.toLowerCase();
+    return (elToSearch) => {
+      let textToSearch = elToSearch.textContent.toLowerCase();
       return textToSearch.includes(searchTerm);
     }
   },
@@ -361,11 +398,8 @@ but will not create them yourself.
 - `number` the page number, with the first page being 1
 - `heading` The current hierarchy of headings from previous pages, in the form of `{ h1: String, h2: String, ... h6: String }`
 - `isEmpty` `Bool` Whether the page includes flow content
-- `isLeft` `Bool` The page is on the left (verso)
-- `isRight` `Bool` The page is on the right (recto)
-- `element` top-level `HTMLElement`
-- `background` `HTMLElement` that covers the full bleed area
-- `footer` `HTMLElement` that contains footnotes
+- `isRight` `Bool` The page is on the right (the front of the leaf)
+- `isLeft` `Bool` The page is on the left (the back of the leaf)
 
 ##### `Book`
 You may receive instances of `Book` when using custom rules,

@@ -1,6 +1,6 @@
 {
   "name": "bindery",
-  "version": "2.0.0-alpha.4.2",
+  "version": "2.0.0-alpha.5",
   "description": "",
   "main": "build/bindery.js",
   "repository": {
@@ -31,7 +31,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "webpack --config webpack.config.js && cp build/bindery.js docs/js",
+    "build": "webpack --config webpack.config.js && cp build/bindery.js docs/js && cp build/bindery.js.map docs/js",
     "minify": "webpack --config webpack.config.js -p",
     "dist": "webpack --config webpack.config.js && webpack --config webpack.config.js -p && cp build/bindery.js docs/js",
     "docs": "cd docs && jekyll serve",

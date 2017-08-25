@@ -19,6 +19,7 @@
     background: $background;
     padding: 50px 20px;
     z-index: 99;
+    overflow: scroll;
     visibility: hidden;
     top: 0;
     left: 0;
@@ -26,7 +27,6 @@
     bottom: 0;
 
     .#{$pre}-debug & {
-      overflow: scroll;
       visibility: visible;
     }
 

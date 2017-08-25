@@ -21,6 +21,9 @@
 		.tootall {
 			height: 550px;
 		}
+		.toowide {
+			width: 550px;
+		}
 
 		figure img {
 		  height: 100%;
@@ -50,6 +53,7 @@
 					url: './content.html',
 					selector: ".content",
 				},
+				bleed: '0.25in',
 			  rules: [
 					Bindery.RunningHeader(),
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
