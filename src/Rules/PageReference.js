@@ -1,18 +1,10 @@
 import Replace from './Replace';
 import RuleOption from './RuleOption';
+import { makeRanges } from '../utils';
 
 // Options:
 // selector: String
 // replace: function (HTMLElement, number) => HTMLElement
-
-const makeRanges = arr => arr.reduce((soFar, curr, i) => {
-  if (i === 0) return soFar + curr;
-  const prev = arr[i - 1];
-  if (i === arr.length - 1) return `${soFar}–${curr}`;
-  if (curr === prev + 1) return soFar;
-  if (i === 1) return `${soFar}, ${curr}`;
-  return `${soFar}–${prev}, ${curr}`;
-}, '');
 
 class PageReference extends Replace {
   constructor(options) {
