@@ -39,9 +39,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   const makeNewPage = () => {
     const newPage = new Page();
-    const shouldScroll = isDebugging && scrollPct(measureArea) > 0.9;
+    const shouldScroll = scrollPct(measureArea) > 0.9;
     measureArea.appendChild(newPage.element);
-    if (shouldScroll) scrollToBottom(measureArea);
+    if (shouldScroll) {
+      if (isDebugging) scrollToBottom(measureArea);
+      else measureArea.scrollTop = measureArea.scrollHeight;
+    }
 
     applyNewPageRules(newPage);
     return newPage;
@@ -173,10 +176,14 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     // So this node won't get cloned. TODO: this is unclear
     state.breadcrumb.pop();
 
+    if (state.breadcrumb.length < 1) {
+      throw Error('Bindery: Attempting to move the top-level element is not allowed');
+    }
+
     // find the nearest splittable parent
     let willMove = nodeToMove;
     const pathToRestore = [];
-    while (!isSplittable(last(state.breadcrumb))) {
+    while (state.breadcrumb.length > 1 && !isSplittable(last(state.breadcrumb))) {
       // console.log('Not OK to split:', last(state.breadcrumb));
       willMove = state.breadcrumb.pop();
       pathToRestore.unshift(willMove);
@@ -190,10 +197,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     // remove the unsplittable node and subnodes
     parent.removeChild(willMove);
 
-    // TODO: step back even further if the
-    // to avoid leaving otherwise empty nodes behind
-    if (last(state.breadcrumb).textContent.trim() === '') {
-      // console.log('Leaving empty node', last(state.breadcrumb));
+    // Note that this can back all the way up leaving the page empty
+    if (state.breadcrumb.length > 1 && last(state.breadcrumb).textContent.trim() === '') {
       parent.appendChild(willMove);
       willMove = state.breadcrumb.pop();
       pathToRestore.unshift(willMove);
@@ -201,19 +206,35 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
 
     if (state.currentPage.isEmpty) {
-      // throw Error('moving from empty page');
+      // Creating a new page won't help,
+      // presumably because this element is too tall.
+      // Add it back to the same page.
+      nodeToMove.setAttribute('data-bindery-oversized', true);
+    } else {
+      // create new page and clone context onto it
+      if (state.currentPage.hasOverflowed()) {
+        state.currentPage.suppressErrors = true;
+      }
+      continueOnNewPage();
     }
 
-    // create new page and clone context onto it
-    continueOnNewPage();
 
     // append node as first in new page
-    last(state.breadcrumb).appendChild(willMove);
+    if (!state.breadcrumb[0]) {
+      console.log('new page has no breadcrumb, adding ', willMove);
+      state.currentPage.flowContent.appendChild(willMove);
+    } else {
+      last(state.breadcrumb).appendChild(willMove);
+    }
+
 
     // restore subpath
     pathToRestore.forEach((restore) => {
       state.breadcrumb.push(restore);
     });
+
+    // TODO: Confusing. If we didn't pop this node above, we don't
+    // need to push it back again.
     state.breadcrumb.push(nodeToMove);
   };
 
@@ -236,6 +257,10 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     last(state.breadcrumb).appendChild(textNode);
 
     if (!state.currentPage.hasOverflowed()) {
+      scheduler.throttle(doneCallback);
+      return;
+    }
+    if (last(state.breadcrumb).hasAttribute('data-bindery-oversized')) {
       scheduler.throttle(doneCallback);
       return;
     }
@@ -301,16 +326,22 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       continueOnNewPage();
       scheduler.throttle(next);
     };
+
     if (isSplittable(parent)) {
       const undoAddTextNode = () => {
-        moveNodeToNextPage(parent);
-        addTextNodeIncremental(child, next, forceAddTextNode);
+        if (state.breadcrumb.length > 1) {
+          moveNodeToNextPage(parent);
+          scheduler.throttle(() => addTextNodeIncremental(child, next, forceAddTextNode));
+        } else {
+          forceAddTextNode();
+        }
       };
+
       addTextNodeIncremental(child, next, undoAddTextNode);
     } else {
       const undoAddTextNode = () => {
         moveNodeToNextPage(parent);
-        addTextNode(child, next, forceAddTextNode);
+        scheduler.throttle(() => addTextNode(child, next, forceAddTextNode));
       };
       addTextNode(child, next, undoAddTextNode);
     }
@@ -380,9 +411,17 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   // one by one recursively until thet overflow the page
   const addElementNode = (node, doneCallback) => {
     if (state.currentPage.hasOverflowed()) {
-      // console.error('Bindery: Trying to add node to a page that\'s already overflowing');
-      state.currentPage.suppressErrors = true;
-      continueOnNewPage();
+      if (last(state.breadcrumb).hasAttribute('data-bindery-oversized')) {
+        // Do nothing. We just have to add nodes
+        // despite the page overflowing.
+        // TODO: we may need to walk up the tree
+        // to check if this element is the child of
+        // an oversized node
+      } else {
+        // console.error('Bindery: Trying to add node to a page that\'s already overflowing');
+        state.currentPage.suppressErrors = true;
+        continueOnNewPage();
+      }
     }
 
     // Add this node to the current page or context

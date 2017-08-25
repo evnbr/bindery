@@ -3,7 +3,7 @@
 // to prevent the call stack from getting too big.
 //
 // There might be a better way to do this.
-const MAX_CALLS = 500;
+const MAX_CALLS = 1000;
 
 class Scheduler {
   constructor(debuggable) {
