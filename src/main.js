@@ -9,6 +9,7 @@ import Rules from './Rules/';
 
 require('./_style/main.scss');
 
+const DEFAULT_BLEED = '12pt';
 const DEFAULT_PAGE_SIZE = { width: '288pt', height: '432pt' };
 const DEFAULT_PAGE_MARGIN = {
   inner: '24pt',
@@ -28,7 +29,7 @@ class Bindery {
     this.styler = new Styler();
     this.styler.setSize(opts.pageSize || DEFAULT_PAGE_SIZE);
     this.styler.setMargin(opts.pageMargin || DEFAULT_PAGE_MARGIN);
-    this.styler.setBleed('0.2in');
+    this.styler.setBleed(opts.bleed || DEFAULT_BLEED);
 
 
     this.viewer = new Viewer({ bindery: this });
