@@ -135,11 +135,16 @@ Bindery.Continuation({
 
 ##### `Bindery.PageBreak`
 Adds or avoids page breaks for the selected element.
-- `selector` Which elements the rule should be applied to.
-- `position` `'before'`, `'after'`, or `'both'` will insert breaks before and after the element. `'avoid'` will
-prevent the element from breaking in the middle, by pushing it to the next page.
-- `continue` `'left'` or `'right'` will insert an extra break when appropriate so that the flow will resume
+- `selector:` Which elements the rule should be applied to.
+- `position:`
+  - `'before'`
+  - `'after'`
+  - `'both'` insert breaks before and after the element
+  - `'avoid'` prevent the element from breaking in the middle, by pushing it to the next page.
+- `continue:` will insert an extra break when appropriate so that the flow will resume
 on a specific page. `Optional`
+  - `'left'`
+  - `'right'`
 
 {% highlight js %}
 // Make sure chapter titles always start on a righthand page.
@@ -154,10 +159,19 @@ Bindery.PageBreak({
 ##### `Bindery.FullBleedPage`
 Removes the selected element from the ordinary flow of the book and places it on its own
 page. Good for displaying figures and imagery.
-- `selector` Which elements the rule should be applied to.
-- `continue` `'same', 'left', 'right', 'next'` — Where to resume the book flow after adding the
-full bleed element. Left, right, and next continue after the element. `same` will
-continue the flow where it left off, so there's not a blank gap before the image.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed element
+  - `'same'` `default` Continue Where it left off, so there's not a blank gap before the image.
+  - `'next'` Continues on a new page after the full-bleed page
+  - `'left'` Continues on the next left page after the full-bleed page
+  - `'right'` Continues on the next right page after the full-bleed page
+- `rotate:` Optionally add a rotation the full-bleed content
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+  - `'inward'` The top will become the outside edge
+  - `'outward'` The top will become the inside edge
 
 {% highlight js %}
 Bindery.FullBleedPage({
@@ -171,7 +185,7 @@ The same as `Bindery.FullBleedPage`, but places the element across two pages.
 
 ##### `Bindery.RunningHeader`
 The.
-- `render` A function that takes a `Page` and returns a string of HTML. You'll
+- `render:` A function that takes a `Page` and returns a string of HTML. You'll
 probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
 of the `Page` — see [Page](#page) for details. `Optional`
 
@@ -193,11 +207,11 @@ Bindery.RunningHeader({
 Add a footnote to the bottom of the flow area. Footnotes cut into the area for
 text, so note that very large footnotes may bump the entire element to the
 next page.
-- `selector` Which elements the rule should be applied to.
-- `render` A function that takes an element and number, and returns the
+- `selector:` Which elements the rule should be applied to.
+- `render:` A function that takes an element and number, and returns the
 footnote for that element. This footnote will be inserted at the bottom of the flow
 area.
-- `replace` A function that takes the selected element and number, and returns
+- `replace:` A function that takes the selected element and number, and returns
 an new element with a footnote indicator. By default, Bindery will simply insert
 the number as a superscript after the original element. `Optional`
 
@@ -216,14 +230,15 @@ Bindery.Footnote({
 ##### `Bindery.PageReference`
 Use PageReference to create a table of contents, index, endnotes, or anywhere
 you might otherwise use anchor links or in-page navigation on the web.
-- `selector` Which elements the rule should be applied to.
-- `replace` A function that takes an element and a page range, and must return
+- `selector:` Which elements the rule should be applied to.
+- `replace:` A function that takes an element and a page range, and must return
 a new element. By default, Bindery will simply insert the page range
 after the original element. `Optional`
-- `createTest` A function that takes your reference element and returns a test function.
+- `createTest:` A function that takes your reference element and returns a test function.
 The test function receives a page element, and should return true if the
 reference can be found. By default, the test function will look for
-the anchor tag of the reference element's `href` property. `Optional`
+the anchor tag of the reference element's `href` property, which is useful for
+a table of contents. Use a custom function to create an index.
 
 #### Creating a Table of Contents
 A table of contents is a reference that points to a specific page. By default, PageReference will look for anchor links. To create a table of
@@ -282,11 +297,21 @@ This will transform the list items as below:
 
 {% highlight html %}
 <!-- Before -->
+<p>
+  Most books are perfect bound.
+</p>
+...
 <ul class='index-content'>
   <li>Saddle Stitch</li>
 </ul>
+{% endhighlight %}
 
+{% highlight html %}
 <!-- After -->
+<p>
+  Most books are perfect bound.
+</p>
+...
 <ul class='index-content'>
   <li>Saddle Stitch, 3-5, 10, 24</li>
 </ul>
@@ -314,9 +339,12 @@ Bindery.PageReference({
   Most books are perfect bound.
 </p>
 
-<!-- In your index markup -->
+...
+
 <ul>
-  <li data-index-reference='perfectBind'>Perfect Binding</li>
+  <li data-index-reference='perfectBind'>
+    Perfect Binding
+  </li>
 </ul>
 {% endhighlight %}
 

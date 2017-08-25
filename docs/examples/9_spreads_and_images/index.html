@@ -4,7 +4,41 @@
 <head>
 	<meta charset="utf-8">
 	<title>Spreads and Images</title>
-	<link rel="stylesheet" type="text/css" href="style.css" />
+	<style>
+		p {
+		  text-indent: 1rem;
+		  margin: 0;
+		}
+
+		figure {
+		  margin: 0;
+		  width: 100%;
+		  height: 100%;
+		  position: relative;
+			background: #eee;
+		}
+
+		.tootall {
+			height: 550px;
+		}
+
+		figure img {
+		  height: 100%;
+		  width: 100%;
+		}
+
+		figcaption {
+			mix-blend-mode: difference;
+		  font: 40pt sans-serif;
+			text-align: center;
+		  padding: 40pt;
+		  color: white;
+		  position: absolute;
+		  bottom: 0;
+		  left: 0;
+		  right: 0;
+		}
+	</style>
 </head>
 
 <body>
@@ -19,8 +53,16 @@
 			  rules: [
 					Bindery.RunningHeader(),
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+
 					Bindery.FullBleedPage({ selector: '.fullpage', continue: 'next' }),
+					Bindery.FullBleedPage({ selector: '.inward', continue: 'next', rotate: 'inward' }),
+					Bindery.FullBleedPage({ selector: '.outward', continue: 'next', rotate: 'outward' }),
+					Bindery.FullBleedPage({ selector: '.full-clockwise', continue: 'next', rotate: 'clockwise' }),
+					Bindery.FullBleedPage({ selector: '.full-counterclockwise', continue: 'next', rotate: 'counterclockwise' }),
+
 					Bindery.FullBleedSpread({ selector: '.spread', continue: 'same' }),
+					Bindery.FullBleedSpread({ selector: '.tall-clockwise', continue: 'same', rotate: 'clockwise' }),
+					Bindery.FullBleedSpread({ selector: '.tall-counterclockwise', continue: 'same', rotate: 'counterclockwise' }),
 			  ],
 			});
 

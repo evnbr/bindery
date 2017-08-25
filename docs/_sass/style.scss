@@ -203,13 +203,23 @@ $accent-light: rgba(5, 0, 154, 0.4);
   margin-bottom: 2rem;
 }
 
-.docs-content li {
+.docs-content ul li {
   margin: 0 0 1rem 1.5rem;
   position: relative;
 }
 
-.docs-content li code:first-child {
-  // color: #008080;
+.docs-content li li {
+  margin: 0;
+  code:first-child {
+    color: #d14;
+    display: inline-block;
+    margin-right: 1em;
+  }
+}
+
+
+.docs-content > ul > li > code:first-child {
+  color: #008080;
   font-weight: 500;
   width: 7.5rem;
   line-height: 2rem;
