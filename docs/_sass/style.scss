@@ -6,12 +6,13 @@ $black: black;
 $accent: #0000d0;
 $accent-dark: navy;
 
-$sidebar-width: 20rem;
+$sidebar-width: 16rem;
 
 $roomForDocsSideNav: 50rem;
 $narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+$serif: Minion Pro, Adobe Caslon Pro, Caslon Times, Times New Roman, serif;
 
 * {
   margin: 0;
@@ -43,15 +44,14 @@ em {
 }
 
 .post-content {
-  font: 24px / 1.4 Times, Times New Roman, serif;
-  // font: 20px / 1.4 Minion Pro, Times, Times New Roman, serif;
+  font: 24px / 1.4 $serif;
 }
 
 
 .sc {
-  // font-feature-settings: "smcp";
-  text-transform: uppercase;
-  font-size: 0.9em;
+  font-feature-settings: "smcp";
+  // text-transform: uppercase;
+  // font-size: 0.9em;
 }
 
 .post-content .btn {
@@ -106,25 +106,28 @@ $accent-light: rgba(5, 0, 154, 0.4);
   background-repeat: repeat-x;
   background-size: 2px .1em;
   background-position: 0 1.06em;
-
 }
 
 
 .site-header, .page-content, .site-footer {
-  margin: 0 auto;
-  max-width: 45rem;
-  padding: 0 1rem;
+  margin: 0 5%;
+  // max-width: 45rem;
+  // padding: 0 1rem;
 }
-// .docs-content {
-//   max-width: 80rem;
-//   padding-left: $sidebar-width;
-//   margin: 0;
-// }
+
+.page-content {
+  margin: 0 5%;
+}
+
+.post-content {
+  max-width: 50rem;
+}
 
 .site-header {
   position: relative;
   margin-top: 1rem;
   font-weight: 400;
+  font: 24px $serif;
 }
 
 .site-footer {
@@ -186,14 +189,26 @@ $accent-light: rgba(5, 0, 154, 0.4);
 
 .docs-nav {
   background: white;
-  z-index: 999;
+  z-index: 99;
   position: relative;
+  display: inline-block;
   a {
+    position: relative;
     color: $black;
     &:hover {
       color: $accent;
       opacity: 1;
     }
+  }
+  .selected::after {
+    content: '';
+    background: currentColor;
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    left: -1em;
+    top: 0.4em;
+    border-radius: 50%;
   }
 }
 
@@ -210,10 +225,11 @@ $accent-light: rgba(5, 0, 154, 0.4);
 
 .docs-content li li {
   margin: 0;
+  text-indent: 5em hanging;
   code:first-child {
     color: #d14;
     display: inline-block;
-    margin-right: 1em;
+    margin-right: 0.5em;
   }
 }
 
@@ -258,12 +274,12 @@ $accent-light: rgba(5, 0, 154, 0.4);
   background: url(logo.svg) no-repeat;
   background-size: contain;
   vertical-align: middle;
-  margin-right: 1rem;
+  margin-right: 0.8rem;
   display: inline-block;
 }
 
 .site-title {
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .site-header a {
@@ -285,22 +301,40 @@ figure > img {
 }
 
 h1 {
-  font-size: 5.5rem;
-  line-height: 1;
+  // font-size: 5.5rem;
+  font-size: 11vw;
+  // font-size: 4rem;
+  width: 90vw;
+  line-height: 0.95;
   margin: 2rem 0;
+  font-family: $serif;
+  // font-family: $system;
+  letter-spacing: -0.005em;
 }
 
 h2 {
-  font-size: 4rem;
-  line-height: 1;
-  padding: 2rem 0 1rem;
+  font-family: $serif;
+  font-size: 3rem;
+  padding: 0 0 3rem;
+  // background-image: linear-gradient(to bottom, black 50%,rgba(0,0,0,0) 50%);
+  // background-repeat: repeat-x;
+  // background-size: 2px .1em;
+  // background-position: 0 2.8em;
+  display: inline-block;
+
 }
 
 h3 {
-  font: 2rem/1.5 $system;
-  font-weight: 500;
+  // font: 2rem/1.5 $system;
+  // font-weight: 500;
+  font: 1rem/1.5 $system;
+  font-weight: 600;
+
   padding-top: 3rem;
   padding-bottom: 1.5rem;
+  &:first-child {
+    padding-top: 0;
+  }
 }
 
 h4 {
@@ -342,7 +376,10 @@ pre, code {
     margin: 1rem 0;
     float: none;
   }
-  .post-content {
+  .nav-item {
+    margin-right: 1em;
+  }
+  .site-header, .post-content {
     font-size: 20px;
   }
   h1 {
@@ -361,16 +398,19 @@ pre, code {
   }
   .site-nav {
     position: absolute;
-    right: 1rem;
-    top: 0.8rem;
+    left: $sidebar-width;
+    top: 0.35rem;
   }
   .logo {
-    height: 48px;
-    width: 48px;
+    height: 40px;
+    width: 40px;
   }
 }
 
 @media (max-width: $roomForDocsSideNav) {
+  .page-content {
+    margin-top: 2rem;
+  }
   .docs-nav-item {
     // box-shadow: inset 0 0.5px grey;
     padding: 0.6rem 0 0.7rem;
@@ -404,16 +444,37 @@ pre, code {
 }
 
 @media (min-width: $roomForDocsSideNav) {
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+  }
+  .page-content {
+    margin-top: 8rem;
+  }
+  .docs-content {
+    max-width: calc(45rem);
+    margin-left: $sidebar-width;
+  }
+
   .docs-nav {
     background: transparent;
     position: fixed;
-    bottom: 0;
+    top: 0;
     max-height: 100%;
     overflow-y: scroll;
-    right: 0;
-    padding: 2rem;
+    padding: 8rem 0 2rem;
     width: $sidebar-width;
+    left: 0;
+    padding-left: 5%;
   }
+
+  .docs-nav h2 {
+    padding-bottom: 3rem;
+  }
+
   .docs-nav-subitem {
     // border-left: 1px solid gray;
     // padding-left: 1rem;
@@ -426,6 +487,7 @@ pre, code {
     display: none;
   }
 }
+
 
 .highlight pre {
   // background-color: #f5f5ff;

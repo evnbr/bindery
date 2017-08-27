@@ -5,9 +5,9 @@ permalink: /examples/
 order: 3
 ---
 
-## Examples
+<!-- ## Examples -->
 
-#### Simple
+### Simple
 
 <ul>
 {% for ex in site.data.examples.simple %}
@@ -19,7 +19,7 @@ order: 3
 {% endfor %}
 </ul>
 
-#### Complicated
+### Complicated
 
 <ul>
 {% for ex in site.data.examples.advanced %}
