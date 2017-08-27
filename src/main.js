@@ -1,9 +1,7 @@
 import paginate from './paginate';
-
 import Styler from './Styler';
 import Viewer from './Viewer';
 import c from './utils/prefixClass';
-import { arraysEqual } from './utils';
 
 import Rules from './Rules/';
 
@@ -112,7 +110,6 @@ class Bindery {
   }
 
   cancel() {
-    this.stopCheckingLayout();
     this.viewer.cancel();
     document.body.classList.remove(c('viewing'));
     this.source.style.display = '';
@@ -142,8 +139,6 @@ class Bindery {
       return;
     }
 
-    this.stopCheckingLayout();
-
     this.source.style.display = '';
     const content = this.source.cloneNode(true);
     this.source.style.display = 'none';
@@ -170,7 +165,6 @@ class Bindery {
           if (doneBinding) doneBinding();
           this.viewer.element.classList.remove(c('in-progress'));
           document.body.classList.remove(c('debug'));
-          this.startCheckingLayout();
         }, 100);
       },
       progress: (pageCount) => {
@@ -183,47 +177,6 @@ class Bindery {
       isDebugging: this.debug,
     });
   }
-
-  startCheckingLayout() {
-    if (this.autoupdate) {
-      this.layoutChecker = setInterval(() => {
-        this.checkLayoutChange();
-      }, 500);
-    }
-  }
-
-  stopCheckingLayout() {
-    if (this.layoutChecker) {
-      clearInterval(this.layoutChecker);
-      this.pageOverflows = null;
-    }
-  }
-
-  checkLayoutChange() {
-    if (this.viewer.mode !== 'grid') return;
-    if (!this.pageOverflows) {
-      this.pageOverflows = this.getPageOverflows();
-      return;
-    }
-
-    const newOverflows = this.getPageOverflows();
-    if (!arraysEqual(newOverflows, this.pageOverflows)) {
-      this.throttledUpdateBook();
-      this.pageOverflows = newOverflows;
-    }
-  }
-
-  throttledUpdateBook() {
-    if (this.makeBookTimer) clearTimeout(this.makeBookTimer);
-    this.makeBookTimer = setTimeout(() => {
-      this.makeBook();
-    }, 500);
-  }
-
-  getPageOverflows() {
-    return this.viewer.pages.map(page => page.overflowAmount());
-  }
-
 }
 
 
