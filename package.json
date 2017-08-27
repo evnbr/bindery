@@ -2,7 +2,7 @@
   "name": "bindery",
   "version": "2.0.0-alpha.5",
   "description": "",
-  "main": "build/bindery.js",
+  "main": "dist/bindery.min.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/evnbr/bindery.git"
@@ -33,13 +33,13 @@
     "test": "jest",
     "stats": "webpack --json > stats.json",
     "moduleSize": "webpack --config webpack.config.js -p --display-modules",
-    "build": "webpack --config webpack.config.js && cp build/bindery.js docs/js && cp build/bindery.js.map docs/js",
+    "build": "webpack --config webpack.config.js && cp dist/bindery.js docs/js && cp dist/bindery.js.map docs/js",
     "minify": "webpack --config webpack.config.js -p",
-    "dist": "webpack --config webpack.config.js && webpack --config webpack.config.js -p && cp build/bindery.js docs/js",
+    "dist": "webpack --config webpack.config.js && webpack --config webpack.config.js -p && cp dist/bindery.js docs/js",
     "docs": "cd docs && jekyll serve",
     "lint": "eslint src/ webpack.*.js --cache"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "MIT"
 }

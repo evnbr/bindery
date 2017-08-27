@@ -9,7 +9,7 @@ module.exports = {
     filename: isProd ? 'bindery.min.js' : 'bindery.js',
     libraryTarget: 'var',
     library: 'Bindery',
-    path: `${__dirname}/build/`,
+    path: `${__dirname}/dist/`,
   },
   plugins: [
     new WebpackAutoInject({

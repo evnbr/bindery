@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.5 - Sunday, August 27th, 2017, 2:10:45 PM  
+// [AIV]  Build version: 2.0.0-alpha.5 - Sunday, August 27th, 2017, 2:30:20 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
