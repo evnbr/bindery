@@ -32,8 +32,6 @@ bindery.makeBook();
 {% endhighlight %}
 
 
-### Options
-
 ##### `source`
 Content to flow across pages. If the content is on the same page, use a CSS selector or a reference to the node. If the content must be fetched from a remote page, pass an object in the form of `{ url, selector }`.
 
@@ -99,7 +97,7 @@ Bindery.makeBook({
 
 
 ##### `rules`
-An array of Rules. See the [`Rules` section](#rules-1) for available options.
+An array of Rules. See the [Components section](#components) for available options.
 
 {% highlight js %}
 Bindery.makeBook({
@@ -128,22 +126,7 @@ Bindery.makeBook({
 });
 {% endhighlight %}
 
-### Rules
-
-##### `Bindery.Continuation`
-If you want to customize the design when an element splits across two pages. [See example](#).
-- `selector` Which elements the rule should be applied to.
-- `hasContinuationClass` Applied to elements that will continue onto the next page. `Optional`
-- `isContinuationClass` Applied to elements that started on a previous page. `Optional`
-
-{% highlight js %}
-Bindery.Continuation({
-  selector: 'p',
-  hasContinuationClass: 'my-continues',
-  isContinuationClass: 'my-from',
-}),
-{% endhighlight %}
-
+### Components
 
 ##### `Bindery.PageBreak`
 Adds or avoids page breaks for the selected element.
@@ -166,54 +149,6 @@ Bindery.PageBreak({
   continue: 'right'
 })
 {% endhighlight %}
-
-
-##### `Bindery.FullBleedPage`
-Removes the selected element from the ordinary flow of the book and places it on its own
-page. Good for displaying figures and imagery.
-- `selector:` Which elements the rule should be applied to.
-- `continue:` Where to resume the book flow after adding the
-full bleed element
-  - `'same'` `default` Continues back where the element was, so there's not a blank gap before the page.
-  - `'next'` Continues on a new page
-  - `'left'` Continues on the next left page, inserting another page when appropriate
-  - `'right'` Continues on the next right page, inserting another page when appropriate
-- `rotate:` Optionally add a rotation the full-bleed content
-  - `'none'` `default`
-  - `'clockwise'` The top will become the left edge
-  - `'counterclockwise'` The top will become the right edge
-  - `'inward'` The top will become the outside edge
-  - `'outward'` The top will become the inside edge
-
-{% highlight js %}
-Bindery.FullBleedPage({
-  selector: '.big-figure',
-  continue: 'same'
-}),
-{% endhighlight %}
-
-##### `Bindery.FullBleedSpread`
-The same as `Bindery.FullBleedPage`, but places the element across two pages.
-- `selector:` Which elements the rule should be applied to.
-- `continue:` Where to resume the book flow after adding the
-full bleed element
-  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
-  - `'next'` Continues on a new page after the spread.
-  - `'left'` Continues on the next left page after the spread
-  - `'right'` Continues on the next right page after the spread
-- `rotate:` Optionally add a rotation the full-bleed content
-  - `'none'` `default`
-  - `'clockwise'` The top will become the left edge
-  - `'counterclockwise'` The top will become the right edge
-
-{% highlight js %}
-Bindery.FullBleedSpread({
-  selector: '.wide-figure',
-  continue: 'next',
-  rotate: 'clockwise',
-}),
-{% endhighlight %}
-
 
 
 ##### `Bindery.RunningHeader`
@@ -258,6 +193,66 @@ Bindery.Footnote({
   render: function(element, number) {
     return '<i>' + number + '</i>: Link to ' + element.href;
   }
+}),
+{% endhighlight %}
+
+##### `Bindery.FullBleedPage`
+Removes the selected element from the ordinary flow of the book and places it on its own
+page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed page
+  - `'same'` `default` Continues back where the element was, so there's not a blank gap before the page. Note that this usually results in a different order than your original markup
+  - `'next'` Continues on a new page
+  - `'left'` Continues on the next left page, inserting another page when appropriate
+  - `'right'` Continues on the next right page, inserting another page when appropriate
+- `rotate:` Optionally add a rotation the full-bleed content
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+  - `'inward'` The top will become the outside edge
+  - `'outward'` The top will become the inside edge
+
+{% highlight js %}
+Bindery.FullBleedPage({
+  selector: '.big-figure',
+  continue: 'same'
+}),
+{% endhighlight %}
+
+##### `Bindery.FullBleedSpread`
+The same as [`FullBleedPage`](#binderyfullbleedpage), but places the element across two pages.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed element
+  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
+  - `'next'` Continues on a new page after the spread.
+  - `'left'` Continues on the next left page after the spread
+  - `'right'` Continues on the next right page after the spread
+- `rotate:` Optionally add a rotation the full-bleed content
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+
+{% highlight js %}
+Bindery.FullBleedSpread({
+  selector: '.wide-figure',
+  continue: 'next',
+  rotate: 'clockwise',
+}),
+{% endhighlight %}
+
+##### `Bindery.Continuation`
+If you want to customize the design when an element splits across two pages. [See example](/bindery/example-viewer/#7_custom_continuation).
+- `selector` Which elements the rule should be applied to.
+- `hasContinuationClass` Applied to elements that will continue onto the next page. `Optional`
+- `isContinuationClass` Applied to elements that started on a previous page. `Optional`
+
+{% highlight js %}
+Bindery.Continuation({
+  selector: 'p',
+  hasContinuationClass: 'my-continues',
+  isContinuationClass: 'my-from',
 }),
 {% endhighlight %}
 

@@ -3,21 +3,15 @@ layout: default
 ---
 <article class="post">
   <div id="docs-top" class="post-content docs-content">
-    <h2>{{ page.title | escape }}</h1>
   </div>
 
   <div class="docs-scroll-back"><a href="#">↑</a></div>
 
   <nav class="docs-nav">
-      <!-- <div class="nav-head nav-item">
-        Docs
-      </div> -->
+      <!-- <h2>{{ page.title | escape }}</h1> -->
 
       <div class="docs-nav-item">
         <a href="#setup">Setup</a>
-      </div>
-      <div class="docs-nav-item">
-        <a href="#options">Options</a>
         <div class="nav-sub">
           <div class="docs-nav-item docs-nav-subitem">
             <a href="#source">Source</a>
@@ -25,23 +19,35 @@ layout: default
           <div class="docs-nav-item docs-nav-subitem">
             <a href="#pagesize">Page Size</a>
           </div>
+          <div class="docs-nav-item docs-nav-subitem">
+            <a href="#pagemargin">Page Margin</a>
+          </div>
+          <div class="docs-nav-item docs-nav-subitem">
+            <a href="#bleed">Bleed</a>
+          </div>
+          <div class="docs-nav-item docs-nav-subitem">
+            <a href="#rules">Rules</a>
+          </div>
         </div>
       </div>
 
       <div class="docs-nav-item">
-        <a href="#rules-1">Rules</a>
+        <a href="#components">Components</a>
         <div class="nav-sub">
           <div class="docs-nav-item docs-nav-subitem">
             <a href="#binderypagebreak">Page Breaks</a>
           </div>
           <div class="docs-nav-item docs-nav-subitem">
-            <a href="#binderyfullbleedpage">Spreads</a>
-          </div>
-          <div class="docs-nav-item docs-nav-subitem">
-            <a href="#binderyrunningheader">Running Heads</a>
+            <a href="#binderyrunningheader">Running Headers</a>
           </div>
           <div class="docs-nav-item docs-nav-subitem">
             <a href="#binderyfootnote">Footnotes</a>
+          </div>
+          <div class="docs-nav-item docs-nav-subitem">
+            <a href="#binderyfullbleedpage">Full-bleed Pages</a>
+          </div>
+          <div class="docs-nav-item docs-nav-subitem">
+            <a href="#binderyfullbleedspread">Full-bleed Spreads</a>
           </div>
         </div>
       </div>
@@ -75,5 +81,31 @@ layout: default
   <div class="post-content docs-content">
     {{ content }}
   </div>
+
+  <script>
+    let anchors = Array.from(document.querySelectorAll('h3, h4, h5'));
+    let currentAnchor;
+    let updateAnchor = () => {
+      let inview = anchors.find((el) => el.offsetTop > document.body.scrollTop);
+      let newAnchor = document.querySelector(`[href='#${inview.id}']`);
+      console.log(`[href='#${inview.id}]'`);
+      if (newAnchor && newAnchor !== currentAnchor) {
+        if (currentAnchor) currentAnchor.classList.remove('selected');
+        newAnchor.classList.add('selected');
+        currentAnchor = newAnchor;
+      }
+    };
+    updateAnchor();
+    let throttle;
+    window.addEventListener('scroll', () => {
+      if (!throttle) {
+        throttle = setTimeout(() => {
+          clearTimeout(throttle);
+          throttle = null;
+          updateAnchor()
+        }, 50)
+      }
+    });
+  </script>
 
 </article>

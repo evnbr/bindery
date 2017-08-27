@@ -1,33 +1,30 @@
 ---
 layout: page
-title:  Getting Started
-permalink: /getting-started/
+title:  Intro
+permalink: /intro/
 order: 0
 ---
 
-## Getting Started
+<!-- ## Intro -->
 
+Welcome.
 
-If you have web design experience, bindery.js lets you think of print as an extension of responsive design. If you have print design experience, it enables you to express layouts programmatically, without giving up capabilities you know from InDesign.
+If you're a web designer, bindery.js lets you think about books as an extension of responsive design. If you're a print designer, it enables you to express book layout programmatically, without giving up capabilities you know from InDesign.
 
 
 ### Setup
 
 Just include the script in the same file as your content, and you're ready to go.
 
-
 {% highlight html %}
-<body>
-  <div class="content">
-    <!-- The contents of your book -->
-  </div>
+<div class="content">
+  <!-- The contents of your book -->
+</div>
 
-  <script src="./bindery.min.js"></script>
-  <script>
-    Bindery.makeBook({ source: '.content' });
-  </script>
-</body>
-
+<script src="./bindery.min.js"></script>
+<script>
+  Bindery.makeBook({ source: '.content' });
+</script>
 {% endhighlight %}
 
 Use your usual web CSS however you choose. When printing, `96px = 1in`.
@@ -41,18 +38,15 @@ Your book content is probably pretty long, so you may want to keep it in a separ
 file. You can fetch it by passing in the URL, like this.
 
 {% highlight html %}
-<body>
-  <script src="./bindery.min.js"></script>
-  <script>
-    Bindery.makeBook({
-      source: {
-        selector: '.content'
-        url: '/content.html',
-      },
-    });
-  </script>
-</body>
-
+<script src="./bindery.min.js"></script>
+<script>
+  Bindery.makeBook({
+    source: {
+      selector: '.content'
+      url: '/content.html',
+    },
+  });
+</script>
 {% endhighlight %}
 
 Keep in mind, your browser won't fetch content from a different URL,
