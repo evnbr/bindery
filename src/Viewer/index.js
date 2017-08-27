@@ -1,10 +1,11 @@
 import h from 'hyperscript';
 import c from '../utils/prefixClass';
 
-import Page from '../Page';
 import Controls from '../Controls';
 
 import errorView from './error';
+import orderPagesBooklet from './orderPagesBooklet';
+import padPages from './padPages';
 import { gridLayout, printLayout, flipLayout } from '../Layouts';
 
 const MODE_FLIP = 'interactive';
@@ -30,41 +31,6 @@ const setOrientationCSS = (newValue) => {
   sheet.innerHTML = `@page { size: ${newValue}; }`;
   document.head.appendChild(sheet);
 };
-
-const orderPagesBooklet = (pages) => {
-  while (pages.length % 4 !== 0) {
-    const spacerPage = new Page();
-    spacerPage.element.style.visibility = 'hidden';
-    pages.push(spacerPage);
-  }
-  const bookletOrder = [];
-  const len = pages.length;
-
-  for (let i = 0; i < len / 2; i += 2) {
-    bookletOrder.push(pages[len - 1 - i]);
-    bookletOrder.push(pages[i]);
-    bookletOrder.push(pages[i + 1]);
-    bookletOrder.push(pages[len - 2 - i]);
-  }
-
-  return bookletOrder;
-};
-
-const padPages = (pages) => {
-  if (pages.length % 2 !== 0) {
-    const pg = new Page();
-    pages.push(pg);
-  }
-  const spacerPage = new Page();
-  const spacerPage2 = new Page();
-  spacerPage.element.style.visibility = 'hidden';
-  spacerPage2.element.style.visibility = 'hidden';
-  pages.unshift(spacerPage);
-  pages.push(spacerPage2);
-
-  return pages;
-};
-
 
 class Viewer {
   constructor({ bindery }) {
