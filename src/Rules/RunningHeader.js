@@ -12,7 +12,7 @@ class RunningHeader extends Rule {
   constructor(options = {}) {
     super(options);
     this.name = 'Running Header';
-    this.validate(options, {
+    RuleOption.validate(options, {
       render: RuleOption.func,
     });
   }

@@ -12,7 +12,7 @@ class FullBleedSpread extends OutOfFlow {
     options.rotate = options.rotate || 'none';
     super(options);
     this.name = 'Full Bleed Spread';
-    this.validate(options, {
+    RuleOption.validate(options, {
       selector: RuleOption.string,
       continue: RuleOption.enum('next', 'same', 'left', 'right'),
       rotate: RuleOption.enum('none', 'clockwise', 'counterclockwise'),

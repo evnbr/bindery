@@ -31,6 +31,8 @@
   },
   "scripts": {
     "test": "jest",
+    "stats": "webpack --json > stats.json",
+    "moduleSize": "webpack --config webpack.config.js -p --display-modules",
     "build": "webpack --config webpack.config.js && cp build/bindery.js docs/js && cp build/bindery.js.map docs/js",
     "minify": "webpack --config webpack.config.js -p",
     "dist": "webpack --config webpack.config.js && webpack --config webpack.config.js -p && cp build/bindery.js docs/js",

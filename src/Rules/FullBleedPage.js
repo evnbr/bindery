@@ -12,7 +12,7 @@ class FullBleedPage extends OutOfFlow {
     options.rotate = options.rotate || 'none';
     super(options);
     this.name = 'Full Bleed Page';
-    this.validate(options, {
+    RuleOption.validate(options, {
       selector: RuleOption.string,
       continue: RuleOption.enum('next', 'same', 'left', 'right'),
       rotate: RuleOption.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise'),

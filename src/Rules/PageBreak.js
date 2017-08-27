@@ -8,7 +8,7 @@ class PageBreak extends Rule {
     super(options);
 
     this.name = 'Page Break';
-    this.validate(options, {
+    RuleOption.validate(options, {
       selector: RuleOption.string,
       continue: RuleOption.enum('any', 'left', 'right'),
       position: RuleOption.enum('before', 'after', 'both', 'avoid'),

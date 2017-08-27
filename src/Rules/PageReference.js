@@ -10,7 +10,7 @@ class PageReference extends Replace {
   constructor(options) {
     super(options);
     this.name = 'Page Reference';
-    this.validate(options, {
+    RuleOption.validate(options, {
       selector: RuleOption.string,
       replace: RuleOption.func,
       createTest: RuleOption.func,

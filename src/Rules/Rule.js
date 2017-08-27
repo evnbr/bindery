@@ -7,17 +7,4 @@ export default class Rule {
       this[key] = options[key];
     });
   }
-
-  validate(opts, validOpts) {
-    Object.keys(opts).forEach((k) => {
-      if (!validOpts[k]) {
-        console.error(`Bindery: Rule '${this.name}' doesn't have an option '${k}'`);
-      } else {
-        const val = opts[k];
-        if (!validOpts[k](val)) {
-          console.error(`Bindery: In Rule '${this.name}', '${val}' is not a valid value for '${k}'`);
-        }
-      }
-    });
-  }
 }
