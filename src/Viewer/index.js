@@ -147,6 +147,7 @@ class Viewer {
   }
   clear() {
     this.book = null;
+    this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
     this.zoomBox.innerHTML = '';
   }
   cancel() {
@@ -255,18 +256,18 @@ class Viewer {
 
     this.book.pages.forEach((page, i) => {
       if (!this.zoomBox.contains(page.element)) {
-        if (this.lastSpread && this.lastSpread.children.length < 2) {
-          this.lastSpread.appendChild(page.element);
+        if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < 2) {
+          this.lastSpreadInProgress.appendChild(page.element);
         } else {
           if (i === 0) {
             const spacer = new Page();
             spacer.element.style.visibility = 'hidden';
-            this.lastSpread = twoPageSpread(spacer.element, page.element);
+            this.lastSpreadInProgress = twoPageSpread(spacer.element, page.element);
           } else {
-            this.lastSpread = twoPageSpread(page.element);
+            this.lastSpreadInProgress = twoPageSpread(page.element);
           }
 
-          this.zoomBox.appendChild(this.lastSpread);
+          this.zoomBox.appendChild(this.lastSpreadInProgress);
         }
       }
     });
