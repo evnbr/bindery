@@ -2,6 +2,7 @@ import h from 'hyperscript';
 import c from '../utils/prefixClass';
 
 import Controls from '../Controls';
+import Page from '../Page';
 
 import errorView from './error';
 import orderPagesBooklet from './orderPagesBooklet';
@@ -37,8 +38,7 @@ class Viewer {
     this.book = null;
 
     this.zoomBox = h(c('.zoom-wrap'));
-    const spinner = h(c('.spinner'));
-    this.element = h(c('.root'), this.zoomBox, spinner);
+    this.element = h(c('.root'), this.zoomBox);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
@@ -241,6 +241,30 @@ class Viewer {
 
     document.body.scrollTop = document.body.scrollHeight * scrollPct;
     this.updateZoom();
+  }
+
+  renderProgress() {
+    const twoPageSpread = function (...arg) {
+      return h(c('.spread-wrapper') + c('.spread-size'), ...arg);
+    };
+
+    this.book.pages.forEach((page, i) => {
+      if (!this.zoomBox.contains(page.element)) {
+        if (this.lastSpread && this.lastSpread.children.length < 2) {
+          this.lastSpread.appendChild(page.element);
+        } else {
+          if (i === 0) {
+            const spacer = new Page();
+            spacer.element.style.visibility = 'hidden';
+            this.lastSpread = twoPageSpread(spacer.element, page.element);
+          } else {
+            this.lastSpread = twoPageSpread(page.element);
+          }
+
+          this.zoomBox.appendChild(this.lastSpread);
+        }
+      }
+    });
   }
 
   updateZoom() {

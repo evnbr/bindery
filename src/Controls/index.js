@@ -343,7 +343,10 @@ class Controls {
     // if (this.binder.debug) debugToggle.classList.add('selected');
 
     this.element = h(c('.controls'),
-      header,
+      row(
+        h(c('.spinner')),
+        header
+      ),
       arrangement,
       // paperSize,
       orientation,

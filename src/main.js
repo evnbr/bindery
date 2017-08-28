@@ -157,18 +157,18 @@ class Bindery {
       content,
       rules: this.rules,
       success: (book) => {
-        setTimeout(() => {
-          this.viewer.book = book;
-          this.viewer.render();
+        this.viewer.book = book;
+        this.viewer.render();
 
-          this.controls.setDone();
-          if (doneBinding) doneBinding();
-          this.viewer.element.classList.remove(c('in-progress'));
-          document.body.classList.remove(c('debug'));
-        }, 100);
+        this.controls.setDone();
+        if (doneBinding) doneBinding();
+        this.viewer.element.classList.remove(c('in-progress'));
+        document.body.classList.remove(c('debug'));
       },
-      progress: (pageCount) => {
-        this.controls.updateProgress(pageCount);
+      progress: (book) => {
+        this.viewer.book = book;
+        this.controls.updateProgress(book.pages.length);
+        this.viewer.renderProgress();
       },
       error: (error) => {
         document.body.classList.remove(c('in-progress'));

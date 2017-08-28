@@ -88,7 +88,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       }
     }
 
-    progress(state.pages.length);
+    state.book.pages = state.pages;
+    progress(state.book);
 
     return newPage;
   };
