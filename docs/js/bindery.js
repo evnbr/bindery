@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.6 - Monday, August 28th, 2017, 3:12:42 PM  
+// [AIV]  Build version: 2.0.0-alpha.6 - Monday, August 28th, 2017, 3:19:18 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -2726,6 +2726,7 @@ var Viewer = function () {
           }
         }
       });
+      this.updateZoom();
     }
   }, {
     key: 'updateZoom',
