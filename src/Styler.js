@@ -43,78 +43,81 @@ class Styler {
     const w = parseVal(this.size.width);
 
     sheet.innerHTML = `
-      ${c('.page-size')} {
-        height: ${this.size.height};
-        width: ${this.size.width};
-      }
-      ${c('.page-size-rotated')} {
-        height: ${this.size.width};
-        width: ${this.size.height};
-      }
-      ${c('.spread-size')} {
-        height: ${this.size.height};
-        width: ${w.val * 2}${w.unit};
-      }
-      ${c('.spread-size-rotated')} {
-        height: ${w.val * 2}${w.unit};
-        width: ${this.size.height};
-      }
-      ${c('.flowbox')},
-      ${c('.footer')} {
-        margin-left: ${this.margin.inner};
-        margin-right: ${this.margin.outer};
-      }
-      ${c('.left')} ${c('.flowbox')},
-      ${c('.left')} ${c('.footer')} {
-        margin-left: ${this.margin.outer};
-        margin-right: ${this.margin.inner};
-      }
+${c('.show-crop')} ${c('.spread-wrapper')},
+${c('.show-bleed-marks')} ${c('.spread-wrapper')} {
+  margin: calc(${this.bleed} + 12pt) auto;
+}
+${c('.page-size')} {
+  height: ${this.size.height};
+  width: ${this.size.width};
+}
+${c('.page-size-rotated')} {
+  height: ${this.size.width};
+  width: ${this.size.height};
+}
+${c('.spread-size')} {
+  height: ${this.size.height};
+  width: ${w.val * 2}${w.unit};
+}
+${c('.spread-size-rotated')} {
+  height: ${w.val * 2}${w.unit};
+  width: ${this.size.height};
+}
+${c('.flowbox')},
+${c('.footer')} {
+  margin-left: ${this.margin.inner};
+  margin-right: ${this.margin.outer};
+}
+${c('.left')} ${c('.flowbox')},
+${c('.left')} ${c('.footer')} {
+  margin-left: ${this.margin.outer};
+  margin-right: ${this.margin.inner};
+}
 
-      ${c('.left')} ${c('.running-header')} {
-        left: ${this.margin.outer};
-      }
-      ${c('.right')} ${c('.running-header')} {
-        right: ${this.margin.outer};
-      }
+${c('.left')} ${c('.running-header')} {
+  left: ${this.margin.outer};
+}
+${c('.right')} ${c('.running-header')} {
+  right: ${this.margin.outer};
+}
 
-      ${c('.flowbox')} { margin-top: ${this.margin.top}; }
-      ${c('.footer')}{ margin-bottom: ${this.margin.bottom}; }
+${c('.flowbox')} { margin-top: ${this.margin.top}; }
+${c('.footer')}{ margin-bottom: ${this.margin.bottom}; }
 
+${c('.bleed-left')},
+${c('.bleed-right')},
+${c('.crop-left')},
+${c('.crop-right')},
+${c('.crop-fold')} {
+  top: calc( -12pt - ${this.bleed} );
+  bottom: calc( -12pt - ${this.bleed} );
+}
 
-      ${c('.bleed-left')},
-      ${c('.bleed-right')},
-      ${c('.crop-left')},
-      ${c('.crop-right')},
-      ${c('.crop-fold')} {
-        top: calc( -12pt - ${this.bleed} );
-        bottom: calc( -12pt - ${this.bleed} );
-      }
+${c('.bleed-top')},
+${c('.bleed-bottom')},
+${c('.crop-top')},
+${c('.crop-bottom')} {
+  left: calc( -12pt - ${this.bleed} );
+  right: calc( -12pt - ${this.bleed} );
+}
+${c('.bleed-left')}   { left: -${this.bleed}; }
+${c('.bleed-right')}  { right: -${this.bleed}; }
+${c('.bleed-top')}    { top: -${this.bleed}; }
+${c('.bleed-bottom')} { bottom: -${this.bleed}; }
 
-      ${c('.bleed-top')},
-      ${c('.bleed-bottom')},
-      ${c('.crop-top')},
-      ${c('.crop-bottom')} {
-        left: calc( -12pt - ${this.bleed} );
-        right: calc( -12pt - ${this.bleed} );
-      }
-      ${c('.bleed-left')}   { left: -${this.bleed}; }
-      ${c('.bleed-right')}  { right: -${this.bleed}; }
-      ${c('.bleed-top')}    { top: -${this.bleed}; }
-      ${c('.bleed-bottom')} { bottom: -${this.bleed}; }
+${c('.background')} {
+  top: -${this.bleed};
+  bottom: -${this.bleed};
+  left: -${this.bleed};
+  right: -${this.bleed};
+}
 
-      ${c('.background')} {
-        top: -${this.bleed};
-        bottom: -${this.bleed};
-        left: -${this.bleed};
-        right: -${this.bleed};
-      }
-
-      ${c('.spread')}${c('.right')} > ${c('.background')} {
-        left: calc(-100% - ${this.bleed});
-      }
-      ${c('.spread')}${c('.left')} > ${c('.background')} {
-        right: calc(-100% - ${this.bleed});
-      }
+${c('.spread')}${c('.right')} > ${c('.background')} {
+  left: calc(-100% - ${this.bleed});
+}
+${c('.spread')}${c('.left')} > ${c('.background')} {
+  right: calc(-100% - ${this.bleed});
+}
     `;
     document.head.appendChild(sheet);
   }

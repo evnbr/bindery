@@ -11,7 +11,7 @@ class Footnote extends Replace {
   constructor(options) {
     super(options);
     this.name = 'Footnote';
-    this.validate(options, {
+    RuleOption.validate(options, {
       selector: RuleOption.string,
       replace: RuleOption.func,
       render: RuleOption.func,

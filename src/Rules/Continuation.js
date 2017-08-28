@@ -13,7 +13,7 @@ class Continuation extends Rule {
     super(options);
 
     this.name = 'Continuation';
-    this.validate(options, {
+    RuleOption.validate(options, {
       selector: RuleOption.string,
       hasContinuationClass: RuleOption.string,
       isContinuationClass: RuleOption.string,

@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.5 - Friday, August 25th, 2017, 2:39:25 PM  
+// [AIV]  Build version: 2.0.0-alpha.6 - Monday, August 28th, 2017, 2:00:43 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -288,6 +288,18 @@ var RuleOption = {
   },
   func: function func(val) {
     return typeof val === 'function';
+  },
+  validate: function validate(opts, validOpts) {
+    Object.keys(opts).forEach(function (k) {
+      if (!validOpts[k]) {
+        console.error('Bindery: Rule \'' + opts.name + '\' doesn\'t have an option \'' + k + '\'');
+      } else {
+        var val = opts[k];
+        if (!validOpts[k](val)) {
+          console.error('Bindery: In Rule \'' + opts.name + '\', \'' + val + '\' is not a valid value for \'' + k + '\'');
+        }
+      }
+    });
   }
 };
 
@@ -304,79 +316,25 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Rule = function () {
-  function Rule(options) {
-    var _this = this;
+var Rule = function Rule(options) {
+  var _this = this;
 
-    _classCallCheck(this, Rule);
+  _classCallCheck(this, Rule);
 
-    this.name = options.name ? options.name : 'Unnamed Bindery Rule';
-    this.selector = '';
+  this.name = options.name ? options.name : 'Unnamed Bindery Rule';
+  this.selector = '';
 
-    Object.keys(options).forEach(function (key) {
-      _this[key] = options[key];
-    });
-  }
-
-  _createClass(Rule, [{
-    key: 'validate',
-    value: function validate(opts, validOpts) {
-      var _this2 = this;
-
-      Object.keys(opts).forEach(function (k) {
-        if (!validOpts[k]) {
-          console.error('Bindery: Rule \'' + _this2.name + '\' doesn\'t have an option \'' + k + '\'');
-        } else {
-          var val = opts[k];
-          if (!validOpts[k](val)) {
-            console.error('Bindery: In Rule \'' + _this2.name + '\', \'' + val + '\' is not a valid value for \'' + k + '\'');
-          }
-        }
-      });
-    }
-  }]);
-
-  return Rule;
-}();
+  Object.keys(options).forEach(function (key) {
+    _this[key] = options[key];
+  });
+};
 
 exports.default = Rule;
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.makeRanges = exports.last = exports.arraysEqual = undefined;
-
-var _arraysEqual = __webpack_require__(17);
-
-var _arraysEqual2 = _interopRequireDefault(_arraysEqual);
-
-var _arrayLast = __webpack_require__(18);
-
-var _arrayLast2 = _interopRequireDefault(_arrayLast);
-
-var _makeRanges = __webpack_require__(19);
-
-var _makeRanges2 = _interopRequireDefault(_makeRanges);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.arraysEqual = _arraysEqual2.default;
-exports.last = _arrayLast2.default;
-exports.makeRanges = _makeRanges2.default;
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -502,7 +460,7 @@ var Page = function () {
 exports.default = Page;
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -584,7 +542,7 @@ exports.convertStrToStr = convertStrToStr;
 exports.convertStrToPx = convertStrToPx;
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -662,7 +620,7 @@ var Replace = function (_Rule) {
 exports.default = Replace;
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -693,6 +651,36 @@ var elementToString = function elementToString(node) {
 exports.default = elementToString;
 
 /***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.makeRanges = exports.last = exports.arraysEqual = undefined;
+
+var _arraysEqual = __webpack_require__(17);
+
+var _arraysEqual2 = _interopRequireDefault(_arraysEqual);
+
+var _arrayLast = __webpack_require__(18);
+
+var _arrayLast2 = _interopRequireDefault(_arrayLast);
+
+var _makeRanges = __webpack_require__(19);
+
+var _makeRanges2 = _interopRequireDefault(_makeRanges);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.arraysEqual = _arraysEqual2.default;
+exports.last = _arrayLast2.default;
+exports.makeRanges = _makeRanges2.default;
+
+/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -717,7 +705,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _elementToString = __webpack_require__(8);
+var _elementToString = __webpack_require__(7);
 
 var _elementToString2 = _interopRequireDefault(_elementToString);
 
@@ -794,9 +782,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _utils = __webpack_require__(4);
-
-var _Rules = __webpack_require__(35);
+var _Rules = __webpack_require__(37);
 
 var _Rules2 = _interopRequireDefault(_Rules);
 
@@ -804,7 +790,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-__webpack_require__(43);
+__webpack_require__(45);
 
 var DEFAULT_BLEED = '12pt';
 var DEFAULT_PAGE_SIZE = { width: '288pt', height: '432pt' };
@@ -819,7 +805,7 @@ var Bindery = function () {
   function Bindery(opts) {
     _classCallCheck(this, Bindery);
 
-    console.log('Bindery ' + '2.0.0-alpha.5');
+    console.log('Bindery ' + '2.0.0-alpha.6');
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
@@ -905,7 +891,6 @@ var Bindery = function () {
   }, {
     key: 'cancel',
     value: function cancel() {
-      this.stopCheckingLayout();
       this.viewer.cancel();
       document.body.classList.remove((0, _prefixClass2.default)('viewing'));
       this.source.style.display = '';
@@ -939,14 +924,13 @@ var Bindery = function () {
         return;
       }
 
-      this.stopCheckingLayout();
-
       this.source.style.display = '';
       var content = this.source.cloneNode(true);
       this.source.style.display = 'none';
 
       // In case we're updating an existing layout
       this.viewer.clear();
+
       document.body.classList.add((0, _prefixClass2.default)('viewing'));
       this.viewer.element.classList.add((0, _prefixClass2.default)('in-progress'));
       if (this.debug) document.body.classList.add((0, _prefixClass2.default)('debug'));
@@ -959,76 +943,24 @@ var Bindery = function () {
         content: content,
         rules: this.rules,
         success: function success(book) {
-          setTimeout(function () {
-            _this3.viewer.book = book;
-            _this3.viewer.render();
+          _this3.viewer.book = book;
+          _this3.viewer.render();
 
-            _this3.controls.setDone();
-            if (doneBinding) doneBinding();
-            _this3.viewer.element.classList.remove((0, _prefixClass2.default)('in-progress'));
-            document.body.classList.remove((0, _prefixClass2.default)('debug'));
-            _this3.startCheckingLayout();
-          }, 100);
+          _this3.controls.setDone();
+          if (doneBinding) doneBinding();
+          _this3.viewer.element.classList.remove((0, _prefixClass2.default)('in-progress'));
+          document.body.classList.remove((0, _prefixClass2.default)('debug'));
         },
-        progress: function progress(pageCount) {
-          _this3.controls.updateProgress(pageCount);
+        progress: function progress(book) {
+          _this3.viewer.book = book;
+          _this3.controls.updateProgress(book.pages.length);
+          _this3.viewer.renderProgress();
         },
         error: function error(_error) {
-          document.body.classList.remove((0, _prefixClass2.default)('in-progress'));
+          _this3.viewer.element.classList.remove((0, _prefixClass2.default)('in-progress'));
           _this3.viewer.displayError('Layout couldn\'t complete', _error);
         },
         isDebugging: this.debug
-      });
-    }
-  }, {
-    key: 'startCheckingLayout',
-    value: function startCheckingLayout() {
-      var _this4 = this;
-
-      if (this.autoupdate) {
-        this.layoutChecker = setInterval(function () {
-          _this4.checkLayoutChange();
-        }, 500);
-      }
-    }
-  }, {
-    key: 'stopCheckingLayout',
-    value: function stopCheckingLayout() {
-      if (this.layoutChecker) {
-        clearInterval(this.layoutChecker);
-        this.pageOverflows = null;
-      }
-    }
-  }, {
-    key: 'checkLayoutChange',
-    value: function checkLayoutChange() {
-      if (this.viewer.mode !== 'grid') return;
-      if (!this.pageOverflows) {
-        this.pageOverflows = this.getPageOverflows();
-        return;
-      }
-
-      var newOverflows = this.getPageOverflows();
-      if (!(0, _utils.arraysEqual)(newOverflows, this.pageOverflows)) {
-        this.throttledUpdateBook();
-        this.pageOverflows = newOverflows;
-      }
-    }
-  }, {
-    key: 'throttledUpdateBook',
-    value: function throttledUpdateBook() {
-      var _this5 = this;
-
-      if (this.makeBookTimer) clearTimeout(this.makeBookTimer);
-      this.makeBookTimer = setTimeout(function () {
-        _this5.makeBook();
-      }, 500);
-    }
-  }, {
-    key: 'getPageOverflows',
-    value: function getPageOverflows() {
-      return this.viewer.pages.map(function (page) {
-        return page.overflowAmount();
       });
     }
   }], [{
@@ -1065,7 +997,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _elementToString = __webpack_require__(8);
+var _elementToString = __webpack_require__(7);
 
 var _elementToString2 = _interopRequireDefault(_elementToString);
 
@@ -1075,13 +1007,13 @@ var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
 var _scrollElement = __webpack_require__(16);
 
-var _utils = __webpack_require__(4);
+var _utils = __webpack_require__(8);
 
 var _Book = __webpack_require__(20);
 
 var _Book2 = _interopRequireDefault(_Book);
 
-var _Page = __webpack_require__(5);
+var _Page = __webpack_require__(4);
 
 var _Page2 = _interopRequireDefault(_Page);
 
@@ -1144,11 +1076,12 @@ var paginate = function paginate(_ref) {
 
   var makeNewPage = function makeNewPage() {
     var newPage = new _Page2.default();
-    var shouldScroll = (0, _scrollElement.scrollPct)(measureArea) > 0.9;
+    // const shouldScroll = scrollPct(measureArea) > 0.9;
     measureArea.appendChild(newPage.element);
-    if (shouldScroll) {
-      if (isDebugging) (0, _scrollElement.scrollToBottom)(measureArea);else measureArea.scrollTop = measureArea.scrollHeight;
-    }
+    // if (shouldScroll) {
+    //   if (isDebugging) scrollToBottom(measureArea);
+    //   else measureArea.scrollTop = measureArea.scrollHeight;
+    // }
 
     applyNewPageRules(newPage);
     return newPage;
@@ -1192,7 +1125,7 @@ var paginate = function paginate(_ref) {
       }
     }
 
-    progress(state.pages.length);
+    updatePaginationProgress();
 
     return newPage;
   };
@@ -1563,6 +1496,13 @@ var paginate = function paginate(_ref) {
     };
     // kick it off
     addNext();
+  };
+
+  var updatePaginationProgress = function updatePaginationProgress() {
+    (0, _annotatePages2.default)(state.pages);
+    state.book.pages = state.pages;
+    afterBindRules(state.book);
+    progress(state.book);
   };
 
   var finishPagination = function finishPagination() {
@@ -2380,11 +2320,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Page = __webpack_require__(5);
+var _Page = __webpack_require__(4);
 
 var _Page2 = _interopRequireDefault(_Page);
 
-var _convertUnits = __webpack_require__(6);
+var _convertUnits = __webpack_require__(5);
 
 var _prefixClass = __webpack_require__(0);
 
@@ -2444,7 +2384,7 @@ var Styler = function () {
       }
       var w = (0, _convertUnits.parseVal)(this.size.width);
 
-      sheet.innerHTML = '\n      ' + (0, _prefixClass2.default)('.page-size') + ' {\n        height: ' + this.size.height + ';\n        width: ' + this.size.width + ';\n      }\n      ' + (0, _prefixClass2.default)('.page-size-rotated') + ' {\n        height: ' + this.size.width + ';\n        width: ' + this.size.height + ';\n      }\n      ' + (0, _prefixClass2.default)('.spread-size') + ' {\n        height: ' + this.size.height + ';\n        width: ' + w.val * 2 + w.unit + ';\n      }\n      ' + (0, _prefixClass2.default)('.spread-size-rotated') + ' {\n        height: ' + w.val * 2 + w.unit + ';\n        width: ' + this.size.height + ';\n      }\n      ' + (0, _prefixClass2.default)('.flowbox') + ',\n      ' + (0, _prefixClass2.default)('.footer') + ' {\n        margin-left: ' + this.margin.inner + ';\n        margin-right: ' + this.margin.outer + ';\n      }\n      ' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.flowbox') + ',\n      ' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.footer') + ' {\n        margin-left: ' + this.margin.outer + ';\n        margin-right: ' + this.margin.inner + ';\n      }\n\n      ' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n        left: ' + this.margin.outer + ';\n      }\n      ' + (0, _prefixClass2.default)('.right') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n        right: ' + this.margin.outer + ';\n      }\n\n      ' + (0, _prefixClass2.default)('.flowbox') + ' { margin-top: ' + this.margin.top + '; }\n      ' + (0, _prefixClass2.default)('.footer') + '{ margin-bottom: ' + this.margin.bottom + '; }\n\n\n      ' + (0, _prefixClass2.default)('.bleed-left') + ',\n      ' + (0, _prefixClass2.default)('.bleed-right') + ',\n      ' + (0, _prefixClass2.default)('.crop-left') + ',\n      ' + (0, _prefixClass2.default)('.crop-right') + ',\n      ' + (0, _prefixClass2.default)('.crop-fold') + ' {\n        top: calc( -12pt - ' + this.bleed + ' );\n        bottom: calc( -12pt - ' + this.bleed + ' );\n      }\n\n      ' + (0, _prefixClass2.default)('.bleed-top') + ',\n      ' + (0, _prefixClass2.default)('.bleed-bottom') + ',\n      ' + (0, _prefixClass2.default)('.crop-top') + ',\n      ' + (0, _prefixClass2.default)('.crop-bottom') + ' {\n        left: calc( -12pt - ' + this.bleed + ' );\n        right: calc( -12pt - ' + this.bleed + ' );\n      }\n      ' + (0, _prefixClass2.default)('.bleed-left') + '   { left: -' + this.bleed + '; }\n      ' + (0, _prefixClass2.default)('.bleed-right') + '  { right: -' + this.bleed + '; }\n      ' + (0, _prefixClass2.default)('.bleed-top') + '    { top: -' + this.bleed + '; }\n      ' + (0, _prefixClass2.default)('.bleed-bottom') + ' { bottom: -' + this.bleed + '; }\n\n      ' + (0, _prefixClass2.default)('.background') + ' {\n        top: -' + this.bleed + ';\n        bottom: -' + this.bleed + ';\n        left: -' + this.bleed + ';\n        right: -' + this.bleed + ';\n      }\n\n      ' + (0, _prefixClass2.default)('.spread') + (0, _prefixClass2.default)('.right') + ' > ' + (0, _prefixClass2.default)('.background') + ' {\n        left: calc(-100% - ' + this.bleed + ');\n      }\n      ' + (0, _prefixClass2.default)('.spread') + (0, _prefixClass2.default)('.left') + ' > ' + (0, _prefixClass2.default)('.background') + ' {\n        right: calc(-100% - ' + this.bleed + ');\n      }\n    ';
+      sheet.innerHTML = '\n' + (0, _prefixClass2.default)('.show-crop') + ' ' + (0, _prefixClass2.default)('.spread-wrapper') + ',\n' + (0, _prefixClass2.default)('.show-bleed-marks') + ' ' + (0, _prefixClass2.default)('.spread-wrapper') + ' {\n  margin: calc(' + this.bleed + ' + 12pt) auto;\n}\n' + (0, _prefixClass2.default)('.page-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + this.size.width + ';\n}\n' + (0, _prefixClass2.default)('.page-size-rotated') + ' {\n  height: ' + this.size.width + ';\n  width: ' + this.size.height + ';\n}\n' + (0, _prefixClass2.default)('.spread-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + w.val * 2 + w.unit + ';\n}\n' + (0, _prefixClass2.default)('.spread-size-rotated') + ' {\n  height: ' + w.val * 2 + w.unit + ';\n  width: ' + this.size.height + ';\n}\n' + (0, _prefixClass2.default)('.flowbox') + ',\n' + (0, _prefixClass2.default)('.footer') + ' {\n  margin-left: ' + this.margin.inner + ';\n  margin-right: ' + this.margin.outer + ';\n}\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.flowbox') + ',\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.footer') + ' {\n  margin-left: ' + this.margin.outer + ';\n  margin-right: ' + this.margin.inner + ';\n}\n\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n  left: ' + this.margin.outer + ';\n}\n' + (0, _prefixClass2.default)('.right') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n  right: ' + this.margin.outer + ';\n}\n\n' + (0, _prefixClass2.default)('.flowbox') + ' { margin-top: ' + this.margin.top + '; }\n' + (0, _prefixClass2.default)('.footer') + '{ margin-bottom: ' + this.margin.bottom + '; }\n\n' + (0, _prefixClass2.default)('.bleed-left') + ',\n' + (0, _prefixClass2.default)('.bleed-right') + ',\n' + (0, _prefixClass2.default)('.crop-left') + ',\n' + (0, _prefixClass2.default)('.crop-right') + ',\n' + (0, _prefixClass2.default)('.crop-fold') + ' {\n  top: calc( -12pt - ' + this.bleed + ' );\n  bottom: calc( -12pt - ' + this.bleed + ' );\n}\n\n' + (0, _prefixClass2.default)('.bleed-top') + ',\n' + (0, _prefixClass2.default)('.bleed-bottom') + ',\n' + (0, _prefixClass2.default)('.crop-top') + ',\n' + (0, _prefixClass2.default)('.crop-bottom') + ' {\n  left: calc( -12pt - ' + this.bleed + ' );\n  right: calc( -12pt - ' + this.bleed + ' );\n}\n' + (0, _prefixClass2.default)('.bleed-left') + '   { left: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-right') + '  { right: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-top') + '    { top: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-bottom') + ' { bottom: -' + this.bleed + '; }\n\n' + (0, _prefixClass2.default)('.background') + ' {\n  top: -' + this.bleed + ';\n  bottom: -' + this.bleed + ';\n  left: -' + this.bleed + ';\n  right: -' + this.bleed + ';\n}\n\n' + (0, _prefixClass2.default)('.spread') + (0, _prefixClass2.default)('.right') + ' > ' + (0, _prefixClass2.default)('.background') + ' {\n  left: calc(-100% - ' + this.bleed + ');\n}\n' + (0, _prefixClass2.default)('.spread') + (0, _prefixClass2.default)('.left') + ' > ' + (0, _prefixClass2.default)('.background') + ' {\n  right: calc(-100% - ' + this.bleed + ');\n}\n    ';
       document.head.appendChild(sheet);
     }
   }]);
@@ -2475,19 +2415,27 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _Page = __webpack_require__(5);
-
-var _Page2 = _interopRequireDefault(_Page);
-
 var _Controls = __webpack_require__(27);
 
 var _Controls2 = _interopRequireDefault(_Controls);
+
+var _Page = __webpack_require__(4);
+
+var _Page2 = _interopRequireDefault(_Page);
 
 var _error = __webpack_require__(29);
 
 var _error2 = _interopRequireDefault(_error);
 
-var _Layouts = __webpack_require__(30);
+var _orderPagesBooklet = __webpack_require__(30);
+
+var _orderPagesBooklet2 = _interopRequireDefault(_orderPagesBooklet);
+
+var _padPages = __webpack_require__(31);
+
+var _padPages2 = _interopRequireDefault(_padPages);
+
+var _Layouts = __webpack_require__(32);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2517,40 +2465,6 @@ var setOrientationCSS = function setOrientationCSS(newValue) {
   document.head.appendChild(sheet);
 };
 
-var orderPagesBooklet = function orderPagesBooklet(pages) {
-  while (pages.length % 4 !== 0) {
-    var spacerPage = new _Page2.default();
-    spacerPage.element.style.visibility = 'hidden';
-    pages.push(spacerPage);
-  }
-  var bookletOrder = [];
-  var len = pages.length;
-
-  for (var i = 0; i < len / 2; i += 2) {
-    bookletOrder.push(pages[len - 1 - i]);
-    bookletOrder.push(pages[i]);
-    bookletOrder.push(pages[i + 1]);
-    bookletOrder.push(pages[len - 2 - i]);
-  }
-
-  return bookletOrder;
-};
-
-var padPages = function padPages(pages) {
-  if (pages.length % 2 !== 0) {
-    var pg = new _Page2.default();
-    pages.push(pg);
-  }
-  var spacerPage = new _Page2.default();
-  var spacerPage2 = new _Page2.default();
-  spacerPage.element.style.visibility = 'hidden';
-  spacerPage2.element.style.visibility = 'hidden';
-  pages.unshift(spacerPage);
-  pages.push(spacerPage2);
-
-  return pages;
-};
-
 var Viewer = function () {
   function Viewer(_ref) {
     var bindery = _ref.bindery;
@@ -2560,8 +2474,7 @@ var Viewer = function () {
     this.book = null;
 
     this.zoomBox = (0, _hyperscript2.default)((0, _prefixClass2.default)('.zoom-wrap'));
-    var spinner = (0, _hyperscript2.default)((0, _prefixClass2.default)('.spinner'));
-    this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.root'), this.zoomBox, spinner);
+    this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.root'), this.zoomBox);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
@@ -2581,6 +2494,8 @@ var Viewer = function () {
     this.setFlip = this.setFlip.bind(this);
 
     this.controls = new _Controls2.default({ binder: bindery, viewer: this });
+
+    this.element.classList.add((0, _prefixClass2.default)('in-progress'));
 
     this.element.appendChild(this.controls.element);
     document.body.appendChild(this.element);
@@ -2658,6 +2573,7 @@ var Viewer = function () {
     key: 'clear',
     value: function clear() {
       this.book = null;
+      this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
       this.zoomBox.innerHTML = '';
     }
   }, {
@@ -2750,15 +2666,20 @@ var Viewer = function () {
     key: 'render',
     value: function render() {
       if (!this.book) return;
+      var _document = document,
+          body = _document.body;
+
+
       if (!this.element.parentNode) {
-        document.body.appendChild(this.element);
+        body.appendChild(this.element);
       }
 
       this.flaps = [];
-      document.body.classList.add((0, _prefixClass2.default)('viewing'));
+      body.classList.add((0, _prefixClass2.default)('viewing'));
       this.element.setAttribute('bindery-view-mode', this.mode);
 
-      var scrollPct = document.body.scrollTop / document.body.scrollHeight;
+      var scrollMax = body.scrollHeight - body.offsetHeight;
+      var scrollPct = body.scrollTop / scrollMax;
 
       if (this.mode === MODE_PREVIEW) {
         this.renderGrid();
@@ -2772,8 +2693,39 @@ var Viewer = function () {
         this.renderGrid();
       }
 
-      document.body.scrollTop = document.body.scrollHeight * scrollPct;
+      body.scrollTop = scrollMax * scrollPct;
       this.updateZoom();
+    }
+  }, {
+    key: 'renderProgress',
+    value: function renderProgress() {
+      var _this3 = this;
+
+      var twoPageSpread = function twoPageSpread() {
+        for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
+          arg[_key] = arguments[_key];
+        }
+
+        return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.spread-wrapper') + (0, _prefixClass2.default)('.spread-size')].concat(arg));
+      };
+
+      this.book.pages.forEach(function (page, i) {
+        if (!_this3.zoomBox.contains(page.element)) {
+          if (_this3.lastSpreadInProgress && _this3.lastSpreadInProgress.children.length < 2) {
+            _this3.lastSpreadInProgress.appendChild(page.element);
+          } else {
+            if (i === 0) {
+              var spacer = new _Page2.default();
+              spacer.element.style.visibility = 'hidden';
+              _this3.lastSpreadInProgress = twoPageSpread(spacer.element, page.element);
+            } else {
+              _this3.lastSpreadInProgress = twoPageSpread(page.element);
+            }
+
+            _this3.zoomBox.appendChild(_this3.lastSpreadInProgress);
+          }
+        }
+      });
     }
   }, {
     key: 'updateZoom',
@@ -2815,9 +2767,9 @@ var Viewer = function () {
 
       var pages = this.book.pages.slice();
       if (this.printArrange === ARRANGE_SPREAD) {
-        pages = padPages(pages);
+        pages = (0, _padPages2.default)(pages);
       } else if (this.printArrange === ARRANGE_BOOKLET) {
-        pages = orderPagesBooklet(pages);
+        pages = (0, _orderPagesBooklet2.default)(pages);
       }
 
       var fragment = (0, _Layouts.printLayout)(pages, isTwoUp, orient, isBooklet);
@@ -2831,7 +2783,7 @@ var Viewer = function () {
 
       var pages = this.book.pages.slice();
 
-      if (this.doubleSided) pages = padPages(pages);
+      if (this.doubleSided) pages = (0, _padPages2.default)(pages);
 
       var fragment = (0, _Layouts.gridLayout)(pages, this.doubleSided);
       this.zoomBox.appendChild(fragment);
@@ -2846,7 +2798,7 @@ var Viewer = function () {
       this.element.classList.remove((0, _prefixClass2.default)('show-guides'));
       this.zoomBox.classList.add((0, _prefixClass2.default)('stage3d'));
 
-      var pages = padPages(this.book.pages.slice());
+      var pages = (0, _padPages2.default)(this.book.pages.slice());
 
       var fragment = (0, _Layouts.flipLayout)(pages, this.doubleSided);
       this.zoomBox.appendChild(fragment);
@@ -2897,7 +2849,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _convertUnits = __webpack_require__(6);
+var _convertUnits = __webpack_require__(5);
 
 var _prefixClass = __webpack_require__(0);
 
@@ -3021,7 +2973,8 @@ var Controls = function Controls(opts) {
 
   var viewSwitcher = _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.viewswitcher')].concat(viewModes));
 
-  var header = (0, _components.title)('Loading...');
+  var headerContent = (0, _hyperscript2.default)('span', 'Loading');
+  var header = (0, _components.title)((0, _hyperscript2.default)((0, _prefixClass2.default)('.spinner')), headerContent);
 
   var updateLayoutPreview = function updateLayoutPreview(newSize, newMargin) {
     var px = {
@@ -3066,18 +3019,18 @@ var Controls = function Controls(opts) {
   updateLayoutPreview(this.binder.styler.size, this.binder.styler.margin);
 
   this.setInProgress = function () {
-    header.textContent = 'Paginating...';
+    headerContent.textContent = 'Paginating';
     validCheck.style.display = 'none';
     inProgress.style.display = '';
     forceRefresh.style.display = 'none';
   };
 
   this.updateProgress = function (count) {
-    header.textContent = count + ' Pages...';
+    headerContent.textContent = count + ' Pages';
   };
 
   this.setDone = function () {
-    header.textContent = viewer.book.pages.length + ' Pages';
+    headerContent.textContent = viewer.book.pages.length + ' Pages';
     inProgress.style.display = 'none';
     forceRefresh.style.display = '';
     validCheck.style.display = 'none';
@@ -3216,7 +3169,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _convertUnits = __webpack_require__(6);
+var _convertUnits = __webpack_require__(5);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3360,7 +3313,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function (title, text) {
-  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.5'));
+  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.6'));
 };
 
 var _hyperscript = __webpack_require__(1);
@@ -3383,17 +3336,89 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _Page = __webpack_require__(4);
+
+var _Page2 = _interopRequireDefault(_Page);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var orderPagesBooklet = function orderPagesBooklet(pages) {
+  while (pages.length % 4 !== 0) {
+    var spacerPage = new _Page2.default();
+    spacerPage.element.style.visibility = 'hidden';
+    pages.push(spacerPage);
+  }
+  var bookletOrder = [];
+  var len = pages.length;
+
+  for (var i = 0; i < len / 2; i += 2) {
+    bookletOrder.push(pages[len - 1 - i]);
+    bookletOrder.push(pages[i]);
+    bookletOrder.push(pages[i + 1]);
+    bookletOrder.push(pages[len - 2 - i]);
+  }
+
+  return bookletOrder;
+};
+
+exports.default = orderPagesBooklet;
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Page = __webpack_require__(4);
+
+var _Page2 = _interopRequireDefault(_Page);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var padPages = function padPages(pages) {
+  if (pages.length % 2 !== 0) {
+    var pg = new _Page2.default();
+    pages.push(pg);
+  }
+  var spacerPage = new _Page2.default();
+  var spacerPage2 = new _Page2.default();
+  spacerPage.element.style.visibility = 'hidden';
+  spacerPage2.element.style.visibility = 'hidden';
+  pages.unshift(spacerPage);
+  pages.push(spacerPage2);
+
+  return pages;
+};
+
+exports.default = padPages;
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.flipLayout = exports.printLayout = exports.gridLayout = undefined;
 
-var _gridLayout = __webpack_require__(31);
+var _gridLayout = __webpack_require__(33);
 
 var _gridLayout2 = _interopRequireDefault(_gridLayout);
 
-var _printLayout = __webpack_require__(32);
+var _printLayout = __webpack_require__(34);
 
 var _printLayout2 = _interopRequireDefault(_printLayout);
 
-var _flipLayout = __webpack_require__(34);
+var _flipLayout = __webpack_require__(36);
 
 var _flipLayout2 = _interopRequireDefault(_flipLayout);
 
@@ -3404,7 +3429,7 @@ exports.printLayout = _printLayout2.default;
 exports.flipLayout = _flipLayout2.default;
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3459,7 +3484,7 @@ var renderGridLayout = function renderGridLayout(pages, isTwoUp) {
 exports.default = renderGridLayout;
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3477,7 +3502,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _printMarks = __webpack_require__(33);
+var _printMarks = __webpack_require__(35);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3532,7 +3557,7 @@ var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBoo
 exports.default = renderPrintLayout;
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3579,7 +3604,7 @@ exports.printMarksSpread = printMarksSpread;
 exports.bookletMeta = bookletMeta;
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3668,7 +3693,7 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
 exports.default = renderFlipLayout;
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3678,31 +3703,31 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _Continuation2 = __webpack_require__(36);
+var _Continuation2 = __webpack_require__(38);
 
 var _Continuation3 = _interopRequireDefault(_Continuation2);
 
-var _FullBleedSpread2 = __webpack_require__(37);
+var _FullBleedSpread2 = __webpack_require__(39);
 
 var _FullBleedSpread3 = _interopRequireDefault(_FullBleedSpread2);
 
-var _FullBleedPage2 = __webpack_require__(38);
+var _FullBleedPage2 = __webpack_require__(40);
 
 var _FullBleedPage3 = _interopRequireDefault(_FullBleedPage2);
 
-var _Footnote2 = __webpack_require__(39);
+var _Footnote2 = __webpack_require__(41);
 
 var _Footnote3 = _interopRequireDefault(_Footnote2);
 
-var _PageReference2 = __webpack_require__(40);
+var _PageReference2 = __webpack_require__(42);
 
 var _PageReference3 = _interopRequireDefault(_PageReference2);
 
-var _RunningHeader2 = __webpack_require__(41);
+var _RunningHeader2 = __webpack_require__(43);
 
 var _RunningHeader3 = _interopRequireDefault(_RunningHeader2);
 
-var _Replace2 = __webpack_require__(7);
+var _Replace2 = __webpack_require__(6);
 
 var _Replace3 = _interopRequireDefault(_Replace2);
 
@@ -3710,7 +3735,7 @@ var _Rule = __webpack_require__(3);
 
 var _Rule2 = _interopRequireDefault(_Rule);
 
-var _PageBreak2 = __webpack_require__(42);
+var _PageBreak2 = __webpack_require__(44);
 
 var _PageBreak3 = _interopRequireDefault(_PageBreak2);
 
@@ -3748,7 +3773,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3793,7 +3818,7 @@ var Continuation = function (_Rule) {
     var _this = _possibleConstructorReturn(this, (Continuation.__proto__ || Object.getPrototypeOf(Continuation)).call(this, options));
 
     _this.name = 'Continuation';
-    _this.validate(options, {
+    _RuleOption2.default.validate(options, {
       selector: _RuleOption2.default.string,
       hasContinuationClass: _RuleOption2.default.string,
       isContinuationClass: _RuleOption2.default.string
@@ -3819,7 +3844,7 @@ var Continuation = function (_Rule) {
 exports.default = Continuation;
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3870,7 +3895,7 @@ var FullBleedSpread = function (_OutOfFlow) {
     var _this = _possibleConstructorReturn(this, (FullBleedSpread.__proto__ || Object.getPrototypeOf(FullBleedSpread)).call(this, options));
 
     _this.name = 'Full Bleed Spread';
-    _this.validate(options, {
+    _RuleOption2.default.validate(options, {
       selector: _RuleOption2.default.string,
       continue: _RuleOption2.default.enum('next', 'same', 'left', 'right'),
       rotate: _RuleOption2.default.enum('none', 'clockwise', 'counterclockwise')
@@ -3924,7 +3949,7 @@ var FullBleedSpread = function (_OutOfFlow) {
 exports.default = FullBleedSpread;
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3975,7 +4000,7 @@ var FullBleedPage = function (_OutOfFlow) {
     var _this = _possibleConstructorReturn(this, (FullBleedPage.__proto__ || Object.getPrototypeOf(FullBleedPage)).call(this, options));
 
     _this.name = 'Full Bleed Page';
-    _this.validate(options, {
+    _RuleOption2.default.validate(options, {
       selector: _RuleOption2.default.string,
       continue: _RuleOption2.default.enum('next', 'same', 'left', 'right'),
       rotate: _RuleOption2.default.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise')
@@ -4011,7 +4036,7 @@ var FullBleedPage = function (_OutOfFlow) {
 exports.default = FullBleedPage;
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4029,7 +4054,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _Replace2 = __webpack_require__(7);
+var _Replace2 = __webpack_require__(6);
 
 var _Replace3 = _interopRequireDefault(_Replace2);
 
@@ -4059,7 +4084,7 @@ var Footnote = function (_Replace) {
     var _this = _possibleConstructorReturn(this, (Footnote.__proto__ || Object.getPrototypeOf(Footnote)).call(this, options));
 
     _this.name = 'Footnote';
-    _this.validate(options, {
+    _RuleOption2.default.validate(options, {
       selector: _RuleOption2.default.string,
       replace: _RuleOption2.default.func,
       render: _RuleOption2.default.func
@@ -4108,7 +4133,7 @@ var Footnote = function (_Replace) {
 exports.default = Footnote;
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4120,7 +4145,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Replace2 = __webpack_require__(7);
+var _Replace2 = __webpack_require__(6);
 
 var _Replace3 = _interopRequireDefault(_Replace2);
 
@@ -4128,7 +4153,7 @@ var _RuleOption = __webpack_require__(2);
 
 var _RuleOption2 = _interopRequireDefault(_RuleOption);
 
-var _utils = __webpack_require__(4);
+var _utils = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4151,7 +4176,7 @@ var PageReference = function (_Replace) {
     var _this = _possibleConstructorReturn(this, (PageReference.__proto__ || Object.getPrototypeOf(PageReference)).call(this, options));
 
     _this.name = 'Page Reference';
-    _this.validate(options, {
+    _RuleOption2.default.validate(options, {
       selector: _RuleOption2.default.string,
       replace: _RuleOption2.default.func,
       createTest: _RuleOption2.default.func
@@ -4213,7 +4238,7 @@ var PageReference = function (_Replace) {
 exports.default = PageReference;
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4265,7 +4290,7 @@ var RunningHeader = function (_Rule) {
     var _this = _possibleConstructorReturn(this, (RunningHeader.__proto__ || Object.getPrototypeOf(RunningHeader)).call(this, options));
 
     _this.name = 'Running Header';
-    _this.validate(options, {
+    _RuleOption2.default.validate(options, {
       render: _RuleOption2.default.func
     });
     return _this;
@@ -4274,9 +4299,12 @@ var RunningHeader = function (_Rule) {
   _createClass(RunningHeader, [{
     key: 'afterBind',
     value: function afterBind(page) {
-      var el = (0, _hyperscript2.default)((0, _prefixClass2.default)('.running-header'));
-      el.innerHTML = this.render(page);
-      page.element.appendChild(el);
+      if (!page.runningHeader) {
+        var el = (0, _hyperscript2.default)((0, _prefixClass2.default)('.running-header'));
+        page.element.appendChild(el);
+        page.runningHeader = el;
+      }
+      page.runningHeader.innerHTML = this.render(page);
     }
   }, {
     key: 'render',
@@ -4291,7 +4319,7 @@ var RunningHeader = function (_Rule) {
 exports.default = RunningHeader;
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4331,7 +4359,7 @@ var PageBreak = function (_Rule) {
     var _this = _possibleConstructorReturn(this, (PageBreak.__proto__ || Object.getPrototypeOf(PageBreak)).call(this, options));
 
     _this.name = 'Page Break';
-    _this.validate(options, {
+    _RuleOption2.default.validate(options, {
       selector: _RuleOption2.default.string,
       continue: _RuleOption2.default.enum('any', 'left', 'right'),
       position: _RuleOption2.default.enum('before', 'after', 'both', 'avoid')
@@ -4376,16 +4404,16 @@ var PageBreak = function (_Rule) {
 exports.default = PageBreak;
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(44);
+var content = __webpack_require__(46);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(51)(content, {});
+var update = __webpack_require__(53)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -4402,21 +4430,21 @@ if(false) {
 }
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(45)();
+exports = module.exports = __webpack_require__(47)();
 // imports
 
 
 // module
-exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .📖-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n    .📖-show-bleed .📖-page {\n      box-shadow: none;\n      outline: none;\n      overflow: visible; }\n    .📖-page3d .📖-page {\n      overflow: hidden !important; }\n    .📖-page::after {\n      content: \"\";\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      pointer-events: none;\n      z-index: 999; }\n  .📖-zoom-wrap * {\n    transition: box-shadow 0.2s; }\n  .📖-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .📖-show-guides .📖-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .📖-show-guides .📖-flowbox {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-footer {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .📖-show-guides .📖-background {\n    box-shadow: 0 0 0 1px yellow; }\n  .📖-show-guides .📖-out-of-flow {\n    display: block;\n    outline: 1px solid cyan; }\n    .📖-show-guides .📖-out-of-flow::after {\n      font: 10px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      content: attr(data-bindery);\n      position: absolute;\n      background: rgba(0, 255, 255, 0.5);\n      padding: 4px; }\n  .📖-show-guides .📖-right .📖-out-of-flow::after {\n    left: 100%; }\n  .📖-show-guides .📖-left .📖-out-of-flow::after {\n    right: 100%; }\n  .📖-is-overflowing {\n    overflow: visible; }\n    .📖-is-overflowing::before {\n      transition: none;\n      content: \"+\";\n      position: absolute;\n      bottom: 0;\n      display: block;\n      margin: 0 auto -10px;\n      left: 0;\n      right: 0;\n      text-align: center;\n      font: 8px/1.3 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      font-weight: 500;\n      text-transform: uppercase;\n      letter-spacing: 0.1em;\n      color: #ad0000;\n      width: 12px;\n      background: white;\n      z-index: 999;\n      border-radius: 2px;\n      padding: 4px;\n      overflow: hidden;\n      border: 1px solid currentColor; }\n    .📖-is-overflowing:hover::before {\n      content: \"Overflow\";\n      width: 54px; }\n    .📖-is-overflowing .📖-content {\n      transition: none; }\n      .📖-is-overflowing .📖-content:hover::after {\n        box-shadow: inset 0 0 0 1px #ad0000;\n        background: rgba(173, 0, 0, 0.04);\n        content: '';\n        position: absolute;\n        top: 0;\n        left: 0;\n        right: 0;\n        bottom: 0; } }\n\n.📖-out-of-flow {\n  display: none; }\n\n.📖-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.📖-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.📖-content {\n  /* hack to prevent margin collapse, leading to wrong height */\n  padding: 0.1px;\n  position: relative; }\n\n.📖-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n.📖-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt; }\n\n.📖-rotate-container {\n  position: absolute; }\n  .📖-rotate-container.📖-rotate-clockwise {\n    transform: rotate(90deg) translate3d(0, -100%, 0);\n    transform-origin: top left; }\n    .📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background {\n      bottom: 0; }\n    .📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background {\n      top: 0; }\n  .📖-rotate-container.📖-rotate-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, 0, 0);\n    transform-origin: top left; }\n    .📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n      top: 0; }\n    .📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n      bottom: 0; }\n  .📖-rotate-container.📖-rotate-inward .📖-background {\n    bottom: 0; }\n  .📖-left .📖-rotate-container.📖-rotate-inward {\n    transform: rotate(-90deg) translate3d(-100%, 0, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-inward {\n    transform: rotate(90deg) translate3d(0, -100%, 0);\n    transform-origin: top left; }\n  .📖-rotate-container.📖-rotate-outward .📖-background {\n    top: 0; }\n  .📖-left .📖-rotate-container.📖-rotate-outward {\n    transform: rotate(90deg) translate3d(0, -100%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-outward {\n    transform: rotate(-90deg) translate3d(-100%, 0, 0);\n    transform-origin: top left; }\n  .📖-left .📖-rotate-container.📖-rotate-spread-clockwise {\n    transform: rotate(90deg) translate3d(0, -100%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-clockwise {\n    transform: rotate(90deg) translate3d(0, -50%, 0);\n    transform-origin: top left; }\n  .📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, 0%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, -50%, 0);\n    transform-origin: top left; }\n\n/*Bleed as layer*/\n.📖-background {\n  position: absolute;\n  z-index: 0;\n  overflow: hidden; }\n  .📖-left > .📖-background {\n    right: 0; }\n  .📖-right > .📖-background {\n    left: 0; }\n\n.📖-sup {\n  font-size: 0.667em; }\n\n.📖-running-header, .📖-footer {\n  font-size: 10pt; }\n\n.📖-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .📖-left .📖-running-header {\n    left: 18pt;\n    text-align: left; }\n  .📖-right .📖-running-header {\n    right: 18pt;\n    text-align: right; }\n\np.📖-continuation {\n  text-indent: 0 !important; }\n\nli.📖-continuation {\n  list-style: none !important; }\n\n.📖-print-mark-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .📖-show-crop .📖-print-mark-wrap,\n  .📖-show-bleed-marks .📖-print-mark-wrap {\n    display: block; }\n  .📖-show-crop .📖-print-mark-wrap > [class*='crop'] {\n    display: block; }\n  .📖-show-bleed-marks .📖-print-mark-wrap > [class*='bleed'] {\n    display: block; }\n  .📖-print-mark-wrap > div {\n    display: none;\n    position: absolute;\n    overflow: hidden; }\n    .📖-print-mark-wrap > div::before, .📖-print-mark-wrap > div:after {\n      content: \"\";\n      background: black;\n      width: 12pt;\n      height: 12pt;\n      display: block;\n      position: absolute; }\n    .📖-print-mark-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .📖-print-mark-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.📖-show-crop .📖-print-page .📖-spread-wrapper,\n.📖-show-bleed-marks .📖-print-page .📖-spread-wrapper {\n  margin: 30pt auto; }\n\n.📖-crop-fold, .📖-crop-left, .📖-crop-right {\n  transform: scaleX(0.5);\n  width: 1px;\n  margin: auto; }\n\n.📖-crop-fold {\n  right: 0;\n  left: 0; }\n\n.📖-crop-left {\n  left: 0; }\n\n.📖-crop-right {\n  right: 0; }\n\n.📖-crop-top, .📖-crop-bottom {\n  transform: scaleY(0.5);\n  height: 1px; }\n\n.📖-crop-top {\n  top: 0; }\n\n.📖-crop-bottom {\n  bottom: 0; }\n\n.📖-bleed-left, .📖-bleed-right {\n  transform: scaleX(0.5);\n  width: 1px;\n  margin: auto; }\n\n.📖-bleed-top, .📖-bleed-bottom {\n  transform: scaleY(0.5);\n  height: 1px; }\n\n@media screen {\n  .📖-viewing {\n    background: #f4f4f4 !important; }\n  .📖-root {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .📖-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    z-index: 99;\n    overflow: scroll;\n    visibility: hidden;\n    top: 0;\n    left: 0;\n    right: 240px;\n    bottom: 0; }\n    .📖-debug .📖-measure-area {\n      visibility: visible; }\n    .📖-measure-area .📖-page {\n      margin: 0 auto 50px; }\n  .📖-print-page {\n    margin: 0 auto; }\n  .📖-spinner {\n    border: 2px solid transparent;\n    border-left-color: #0000d0;\n    width: 32px;\n    height: 32px;\n    border-radius: 50%;\n    position: absolute;\n    top: 0;\n    left: 0;\n    bottom: 0;\n    right: 0;\n    margin: auto;\n    z-index: 999;\n    opacity: 0; }\n  .📖-in-progress .📖-spinner {\n    opacity: 1;\n    animation: spin 0.6s linear infinite; }\n  .📖-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    background: url(" + __webpack_require__(46) + ") no-repeat 0% 0%;\n    background-size: 48px;\n    padding-top: 64px; }\n    .📖-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .📖-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .📖-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .📖-show-bleed .📖-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .📖-letter-landscape {\n    width: 11in;\n    height: 8.5in; }\n  .📖-letter-portrait {\n    width: 8.5in;\n    height: 11in; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .📖-root {\n    -webkit-print-color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .📖-viewing > :not(.📖-root) {\n    display: none !important; }\n  .📖-controls {\n    display: none !important; }\n  .📖-print-page {\n    margin: 0; }\n  .📖-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.📖-viewing {\n  margin: 0; }\n\n.📖-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.📖-viewing > :not(.📖-root):not(.📖-measure-area) {\n  display: none !important; }\n\n.📖-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden; }\n\n.📖-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.📖-print-page .📖-spread-wrapper {\n  margin: 0 auto; }\n\n.📖-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.📖-stage3d {\n  perspective: 3000px;\n  transform-style: preserve-3d; }\n\n.📖-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .📖-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .📖-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .📖-page3d .📖-page {\n    position: absolute;\n    backface-visibility: hidden; }\n  .📖-page3d .📖-page3d-front {\n    transform: rotateY(0); }\n    .📖-page3d .📖-page3d-front::after {\n      box-shadow: inset 12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n  .📖-page3d .📖-page3d-back {\n    transform: rotateY(-180deg); }\n    .📖-page3d .📖-page3d-back::after {\n      box-shadow: inset -12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n\n@media screen {\n  .📖-viewing .📖-controls {\n    display: block !important; } }\n\n.📖-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  padding-bottom: 100px; }\n  .📖-controls * {\n    font: inherit;\n    color: inherit;\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box; }\n\n.📖-title {\n  padding: 20px;\n  font-size: 18px; }\n\n.📖-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0, 0, 0, 0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  width: auto;\n  margin-right: 8px; }\n  .📖-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .📖-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .📖-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n\n.📖-btn-light {\n  background: none; }\n\n.📖-btn-main {\n  background: #0000d0;\n  color: white; }\n  .📖-btn-main:hover {\n    background: #0000d0;\n    opacity: 0.7; }\n  .📖-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.📖-in-progress .📖-btn-print {\n  display: none; }\n\n.📖-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  z-index: 99;\n  width: 240px;\n  background: #f4f4f4; }\n\n.📖-viewmode {\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 3px; }\n  .📖-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-viewmode .📖-icon {\n    height: 32px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .📖-viewmode.📖-grid .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(47) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-flip .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(48) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-outline .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(49) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-print .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(50) + ") no-repeat 50% 50%; }\n\n[bindery-view-mode='grid'] .📖-grid,\n[bindery-view-mode='interactive'] .📖-flip,\n[bindery-view-mode='outline'] .📖-outline,\n[bindery-view-mode='print'] .📖-print {\n  color: #0000d0; }\n\n.📖-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 4px 8px;\n  cursor: pointer; }\n  .📖-row select {\n    float: right;\n    border: none;\n    background: transparent;\n    padding: 12px;\n    width: 100px; }\n    .📖-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .📖-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    background: none; }\n    .📖-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .📖-row input:invalid {\n      color: #bf5656; }\n\n.📖-row.📖-debug-controls {\n  display: none; }\n  .📖-debug .📖-in-progress .📖-row.📖-debug-controls {\n    display: block; }\n\n.📖-expand-row {\n  color: rgba(0, 0, 0, 0.4);\n  font-weight: 500;\n  border-radius: 4px; }\n  .📖-expand-row:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-expand-row::after {\n    content: '+';\n    font-size: 1.5em;\n    padding: 0;\n    position: absolute;\n    right: 12px;\n    top: 2px;\n    font-weight: 300; }\n  .📖-expand-row.selected::after {\n    content: '\\2013'; }\n  .📖-expand-row.selected + .📖-expand-area {\n    opacity: 1;\n    max-height: 400px;\n    margin-bottom: 12px; }\n\n.📖-expand-area {\n  opacity: 0;\n  max-height: 0;\n  margin: -4px 8px 0;\n  border-radius: 0 0 4px 4px;\n  transition: max-height 0.3s, margin 0.3s, opacity 0.5s;\n  overflow: hidden; }\n  .📖-expand-area .📖-row {\n    margin: 4px 0; }\n\n.📖-size, .📖-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px; }\n\n.📖-size {\n  padding: 8px 0;\n  font-size: 12px; }\n  .📖-size div {\n    position: relative;\n    padding: 6px 12px;\n    color: #aaa; }\n\n.📖-layout-control {\n  margin: 4px 12px 8px; }\n\n.📖-margin {\n  overflow: hidden; }\n  .📖-margin > div {\n    position: absolute;\n    width: 54px;\n    height: 24px;\n    z-index: 5; }\n    .📖-margin > div:hover {\n      z-index: 99; }\n  .📖-margin .top {\n    left: 0;\n    right: 0;\n    margin: auto;\n    top: 0; }\n  .📖-margin .bottom {\n    left: 0;\n    right: 0;\n    margin: auto;\n    bottom: 0; }\n  .📖-margin .inner {\n    left: 0;\n    text-align: left;\n    top: calc(50% - 12px); }\n    .📖-margin .inner input {\n      text-align: left; }\n  .📖-margin .outer {\n    right: 0;\n    text-align: right;\n    top: calc(50% - 12px); }\n    .📖-margin .outer input {\n      text-align: right; }\n  .📖-margin .📖-preview {\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    border: 1px solid #a9a9ff;\n    height: auto;\n    width: auto;\n    z-index: 0;\n    pointer-events: none;\n    transition: border 0.2s; }\n\n.📖-margin input {\n  text-align: center;\n  padding: 4px;\n  font-size: 12px;\n  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white; }\n  .📖-margin input:focus {\n    background: none !important; }\n\n.📖-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0, 0, 0, 0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  transition: all 0.2s;\n  position: relative; }\n  .📖-switch-handle {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    background: white;\n    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n    transition: all 0.2s;\n    position: absolute;\n    left: 0px;\n    top: 0px; }\n  .📖-switch:hover .📖-switch-handle {\n    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); }\n  .📖-switch:active .📖-switch-handle {\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); }\n\n.📖-row.selected .📖-switch {\n  background: rgba(0, 0, 208, 0.6); }\n\n.📖-row.selected .📖-switch-handle {\n  background: #0000d0;\n  left: 12px; }\n\n@media (max-width: 500px) {\n  .📖-root {\n    padding-right: 0; }\n  .📖-controls {\n    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);\n    left: 0;\n    width: unset;\n    padding-bottom: 2em;\n    top: unset; }\n  .📖-viewswitcher {\n    right: unset; }\n  .📖-measure-area {\n    right: 0; }\n  .📖-btn-main {\n    float: right; } }\n", ""]);
+exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .📖-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n    .📖-show-bleed .📖-page {\n      box-shadow: none;\n      outline: none;\n      overflow: visible; }\n    .📖-page3d .📖-page {\n      overflow: hidden !important; }\n    .📖-page::after {\n      content: \"\";\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      pointer-events: none;\n      z-index: 999; }\n  .📖-zoom-wrap * {\n    transition: box-shadow 0.2s; }\n  .📖-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .📖-show-guides .📖-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .📖-show-guides .📖-flowbox {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-footer {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .📖-show-guides .📖-background {\n    box-shadow: 0 0 0 1px yellow; }\n  .📖-show-guides .📖-out-of-flow {\n    display: block;\n    outline: 1px solid cyan; }\n    .📖-show-guides .📖-out-of-flow::after {\n      font: 10px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      content: attr(data-bindery);\n      position: absolute;\n      background: rgba(0, 255, 255, 0.5);\n      padding: 4px; }\n  .📖-show-guides .📖-right .📖-out-of-flow::after {\n    left: 100%; }\n  .📖-show-guides .📖-left .📖-out-of-flow::after {\n    right: 100%; }\n  .📖-is-overflowing {\n    overflow: visible; }\n    .📖-is-overflowing::before {\n      transition: none;\n      content: \"+\";\n      position: absolute;\n      bottom: 0;\n      display: block;\n      margin: 0 auto -10px;\n      left: 0;\n      right: 0;\n      text-align: center;\n      font: 8px/1.3 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      font-weight: 500;\n      text-transform: uppercase;\n      letter-spacing: 0.1em;\n      color: #ad0000;\n      width: 12px;\n      background: white;\n      z-index: 999;\n      border-radius: 2px;\n      padding: 4px;\n      overflow: hidden;\n      border: 1px solid currentColor; }\n    .📖-is-overflowing:hover::before {\n      content: \"Overflow\";\n      width: 54px; }\n    .📖-is-overflowing .📖-content {\n      transition: none; }\n      .📖-is-overflowing .📖-content:hover::after {\n        box-shadow: inset 0 0 0 1px #ad0000;\n        background: rgba(173, 0, 0, 0.04);\n        content: '';\n        position: absolute;\n        top: 0;\n        left: 0;\n        right: 0;\n        bottom: 0; } }\n\n.📖-out-of-flow {\n  display: none; }\n\n.📖-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.📖-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.📖-content {\n  padding: 0.1px;\n  /* prevent margin collapse */\n  position: relative; }\n\n.📖-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n.📖-footer > :first-child:before {\n  content: \"\";\n  display: block;\n  width: 24pt;\n  height: 1px;\n  box-shadow: inset 0 0.5px 0 0 black;\n  margin-bottom: 8pt; }\n\n.📖-rotate-container {\n  position: absolute; }\n  .📖-rotate-container.📖-rotate-clockwise {\n    transform: rotate(90deg) translate3d(0, -100%, 0);\n    transform-origin: top left; }\n    .📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background {\n      bottom: 0; }\n    .📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background {\n      top: 0; }\n  .📖-rotate-container.📖-rotate-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, 0, 0);\n    transform-origin: top left; }\n    .📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n      top: 0; }\n    .📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n      bottom: 0; }\n  .📖-rotate-container.📖-rotate-inward .📖-background {\n    bottom: 0; }\n  .📖-left .📖-rotate-container.📖-rotate-inward {\n    transform: rotate(-90deg) translate3d(-100%, 0, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-inward {\n    transform: rotate(90deg) translate3d(0, -100%, 0);\n    transform-origin: top left; }\n  .📖-rotate-container.📖-rotate-outward .📖-background {\n    top: 0; }\n  .📖-left .📖-rotate-container.📖-rotate-outward {\n    transform: rotate(90deg) translate3d(0, -100%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-outward {\n    transform: rotate(-90deg) translate3d(-100%, 0, 0);\n    transform-origin: top left; }\n  .📖-left .📖-rotate-container.📖-rotate-spread-clockwise {\n    transform: rotate(90deg) translate3d(0, -100%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-clockwise {\n    transform: rotate(90deg) translate3d(0, -50%, 0);\n    transform-origin: top left; }\n  .📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, 0%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, -50%, 0);\n    transform-origin: top left; }\n\n/*Bleed as layer*/\n.📖-background {\n  position: absolute;\n  z-index: 0;\n  overflow: hidden; }\n  .📖-left > .📖-background {\n    right: 0; }\n  .📖-right > .📖-background {\n    left: 0; }\n\n.📖-sup {\n  font-size: 0.667em; }\n\n.📖-running-header, .📖-footer {\n  font-size: 10pt; }\n\n.📖-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .📖-left .📖-running-header {\n    left: 18pt;\n    text-align: left; }\n  .📖-right .📖-running-header {\n    right: 18pt;\n    text-align: right; }\n\np.📖-continuation {\n  text-indent: 0 !important; }\n\nli.📖-continuation {\n  list-style: none !important; }\n\n.📖-print-mark-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .📖-show-crop .📖-print-mark-wrap,\n  .📖-show-bleed-marks .📖-print-mark-wrap {\n    display: block; }\n  .📖-show-crop .📖-print-mark-wrap > [class*='crop'] {\n    display: block; }\n  .📖-show-bleed-marks .📖-print-mark-wrap > [class*='bleed'] {\n    display: block; }\n  .📖-print-mark-wrap > div {\n    display: none;\n    position: absolute;\n    overflow: hidden; }\n    .📖-print-mark-wrap > div::before, .📖-print-mark-wrap > div::after {\n      content: \"\";\n      display: block;\n      position: absolute; }\n    .📖-print-mark-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .📖-print-mark-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.📖-crop-fold, .📖-crop-left, .📖-crop-right {\n  width: 1px;\n  margin: auto; }\n  .📖-crop-fold::before, .📖-crop-fold:after, .📖-crop-left::before, .📖-crop-left:after, .📖-crop-right::before, .📖-crop-right:after {\n    width: 1px;\n    height: 12pt;\n    background-image: linear-gradient(to right, black 0%, black 51%, transparent 51%);\n    background-size: 1px 100%; }\n\n.📖-crop-fold {\n  right: 0;\n  left: 0; }\n\n.📖-crop-left {\n  left: 0; }\n\n.📖-crop-right {\n  right: 0; }\n\n.📖-crop-top, .📖-crop-bottom {\n  height: 1px; }\n  .📖-crop-top::before, .📖-crop-top:after, .📖-crop-bottom::before, .📖-crop-bottom:after {\n    width: 12pt;\n    height: 1px;\n    background-image: linear-gradient(to bottom, black 0%, black 51%, transparent 51%);\n    background-size: 100% 1px; }\n\n.📖-crop-top {\n  top: 0; }\n\n.📖-crop-bottom {\n  bottom: 0; }\n\n.📖-bleed-left, .📖-bleed-right {\n  width: 1px;\n  margin: auto; }\n  .📖-bleed-left::before, .📖-bleed-left:after, .📖-bleed-right::before, .📖-bleed-right:after {\n    width: 1px;\n    height: 12pt;\n    background-image: linear-gradient(to right, black 0%, black 51%, transparent 51%);\n    background-size: 1px 100%; }\n\n.📖-bleed-top, .📖-bleed-bottom {\n  height: 1px; }\n  .📖-bleed-top::before, .📖-bleed-top:after, .📖-bleed-bottom::before, .📖-bleed-bottom:after {\n    width: 12pt;\n    height: 1px;\n    background-image: linear-gradient(to bottom, black 0%, black 51%, transparent 51%);\n    background-size: 100% 1px; }\n\n@media screen {\n  .📖-viewing {\n    background: #f4f4f4 !important; }\n  .📖-root {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .📖-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    z-index: 99;\n    overflow: scroll;\n    visibility: hidden;\n    top: 0;\n    left: 0;\n    right: 240px;\n    bottom: 0; }\n    .📖-debug .📖-measure-area {\n      visibility: visible; }\n    .📖-measure-area .📖-page {\n      margin: 0 auto 50px; }\n  .📖-print-page {\n    margin: 0 auto; }\n  .📖-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    background: url(" + __webpack_require__(48) + ") no-repeat 0% 0%;\n    background-size: 48px;\n    padding-top: 64px; }\n    .📖-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .📖-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .📖-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .📖-show-bleed .📖-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .📖-letter-landscape {\n    width: 11in;\n    height: 8.5in; }\n  .📖-letter-portrait {\n    width: 8.5in;\n    height: 11in; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .📖-root * {\n    -webkit-print-color-adjust: exact;\n    color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .📖-viewing > :not(.📖-root) {\n    display: none !important; }\n  .📖-controls {\n    display: none !important; }\n  .📖-print-page {\n    padding: 1px;\n    /* prevent margin collapse */\n    margin: 0; }\n  .📖-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.📖-viewing {\n  margin: 0; }\n\n.📖-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.📖-viewing > :not(.📖-root):not(.📖-measure-area) {\n  display: none !important; }\n\n.📖-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden; }\n\n.📖-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.📖-print-page .📖-spread-wrapper {\n  margin: 0 auto; }\n\n.📖-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.📖-stage3d {\n  perspective: 3000px;\n  transform-style: preserve-3d; }\n\n.📖-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .📖-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .📖-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .📖-page3d .📖-page {\n    position: absolute;\n    backface-visibility: hidden; }\n  .📖-page3d .📖-page3d-front {\n    transform: rotateY(0); }\n    .📖-page3d .📖-page3d-front::after {\n      box-shadow: inset 12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n  .📖-page3d .📖-page3d-back {\n    transform: rotateY(-180deg); }\n    .📖-page3d .📖-page3d-back::after {\n      box-shadow: inset -12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n\n@media screen {\n  .📖-viewing .📖-controls {\n    display: block !important; } }\n\n.📖-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  padding-bottom: 100px; }\n  .📖-controls * {\n    font: inherit;\n    color: inherit;\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box; }\n\n.📖-title {\n  padding: 20px;\n  font-size: 18px; }\n\n.📖-spinner {\n  border: 1px solid transparent;\n  border-left-color: black;\n  width: 20px;\n  height: 20px;\n  border-radius: 50%;\n  margin-right: 0.5em;\n  display: none;\n  vertical-align: middle; }\n  .📖-in-progress .📖-spinner {\n    display: inline-block;\n    animation: spin 0.6s linear infinite; }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n.📖-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: #444;\n  border: none;\n  background: rgba(0, 0, 0, 0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  width: auto;\n  margin-right: 8px; }\n  .📖-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .📖-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .📖-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n\n.📖-btn-light {\n  background: none; }\n\n.📖-btn-main {\n  background: #0000d0;\n  color: white; }\n  .📖-btn-main:hover {\n    background: #0000d0;\n    opacity: 0.7; }\n  .📖-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.📖-in-progress .📖-btn-print {\n  opacity: 0.5;\n  pointer-events: none; }\n\n.📖-viewswitcher {\n  padding: 12px 8px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  z-index: 99;\n  width: 240px;\n  background: #f4f4f4; }\n\n.📖-viewmode {\n  height: 54px;\n  width: 25%;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 3px; }\n  .📖-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-viewmode .📖-icon {\n    height: 32px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .📖-viewmode.📖-grid .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(49) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-flip .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(50) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-outline .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(51) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-print .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(52) + ") no-repeat 50% 50%; }\n\n[bindery-view-mode='grid'] .📖-grid,\n[bindery-view-mode='interactive'] .📖-flip,\n[bindery-view-mode='outline'] .📖-outline,\n[bindery-view-mode='print'] .📖-print {\n  color: #0000d0; }\n\n.📖-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 4px 8px;\n  cursor: pointer; }\n  .📖-row select {\n    float: right;\n    border: none;\n    background: transparent;\n    padding: 12px;\n    width: 100px; }\n    .📖-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .📖-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    background: none; }\n    .📖-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .📖-row input:invalid {\n      color: #bf5656; }\n\n.📖-row.📖-debug-controls {\n  display: none; }\n  .📖-debug .📖-in-progress .📖-row.📖-debug-controls {\n    display: block; }\n\n.📖-expand-row {\n  color: rgba(0, 0, 0, 0.4);\n  font-weight: 500;\n  border-radius: 4px; }\n  .📖-expand-row:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-expand-row::after {\n    content: '+';\n    font-size: 1.5em;\n    padding: 0;\n    position: absolute;\n    right: 12px;\n    top: 2px;\n    font-weight: 300; }\n  .📖-expand-row.selected::after {\n    content: '\\2013'; }\n  .📖-expand-row.selected + .📖-expand-area {\n    opacity: 1;\n    max-height: 400px;\n    margin-bottom: 12px; }\n\n.📖-expand-area {\n  opacity: 0;\n  max-height: 0;\n  margin: -4px 8px 0;\n  border-radius: 0 0 4px 4px;\n  transition: max-height 0.3s, margin 0.3s, opacity 0.5s;\n  overflow: hidden; }\n  .📖-expand-area .📖-row {\n    margin: 4px 0; }\n\n.📖-size, .📖-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px; }\n\n.📖-size {\n  padding: 8px 0;\n  font-size: 12px; }\n  .📖-size div {\n    position: relative;\n    padding: 6px 12px;\n    color: #aaa; }\n\n.📖-layout-control {\n  margin: 4px 12px 8px; }\n\n.📖-margin {\n  overflow: hidden; }\n  .📖-margin > div {\n    position: absolute;\n    width: 54px;\n    height: 24px;\n    z-index: 5; }\n    .📖-margin > div:hover {\n      z-index: 99; }\n  .📖-margin .top {\n    left: 0;\n    right: 0;\n    margin: auto;\n    top: 0; }\n  .📖-margin .bottom {\n    left: 0;\n    right: 0;\n    margin: auto;\n    bottom: 0; }\n  .📖-margin .inner {\n    left: 0;\n    text-align: left;\n    top: calc(50% - 12px); }\n    .📖-margin .inner input {\n      text-align: left; }\n  .📖-margin .outer {\n    right: 0;\n    text-align: right;\n    top: calc(50% - 12px); }\n    .📖-margin .outer input {\n      text-align: right; }\n  .📖-margin .📖-preview {\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    border: 1px solid #a9a9ff;\n    height: auto;\n    width: auto;\n    z-index: 0;\n    pointer-events: none;\n    transition: border 0.2s; }\n\n.📖-margin input {\n  text-align: center;\n  padding: 4px;\n  font-size: 12px;\n  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white; }\n  .📖-margin input:focus {\n    background: none !important; }\n\n.📖-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0, 0, 0, 0.2);\n  border-radius: 8px;\n  margin-right: 5px;\n  vertical-align: middle;\n  float: right;\n  transition: all 0.2s;\n  position: relative; }\n  .📖-switch-handle {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    background: white;\n    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n    transition: all 0.2s;\n    position: absolute;\n    left: 0px;\n    top: 0px; }\n  .📖-switch:hover .📖-switch-handle {\n    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); }\n  .📖-switch:active .📖-switch-handle {\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); }\n\n.📖-row.selected .📖-switch {\n  background: rgba(0, 0, 208, 0.6); }\n\n.📖-row.selected .📖-switch-handle {\n  background: #0000d0;\n  left: 12px; }\n\n@media (max-width: 500px) {\n  .📖-root {\n    padding-right: 0; }\n  .📖-controls {\n    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);\n    left: 0;\n    width: unset;\n    padding-bottom: 2em;\n    top: unset; }\n  .📖-viewswitcher {\n    right: unset; }\n  .📖-measure-area {\n    right: 0; }\n  .📖-btn-main {\n    float: right; } }\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports) {
 
 /*
@@ -4472,37 +4500,37 @@ module.exports = function() {
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='36' height='36' viewBox='0 0 36 36' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cdefs%3E%3Cpath id='a' d='M0 4H15V27H0z'/%3E%3Cpath id='b' d='M15 4H30V27H15z'/%3E%3Cpath id='c' d='M14 4.07147535L27 0 27 22.9285247 14 27z'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23a'/%3E%3Cpath stroke='%23000000' d='M0.5 4.5H14.5V26.5H0.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23b'/%3E%3Cpath stroke='%23000000' d='M15.5 4.5H29.5V26.5H15.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23c'/%3E%3Cpath stroke='%23000000' d='M14.5,4.43882867 L14.5,26.3194563 L26.5,22.5611713 L26.5,0.680543732 L14.5,4.43882867 Z'/%3E%3C/g%3E%3Cpath fill='%23000000' opacity='.3' d='M16.3241613 26.7071852L25.7154453 22.615177 26.1596848 4.74924377 28 4.30920273 28 27z' transform='translate(3 2)'/%3E%3Ccircle fill='%23000000' cx='11' cy='14' r='1'/%3E%3Ccircle fill='%23000000' cx='11' cy='21' r='1'/%3E%3Cpath d='M28.1793786,11.0743011 C24.667534,11.0743011 21.8206214,13.9212136 21.8206214,17.4330583' stroke='%23000000' transform='rotate(-45 25 14.254)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M0.5 0.5H11.5V15.5H0.5z' transform='translate(5 8)'/%3E%3Cpath d='M22.5,15.5 L22.5,0.5' stroke-linecap='square' transform='translate(5 8)'/%3E%3Cpath d='M16.5,8.5 L16.5,23.5 L16.9093327,23.5 L24.5,20.6534998 L24.5,5.72150023 L17.1755617,8.46816459 L17,8.5 L16.5,8.5 Z'/%3E%3Cpath d='M27.5 23.5L16.5 23.5M24.5 8.5L27.5 8.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23000000'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3Cpath stroke='%23000000' d='M8.5 13.5H13.5V20.5H8.5z'/%3E%3Cpath fill='%23000000' d='M8 11H14V12H8z'/%3E%3Cpath stroke='%23000000' d='M19.5 13.5H24.5V20.5H19.5z'/%3E%3Cpath fill='%23000000' d='M19 11H25V12H19z'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M4.5 5.5H28.5V24.5H4.5z'/%3E%3Cpath d='M7.5 8.5L9.5 8.5M14.5 8.5L16.5 8.5M14.5 21.5L16.5 21.5M16.5 8.5L18.5 8.5M16.5 21.5L18.5 21.5M23.5 8.5L25.5 8.5M23.5 21.5L25.5 21.5M7.5 21.5L9.5 21.5M7.5 8.5L7.5 10.5M25.5 8.5L25.5 10.5M16.5 8.5L16.5 10.5M7.5 19.5L7.5 21.5M25.5 19.5L25.5 21.5M16.5 19.5L16.5 21.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, exports) {
 
 /*

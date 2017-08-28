@@ -34,11 +34,8 @@ $bleedOffset: $markOffset;
     overflow: hidden;
 
     &::before,
-    &:after {
+    &::after {
       content: "";
-      background: black;
-      width: $markLen;
-      height: $markLen;
       display: block;
       position: absolute;
     }
@@ -52,18 +49,36 @@ $bleedOffset: $markOffset;
   }
 
 }
-.#{$pre}-show-crop .#{$pre}-print-page .#{$pre}-spread-wrapper,
-.#{$pre}-show-bleed-marks .#{$pre}-print-page .#{$pre}-spread-wrapper {
-  margin: 30pt auto;
+
+@mixin vertical-mark {
+  &::before,
+  &:after {
+    width: 1px;
+    height: $markLen;
+    background-image: linear-gradient(to right, black 0%, black 51%, transparent 51%);
+    background-size: 1px 100%;
+  }
 }
+
+@mixin horizontal-mark {
+  &::before,
+  &:after {
+    width: $markLen;
+    height: 1px;
+    background-image: linear-gradient(to bottom, black 0%, black 51%, transparent 51%);
+    background-size: 100% 1px;
+  }
+}
+
 
 .#{$pre}-crop {
   &-fold,
   &-left,
   &-right {
-    transform: scaleX(0.5);
+    // transform: scaleX(0.5);
     width: 1px;
     margin: auto;
+    @include vertical-mark
   }
   &-fold { right: 0; left: 0; }
   &-left { left: 0; }
@@ -72,8 +87,9 @@ $bleedOffset: $markOffset;
 
   &-top,
   &-bottom {
-    transform: scaleY(0.5);
+    // transform: scaleY(0.5);
     height: 1px;
+    @include horizontal-mark
   }
 
   &-top {
@@ -87,15 +103,15 @@ $bleedOffset: $markOffset;
 .#{$pre}-bleed {
   &-left,
   &-right {
-    transform: scaleX(0.5);
     width: 1px;
     margin: auto;
+    @include vertical-mark
   }
 
 
   &-top,
   &-bottom {
-    transform: scaleY(0.5);
     height: 1px;
+    @include horizontal-mark
   }
 }

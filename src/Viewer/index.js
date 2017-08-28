@@ -1,10 +1,12 @@
 import h from 'hyperscript';
 import c from '../utils/prefixClass';
 
-import Page from '../Page';
 import Controls from '../Controls';
+import Page from '../Page';
 
 import errorView from './error';
+import orderPagesBooklet from './orderPagesBooklet';
+import padPages from './padPages';
 import { gridLayout, printLayout, flipLayout } from '../Layouts';
 
 const MODE_FLIP = 'interactive';
@@ -31,48 +33,12 @@ const setOrientationCSS = (newValue) => {
   document.head.appendChild(sheet);
 };
 
-const orderPagesBooklet = (pages) => {
-  while (pages.length % 4 !== 0) {
-    const spacerPage = new Page();
-    spacerPage.element.style.visibility = 'hidden';
-    pages.push(spacerPage);
-  }
-  const bookletOrder = [];
-  const len = pages.length;
-
-  for (let i = 0; i < len / 2; i += 2) {
-    bookletOrder.push(pages[len - 1 - i]);
-    bookletOrder.push(pages[i]);
-    bookletOrder.push(pages[i + 1]);
-    bookletOrder.push(pages[len - 2 - i]);
-  }
-
-  return bookletOrder;
-};
-
-const padPages = (pages) => {
-  if (pages.length % 2 !== 0) {
-    const pg = new Page();
-    pages.push(pg);
-  }
-  const spacerPage = new Page();
-  const spacerPage2 = new Page();
-  spacerPage.element.style.visibility = 'hidden';
-  spacerPage2.element.style.visibility = 'hidden';
-  pages.unshift(spacerPage);
-  pages.push(spacerPage2);
-
-  return pages;
-};
-
-
 class Viewer {
   constructor({ bindery }) {
     this.book = null;
 
     this.zoomBox = h(c('.zoom-wrap'));
-    const spinner = h(c('.spinner'));
-    this.element = h(c('.root'), this.zoomBox, spinner);
+    this.element = h(c('.root'), this.zoomBox);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_SPREAD;
@@ -92,6 +58,8 @@ class Viewer {
     this.setFlip = this.setFlip.bind(this);
 
     this.controls = new Controls({ binder: bindery, viewer: this });
+
+    this.element.classList.add(c('in-progress'));
 
     this.element.appendChild(this.controls.element);
     document.body.appendChild(this.element);
@@ -179,6 +147,7 @@ class Viewer {
   }
   clear() {
     this.book = null;
+    this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
     this.zoomBox.innerHTML = '';
   }
   cancel() {
@@ -251,15 +220,18 @@ class Viewer {
   }
   render() {
     if (!this.book) return;
+    const { body } = document;
+
     if (!this.element.parentNode) {
-      document.body.appendChild(this.element);
+      body.appendChild(this.element);
     }
 
     this.flaps = [];
-    document.body.classList.add(c('viewing'));
+    body.classList.add(c('viewing'));
     this.element.setAttribute('bindery-view-mode', this.mode);
 
-    const scrollPct = document.body.scrollTop / document.body.scrollHeight;
+    const scrollMax = body.scrollHeight - body.offsetHeight;
+    const scrollPct = body.scrollTop / scrollMax;
 
     if (this.mode === MODE_PREVIEW) {
       this.renderGrid();
@@ -273,8 +245,32 @@ class Viewer {
       this.renderGrid();
     }
 
-    document.body.scrollTop = document.body.scrollHeight * scrollPct;
+    body.scrollTop = scrollMax * scrollPct;
     this.updateZoom();
+  }
+
+  renderProgress() {
+    const twoPageSpread = function (...arg) {
+      return h(c('.spread-wrapper') + c('.spread-size'), ...arg);
+    };
+
+    this.book.pages.forEach((page, i) => {
+      if (!this.zoomBox.contains(page.element)) {
+        if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < 2) {
+          this.lastSpreadInProgress.appendChild(page.element);
+        } else {
+          if (i === 0) {
+            const spacer = new Page();
+            spacer.element.style.visibility = 'hidden';
+            this.lastSpreadInProgress = twoPageSpread(spacer.element, page.element);
+          } else {
+            this.lastSpreadInProgress = twoPageSpread(page.element);
+          }
+
+          this.zoomBox.appendChild(this.lastSpreadInProgress);
+        }
+      }
+    });
   }
 
   updateZoom() {
