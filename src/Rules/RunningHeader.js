@@ -17,9 +17,12 @@ class RunningHeader extends Rule {
     });
   }
   afterBind(page) {
-    const el = h(c('.running-header'));
-    el.innerHTML = this.render(page);
-    page.element.appendChild(el);
+    if (!page.runningHeader) {
+      const el = h(c('.running-header'));
+      page.element.appendChild(el);
+      page.runningHeader = el;
+    }
+    page.runningHeader.innerHTML = this.render(page);
   }
   render(page) {
     return page.number;

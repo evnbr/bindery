@@ -39,12 +39,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   const makeNewPage = () => {
     const newPage = new Page();
-    const shouldScroll = scrollPct(measureArea) > 0.9;
+    // const shouldScroll = scrollPct(measureArea) > 0.9;
     measureArea.appendChild(newPage.element);
-    if (shouldScroll) {
-      if (isDebugging) scrollToBottom(measureArea);
-      else measureArea.scrollTop = measureArea.scrollHeight;
-    }
+    // if (shouldScroll) {
+    //   if (isDebugging) scrollToBottom(measureArea);
+    //   else measureArea.scrollTop = measureArea.scrollHeight;
+    // }
 
     applyNewPageRules(newPage);
     return newPage;
@@ -462,6 +462,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const updatePaginationProgress = () => {
     annotatePages(state.pages);
     state.book.pages = state.pages;
+    afterBindRules(state.book);
     progress(state.book);
   };
 
