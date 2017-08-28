@@ -93,8 +93,9 @@
 }
 
 @media print {
-  .#{$pre}-root {
+  .#{$pre}-root * {
     -webkit-print-color-adjust: exact;
+    color-adjust: exact;
   }
 
   /* Don't print anything that hasn't been exported. This hides extra controls/ */
@@ -107,6 +108,7 @@
   }
 
   .#{$pre}-print-page {
+    padding: 1px;   /* prevent margin collapse */
     margin: 0;
   }
 

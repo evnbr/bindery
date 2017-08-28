@@ -145,8 +145,7 @@
 }
 
 .#{$pre}-content {
-  /* hack to prevent margin collapse, leading to wrong height */
-  padding: 0.1px;
+  padding: 0.1px;   /* prevent margin collapse */
   position: relative;
 }
 
