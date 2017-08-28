@@ -271,6 +271,7 @@ class Viewer {
         }
       }
     });
+    this.updateZoom();
   }
 
   updateZoom() {
