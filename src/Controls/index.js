@@ -166,7 +166,8 @@ class Controls {
 
     const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
 
-    const header = title('Loading...');
+    const headerContent = h('span', 'Loading');
+    const header = title(h(c('.spinner')), headerContent);
 
     const updateLayoutPreview = (newSize, newMargin) => {
       const px = {
@@ -211,18 +212,18 @@ class Controls {
     updateLayoutPreview(this.binder.styler.size, this.binder.styler.margin);
 
     this.setInProgress = () => {
-      header.textContent = 'Paginating...';
+      headerContent.textContent = 'Paginating';
       validCheck.style.display = 'none';
       inProgress.style.display = '';
       forceRefresh.style.display = 'none';
     };
 
     this.updateProgress = (count) => {
-      header.textContent = `${count} Pages...`;
+      headerContent.textContent = `${count} Pages`;
     };
 
     this.setDone = () => {
-      header.textContent = `${viewer.book.pages.length} Pages`;
+      headerContent.textContent = `${viewer.book.pages.length} Pages`;
       inProgress.style.display = 'none';
       forceRefresh.style.display = '';
       validCheck.style.display = 'none';
@@ -343,10 +344,7 @@ class Controls {
     // if (this.binder.debug) debugToggle.classList.add('selected');
 
     this.element = h(c('.controls'),
-      row(
-        h(c('.spinner')),
-        header
-      ),
+      header,
       arrangement,
       // paperSize,
       orientation,

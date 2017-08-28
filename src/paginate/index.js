@@ -88,8 +88,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       }
     }
 
-    state.book.pages = state.pages;
-    progress(state.book);
+    updatePaginationProgress();
 
     return newPage;
   };
@@ -458,6 +457,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     };
     // kick it off
     addNext();
+  };
+
+  const updatePaginationProgress = () => {
+    annotatePages(state.pages);
+    state.book.pages = state.pages;
+    progress(state.book);
   };
 
   const finishPagination = () => {

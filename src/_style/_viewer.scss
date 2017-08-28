@@ -39,27 +39,6 @@
      margin: 0 auto;
    }
 
-   .#{$pre}-spinner {
-     border: 2px solid transparent;
-     border-left-color: $accent;
-     width: 32px;
-     height: 32px;
-     border-radius: 50%;
-     position: absolute;
-     top: 0;
-     left: 0;
-     bottom: 0;
-     right: 0;
-     margin: auto;
-     z-index: 999;
-     opacity: 0;
-   }
-
-   .#{$pre}-in-progress .#{$pre}-spinner {
-     opacity: 1;
-     animation: spin 0.6s linear infinite;
-   }
-
    .#{$pre}-error {
      font: 16px / 1.4 $system;
      margin: 15vh 15vw;
@@ -107,10 +86,6 @@
 @keyframes fadeUp {
   0%   { opacity: 0; }
   100% { opacity: 1; }
-}
-@keyframes spin {
-  0%   { transform: rotateZ(0); }
-  100% { transform: rotateZ(360deg); }
 }
 
 @page {

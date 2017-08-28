@@ -145,6 +145,7 @@ class Bindery {
 
     // In case we're updating an existing layout
     this.viewer.clear();
+
     document.body.classList.add(c('viewing'));
     this.viewer.element.classList.add(c('in-progress'));
     if (this.debug) document.body.classList.add(c('debug'));
@@ -171,7 +172,7 @@ class Bindery {
         this.viewer.renderProgress();
       },
       error: (error) => {
-        document.body.classList.remove(c('in-progress'));
+        this.viewer.element.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
       },
       isDebugging: this.debug,
