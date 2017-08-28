@@ -3,11 +3,13 @@
 
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Bindery Ex 6 — Wikipedia Content</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
+	<script type="text/javascript" src='/bindery/js/viewExampleSource.js'></script>
 	<script type="text/javascript" src="/bindery/js/bindery.js"></script>
 	<script type="text/javascript" src="getArticle.js"></script>
 	<script>
@@ -20,6 +22,7 @@
 					Bindery.PageBreak({ selector: '.vertical-navbox', position: 'before', continue: 'right' }),
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
 					Bindery.PageBreak({ selector: 'tr', position: 'avoid' }),
+					// Bindery.FullBleedSpread({ selector: '.thumb', continue: 'same' }),
 					Bindery.Replace({
 						selector: '.navbox-list a[href]',
 						replace: (element) => {
@@ -83,8 +86,8 @@
 			  ],
 			});
 		});
-
-
 	</script>
+
+	<script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
 </body>
 </html>

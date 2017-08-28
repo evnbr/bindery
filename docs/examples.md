@@ -12,9 +12,8 @@ order: 3
 <ul>
 {% for ex in site.data.examples.simple %}
   <li>
-      <a href="/bindery/example-viewer/#{{ ex.id }}">{{ ex.title | escape }}</a>
-      <!-- <a href="https://github.com/evnbr/bindery/tree/master/docs/{{ ex.id }}">Source</a> -->
-      {{ ex.desc | escape }}
+      <a href="/bindery/examples/{{ ex.id }}">{{ ex.title | escape }}</a>
+      <div>{{ ex.desc | escape }}</div>
   </li>
 {% endfor %}
 </ul>
@@ -24,9 +23,8 @@ order: 3
 <ul>
 {% for ex in site.data.examples.advanced %}
   <li>
-      <a href="/bindery/example-viewer/#{{ ex.id }}">{{ ex.title | escape }}</a>
-      <!-- <a href="https://github.com/evnbr/bindery/tree/master/docs/{{ ex.id }}">Source</a> -->
-      {{ ex.desc | escape }}
+    <a href="/bindery/examples/{{ ex.id }}">{{ ex.title | escape }}</a>
+    <div>{{ ex.desc | escape }}</div>
   </li>
 {% endfor %}
 </ul>
