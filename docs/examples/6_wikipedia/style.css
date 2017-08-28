@@ -32,6 +32,19 @@ h4 {
   font-weight: 400;
 }
 
+.thumb, .thumbinner, .thumbinner a {
+  display: block;
+  width: unset !important;
+  height: 100%;
+}
+.thumbinner img {
+  height: 100%;
+  width: unset !important;
+  margin: auto;
+  display: block;
+}
+
+
 #toc ul {
   list-style: none;
   padding-left: 1rem;
