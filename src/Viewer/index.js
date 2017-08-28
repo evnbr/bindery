@@ -59,6 +59,8 @@ class Viewer {
 
     this.controls = new Controls({ binder: bindery, viewer: this });
 
+    this.element.classList.add(c('in-progress'));
+
     this.element.appendChild(this.controls.element);
     document.body.appendChild(this.element);
   }
@@ -217,15 +219,18 @@ class Viewer {
   }
   render() {
     if (!this.book) return;
+    const { body } = document;
+
     if (!this.element.parentNode) {
-      document.body.appendChild(this.element);
+      body.appendChild(this.element);
     }
 
     this.flaps = [];
-    document.body.classList.add(c('viewing'));
+    body.classList.add(c('viewing'));
     this.element.setAttribute('bindery-view-mode', this.mode);
 
-    const scrollPct = document.body.scrollTop / document.body.scrollHeight;
+    const scrollMax = body.scrollHeight - body.offsetHeight;
+    const scrollPct = body.scrollTop / scrollMax;
 
     if (this.mode === MODE_PREVIEW) {
       this.renderGrid();
@@ -239,7 +244,7 @@ class Viewer {
       this.renderGrid();
     }
 
-    document.body.scrollTop = document.body.scrollHeight * scrollPct;
+    body.scrollTop = scrollMax * scrollPct;
     this.updateZoom();
   }
 
