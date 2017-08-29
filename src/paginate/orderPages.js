@@ -7,6 +7,21 @@ const indexOfNextInFlowPage = (pages, startIndex) => {
   return startIndex;
 };
 
+// Given an array of pages with alwaysLeft, alwaysRight, and isOutOfFlow
+// properties.
+//
+// Orders them so that alwaysLeft and alwaysRight are true.
+
+// If the page is 'in flow', order must be respected, so extra blank pages
+// are inserted.
+//
+// If the page is 'out of flow', we'd prefer not to add a blank page.
+// Instead it floats backwards in the book, pulling the next
+// in-flow page forward. If several 'out of flow' pages
+// are next to each other, they will remain in order, all being pushed
+// backward together.
+
+
 const orderPages = (pages, makeNewPage) => {
   const orderedPages = pages.slice();
 
@@ -14,16 +29,7 @@ const orderPages = (pages, makeNewPage) => {
     const page = orderedPages[i];
     const isLeft = i % 2 !== 0;
 
-    if (isLeft && page.alwaysRight) {
-      if (page.isOutOfFlow) {
-        const indexToSwap = indexOfNextInFlowPage(orderedPages, i + 1);
-        const pageToMoveUp = orderedPages[indexToSwap];
-        orderedPages.splice(indexToSwap, 1);
-        orderedPages.splice(i, 0, pageToMoveUp);
-      } else {
-        orderedPages.splice(i, 0, makeNewPage());
-      }
-    } else if (!isLeft && page.alwaysLeft) {
+    if ((isLeft && page.alwaysRight) || (!isLeft && page.alwaysLeft)) {
       if (page.isOutOfFlow) {
         const indexToSwap = indexOfNextInFlowPage(orderedPages, i + 1);
         const pageToMoveUp = orderedPages[indexToSwap];
