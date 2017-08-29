@@ -271,8 +271,8 @@ $accent-light: rgba(5, 0, 154, 0.4);
 .logo {
   width: 32px;
   height: 32px;
-  background: url(logo.svg) no-repeat;
-  background-size: contain;
+  -webkit-mask: url(logo.svg) no-repeat 50% 50%;
+  background: currentColor;
   vertical-align: middle;
   margin-right: 0.8rem;
   display: inline-block;
@@ -404,6 +404,7 @@ pre, code {
   .logo {
     height: 40px;
     width: 40px;
+    -webkit-mask-size: 40px;
   }
 }
 
