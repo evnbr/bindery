@@ -1,34 +1,32 @@
 ---
 layout: page
-title:  Intro
+title:  Introduction
+shortTitle: Intro
 permalink: /intro/
 order: 0
 ---
 
 <!-- ## Intro -->
 
-Welcome.
+### Getting Started
 
-If you're a web designer, bindery.js lets you think about books as an extension of responsive design. If you're a print designer, it enables you to express book layout programmatically, without giving up capabilities you know from InDesign.
-
-
-### Setup
-
-Just include the script in the same file as your content, and you're ready to go.
+Welcome. Bindery is intended for web designers and developers of every skill level—you don't
+need any prior javascript experience. Just include the script tag in the same <span class='sc'>html</span> file as your content, and you're ready to go. Like this:
 
 {% highlight html %}
 <div class="content">
   <!-- The contents of your book -->
 </div>
 
-<script src="./bindery.min.js"></script>
+<script src="js/bindery.min.js"></script>
 <script>
   Bindery.makeBook({ source: '.content' });
 </script>
 {% endhighlight %}
 
-Use your usual web CSS however you choose. When printing, `96px = 1in`.
-If you add book-specific styles, note that CSS supports print measurements
+Use your usual web CSS however you choose—96 CSS pixels equals 1 CSS inch.
+
+If you add book-specific styles, don't forget that CSS supports print measurements
 like points (`pt`), pica (`pc`), inches (`in`), and millimeters (`mm`).
 You'll want to steer clear of viewport-specific units like `vh` or `vw`.
 
@@ -49,10 +47,8 @@ file. You can fetch it by passing in the URL, like this.
 </script>
 {% endhighlight %}
 
-Keep in mind, your browser won't fetch content from a different URL,
-because that wouldn't be secure. So make sure your page is on server if
-this doesn't work. (Not sure? If the URL says
-`file://`, you aren't using a server).
+Keep in mind, your browser won't fetch content from a different web server
+(since that wouldn't be secure). Make sure you're loading both your current file and your content file from a web server. (Tip: If the URL says `file://`, you aren't using a server).
 
 ### Preparing Content
 
@@ -104,11 +100,11 @@ Bindery.makeBook({
 ### Rules and Options
 
 Rules have options that customize their behavior. Sometimes the options
-are simple, like passing the string `'before'` to `PageBreak`.
+are simple, like `position: 'before'` in `PageBreak` above.
 
-For rules that create new elements on the page, you can pass in your own function.
-You can use whatever tools you like as long as you return an HTML element, or
-the text to display.
+For rules that create new elements on the page, you'll want to be more specific. (This part requires knowing a little bit of javascript). You do so
+by passing in your own function. You can use whatever tools you like as long as you return
+an HTML element, or the text to display.
 
 
 {% highlight javascript %}
@@ -136,6 +132,36 @@ Bindery.makeBook({
 });
 
 {% endhighlight %}
+
+In the example above, we return a string. For complete control, we can create an
+element ourselves in javascript.
+
+{% highlight javascript %}
+// String
+render: (element, number) => {
+  return number + ': Link to ' + element.href;
+}
+
+// document.createElement
+render: (element, number) => {
+  let myFootnoteEl = document.createElement('div');
+  myFootnoteEl.classList.add('my-footnote')
+  myFootnoteEl.textContent = number + ': Link to ' + element.href;
+  return myFootnoteEl;
+}
+
+// jQuery
+render: (element, number) =>  {
+  return  $('<div class="my-footnote">' + number + ': Link to ' + element.href + '</div>');
+}
+
+// hyperscript
+render: (element, number) => {
+  return h('.my-footnote', number + ': Link to ' + element.href);
+}
+
+{% endhighlight %}
+
 
 
 ### Next Steps

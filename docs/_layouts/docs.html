@@ -5,8 +5,6 @@ layout: default
   <div id="docs-top" class="post-content docs-content">
   </div>
 
-  <div class="docs-scroll-back"><a href="#">↑</a></div>
-
   <nav class="docs-nav">
       <!-- <h2>{{ page.title | escape }}</h1> -->
 
@@ -35,19 +33,19 @@ layout: default
         <a href="#components">Components</a>
         <div class="nav-sub">
           <div class="docs-nav-item docs-nav-subitem">
-            <a href="#binderypagebreak">Page Breaks</a>
+            <a href="#pagebreak">Page Breaks</a>
           </div>
           <div class="docs-nav-item docs-nav-subitem">
-            <a href="#binderyrunningheader">Running Headers</a>
+            <a href="#runningheader">Running Headers</a>
           </div>
           <div class="docs-nav-item docs-nav-subitem">
-            <a href="#binderyfootnote">Footnotes</a>
+            <a href="#footnote">Footnotes</a>
           </div>
           <div class="docs-nav-item docs-nav-subitem">
-            <a href="#binderyfullbleedpage">Full-bleed Pages</a>
+            <a href="#fullbleedpage">Full-bleed Pages</a>
           </div>
           <div class="docs-nav-item docs-nav-subitem">
-            <a href="#binderyfullbleedspread">Full-bleed Spreads</a>
+            <a href="#fullbleedspread">Full-bleed Spreads</a>
           </div>
         </div>
       </div>
@@ -81,31 +79,5 @@ layout: default
   <div class="post-content docs-content">
     {{ content }}
   </div>
-
-  <script>
-    let anchors = Array.from(document.querySelectorAll('h3, h4, h5'));
-    let currentAnchor;
-    let updateAnchor = () => {
-      let inview = anchors.find((el) => el.offsetTop > document.body.scrollTop);
-      let newAnchor = document.querySelector(`[href='#${inview.id}']`);
-      console.log(`[href='#${inview.id}]'`);
-      if (newAnchor && newAnchor !== currentAnchor) {
-        if (currentAnchor) currentAnchor.classList.remove('selected');
-        newAnchor.classList.add('selected');
-        currentAnchor = newAnchor;
-      }
-    };
-    updateAnchor();
-    let throttle;
-    window.addEventListener('scroll', () => {
-      if (!throttle) {
-        throttle = setTimeout(() => {
-          clearTimeout(throttle);
-          throttle = null;
-          updateAnchor()
-        }, 50)
-      }
-    });
-  </script>
 
 </article>

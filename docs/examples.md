@@ -1,6 +1,7 @@
 ---
 layout: page
 title:  Examples
+shortTitle: Examples
 permalink: /examples/
 order: 3
 ---

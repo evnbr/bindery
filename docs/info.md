@@ -1,6 +1,7 @@
 ---
 layout: page
-title:  Notes
+title:  About
+shortTitle: About
 permalink: /notes/
 order: 4
 ---
@@ -11,17 +12,15 @@ order: 4
 
 Computer printers predate computer screens.
 
-### Bindery is not trying to be...
+### What bindery is not
 
 1. InDesign — Bindery is for people who are interested in creating layouts
 programmatically. It's not a graphical user interface (though you could build one around it).
 2. A PDF generator — Bindery assumes you're printing straight from
   the browser. If you want to adjust a PDF setting, your browser must support it—for
   example, you must use a page size provided by your browser's print dialog.
-3. [LaTeX](https://www.latex-project.org/) — Bindery is intended to let everyone who knows web standards (or is learning)
-  to design books. It takes advantage of all the existing tools and documentation—browsers, text editor, web inspectors,
-  etc. LaTeX is its own layout system and language for technical users.
-
+3. [LaTeX](https://www.latex-project.org/) — LaTeX is its own layout system and language for technical users. Bindery is intended to let everyone who knows web standards (or is learning) to design books. It takes advantage of all the existing tools and documentation—browsers, text editors, web inspectors, etc.
+4. [CSS Regions]() - CSS Regions was an ill-fated Adobe-led effort to support magazine-like layouts on the web. A polyfill is available [here](https://github.com/FremyCompany/css-regions-polyfill). Bindery's pagination code is much more limited— it doesn't interpret your CSS rules, assumes there's only one flow per page, and assumes you're going to print it.
 
 
 ### Background

@@ -1,15 +1,16 @@
 ---
 layout: docs
-title:  Docs
+title:  Documentation
+shortTitle: Docs
 permalink: /docs/
 order: 2
 ---
 
 ### Setup
 
-##### `Bindery.makeBook(options)`
-The only method you'll need. On page load, create a book and display it. Takes an
-object of options as listed below.
+##### `Bindery.makeBook({ options })`
+Creates a book and displays it immediately on page load.
+It takes an object of options as listed below.
 
 {% highlight javascript %}
 Bindery.makeBook({
@@ -17,15 +18,13 @@ Bindery.makeBook({
 });
 {% endhighlight %}
 
-The above is a shortcut for the following, which you may want to use if you're
+Note that the above is a shortcut for the following, which you may want to use if you're
 integrating Bindery with your own UI.
 
 {% highlight javascript %}
 let bindery = new Bindery({
   source: '#content',
 });
-
-...
 
 // Later, in your own event handler
 bindery.makeBook();
@@ -41,10 +40,10 @@ Bindery.makeBook({
   source: '#content',
 });
 
-// Node reference
-let node = document.getElementByID('content');
+// HTMLElement
+let el = document.getElementByID('content');
 Bindery.makeBook({
-  source: node,
+  source: el,
 });
 
 // Fetch from a URL
@@ -84,8 +83,8 @@ Bindery.makeBook({
 
 ##### `bleed`
 Amount of bleed, with absolute CSS units. This sets the position of bleed and
-crop marks, and will affect the size of [full-bleed pages](#binderyfullbleedpage)
-and [spreads](#binderyfullbleedspread)
+crop marks, and will affect the size of [full-bleed pages](#fullbleedpage)
+and [spreads](#fullbleedspread)
 if they are set to `width: 100%; height: 100%;`
 
 {% highlight js %}
@@ -128,7 +127,7 @@ Bindery.makeBook({
 
 ### Components
 
-##### `Bindery.PageBreak`
+##### `PageBreak`
 Adds or avoids page breaks for the selected element.
 - `selector:` Which elements the rule should be applied to.
 - `position:`
@@ -151,7 +150,7 @@ Bindery.PageBreak({
 {% endhighlight %}
 
 
-##### `Bindery.RunningHeader`
+##### `RunningHeader`
 An element added to each page. By default it will add a page number
 at the top right of each page, but you can use `render` to generate running
 headers using your section titles. Keep in mind you can also use multiple
@@ -175,7 +174,7 @@ Bindery.RunningHeader({
 })
 {% endhighlight %}
 
-##### `Bindery.Footnote`
+##### `Footnote`
 Add a footnote to the bottom of the flow area. Footnotes cut into the area for
 text, so note that very large footnotes may bump the entire element to the
 next page.
@@ -190,13 +189,13 @@ the number as a superscript after the original element. `Optional`
 {% highlight js %}
 Bindery.Footnote({
   selector: 'p > a',
-  render: function(element, number) {
+  render: (element, number) => {
     return '<i>' + number + '</i>: Link to ' + element.href;
   }
 }),
 {% endhighlight %}
 
-##### `Bindery.FullBleedPage`
+##### `FullBleedPage`
 Removes the selected element from the ordinary flow of the book and places it on its own
 page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
 - `selector:` Which elements the rule should be applied to.
@@ -220,8 +219,8 @@ Bindery.FullBleedPage({
 }),
 {% endhighlight %}
 
-##### `Bindery.FullBleedSpread`
-The same as [`FullBleedPage`](#binderyfullbleedpage), but places the element across two pages.
+##### `FullBleedSpread`
+The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
 - `selector:` Which elements the rule should be applied to.
 - `continue:` Where to resume the book flow after adding the
 full bleed element
@@ -242,24 +241,24 @@ Bindery.FullBleedSpread({
 }),
 {% endhighlight %}
 
-##### `Bindery.Continuation`
+##### `Continuation`
 If you want to customize the design when an element splits across two pages. [See example](/bindery/example-viewer/#7_custom_continuation).
-- `selector` Which elements the rule should be applied to.
-- `hasContinuationClass` Applied to elements that will continue onto the next page. `Optional`
-- `isContinuationClass` Applied to elements that started on a previous page. `Optional`
+- `selector:` Which elements the rule should be applied to.
+- `toNext:` Class applied to elements that will continue onto the next page. `Optional`
+- `fromPrevious:` Class applied to elements that started on a previous page. `Optional`
 
 {% highlight js %}
 Bindery.Continuation({
   selector: 'p',
-  hasContinuationClass: 'my-continues',
-  isContinuationClass: 'my-from',
+  toNext: 'my-continues',
+  fromPrevious: 'my-from',
 }),
 {% endhighlight %}
 
 
 ### Referencing Pages
 
-##### `Bindery.PageReference`
+##### `PageReference`
 Use PageReference to create a table of contents, index, endnotes, or anywhere
 you might otherwise use anchor links or in-page navigation on the web.
 - `selector:` Which elements the rule should be applied to.

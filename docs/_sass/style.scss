@@ -2,27 +2,42 @@
 
 // Define defaults for each variable.
 
+@font-face {
+  font-family: 'Plantin';
+  src: url('plantin.woff2');
+}
+
 $black: black;
 $accent: #0000d0;
 $accent-dark: navy;
 
-$sidebar-width: 16rem;
+$string: #b93b5a;
+$keyword: purple;
+
+$sidebar-width: 11rem;
 
 $roomForDocsSideNav: 50rem;
 $narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
-$serif: Minion Pro, Adobe Caslon Pro, Caslon Times, Times New Roman, serif;
+// $serif: Plantin, Minion Pro, Adobe Caslon Pro, Caslon, Times, Times New Roman, serif;
+$serif: Times, Times New Roman, serif;
 
 * {
   margin: 0;
   padding: 0;
   font: inherit;
   box-sizing: border-box;
+  text-indent: 0;
 }
 
 html {
-  font: 16px/1.4 $system;
+  // font: 16px/1.4 $system;
+  font: 24px/1.35 $serif;
+  font: 24px/1.5 Tiempos Headline Test, Minion Pro, Adobe Caslon Pro, Caslon, Times, Times New Roman, serif;
+  // font: 20px/1.7 Copernicus, Minion Pro, Adobe Caslon Pro, Caslon, Times, Times New Roman, serif;
+  letter-spacing: 0.007em;
+  font-weight: 300;
 }
 
 body {
@@ -43,52 +58,52 @@ em {
   font-style: italic;
 }
 
-.post-content {
-  font: 24px / 1.4 $serif;
-}
+// .post-content {
+//   font: 24px / 1.4 $serif;
+// }
 
 
 .sc {
-  font-feature-settings: "smcp";
-  // text-transform: uppercase;
-  // font-size: 0.9em;
+  // font-feature-settings: "smcp";
+  text-transform: uppercase;
+  font-size: 0.95em;
 }
 
 .post-content .btn {
-  font: 14px/1.4 $system;
+  font: 0.6rem/1.4 $system;
   display: inline-block;
-  padding: 0.6rem 1rem;
-  border-radius: 2px;
-  border: 1px solid $black;
+  padding: 0.4rem 0.7rem 0.45rem;
+  border-radius: 3px;
+  border: 1px solid currentColor;
   color: $black;
   background: transparent;
-  font-weight: 500;
+  font-weight: 400;
   text-shadow: none;
   margin-right: 0.5rem;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 
   &:hover {
-    color: white;
-    border-color: $accent;
-    background: $accent;
+    // color: white;
+    color: $accent;
     opacity: 1;
+    background: transparent;
+  }
+  &:active {
+    opacity: 0.5;
   }
 }
 
 .post-content p {
-  margin-bottom: 1.35rem;
-  // text-indent: 4rem;
-  // &:first-child {
-  //   text-indent: 0;
-  // }
+  // margin-bottom: 1.35rem;
+  & + p {
+    text-indent: 1.5em;
+  }
 }
+
 a {
   color: black;
   text-decoration: none;
-  &:hover {
-    opacity: 0.6;
-  }
   &:active {
     opacity: 0.4;
   }
@@ -98,14 +113,17 @@ li {
   margin-left: 2rem;
 }
 
-$accent-light: rgba(5, 0, 154, 0.4);
 .post-content a {
-  color: $accent;
+  // color: $accent;
   text-shadow: 2px 0 0 white, -2px 0 0 white, 0 2px 0 white;
-  background-image: linear-gradient(to bottom, $accent-light 50%,rgba(0,0,0,0) 50%);
+  background-image: linear-gradient(to bottom, black 50%,rgba(0,0,0,0) 50%);
   background-repeat: repeat-x;
-  background-size: 2px .1em;
-  background-position: 0 1.06em;
+  background-size: 2px .06em;
+  background-position: 0 0.9em;
+  &:hover {
+    color: $accent;
+    background-image: linear-gradient(to bottom, $accent 50%,rgba(0,0,0,0) 50%);
+  }
 }
 
 
@@ -115,19 +133,21 @@ $accent-light: rgba(5, 0, 154, 0.4);
   // padding: 0 1rem;
 }
 
+.short-title {
+  display: none;
+}
+
 .page-content {
   margin: 0 5%;
 }
 
 .post-content {
-  max-width: 50rem;
+  max-width: 35rem;
 }
 
 .site-header {
   position: relative;
   margin-top: 1rem;
-  font-weight: 400;
-  font: 24px $serif;
 }
 
 .site-footer {
@@ -140,7 +160,6 @@ $accent-light: rgba(5, 0, 154, 0.4);
   display: inline-block;
   position: relative;
   margin-right: 1.5rem;
-  font-weight: 600;
 
   &:last-child {
     margin-right: 0;
@@ -149,7 +168,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
   &.nav-active a {
     // color: $accent;
 
-    &::after {
+    &::before {
       content: '';
       background: currentColor;
       position: absolute;
@@ -164,30 +183,40 @@ $accent-light: rgba(5, 0, 154, 0.4);
   }
 }
 
-.docs-scroll-back {
-  display: block;
-  position: sticky;
-  top: 1rem;
+.scroll-back {
+  position: fixed;
+  top: 5rem;
+  left: calc(5% + 0.1rem);
   text-align: right;
-  z-index: 99;
-  float: right;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+  transform: scale(0.8) ;
+  .docs-scrolled & {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+    pointer-events: all;
+  }
   a {
     color: black;
-    font-size: 1.5rem;
+    font-family: $system;
+    font-size: 1rem;
     text-align: center;
     display: inline-block;
-    line-height: 3rem;
-    width: 3rem;
-    height: 3rem;
+    line-height: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
     border-radius: 50%;
+    // box-shadow: inset 0 0 0 0.8px black;
     &:hover {
-      background: #eee;
-      opacity: 1;
+      color: $accent;
     }
   }
 }
 
 .docs-nav {
+  // font: 0.7rem / 1.5 $system;
   background: white;
   z-index: 99;
   position: relative;
@@ -200,7 +229,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
       opacity: 1;
     }
   }
-  .selected::after {
+  .selected::before {
     content: '';
     background: currentColor;
     position: absolute;
@@ -212,10 +241,14 @@ $accent-light: rgba(5, 0, 154, 0.4);
   }
 }
 
+.docs-content p + ul {
+  margin-top: 1.5rem;
+}
+
 .docs-content ul {
   list-style: none;
   padding: 0;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .docs-content ul li {
@@ -223,37 +256,42 @@ $accent-light: rgba(5, 0, 154, 0.4);
   position: relative;
 }
 
+
 .docs-content li li {
   margin: 0;
-  text-indent: 5em hanging;
   code:first-child {
-    color: #d14;
+    color: $string;
     display: inline-block;
     margin-right: 0.5em;
   }
 }
 
-
 .docs-content > ul > li > code:first-child {
-  color: #008080;
+  // color: #008080;
   font-weight: 500;
-  width: 7.5rem;
-  line-height: 2rem;
   position: relative;
   left: -1.5rem;
   display: block;
+}
+.docs-content > ul > li {
+  margin: 0 0 1rem 7rem;
+}
+.docs-content > ul > li > code:first-child {
+  position: absolute;
+  left: -7rem;
 }
 
 
 .docs-nav-item {
   position: relative;
   margin-bottom: 1rem;
-  font-weight: 600;
+  // font-weight: 600;
+  font-style: italic;
 }
 .docs-nav-subitem {
-  font-weight: 400;
+  // font-weight: 400;
+  font-style: normal;
   margin-bottom: 0 !important;
-  padding-bottom: 0.5rem;
   &:last-child {
     // margin-bottom: 1rem !important;
     padding-bottom: 0;
@@ -271,7 +309,7 @@ $accent-light: rgba(5, 0, 154, 0.4);
 .logo {
   width: 32px;
   height: 32px;
-  -webkit-mask: url(logo.svg) no-repeat 50% 50%;
+  -webkit-mask: url(logo32.svg) no-repeat 50% 50%;
   background: currentColor;
   vertical-align: middle;
   margin-right: 0.8rem;
@@ -282,9 +320,17 @@ $accent-light: rgba(5, 0, 154, 0.4);
   font-weight: 400;
 }
 
+.site-nav {
+  transition: opacity 0.25s;
+}
+
+.docs-scrolled .site-nav {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .site-header a {
   color: $black;
-  font-weight: 500;
   &:hover {
     color: $accent;
     opacity: 1;
@@ -302,18 +348,17 @@ figure > img {
 
 h1 {
   // font-size: 5.5rem;
-  font-size: 11vw;
-  // font-size: 4rem;
+  font-size: 8vw;
+  // font-size: 2.5rem;
   width: 90vw;
-  line-height: 0.95;
+  line-height: 1.1;
   margin: 2rem 0;
-  font-family: $serif;
   // font-family: $system;
-  letter-spacing: -0.005em;
+  // letter-spacing: -0.005em;
+  // font-style: italic;
 }
 
 h2 {
-  font-family: $serif;
   font-size: 3rem;
   padding: 0 0 3rem;
   // background-image: linear-gradient(to bottom, black 50%,rgba(0,0,0,0) 50%);
@@ -327,8 +372,9 @@ h2 {
 h3 {
   // font: 2rem/1.5 $system;
   // font-weight: 500;
-  font: 1rem/1.5 $system;
-  font-weight: 600;
+  // font: 0.8rem/1.5 $system;
+  // font-weight: 500;
+  font-style: italic;
 
   padding-top: 3rem;
   padding-bottom: 1.5rem;
@@ -357,20 +403,17 @@ blockquote {
  * Code formatting
  */
 pre, code {
-  line-height: 1.5rem;
-  font-family: "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-  font-size: 1.1rem;
+  line-height: 1.1rem;
+  font-family: Input, "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+  letter-spacing: -0.02em;
+  font-size: 0.9rem;
 }
 
 
 
 @media (max-width: $narrow) {
   html {
-    // font-size: 12px;
-  }
-  pre, code {
-    font-size: 0.9rem;
-    line-height: 1.4rem;
+    font-size: 20px;
   }
   .site-nav {
     margin: 1rem 0;
@@ -378,9 +421,6 @@ pre, code {
   }
   .nav-item {
     margin-right: 1em;
-  }
-  .site-header, .post-content {
-    font-size: 20px;
   }
   h1 {
     font-size: 3rem;
@@ -399,12 +439,14 @@ pre, code {
   .site-nav {
     position: absolute;
     left: $sidebar-width;
-    top: 0.35rem;
+    left: 4rem;
+    top: 0;
   }
   .logo {
     height: 40px;
     width: 40px;
     -webkit-mask-size: 40px;
+    -webkit-mask: url(logo40.svg) no-repeat 50% 50%;
   }
 }
 
@@ -412,34 +454,38 @@ pre, code {
   .page-content {
     margin-top: 2rem;
   }
+  .short-title {
+    display: block;
+  }
+  .long-title {
+    display: none;
+  }
   .docs-nav-item {
     // box-shadow: inset 0 0.5px grey;
-    padding: 0.6rem 0 0.7rem;
+    // padding: 0.6rem 0 0.7rem;
     margin: 0;
-    font-weight: 600;
     max-width: 30rem;
   }
   .docs-nav-item a {
     display: block;
-    // display: inline-block;
-    // width: 45%;
-    // max-width: 16em;
   }
   .nav-sub {
-    padding-top: 0.5rem;
+    padding-bottom: 1.5rem;
     display: inline-block;
     vertical-align: top;
   }
   .docs-nav-subitem {
-    font-weight: 400;
     padding-top: 0;
     box-shadow: none;
     display: block;
     width: auto;
     display: inline-block;
-    margin-right: 1rem;
+    // margin-right: 0.5rem;
     a {
       width: auto;
+      &:after {
+        content: ',';
+      }
     }
   }
 }
@@ -452,21 +498,31 @@ pre, code {
     right: 0;
     z-index: 999;
   }
+  pre {
+    width: calc(100vw - 4rem);
+  }
+  .docs-content pre {
+    width: calc(100vw - 16rem);
+  }
   .page-content {
-    margin-top: 8rem;
+    margin-top: 6rem;
+  }
+  .post-content {
+    padding-left: 4rem;
   }
   .docs-content {
-    max-width: calc(45rem);
+    max-width: 28rem;
     margin-left: $sidebar-width;
+    padding-left: 0;
   }
 
   .docs-nav {
     background: transparent;
     position: fixed;
-    top: 0;
+    top: 5rem;
     max-height: 100%;
     overflow-y: scroll;
-    padding: 8rem 0 2rem;
+    padding: 1rem 0 2rem;
     width: $sidebar-width;
     left: 0;
     padding-left: 5%;
@@ -481,11 +537,8 @@ pre, code {
     // padding-left: 1rem;
   }
   .nav-sub {
-    padding-top: 0.5rem;
-    padding-bottom: 1rem;
-  }
-  .docs-scroll-back {
-    display: none;
+    // padding-top: 0.5rem;
+    // padding-bottom: 1rem;
   }
 }
 
@@ -494,8 +547,15 @@ pre, code {
   // background-color: #f5f5ff;
   // padding: 1rem;
   padding-left: 1.5rem;
-  border-left: 1px solid #c0c0c0;
+  padding-bottom: 0.1em;
+  // border-left: 1px solid #c0c0c0;
+  box-shadow: inset 0.5px 0 0 0 black;
   margin: 1.5rem 0;
+}
+
+.highlight pre code {
+  font-size: 0.7rem;
+  line-height: 1.3;
 }
 
 code {
@@ -511,55 +571,6 @@ pre {
     padding-right: 0;
     padding-left: 0;
   }
-}
-
-.example-header {
-  z-index: 99;
-  max-width: unset;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 40px;
-  padding: 1rem 1.5rem;
-  .logo {
-    height: 32px;
-    width: 32px;
-  }
-}
-.example-title,
-.example-item {
-  display: inline-block;
-  font-size: 14px;
-  margin-right: 1em;
-  font-weight: 500;
-  a {
-    display: inline-block;
-    background: white;
-    padding: 0.5em 0.9em;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.2);
-    border-radius: 3px;
-    &:hover {
-      opacity: 1;
-      background: $accent;
-      color: white;
-    }
-    &:active {
-      opacity: 1;
-      background: darken($accent, 10);
-    }
-  }
-}
-
-.example-frame {
-  position: absolute;
-  border: none;
-  background: white;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
 }
 
 // Import partials.
