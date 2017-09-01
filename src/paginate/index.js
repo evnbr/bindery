@@ -354,6 +354,18 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       return;
     }
 
+    const addedChildrenSuccess = () => {
+      // We're now done with this element and its children,
+      // so we pop up a level
+      const addedChild = state.breadcrumb.pop();
+      applyAfterAddRules(addedChild);
+
+      if (state.currentPage.hasOverflowed()) {
+        // console.log('Bindery: Added element despite overflowing');
+      }
+      next();
+    };
+
     if (child.tagName === 'IMG') {
       if (!child.naturalWidth) {
         console.log(`Bindery: Waiting for image '${child.src}' size to load`);
@@ -367,8 +379,11 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         }, 10);
 
         child.addEventListener('error', () => {
+          clearInterval(pollForSize);
           console.error(`Bindery: Image '${child.src}' failed to load.`);
-          addElementChild(parent, child, next);
+          scheduler.throttle(() => {
+            addElementNode(child, addedChildrenSuccess);
+          });
         });
         child.src = child.src;
         return;
@@ -376,31 +391,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
 
     child = applyBeforeAddRules(child);
-
-    const addedChildrenSuccess = () => {
-      // We're now done with this element and its children,
-      // so we pop up a level
-      const addedChild = state.breadcrumb.pop();
-
-      // If this child didn't fit any contents on this page,
-      // but did have contents on a previous page
-      // we should never have added it.
-      // TODO: Catch this earlier.
-      // if (addedChild.classList.contains(c('continuation'))
-      //   && addedChild.children.length === 0) {
-      //   addedChild.parentNode.removeChild(addedChild);
-      // } else {
-      //   // TODO: AfterAdd rules may want to access original child, not split second half
-      //   applyAfterAddRules(addedChild);
-      // }
-      applyAfterAddRules(addedChild);
-
-
-      if (state.currentPage.hasOverflowed()) {
-        // console.log('Bindery: Added element despite overflowing');
-      }
-      next();
-    };
 
     scheduler.throttle(() => {
       addElementNode(child, addedChildrenSuccess);
