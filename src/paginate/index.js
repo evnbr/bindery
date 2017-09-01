@@ -3,7 +3,6 @@ import h from 'hyperscript';
 // Utils
 import elToStr from '../utils/elementToString';
 import c from '../utils/prefixClass';
-import { scrollPct, scrollToBottom } from '../utils/scrollElement';
 import { last } from '../utils';
 
 // Bindery
@@ -22,15 +21,24 @@ const MAXIMUM_PAGE_LIMIT = 9999;
 const paginate = ({ content, rules, success, progress, error, isDebugging }) => {
   // SETUP
   const start = window.performance.now();
+  const scheduler = new Scheduler(isDebugging);
+  const cloneBreadcrumb = breadcrumbCloner(rules);
   const state = {
-    breadcrumb: [], // Stack representing which element we're currently inside
+    breadcrumb: [],
     pages: [],
     book: new Book(),
   };
-  const scheduler = new Scheduler(isDebugging);
+
   const measureArea = document.body.appendChild(h(c('.measure-area')));
 
-  const cloneBreadcrumb = breadcrumbCloner(rules);
+  let updatePaginationProgress;
+  let finishPagination;
+
+  const currentFlowElement = function () {
+    return state.breadcrumb[0]
+      ? last(state.breadcrumb)
+      : state.currentPage.flowContent;
+  };
 
   const applyNewPageRules = (pg) => {
     rules.forEach((rule) => {
@@ -75,7 +83,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     // make sure the cloned page is valid.
     if (newPage.hasOverflowed()) {
-      const suspect = last(state.breadcrumb);
+      const suspect = currentFlowElement();
       if (suspect) {
         console.error(`Bindery: NextPage already overflowing, probably due to a style set on ${elToStr(suspect)}. It may not fit on the page.`);
         suspect.parentNode.removeChild(suspect);
@@ -90,6 +98,9 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   };
 
   const beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
+  const afterAddRules = rules.filter(r => r.selector && r.afterAdd);
+  const afterBindRules = rules.filter(r => r.afterBind);
+
   const applyBeforeAddRules = (element) => {
     let addedElement = element;
     beforeAddRules.forEach((rule) => {
@@ -100,7 +111,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     return addedElement;
   };
 
-  const afterAddRules = rules.filter(r => r.selector && r.afterAdd);
   const applyAfterAddRules = (originalElement) => {
     let addedElement = originalElement;
     afterAddRules.forEach((rule) => {
@@ -121,8 +131,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
           // the last line of text.
             problemElement.parentNode.removeChild(problemElement);
             continueOnNewPage();
-            const lastEl = last(state.breadcrumb);
-            lastEl.appendChild(problemElement);
+            currentFlowElement().appendChild(problemElement);
             return rule.afterAdd(problemElement, state, continueOnNewPage, () => {
               console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
             });
@@ -132,13 +141,11 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     });
     return addedElement;
   };
-  const afterBindRules = (book) => {
-    rules.forEach((rule) => {
-      if (rule.afterBind) {
-        book.pages.forEach((page) => {
-          rule.afterBind(page, book);
-        });
-      }
+  const applyAfterBindRules = (book) => {
+    afterBindRules.forEach((rule) => {
+      book.pages.forEach((page) => {
+        rule.afterBind(page, book);
+      });
     });
   };
 
@@ -150,10 +157,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   const isSplittable = (node) => {
     if (selectorsNotToSplit.some(sel => node.matches(sel))) {
-      if (node.hasAttribute('data-bindery-did-move')) {
-        return true; // don't split it again.
-      }
-      if (node.classList.contains(c('continuation'))) {
+      if (node.hasAttribute('data-bindery-did-move')
+        || node.classList.contains(c('continuation'))) {
         return true; // don't split it again.
       }
       return false;
@@ -164,10 +169,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     return true;
   };
 
-
-  // TODO: Once a node is moved to a new page, it should
-  // no longer trigger another move. otherwise tall elements
-  // will trigger endlessly get shifted to the next page
   const moveElementToNextPage = (nodeToMove) => {
     // So this node won't get cloned. TODO: this is unclear
     state.breadcrumb.pop();
@@ -179,22 +180,20 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     // find the nearest splittable parent
     let willMove = nodeToMove;
     const pathToRestore = [];
-    while (state.breadcrumb.length > 1 && !isSplittable(last(state.breadcrumb))) {
-      // console.log('Not OK to split:', last(state.breadcrumb));
+    while (state.breadcrumb.length > 1 && !isSplittable(currentFlowElement())) {
+      // console.log('Not OK to split:', currentFlowElement());
       willMove = state.breadcrumb.pop();
       pathToRestore.unshift(willMove);
     }
 
-    // console.log('OK to split:', last(state.breadcrumb));
-    // console.log('Will move:', willMove);
+    // Once a node is moved to a new page, it should no longer trigger another
+    // move. otherwise tall elements will endlessly get shifted to the next page
     willMove.setAttribute('data-bindery-did-move', true);
 
     const parent = willMove.parentNode;
-    // remove the unsplittable node and subnodes
     parent.removeChild(willMove);
 
-    // Note that this can back all the way up leaving the page empty
-    if (state.breadcrumb.length > 1 && last(state.breadcrumb).textContent.trim() === '') {
+    if (state.breadcrumb.length > 1 && currentFlowElement().textContent.trim() === '') {
       parent.appendChild(willMove);
       willMove = state.breadcrumb.pop();
       pathToRestore.unshift(willMove);
@@ -202,12 +201,9 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
 
     if (state.currentPage.isEmpty) {
-      // Creating a new page won't help,
-      // presumably because this element is too tall.
-      // Add it back to the same page.
-      nodeToMove.setAttribute('data-bindery-oversized', true);
+      // Fail to move to next page, instead continue here
+      nodeToMove.setAttribute('data-bindery-larger-than-page', true);
     } else {
-      // create new page and clone context onto it
       if (state.currentPage.hasOverflowed()) {
         state.currentPage.suppressErrors = true;
       }
@@ -215,12 +211,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
 
     // append node as first in new page
-    if (!state.breadcrumb[0]) {
-      console.log('new page has no breadcrumb, adding ', willMove);
-      state.currentPage.flowContent.appendChild(willMove);
-    } else {
-      last(state.breadcrumb).appendChild(willMove);
-    }
+    currentFlowElement().appendChild(willMove);
 
     // restore subpath
     pathToRestore.forEach((restore) => {
@@ -233,7 +224,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   };
 
   const addTextNode = (textNode, doneCallback, undoAddTextNode) => {
-    last(state.breadcrumb).appendChild(textNode);
+    currentFlowElement().appendChild(textNode);
 
     if (state.currentPage.hasOverflowed()) {
       textNode.parentNode.removeChild(textNode);
@@ -245,16 +236,15 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   // Adds an text node by incrementally adding words
   // until it just barely doesnt overflow
-  const addTextNodeIncremental = (originalNode, doneCallback, undoAddTextNode) => {
-    let originalText = originalNode.nodeValue;
-    let textNode = originalNode;
-    last(state.breadcrumb).appendChild(textNode);
+  const addTextNodeIncremental = (textNode, doneCallback, undoAddTextNode) => {
+    const originalText = textNode.nodeValue;
+    currentFlowElement().appendChild(textNode);
 
     if (!state.currentPage.hasOverflowed()) {
       scheduler.throttle(doneCallback);
       return;
     }
-    if (last(state.breadcrumb).hasAttribute('data-bindery-oversized')) {
+    if (currentFlowElement().hasAttribute('data-bindery-larger-than-page')) {
       scheduler.throttle(doneCallback);
       return;
     }
@@ -302,7 +292,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   const addTextChild = (parent, child, next) => {
     const forceAddTextNode = () => {
-      last(state.breadcrumb).appendChild(child);
+      currentFlowElement().appendChild(child);
       state.currentPage.suppressErrors = true;
       continueOnNewPage();
       scheduler.throttle(next);
@@ -332,23 +322,20 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   // one by one recursively until thet overflow the page
   const addElementNode = (elementToAdd, doneCallback) => {
     if (state.currentPage.hasOverflowed()) {
-      if (last(state.breadcrumb).hasAttribute('data-bindery-oversized')) {
+      if (currentFlowElement().hasAttribute('data-bindery-larger-than-page')) {
         // Do nothing. We just have to add nodes
         // despite the page overflowing.
         // TODO: we may need to walk up the tree
         // to check if this element is the child of
         // an oversized node
       } else {
-        // console.error('Bindery: Trying to add node to a page that\'s already overflowing');
         state.currentPage.suppressErrors = true;
         continueOnNewPage();
       }
     }
     const element = applyBeforeAddRules(elementToAdd);
 
-    // Add this node to the current page or context
-    if (!state.breadcrumb[0]) state.currentPage.flowContent.appendChild(element);
-    else last(state.breadcrumb).appendChild(element);
+    currentFlowElement().appendChild(element);
 
     state.breadcrumb.push(element);
 
@@ -380,10 +367,9 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
       if (child.nodeType === Node.TEXT_NODE) {
         addTextChild(element, child, addNext);
-      } else if (child.nodeType === Node.ELEMENT_NODE) {
-        if (child.tagName === 'SCRIPT') {
-          addNext(); // skips
-        } else if (child.tagName === 'IMG' && !child.naturalWidth) {
+      } else if (child.nodeType === Node.ELEMENT_NODE
+        && child.tagName !== 'SCRIPT') {
+        if (child.tagName === 'IMG' && !child.naturalWidth) {
           waitForImage(child, () => {
             addElementNode(child, addNext);
           });
@@ -400,9 +386,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     addNext();
   };
 
-  let updatePaginationProgress;
-  let finishPagination;
-
   const startPagination = () => {
     content.style.margin = 0;
     content.style.padding = 0;
@@ -412,7 +395,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   updatePaginationProgress = () => {
     annotatePages(state.pages);
     state.book.pages = state.pages;
-    afterBindRules(state.book);
+    applyAfterBindRules(state.book);
     progress(state.book);
   };
   finishPagination = () => {
@@ -423,8 +406,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     state.book.pages = orderedPages;
     state.book.setCompleted();
-
-    afterBindRules(state.book);
+    applyAfterBindRules(state.book);
 
     const end = window.performance.now();
     if (!isDebugging) {

@@ -11,8 +11,8 @@ const DEFAULT_BLEED = '12pt';
 const DEFAULT_PAGE_SIZE = { width: '288pt', height: '432pt' };
 const DEFAULT_PAGE_MARGIN = {
   inner: '24pt',
-  outer: '32pt',
-  bottom: '54pt',
+  outer: '24pt',
+  bottom: '40pt',
   top: '48pt',
 };
 
