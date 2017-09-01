@@ -15,6 +15,7 @@ import Scheduler from './Scheduler';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
 import breadcrumbCloner from './breadcrumbCloner';
+import waitForImage from './waitForImage';
 
 const MAXIMUM_PAGE_LIMIT = 9999;
 
@@ -39,12 +40,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   const makeNewPage = () => {
     const newPage = new Page();
-    // const shouldScroll = scrollPct(measureArea) > 0.9;
     measureArea.appendChild(newPage.element);
-    // if (shouldScroll) {
-    //   if (isDebugging) scrollToBottom(measureArea);
-    //   else measureArea.scrollTop = measureArea.scrollHeight;
-    // }
 
     applyNewPageRules(newPage);
     return newPage;
@@ -172,7 +168,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   // TODO: Once a node is moved to a new page, it should
   // no longer trigger another move. otherwise tall elements
   // will trigger endlessly get shifted to the next page
-  const moveNodeToNextPage = (nodeToMove) => {
+  const moveElementToNextPage = (nodeToMove) => {
     // So this node won't get cloned. TODO: this is unclear
     state.breadcrumb.pop();
 
@@ -218,7 +214,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       continueOnNewPage();
     }
 
-
     // append node as first in new page
     if (!state.breadcrumb[0]) {
       console.log('new page has no breadcrumb, adding ', willMove);
@@ -226,7 +221,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     } else {
       last(state.breadcrumb).appendChild(willMove);
     }
-
 
     // restore subpath
     pathToRestore.forEach((restore) => {
@@ -285,24 +279,11 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         const fittingText = originalText.substr(0, pos);
         const overflowingText = originalText.substr(pos);
         textNode.nodeValue = fittingText;
-        originalText = overflowingText;
-
-        pos = 0;
 
         // Start on new page
         continueOnNewPage();
-
-        // Continue working with clone
-        textNode = document.createTextNode(originalText);
-        last(state.breadcrumb).appendChild(textNode);
-
-        // If the remainder fits there, we're done
-        if (!state.currentPage.hasOverflowed()) {
-          scheduler.throttle(doneCallback);
-          return;
-        }
-
-        scheduler.throttle(splitTextStep);
+        const remainingTextNode = document.createTextNode(overflowingText);
+        addTextNodeIncremental(remainingTextNode, doneCallback, undoAddTextNode);
         return;
       }
       if (pos > originalText.length - 1) {
@@ -330,7 +311,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     if (isSplittable(parent)) {
       const undoAddTextNode = () => {
         if (state.breadcrumb.length > 1) {
-          moveNodeToNextPage(parent);
+          moveElementToNextPage(parent);
           scheduler.throttle(() => addTextNodeIncremental(child, next, forceAddTextNode));
         } else {
           forceAddTextNode();
@@ -340,66 +321,16 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       addTextNodeIncremental(child, next, undoAddTextNode);
     } else {
       const undoAddTextNode = () => {
-        moveNodeToNextPage(parent);
+        moveElementToNextPage(parent);
         scheduler.throttle(() => addTextNode(child, next, forceAddTextNode));
       };
       addTextNode(child, next, undoAddTextNode);
     }
   };
 
-  const addElementChild = (parent, childToAdd, next) => {
-    let child = childToAdd;
-    if (child.tagName === 'SCRIPT') {
-      next(); // skips
-      return;
-    }
-
-    const addedChildrenSuccess = () => {
-      // We're now done with this element and its children,
-      // so we pop up a level
-      const addedChild = state.breadcrumb.pop();
-      applyAfterAddRules(addedChild);
-
-      if (state.currentPage.hasOverflowed()) {
-        // console.log('Bindery: Added element despite overflowing');
-      }
-      next();
-    };
-
-    if (child.tagName === 'IMG') {
-      if (!child.naturalWidth) {
-        console.log(`Bindery: Waiting for image '${child.src}' size to load`);
-
-        const pollForSize = setInterval(() => {
-          if (child.naturalWidth) {
-            clearInterval(pollForSize);
-            console.log(`Bindery: Image '${child.src}' size loaded.`);
-            addElementChild(parent, child, next);
-          }
-        }, 10);
-
-        child.addEventListener('error', () => {
-          clearInterval(pollForSize);
-          console.error(`Bindery: Image '${child.src}' failed to load.`);
-          scheduler.throttle(() => {
-            addElementNode(child, addedChildrenSuccess);
-          });
-        });
-        child.src = child.src;
-        return;
-      }
-    }
-
-    child = applyBeforeAddRules(child);
-
-    scheduler.throttle(() => {
-      addElementNode(child, addedChildrenSuccess);
-    });
-  };
-
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
-  const addElementNode = (node, doneCallback) => {
+  const addElementNode = (elementToAdd, doneCallback) => {
     if (state.currentPage.hasOverflowed()) {
       if (last(state.breadcrumb).hasAttribute('data-bindery-oversized')) {
         // Do nothing. We just have to add nodes
@@ -413,24 +344,34 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         continueOnNewPage();
       }
     }
+    const element = applyBeforeAddRules(elementToAdd);
 
     // Add this node to the current page or context
-    if (!state.breadcrumb[0]) state.currentPage.flowContent.appendChild(node);
-    else last(state.breadcrumb).appendChild(node);
+    if (!state.breadcrumb[0]) state.currentPage.flowContent.appendChild(element);
+    else last(state.breadcrumb).appendChild(element);
 
-    state.breadcrumb.push(node);
+    state.breadcrumb.push(element);
 
-    const childNodes = [...node.childNodes];
-    node.innerHTML = '';
+    const childNodes = [...element.childNodes];
+    element.innerHTML = '';
 
     // Overflows when empty
     if (state.currentPage.hasOverflowed()) {
-      moveNodeToNextPage(node);
+      moveElementToNextPage(element);
     }
 
     let index = 0;
     const addNext = () => {
       if (!(index < childNodes.length)) {
+        // We're now done with this element and its children,
+        // so we pop up a level
+        const addedChild = state.breadcrumb.pop();
+        applyAfterAddRules(addedChild);
+
+        if (state.currentPage.hasOverflowed()) {
+          // console.log('Bindery: Added element despite overflowing');
+        }
+
         doneCallback();
         return;
       }
@@ -438,9 +379,19 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       index += 1;
 
       if (child.nodeType === Node.TEXT_NODE) {
-        addTextChild(node, child, addNext);
+        addTextChild(element, child, addNext);
       } else if (child.nodeType === Node.ELEMENT_NODE) {
-        addElementChild(node, child, addNext);
+        if (child.tagName === 'SCRIPT') {
+          addNext(); // skips
+        } else if (child.tagName === 'IMG' && !child.naturalWidth) {
+          waitForImage(child, () => {
+            addElementNode(child, addNext);
+          });
+        } else {
+          scheduler.throttle(() => {
+            addElementNode(child, addNext);
+          });
+        }
       } else {
         addNext(); // Skip comments and unknown nodes
       }
@@ -449,14 +400,22 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     addNext();
   };
 
-  const updatePaginationProgress = () => {
+  let updatePaginationProgress;
+  let finishPagination;
+
+  const startPagination = () => {
+    content.style.margin = 0;
+    content.style.padding = 0;
+    continueOnNewPage();
+    addElementNode(content, finishPagination);
+  };
+  updatePaginationProgress = () => {
     annotatePages(state.pages);
     state.book.pages = state.pages;
     afterBindRules(state.book);
     progress(state.book);
   };
-
-  const finishPagination = () => {
+  finishPagination = () => {
     document.body.removeChild(measureArea);
 
     const orderedPages = orderPages(state.pages, makeNewPage);
@@ -474,11 +433,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     success(state.book);
   };
-
-  content.style.margin = 0;
-  content.style.padding = 0;
-  continueOnNewPage();
-  addElementNode(content, finishPagination);
+  startPagination();
 };
 
 export default paginate;
