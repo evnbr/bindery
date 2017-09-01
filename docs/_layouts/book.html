@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+  {% include head.html %}
+
+  <body>
+
+    <main class="content" aria-label="Content">
+      {{ content }}
+    </main>
+
+
+    <script type="text/javascript" src='/bindery/js/bindery.js'></script>
+    <script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
+    <script>
+      Bindery.makeBook({
+        source: '.content'
+      })
+    </script>
+  </body>
+</html>

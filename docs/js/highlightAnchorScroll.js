@@ -4,11 +4,13 @@ let currentAnchor;
 const updateAnchor = () => {
   const scrollPos = document.scrollingElement.scrollTop;
   const inview = anchors.find(el => el.offsetTop > scrollPos);
-  const newAnchor = document.querySelector(`[href='#${inview.id}']`);
-  if (newAnchor && newAnchor !== currentAnchor) {
-    if (currentAnchor) currentAnchor.classList.remove('selected');
-    newAnchor.classList.add('selected');
-    currentAnchor = newAnchor;
+  if (inview) {
+    const newAnchor = document.querySelector(`[href='#${inview.id}']`);
+    if (newAnchor && newAnchor !== currentAnchor) {
+      if (currentAnchor) currentAnchor.classList.remove('selected');
+      newAnchor.classList.add('selected');
+      currentAnchor = newAnchor;
+    }
   }
   if (scrollPos > 10) {
     document.body.classList.add('docs-scrolled');

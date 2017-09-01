@@ -1,25 +1,30 @@
 simple:
   - title: Getting Started
     id: 1_getting_started
-  - title: Content on Separate Page
+  - title: Load content from a separate file
     id: 2_content_on_separate_page
-    desc: Load content from a separate file
-  - title: Using Rules
+  - title: Create page breaks and a table of contents
     id: 3_using_configuration_options
-    desc: Add page breaks and a table of contents
-  - title: Spreads and Images
+  - title: Full-bleed spreads and images
     id: 9_spreads_and_images
 
 advanced:
-  - title: Use existing markup
-    id: 6_wikipedia
-    desc: Format a wikipedia article for print without writing HTML
-  - title: Too much content
-    id: 5_maximum_content
-  - title: Creating an Index
+  - title: Create an index
     id: 8_index
-  - title: Customize how elements split
+  - title: Customize how elements split across pages
     id: 7_custom_continuation
   - title: Create your own rules
     id: 4_custom_rules
     desc: Change the background color per page, add fore-edge graphics
+  - title: Handle content from an external source
+    id: 6_wikipedia
+    desc: Format an existing wikipedia article
+  - title: Too much content
+    id: 5_maximum_content
+
+gallery:
+  - title: johncaserta.com
+    desc: Site for John Caserta's projects, writing, and teaching
+    url: //new.johncaserta.com/bindery.html
+  - title: Add yours?
+    url:

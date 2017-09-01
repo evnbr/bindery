@@ -8,11 +8,12 @@ order: 2
 
 ### Setup
 
-##### `Bindery.makeBook({ options })`
+##### `makeBook({ options })`
 Creates a book and displays it immediately on page load.
 It takes an object of options as listed below.
 
 {% highlight javascript %}
+// With required options
 Bindery.makeBook({
   source: '#content',
 });
@@ -30,9 +31,9 @@ let bindery = new Bindery({
 bindery.makeBook();
 {% endhighlight %}
 
+### Fetching Content
 
-##### `source`
-Content to flow across pages. If the content is on the same page, use a CSS selector or a reference to the node. If the content must be fetched from a remote page, pass an object in the form of `{ url, selector }`.
+If the content is on the same page, use a CSS selector or a reference to the node. If the content must be fetched from a remote page, pass an object in the form of `{ url: String, selector: String }`.
 
 {% highlight javascript %}
 // CSS selector
@@ -55,48 +56,35 @@ Bindery.makeBook({
 });
 {% endhighlight %}
 
+### Page Setup
 
-##### `pageSize`
-Size of page, with absolute CSS units
-
-{% highlight js %}
+- `pageSize` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
+- `pageMargin` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
+- `bleed` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
+and [spreads](#fullbleedspread), and sets the position of bleed and
+crop marks.
+{% highlight javascript %}
 Bindery.makeBook({
   source: '#content',
-  pageSize: { width: '4in', height: '6in' },
-});
-{% endhighlight %}
-
-##### `pageMargin`
-Size of margins, with absolute CSS units
-
-{% highlight js %}
-Bindery.makeBook({
-  source: '#content',
-  pageMargin: {
-    top: '0.25in',
-    inner: '0.25in',
-    outer: '0.25in',
-    bottom: '0.25in',
+  pageSize: {
+    width: '4in',
+    height: '6in'
   },
-});
-{% endhighlight %}
-
-##### `bleed`
-Amount of bleed, with absolute CSS units. This sets the position of bleed and
-crop marks, and will affect the size of [full-bleed pages](#fullbleedpage)
-and [spreads](#fullbleedspread)
-if they are set to `width: 100%; height: 100%;`
-
-{% highlight js %}
-Bindery.makeBook({
-  source: '#content',
+  pageMargin: {
+    top: '12pt',
+    inner: '12pt',
+    outer: '16pt',
+    bottom: '20pt'
+  },
   bleed: '12pt',
 });
 {% endhighlight %}
 
 
-##### `rules`
-An array of Rules. See the [Components section](#components) for available options.
+
+### Components
+
+You can set a series of rules that change the book flow and create related components.
 
 {% highlight js %}
 Bindery.makeBook({
@@ -125,10 +113,19 @@ Bindery.makeBook({
 });
 {% endhighlight %}
 
-### Components
 
 ##### `PageBreak`
 Adds or avoids page breaks for the selected element.
+
+{% highlight js %}
+// Make sure chapter titles always start on a righthand page.
+Bindery.PageBreak({
+  selector: 'h2',
+  position: 'before',
+  continue: 'right'
+})
+{% endhighlight %}
+
 - `selector:` Which elements the rule should be applied to.
 - `position:`
   - `'before'` insert a break before the element, so it starts on a new page
@@ -140,14 +137,6 @@ on a specific page. `Optional`
   - `'left'`
   - `'right'`
 
-{% highlight js %}
-// Make sure chapter titles always start on a righthand page.
-Bindery.PageBreak({
-  selector: 'h2',
-  position: 'before',
-  continue: 'right'
-})
-{% endhighlight %}
 
 
 ##### `RunningHeader`
@@ -178,13 +167,6 @@ Bindery.RunningHeader({
 Add a footnote to the bottom of the flow area. Footnotes cut into the area for
 text, so note that very large footnotes may bump the entire element to the
 next page.
-- `selector:` Which elements the rule should be applied to.
-- `render:` A function that takes an element and number, and returns the
-footnote for that element. This footnote will be inserted at the bottom of the flow
-area.
-- `replace:` A function that takes the selected element and number, and returns
-an new element with a footnote indicator. By default, Bindery will simply insert
-the number as a superscript after the original element. `Optional`
 
 {% highlight js %}
 Bindery.Footnote({
@@ -195,17 +177,25 @@ Bindery.Footnote({
 }),
 {% endhighlight %}
 
+- `selector:` Which elements the rule should be applied to.
+- `render:` A function that takes an element and number, and returns the
+footnote for that element. This footnote will be inserted at the bottom of the flow
+area.
+- `replace:` A function that takes the selected element and number, and returns
+an new element with a footnote indicator. By default, Bindery will simply insert
+the number as a superscript after the original element. `Optional`
+
 ##### `FullBleedPage`
 Removes the selected element from the ordinary flow of the book and places it on its own
 page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
 - `selector:` Which elements the rule should be applied to.
 - `continue:` Where to resume the book flow after adding the
-full bleed page
-  - `'same'` `default` Continues back where the element was, so there's not a blank gap before the page. Note that this usually results in a different order than your original markup
+full bleed page. `Optional`
+  - `'same'` `default` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup.
   - `'next'` Continues on a new page
   - `'left'` Continues on the next left page, inserting another page when appropriate
   - `'right'` Continues on the next right page, inserting another page when appropriate
-- `rotate:` Optionally add a rotation the full-bleed content
+- `rotate:` Add a rotation the full-bleed content. `Optional`
   - `'none'` `default`
   - `'clockwise'` The top will become the left edge
   - `'counterclockwise'` The top will become the right edge
@@ -223,12 +213,12 @@ Bindery.FullBleedPage({
 The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
 - `selector:` Which elements the rule should be applied to.
 - `continue:` Where to resume the book flow after adding the
-full bleed element
+full bleed element. `Optional`
   - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
   - `'next'` Continues on a new page after the spread.
   - `'left'` Continues on the next left page after the spread
   - `'right'` Continues on the next right page after the spread
-- `rotate:` Optionally add a rotation the full-bleed content
+- `rotate:` Add a rotation the full-bleed content. `Optional`
   - `'none'` `default`
   - `'clockwise'` The top will become the left edge
   - `'counterclockwise'` The top will become the right edge
@@ -269,9 +259,9 @@ after the original element. `Optional`
 The test function receives a page element, and should return true if the
 reference can be found. By default, the test function will look for
 the anchor tag of the reference element's `href` property, which is useful for
-a table of contents. Use a custom function to create an index.
+a table of contents. Use a custom function to create an index. `Optional`
 
-#### Creating a Table of Contents
+### Creating a Table of Contents
 A table of contents is a reference that points to a specific page. By default, PageReference will look for anchor links. To create a table of
 contents, do this:
 
@@ -307,7 +297,7 @@ This will transform these anchor links as below:
 {% endhighlight %}
 
 
-#### Creating an Index
+### Creating an Index
 An index is a reference that points to content on a range of pages. There are many way you might create an index. In the following example, rather than
 checking the `href`, Bindery will search the entire text of each page to see if contains the text of your reference element.
 

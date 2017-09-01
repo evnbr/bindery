@@ -19,7 +19,7 @@ order: 3
 {% endfor %}
 </ul>
 
-### Complicated
+### Advanced
 
 <ul>
 {% for ex in site.data.examples.advanced %}
@@ -29,6 +29,17 @@ order: 3
   </li>
 {% endfor %}
 </ul>
+
+### Gallery
+<ul>
+{% for ex in site.data.examples.gallery %}
+  <li>
+    <a href="{{ ex.url }}">{{ ex.title | escape }}</a>
+    <div>{{ ex.desc | escape }}</div>
+  </li>
+{% endfor %}
+</ul>
+
 
 <!-- #### Simple
 

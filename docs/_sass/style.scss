@@ -14,9 +14,10 @@ $accent-dark: navy;
 $string: #b93b5a;
 $keyword: purple;
 
-$sidebar-width: 11rem;
+$sidebar-width: 12rem;
+$docs-options-inset: 6rem;
 
-$roomForDocsSideNav: 50rem;
+$wide-enough-for-side-nav: 50rem;
 $narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
@@ -69,6 +70,10 @@ em {
   font-size: 0.95em;
 }
 
+.home-btns {
+  margin: 1.5rem 0;
+}
+
 .post-content .btn {
   font: 0.6rem/1.4 $system;
   display: inline-block;
@@ -110,7 +115,11 @@ a {
 }
 
 li {
-  margin-left: 2rem;
+  // margin-left: 1rem;
+  // list-style: square;
+  margin-left: 1.5rem;
+  list-style: none;
+  text-indent: -1.5rem;
 }
 
 .post-content a {
@@ -119,7 +128,7 @@ li {
   background-image: linear-gradient(to bottom, black 50%,rgba(0,0,0,0) 50%);
   background-repeat: repeat-x;
   background-size: 2px .06em;
-  background-position: 0 0.9em;
+  background-position: 0 0.95em;
   &:hover {
     color: $accent;
     background-image: linear-gradient(to bottom, $accent 50%,rgba(0,0,0,0) 50%);
@@ -183,7 +192,9 @@ li {
   }
 }
 
+
 .scroll-back {
+  display: none;
   position: fixed;
   top: 5rem;
   left: calc(5% + 0.1rem);
@@ -198,6 +209,10 @@ li {
     opacity: 1;
     pointer-events: all;
   }
+  .docs-nav & {
+    top: 1.9rem;
+    left: calc(5% + 2.5rem);
+  }
   a {
     color: black;
     font-family: $system;
@@ -210,6 +225,7 @@ li {
     border-radius: 50%;
     // box-shadow: inset 0 0 0 0.8px black;
     &:hover {
+      opacity: 0.5;
       color: $accent;
     }
   }
@@ -259,12 +275,14 @@ li {
 
 .docs-content li li {
   margin: 0;
+  text-indent: 0;
   code:first-child {
     color: $string;
     display: inline-block;
     margin-right: 0.5em;
   }
 }
+
 
 .docs-content > ul > li > code:first-child {
   // color: #008080;
@@ -274,11 +292,12 @@ li {
   display: block;
 }
 .docs-content > ul > li {
-  margin: 0 0 1rem 7rem;
+  margin: 0 0 1rem $docs-options-inset;
+  text-indent: 0;
 }
 .docs-content > ul > li > code:first-child {
   position: absolute;
-  left: -7rem;
+  left: -$docs-options-inset;
 }
 
 
@@ -405,8 +424,8 @@ blockquote {
 pre, code {
   line-height: 1.1rem;
   font-family: Input, "Source Code Pro", Menlo, Consolas, Monaco, monospace;
-  letter-spacing: -0.02em;
-  font-size: 0.9rem;
+  letter-spacing: -0.015em;
+  font-size: 0.7rem;
 }
 
 
@@ -450,7 +469,7 @@ pre, code {
   }
 }
 
-@media (max-width: $roomForDocsSideNav) {
+@media (max-width: $wide-enough-for-side-nav) {
   .page-content {
     margin-top: 2rem;
   }
@@ -490,16 +509,19 @@ pre, code {
   }
 }
 
-@media (min-width: $roomForDocsSideNav) {
+@media (min-width: $wide-enough-for-side-nav) {
+  .scroll-back {
+    display: block;
+  }
   .site-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 999;
+    z-index: 99;
   }
   pre {
-    width: calc(100vw - 4rem);
+    width: calc(100vw - 8rem);
   }
   .docs-content pre {
     width: calc(100vw - 16rem);
@@ -520,7 +542,7 @@ pre, code {
     background: transparent;
     position: fixed;
     top: 5rem;
-    max-height: 100%;
+    max-height: calc(100% - 5rem);
     overflow-y: scroll;
     padding: 1rem 0 2rem;
     width: $sidebar-width;

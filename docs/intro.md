@@ -10,23 +10,25 @@ order: 0
 
 ### Getting Started
 
-Welcome. Bindery is intended for web designers and developers of every skill level—you don't
+Bindery is intended for web designers and developers of every skill level—you don't
 need any prior javascript experience. Just include the script tag in the same <span class='sc'>html</span> file as your content, and you're ready to go. Like this:
 
 {% highlight html %}
-<div class="content">
+<div id="content">
   <!-- The contents of your book -->
 </div>
 
 <script src="js/bindery.min.js"></script>
 <script>
-  Bindery.makeBook({ source: '.content' });
+  Bindery.makeBook({ source: '#content' });
 </script>
 {% endhighlight %}
 
-Use your usual web CSS however you choose—96 CSS pixels equals 1 CSS inch.
+Use your usual web CSS if you've got it—96 CSS pixels equals 1 CSS inch. That should be around 1 inch while printed, although some browsers might adjust the scale a little.
 
-If you add book-specific styles, don't forget that CSS supports print measurements
+Avoid using `@media print`, since bindery won't be able to consider those styles during pagination, and you won't be able to see them in the preview.
+
+If you add book-specific styles, note that that CSS supports traditional print measurements
 like points (`pt`), pica (`pc`), inches (`in`), and millimeters (`mm`).
 You'll want to steer clear of viewport-specific units like `vh` or `vw`.
 
@@ -40,7 +42,7 @@ file. You can fetch it by passing in the URL, like this.
 <script>
   Bindery.makeBook({
     source: {
-      selector: '.content'
+      selector: '#content'
       url: '/content.html',
     },
   });
@@ -62,7 +64,7 @@ it might look something like this.
 
 {% highlight html %}
 {% raw %}
-<section class="content">
+<section id="content">
   {% for post in site.posts %}
       <h2>{{ post.title | escape }}</h2>
       <div class="post-content">
@@ -163,8 +165,17 @@ render: (element, number) => {
 {% endhighlight %}
 
 
+### Printing
+
+Print early and often.
+
 
 ### Next Steps
 
-To learn more about available rules and options, check out the [Docs](/bindery/docs)
-or the [Examples](/bindery/examples)
+To learn more about available rules and options, check out the [documentation](/bindery/docs)
+or [view some examples](/bindery/examples).
+
+<div class="home-btns">
+  <a class="btn" href="/bindery/docs" class="btn">View Docs →</a>
+  <a class="btn" href="/bindery/examples" class="btn">View Examples →</a>
+</div>
