@@ -31,7 +31,7 @@ let bindery = new Bindery({
 bindery.makeBook();
 {% endhighlight %}
 
-### Fetching Content
+#### Fetching Content
 
 If the content is on the same page, use a CSS selector or a reference to the node. If the content must be fetched from a remote page, pass an object in the form of `{ url: String, selector: String }`.
 
@@ -56,7 +56,7 @@ Bindery.makeBook({
 });
 {% endhighlight %}
 
-### Page Setup
+#### Page Setup
 
 - `pageSize` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
 - `pageMargin` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
@@ -66,16 +66,8 @@ crop marks.
 {% highlight javascript %}
 Bindery.makeBook({
   source: '#content',
-  pageSize: {
-    width: '4in',
-    height: '6in'
-  },
-  pageMargin: {
-    top: '12pt',
-    inner: '12pt',
-    outer: '16pt',
-    bottom: '20pt'
-  },
+  pageSize: { width: '4in', height: '6in' },
+  pageMargin: { top: '12pt', inner: '12pt', outer: '16pt', bottom: '20pt' },
   bleed: '12pt',
 });
 {% endhighlight %}
@@ -261,7 +253,7 @@ reference can be found. By default, the test function will look for
 the anchor tag of the reference element's `href` property, which is useful for
 a table of contents. Use a custom function to create an index. `Optional`
 
-### Creating a Table of Contents
+#### Creating a Table of Contents
 A table of contents is a reference that points to a specific page. By default, PageReference will look for anchor links. To create a table of
 contents, do this:
 
@@ -297,7 +289,7 @@ This will transform these anchor links as below:
 {% endhighlight %}
 
 
-### Creating an Index
+#### Creating an Index
 An index is a reference that points to content on a range of pages. There are many way you might create an index. In the following example, rather than
 checking the `href`, Bindery will search the entire text of each page to see if contains the text of your reference element.
 
