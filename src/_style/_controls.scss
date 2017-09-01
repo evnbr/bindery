@@ -17,6 +17,7 @@
   background: $background;
   overflow: scroll;
   padding-bottom: 100px;
+  -webkit-font-smoothing: antialiased;
 
   .#{$pre}-in-progress & {
     // pointer-events: none;
@@ -32,8 +33,13 @@
 }
 
 .#{$pre}-title {
-  padding: 20px;
+  padding: 20px 20px 8px;
   font-size: 18px;
+  & + .#{$pre}-expand-row {
+    position: absolute;
+    right: 8px;
+    top: 16px;
+  }
 }
 
 .#{$pre}-spinner {
@@ -58,8 +64,8 @@
 
 .#{$pre}-btn {
   -webkit-appearance: none;
-  padding: 8px 16px;
-  color: #444;
+  padding: 7px 18px;
+  color: black;
   border: none;
   background: rgba(0,0,0,0.06);
   cursor: pointer;
@@ -95,6 +101,7 @@
 }
 
 .#{$pre}-btn-main {
+  margin-top: 4px;
   background: $accent;
   color: white;
 
@@ -118,12 +125,12 @@
 
 .#{$pre}-viewswitcher {
   padding: 12px 8px;
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  z-index: 99;
-  width: $sidebarWidth;
-  background: $background;
+  // position: fixed;
+  // bottom: 0;
+  // right: 0;
+  // z-index: 99;
+  // width: $sidebarWidth;
+  // background: $background;
 }
 
 .#{$pre}-viewmode {
@@ -173,15 +180,18 @@
   position: relative;
   display: block;
   padding: 8px 12px;
-  margin: 4px 8px;
+  margin: 0 8px;
   cursor: pointer;
 
   select {
-    float: right;
+    position: absolute;
     border: none;
     background: transparent;
-    padding: 12px;
+    padding: 8px 12px;
     width: 100px;
+    -webkit-appearance: none;
+    top: 0;
+    right: 0;
     &:hover {
       background: $hover;
     }
@@ -220,8 +230,6 @@
 }
 
 .#{$pre}-expand-row {
-  color: transparentize($text, 0.6);
-  font-weight: 500;
   border-radius: 4px;
 
   &:hover {
@@ -247,7 +255,7 @@
 
   &.selected + .#{$pre}-expand-area {
     opacity: 1;
-    max-height: 400px;
+    max-height: none;
     margin-bottom: 12px;
   }
 }
@@ -258,9 +266,8 @@
   // background: $hover;
   opacity: 0;
   max-height: 0;
-  margin: -4px 8px 0;
+  margin: 0 8px;
   border-radius: 0 0 4px 4px;
-  transition: max-height 0.3s, margin 0.3s, opacity 0.5s;
   overflow: hidden;
 
   .#{$pre}-row {
@@ -364,7 +371,6 @@
   height: 16px;
   background: rgba(0,0,0,0.2);
   border-radius: 8px;
-  margin-right: 5px;
   vertical-align: middle;
   float: right;
   transition: all 0.2s;

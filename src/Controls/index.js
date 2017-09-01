@@ -121,7 +121,7 @@ class Controls {
     arrangeSelect.addEventListener('change', () => {
       viewer.setPrintArrange(arrangeSelect.value);
     });
-    const arrangement = row('Print', arrangeSelect);
+    const arrangement = row('Sheet Layout', arrangeSelect);
 
     const orientationSelect = select(
       option({ value: 'landscape' }, 'Landscape'),
@@ -155,7 +155,7 @@ class Controls {
     const forceRefresh = btn({ onclick: () => {
       this.binder.debug = false;
       paginate();
-    } }, 'Update');
+    } }, 'Update Pagination');
 
     const viewModes = [
       viewMode('grid', viewer.setGrid, 'Preview'),
@@ -259,6 +259,7 @@ class Controls {
         this.binder.styler.setMargin(newMargin);
         this.binder.styler.setBleed(newBleed);
         this.binder.styler.updateStylesheet();
+        viewer.updateZoom();
 
         if (this.binder.autoupdate) {
           if (this.binder.styler.isSizeValid()) {
@@ -345,27 +346,31 @@ class Controls {
 
     this.element = h(c('.controls'),
       header,
-      arrangement,
-      // paperSize,
-      orientation,
+      viewSwitcher,
 
-      expandRow('Marks and Bleed'),
-      expandArea(
-        cropToggle,
-        bleedMarkToggle,
-        bleedAmount,
-      ),
+      // expandRow('⚙️'),
+      // expandArea(
+        arrangement,
+        // paperSize,
+        // orientation,
 
-      expandRow('Pagination'),
-      expandArea(
-        layoutControl,
-        row(layoutState),
-      ),
+        expandRow('Marks and Bleed'),
+        expandArea(
+          cropToggle,
+          bleedMarkToggle,
+          bleedAmount,
+        ),
+
+        expandRow('Book Setup'),
+        expandArea(
+          layoutControl,
+          row(layoutState),
+        ),
+      // ),
 
       debugControls,
 
       row(doneBtn, printBtn),
-      viewSwitcher,
     );
   }
 

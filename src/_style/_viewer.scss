@@ -26,10 +26,6 @@
     right: $sidebarWidth;
     bottom: 0;
 
-    .#{$pre}-debug & {
-      visibility: visible;
-    }
-
     .#{$pre}-page {
       margin: 0 auto 50px;
     }
