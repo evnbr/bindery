@@ -4,6 +4,7 @@ title:  About
 shortTitle: About
 permalink: /notes/
 order: 4
+inBook: true
 ---
 
 <!-- ## Notes -->
@@ -19,6 +20,9 @@ a publication from participants in the graphic design course *HTML Output* at [R
 
 Bindery.js 2.0 has been redeveloped since February 2017 by [Evan Brooks](http://evanbrooks.info). It has been rewritten from scratch to be smaller, faster, more flexible, and more robust.  With thanks to [John Caserta](http://johncaserta.com/) and [Teddy Bradford](#) for contributions and feedback.
 
+Report bugs, make suggestions, or lend a hand
+  <a href="https://github.com/evnbr/bindery">on Github</a>.
+
 ### What bindery is not
 
 1. *InDesign*— Bindery is for people who are interested in creating layouts
@@ -27,7 +31,7 @@ programmatically. It's not a graphical user interface (though you could build on
   the browser. If you want to adjust a PDF setting, your browser must support it—for
   example, you must use a page size provided by your browser's print dialog.
 3. *[LaTeX](https://www.latex-project.org/)*— LaTeX is a markup language and typesetting system popular in the scientific community. Bindery is intended for everyone who knows web standards (or is learning). It takes advantage of all the existing tools and documentation—browsers, text editors, web inspectors, etc.
-4. *[CSS Regions]()*— CSS Regions was an ill-fated Adobe-led effort to support magazine-like layouts on the web. A polyfill is available [here](https://github.com/FremyCompany/css-regions-polyfill). Bindery's pagination code is much more limited— it doesn't interpret your CSS rules, assumes there's only one flow per page, and assumes you're going to print it.
+4. *[CSS Regions](https://www.w3.org/TR/css-regions-1/)*— CSS Regions was an ill-fated Adobe-led effort to support magazine-like layouts on the web. A polyfill is available [here](https://github.com/FremyCompany/css-regions-polyfill). Bindery's pagination code is much more limited— it doesn't interpret your CSS rules, assumes there's only one flow per page, and assumes you're going to print it.
 
 ### Colophon
 This page was rendered at 7:05 PM on August 30, 2017 with Google Chrome 45.1 on Mac OSX 10.9.

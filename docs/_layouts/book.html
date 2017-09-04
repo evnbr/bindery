@@ -1,21 +1,57 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+<html class="book" lang="{{ page.lang | default: site.lang | default: "en" }}">
 
   {% include head.html %}
-
   <body>
 
-    <main class="content" aria-label="Content">
-      {{ content }}
-    </main>
-
-
     <script type="text/javascript" src='/bindery/js/bindery.js'></script>
-    <script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
     <script>
       Bindery.makeBook({
-        source: '.content'
-      })
+        source: {
+          url: '/bindery/book-content/',
+          selector: '.content',
+        },
+        rules: [
+          Bindery.PageBreak({
+            selector: 'h2',
+            position: 'before',
+            continue: 'right',
+          }),
+          Bindery.PageBreak({
+            selector: '.toc-header',
+            position: 'before',
+            continue: 'right',
+          }),
+          Bindery.PageBreak({
+            selector: '#colophon',
+            position: 'before',
+            continue: 'right',
+          }),
+          Bindery.FullBleedPage({
+            selector: '.logo',
+            continue: 'right',
+          }),
+          // Bindery.PageBreak({
+          //   selector: '.logo',
+          //   position: 'after',
+          //   continue: 'right',
+          // }),
+          Bindery.PageBreak({
+            selector: '.highlight',
+            position: 'avoid',
+          }),
+          Bindery.PageReference({
+            selector: '.toc a',
+          }),
+          Bindery.RunningHeader(),
+          Bindery.Footnote({
+            selector: '.post-content a',
+            render: (element, number) => {
+              return '<i>' + number + '</i>: ' + element.href;
+            }
+          }),
+        ]
+      });
     </script>
   </body>
 </html>

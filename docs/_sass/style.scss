@@ -74,7 +74,7 @@ em {
   margin: 1.5rem 0;
 }
 
-.post-content .btn {
+.btn, .post-content .btn {
   font: 0.6rem/1.4 $system;
   display: inline-block;
   padding: 0.4rem 0.7rem 0.45rem;
@@ -98,12 +98,18 @@ em {
     opacity: 0.5;
   }
 }
+.btn-link {
+  font: 0.6rem/1.4 $system;
+}
+.make-book {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: white;
+}
 
-.post-content p {
-  // margin-bottom: 1.35rem;
-  & + p {
-    text-indent: 1.5em;
-  }
+p + p {
+  text-indent: 1.5em;
 }
 
 a {
@@ -378,14 +384,9 @@ h1 {
 }
 
 h2 {
-  font-size: 3rem;
+  font-size: 1.5rem;
+  // font-style: italic;
   padding: 0 0 3rem;
-  // background-image: linear-gradient(to bottom, black 50%,rgba(0,0,0,0) 50%);
-  // background-repeat: repeat-x;
-  // background-size: 2px .1em;
-  // background-position: 0 2.8em;
-  display: inline-block;
-
 }
 
 h3 {
@@ -554,18 +555,10 @@ pre, code {
     padding-bottom: 3rem;
   }
 
-  .docs-nav-subitem {
-    // border-left: 1px solid gray;
-    // padding-left: 1rem;
-  }
-  .nav-sub {
-    // padding-top: 0.5rem;
-    // padding-bottom: 1rem;
-  }
 }
 
 
-.highlight pre {
+.highlight pre, pre.highlight {
   // background-color: #f5f5ff;
   // padding: 1rem;
   padding-left: 1.5rem;
@@ -580,10 +573,6 @@ pre, code {
   line-height: 1.3;
 }
 
-code {
-  // padding: 1px 5px;
-}
-
 pre {
   // padding: 8px 12px;
   overflow-x: auto;
@@ -595,7 +584,49 @@ pre {
   }
 }
 
+html.book {
+  font-size: 10pt;
+  word-wrap: break-word;
+}
+
+.book {
+  .site-header {
+    position: relative;
+  }
+  pre.highlight {
+    box-shadow: none;
+    white-space: pre-wrap;
+    width: 100%;
+    padding: 0;
+  }
+  .highlighter-rouge:first-child .highlight {
+    margin-top: 0;
+  }
+  .post-content .btn {
+    border: 0;
+    padding: 0;
+    font-size: 0.8rem;
+    /*display: none;*/
+  }
+  .logo {
+    width: calc(100% - 12pt);
+    height: 90%;
+  }
+  .docs-content, .post-content {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+sup {
+  font-size: 0.6rem;
+}
+.footnote {
+  font: 0.7rem/1.3 $system;
+  font-size: 0.7rem;
+}
+
+
+
 // Import partials.
-@import
-  "syntax-highlighting"
-;
+@import "syntax-highlighting";

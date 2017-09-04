@@ -13,7 +13,7 @@
     let t = 0;
     const step = () => {
       scroller.scrollTop = start + (easeInOutQuad(t) * dist);
-      t += 0.08;
+      t += 0.06;
       if (t < 1) requestAnimationFrame(step);
       else scroller.scrollTop = end;
     };

@@ -4,6 +4,7 @@ title:  Documentation
 shortTitle: Docs
 permalink: /docs/
 order: 2
+inBook: true
 ---
 
 ### Setup
@@ -12,30 +13,30 @@ order: 2
 Creates a book and displays it immediately on page load.
 It takes an object of options as listed below.
 
-{% highlight javascript %}
+```js
 // With required options
 Bindery.makeBook({
   source: '#content',
 });
-{% endhighlight %}
+```
 
 Note that the above is a shortcut for the following, which you may want to use if you're
 integrating Bindery with your own UI.
 
-{% highlight javascript %}
+```js
 let bindery = new Bindery({
   source: '#content',
 });
 
 // Later, in your own event handler
 bindery.makeBook();
-{% endhighlight %}
+```
 
-#### Fetching Content
+#### Content Source
 
 If the content is on the same page, use a CSS selector or a reference to the node. If the content must be fetched from a remote page, pass an object in the form of `{ url: String, selector: String }`.
 
-{% highlight javascript %}
+```js
 // CSS selector
 Bindery.makeBook({
   source: '#content',
@@ -54,7 +55,7 @@ Bindery.makeBook({
     url: '/posts.html',
   }
 });
-{% endhighlight %}
+```
 
 #### Page Setup
 
@@ -63,14 +64,14 @@ Bindery.makeBook({
 - `bleed` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
 and [spreads](#fullbleedspread), and sets the position of bleed and
 crop marks.
-{% highlight javascript %}
+```js
 Bindery.makeBook({
   source: '#content',
   pageSize: { width: '4in', height: '6in' },
   pageMargin: { top: '12pt', inner: '12pt', outer: '16pt', bottom: '20pt' },
   bleed: '12pt',
 });
-{% endhighlight %}
+```
 
 
 
@@ -78,7 +79,7 @@ Bindery.makeBook({
 
 You can set a series of rules that change the book flow and create related components.
 
-{% highlight js %}
+```js
 Bindery.makeBook({
   source: '#content',
   rules: [
@@ -86,10 +87,11 @@ Bindery.makeBook({
     Bindery.FullBleedSpread({ selector: '.big-figure' }),
   ],
 });
-{% endhighlight %}
+```
 
 You may prefer to create rules separately:
-{% highlight js %}
+
+```js
 let breakRule = Bindery.PageBreak({
   selector: 'h2',
   position: 'before',
@@ -103,20 +105,20 @@ Bindery.makeBook({
   source: '#content',
   rules: [ breakRule, spreadRule ],
 });
-{% endhighlight %}
+```
 
 
 ##### `PageBreak`
 Adds or avoids page breaks for the selected element.
 
-{% highlight js %}
+```js
 // Make sure chapter titles always start on a righthand page.
 Bindery.PageBreak({
   selector: 'h2',
   position: 'before',
   continue: 'right'
 })
-{% endhighlight %}
+```
 
 - `selector:` Which elements the rule should be applied to.
 - `position:`
@@ -141,7 +143,7 @@ at the bottom and a chapter title at the top.
 probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
 of the `Page` — see [`Page`](#page) for details. `Optional`
 
-{% highlight js %}
+```js
 Bindery.RunningHeader({
   render: (page) => {
     if (page.isEmpty) {
@@ -153,21 +155,21 @@ Bindery.RunningHeader({
     }
   },
 })
-{% endhighlight %}
+```
 
 ##### `Footnote`
 Add a footnote to the bottom of the flow area. Footnotes cut into the area for
 text, so note that very large footnotes may bump the entire element to the
 next page.
 
-{% highlight js %}
+```js
 Bindery.Footnote({
   selector: 'p > a',
   render: (element, number) => {
     return '<i>' + number + '</i>: Link to ' + element.href;
   }
 }),
-{% endhighlight %}
+```
 
 - `selector:` Which elements the rule should be applied to.
 - `render:` A function that takes an element and number, and returns the
@@ -194,12 +196,12 @@ full bleed page. `Optional`
   - `'inward'` The top will become the outside edge
   - `'outward'` The top will become the inside edge
 
-{% highlight js %}
+```js
 Bindery.FullBleedPage({
   selector: '.big-figure',
   continue: 'same'
 }),
-{% endhighlight %}
+```
 
 ##### `FullBleedSpread`
 The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
@@ -215,13 +217,13 @@ full bleed element. `Optional`
   - `'clockwise'` The top will become the left edge
   - `'counterclockwise'` The top will become the right edge
 
-{% highlight js %}
+```js
 Bindery.FullBleedSpread({
   selector: '.wide-figure',
   continue: 'next',
   rotate: 'clockwise',
 }),
-{% endhighlight %}
+```
 
 ##### `Continuation`
 If you want to customize the design when an element splits across two pages. [See example](/bindery/example-viewer/#7_custom_continuation).
@@ -229,13 +231,13 @@ If you want to customize the design when an element splits across two pages. [Se
 - `toNext:` Class applied to elements that will continue onto the next page. `Optional`
 - `fromPrevious:` Class applied to elements that started on a previous page. `Optional`
 
-{% highlight js %}
+```js
 Bindery.Continuation({
   selector: 'p',
   toNext: 'my-continues',
   fromPrevious: 'my-from',
 }),
-{% endhighlight %}
+```
 
 
 ### Referencing Pages
@@ -257,7 +259,7 @@ a table of contents. Use a custom function to create an index. `Optional`
 A table of contents is a reference that points to a specific page. By default, PageReference will look for anchor links. To create a table of
 contents, do this:
 
-{% highlight js %}
+```js
 Bindery.PageReference({
   selector'.table-of-contents a',
   replace: (element, num) => {
@@ -267,11 +269,11 @@ Bindery.PageReference({
     return row;
   }
 })
-{% endhighlight %}
+```
 
 This will transform these anchor links as below:
 
-{% highlight html %}
+```html
 <!-- Before -->
 <ul class='table-of-contents'>
   <li>
@@ -285,15 +287,14 @@ This will transform these anchor links as below:
     <div>Chapter 1 <span class='page-num'>5</span></div>
   </li>
 </ul>
-
-{% endhighlight %}
+```
 
 
 #### Creating an Index
 An index is a reference that points to content on a range of pages. There are many way you might create an index. In the following example, rather than
 checking the `href`, Bindery will search the entire text of each page to see if contains the text of your reference element.
 
-{% highlight js %}
+```js
 Bindery.PageReference({
   selector: '.index-content li',
   createTest: (el) => {
@@ -304,36 +305,32 @@ Bindery.PageReference({
     }
   },
 })
-{% endhighlight %}
+```
 
 This will transform the list items as below:
 
-{% highlight html %}
+```html
 <!-- Before -->
-<p>
-  Most books are perfect bound.
-</p>
+<p>Most books are perfect bound.</p>
 ...
 <ul class='index-content'>
   <li>Saddle Stitch</li>
 </ul>
-{% endhighlight %}
+```
 
-{% highlight html %}
+```html
 <!-- After -->
-<p>
-  Most books are perfect bound.
-</p>
+<p>Most books are perfect bound.</p>
 ...
 <ul class='index-content'>
-  <li>Saddle Stitch, 3-5, 10, 24</li>
+  <li>Saddle Stitch, 5</li>
 </ul>
-{% endhighlight %}
+```
 
 If you
 didn't want to match on the exact string, you could use other selectors or attribute, or use a fuzzier method of searching.
 
-{% highlight js %}
+```js
 Bindery.PageReference({
   selector: '[data-index-reference]',
   createTest: (el) => {
@@ -344,9 +341,9 @@ Bindery.PageReference({
     }
   },
 })
-{% endhighlight %}
+```
 
-{% highlight html %}
+```html
 <!-- In your book markup -->
 <p data-index-id='perfectBind'>
   Most books are perfect bound.
@@ -359,7 +356,7 @@ Bindery.PageReference({
     Perfect Binding
   </li>
 </ul>
-{% endhighlight %}
+```
 
 
 Note that we can't know what page something will end up on until the book layout
@@ -369,7 +366,7 @@ change the layout drastically.
 ### Advanced
 
 ##### `Page`
-You may receive instances of `Page` when using custom rules,
+You may receive instances of this class when using custom rules,
 but will not create them yourself.
 - `number` the page number, with the first page being 1
 - `heading` The current hierarchy of headings from previous pages, in the form of `{ h1: String, h2: String, ... h6: String }`
@@ -378,7 +375,7 @@ but will not create them yourself.
 - `isLeft` `Bool` The page is on the left (the back of the leaf)
 
 ##### `Book`
-You may receive instances of `Book` when using custom rules,
+You may receive instances of this class when using custom rules,
 but will not create them yourself.
 - `pages` Array of `Page`s
 - `isComplete` Whether layout has completed
