@@ -61,7 +61,7 @@
 
 .#{$pre}-btn {
   -webkit-appearance: none;
-  padding: 7px 18px;
+  padding: 8px 16px;
   color: black;
   border: none;
   background: rgba(0,0,0,0.06);
@@ -71,7 +71,6 @@
   font-weight: 500;
   display: inline-block;
   border-radius: 3px;
-  width: auto;
   margin-right: 8px;
   text-decoration: none;
   &:focus {
@@ -85,6 +84,9 @@
 
   &:active {
     background: rgba(0,0,0,0.14);
+  }
+  &:last-child {
+    margin-right: 0;
   }
 }
 
@@ -121,7 +123,7 @@
 
 .#{$pre}-viewmode {
   height: 54px;
-  width: 25%;
+  width: 54px;
   display: inline-block;
   text-align: center;
   font-size: 10px;
@@ -399,10 +401,10 @@
     box-shadow: 0 0 2px rgba(0,0,0,0.3);
     left: 0;
     width: unset;
-    padding-bottom: 2em;
+    padding-bottom: 12px;
     top: unset;
   }
-  .#{$pre}-btn-main {
-    float: right;
+  .#{$pre}-row:last-child {
+    text-align: right;
   }
 }

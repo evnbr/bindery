@@ -22,9 +22,6 @@ class Controls {
     this.binder = opts.binder;
     const viewer = opts.viewer;
 
-    const done = () => {
-      this.binder.cancel();
-    };
     const print = () => {
       viewer.setPrint();
       window.print();
@@ -49,10 +46,13 @@ class Controls {
     cropToggle.classList.add('selected');
     bleedMarkToggle = switchRow({ onclick: toggleBleedMarks }, 'Bleed Marks');
 
-    let doneBtn = '';
-    if (!this.binder.autorun) {
-      doneBtn = btn({ onclick: done }, 'Done');
-    }
+    const doneBtn = btn({ onclick: () => {
+      if (this.binder.autorun) {
+        window.history.back();
+      } else {
+        this.binder.cancel();
+      }
+    } }, 'Done');
 
     const s = this.binder.styler;
     const unitInputs = {
