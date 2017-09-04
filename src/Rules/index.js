@@ -1,4 +1,4 @@
-import Continuation from './Continuation';
+import Split from './Split';
 import Counter from './Counter';
 import FullBleedSpread from './FullBleedSpread';
 import FullBleedPage from './FullBleedPage';
@@ -11,8 +11,8 @@ import PageBreak from './PageBreak';
 
 export default {
   Rule,
-  Continuation(options) {
-    return new Continuation(options);
+  Split(options) {
+    return new Split(options);
   },
   Counter(options) {
     return new Counter(options);

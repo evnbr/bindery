@@ -12,7 +12,9 @@ advanced:
   - title: Create an index
     id: 8_index
   - title: Customize how elements split across pages
-    id: 7_custom_continuation
+    id: 7_custom_split
+  - title: Use a Counter
+    id: 10_counters
   - title: Create your own rules
     id: 4_custom_rules
     desc: Change the background color per page, add fore-edge graphics

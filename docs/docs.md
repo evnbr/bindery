@@ -131,15 +131,15 @@ on a specific page. `Optional`
   - `'left'`
   - `'right'`
 
-##### `Continuation`
+##### `Split`
 Add a class when an element splits across two pages, to customize the styling.
 Bindery makes as few assumptions as possible about your intended design— by default,
 text-indent will be removed from `<p>`s that started on
 the previous page, and the number or bullet will be hidden for
 `<li>`s that started on the previous page.
-[See example](/bindery/example-viewer/#7_custom_continuation).
+[See example](/bindery/example-viewer/#7_custom_split).
 ```js
-Bindery.Continuation({
+Bindery.Split({
   selector: 'p',
   toNext: 'my-continues',
   fromPrevious: 'my-from',
@@ -200,7 +200,7 @@ Bindery's Counters can be used in place of
 which will not work as expected when the DOM is reordered to create a book.
 [See example](/bindery/examples/10_counters).
 - `incrementEl:` CSS Selector. Matching elements will increment the counter by 1.
-- `resetEl:`  CSS Selector. Matching elements will set the counter to 0. `Optional`
+- `resetEl:`  CSS Selector. Matching elements will  set the counter to 0. `Optional`
 - `replaceEl:` CSS Selector. Matching elements will display the value of the counter.
 - `replace:` A function that takes the selected element and the counter value, and returns
 an new element. By default, Bindery will simply replace the contents with the value of the counter. `Optional`

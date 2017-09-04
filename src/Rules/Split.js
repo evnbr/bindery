@@ -6,13 +6,13 @@ import RuleOption from './RuleOption';
 // isContinuationClass: String
 // hasContinuationClass: String
 
-class Continuation extends Rule {
+class Split extends Rule {
   constructor(options) {
-    options.toNext = options.hasContinuationClass || 'my-continues';
-    options.fromPrevious = options.isContinuationClass || 'my-continuation';
+    options.toNext = options.hasContinuationClass || 'split-to-next';
+    options.fromPrevious = options.isContinuationClass || 'split-from-previous';
     super(options);
 
-    this.name = 'Continuation';
+    this.name = 'Split';
     RuleOption.validate(options, {
       selector: RuleOption.string,
       toNext: RuleOption.string,
@@ -27,4 +27,4 @@ class Continuation extends Rule {
   }
 }
 
-export default Continuation;
+export default Split;
