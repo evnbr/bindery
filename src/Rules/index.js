@@ -1,4 +1,5 @@
 import Continuation from './Continuation';
+import Counter from './Counter';
 import FullBleedSpread from './FullBleedSpread';
 import FullBleedPage from './FullBleedPage';
 import Footnote from './Footnote';
@@ -12,6 +13,9 @@ export default {
   Rule,
   Continuation(options) {
     return new Continuation(options);
+  },
+  Counter(options) {
+    return new Counter(options);
   },
   FullBleedPage(options) {
     return new FullBleedPage(options);

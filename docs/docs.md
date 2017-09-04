@@ -131,7 +131,23 @@ on a specific page. `Optional`
   - `'left'`
   - `'right'`
 
-
+##### `Continuation`
+Add a class when an element splits across two pages, to customize the styling.
+Bindery makes as few assumptions as possible about your intended design— by default,
+text-indent will be removed from `<p>`s that started on
+the previous page, and the number or bullet will be hidden for
+`<li>`s that started on the previous page.
+[See example](/bindery/example-viewer/#7_custom_continuation).
+```js
+Bindery.Continuation({
+  selector: 'p',
+  toNext: 'my-continues',
+  fromPrevious: 'my-from',
+}),
+```
+- `selector:` Which elements the rule should be applied to.
+- `toNext:` Class applied to elements that will continue onto the next page. `Optional`
+- `fromPrevious:` Class applied to elements that started on a previous page. `Optional`
 
 ##### `RunningHeader`
 An element added to each page. By default it will add a page number
@@ -139,10 +155,6 @@ at the top right of each page, but you can use `render` to generate running
 headers using your section titles. Keep in mind you can also use multiple
 `RunningHeaders` to create multiple elements— for example, to add both a page number
 at the bottom and a chapter title at the top.
-- `render:` A function that takes a `Page` and returns a string of HTML. You'll
-probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
-of the `Page` — see [`Page`](#page) for details. `Optional`
-
 ```js
 Bindery.RunningHeader({
   render: (page) => {
@@ -156,6 +168,9 @@ Bindery.RunningHeader({
   },
 })
 ```
+- `render:` A function that takes a `Page` and returns a string of HTML. You'll
+probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
+of the `Page` — see [`Page`](#page) for details. `Optional`
 
 ##### `Footnote`
 Add a footnote to the bottom of the flow area. Footnotes cut into the area for
@@ -170,7 +185,6 @@ Bindery.Footnote({
   }
 }),
 ```
-
 - `selector:` Which elements the rule should be applied to.
 - `render:` A function that takes an element and number, and returns the
 footnote for that element. This footnote will be inserted at the bottom of the flow
@@ -178,6 +192,37 @@ area.
 - `replace:` A function that takes the selected element and number, and returns
 an new element with a footnote indicator. By default, Bindery will simply insert
 the number as a superscript after the original element. `Optional`
+
+##### `Counter`
+Increment a counter as the book flows. This is useful for numbering figures or sections.
+Bindery's Counters can be used in place of
+[CSS counters](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters),
+which will not work as expected when the DOM is reordered to create a book.
+[See example](/bindery/examples/10_counters).
+- `incrementEl:` CSS Selector. Matching elements will increment the counter by 1.
+- `resetEl:`  CSS Selector. Matching elements will set the counter to 0. `Optional`
+- `replaceEl:` CSS Selector. Matching elements will display the value of the counter.
+- `replace:` A function that takes the selected element and the counter value, and returns
+an new element. By default, Bindery will simply replace the contents with the value of the counter. `Optional`
+
+```js
+// Replace the contents of span.figure-number
+Bindery.Counter({
+  incrementEl: 'figure',
+  replaceEl: 'span.figure-number',
+})
+
+// Add a number before each paragraph, resetting each section
+Bindery.Counter({
+  incrementEl: 'p',
+  replaceEl: 'p',
+  resetEl: 'h2',
+  replace: (el, counterValue) => {
+    el.insertAdjacentHTML('afterbegin', `<span style='color: red;'>P ${counterValue} </span>`);
+    return el;
+  }
+}),
+```
 
 ##### `FullBleedPage`
 Removes the selected element from the ordinary flow of the book and places it on its own
@@ -225,19 +270,6 @@ Bindery.FullBleedSpread({
 }),
 ```
 
-##### `Continuation`
-If you want to customize the design when an element splits across two pages. [See example](/bindery/example-viewer/#7_custom_continuation).
-- `selector:` Which elements the rule should be applied to.
-- `toNext:` Class applied to elements that will continue onto the next page. `Optional`
-- `fromPrevious:` Class applied to elements that started on a previous page. `Optional`
-
-```js
-Bindery.Continuation({
-  selector: 'p',
-  toNext: 'my-continues',
-  fromPrevious: 'my-from',
-}),
-```
 
 
 ### Referencing Pages
