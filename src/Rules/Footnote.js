@@ -41,7 +41,7 @@ class Footnote extends Replace {
     return element;
   }
   render(element, number) {
-    return `<sup>${number}</sup> Default footnote (<a href='http://evanbrooks.info/bindery/#docs'>Docs</a>)`;
+    return `<sup>${number}</sup> Default footnote (<a href='/bindery/docs/#footnote'>Learn how to change it</a>)`;
   }
 }
 

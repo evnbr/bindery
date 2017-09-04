@@ -32,12 +32,10 @@ class Controls {
 
     const printBtn = btnMain({ onclick: print }, 'Print');
 
-    let layoutControl;
     let cropToggle;
     let bleedMarkToggle;
-    let facingToggle;
 
-    const toggleCrop = () => {
+    const toggleCropMarks = () => {
       viewer.isShowingCropMarks = !viewer.isShowingCropMarks;
       cropToggle.classList.toggle('selected');
     };
@@ -47,32 +45,24 @@ class Controls {
       bleedMarkToggle.classList.toggle('selected');
     };
 
-    const toggleFacing = () => {
-      facingToggle.classList.toggle('selected');
-      layoutControl.classList.toggle('not-facing');
-      viewer.toggleDouble();
-    };
-
-    cropToggle = switchRow({ onclick: toggleCrop }, 'Crop Marks');
+    cropToggle = switchRow({ onclick: toggleCropMarks }, 'Crop Marks');
     cropToggle.classList.add('selected');
     bleedMarkToggle = switchRow({ onclick: toggleBleedMarks }, 'Bleed Marks');
-    facingToggle = switchRow({ onclick: toggleFacing }, 'Facing Pages');
-
-    facingToggle.classList.add('selected');
 
     let doneBtn = '';
     if (!this.binder.autorun) {
       doneBtn = btn({ onclick: done }, 'Done');
     }
 
+    const s = this.binder.styler;
     const unitInputs = {
-      top: inputNumberUnits(this.binder.styler.margin.top),
-      inner: inputNumberUnits(this.binder.styler.margin.inner),
-      outer: inputNumberUnits(this.binder.styler.margin.outer),
-      bottom: inputNumberUnits(this.binder.styler.margin.bottom),
-      width: inputNumberUnits(this.binder.styler.size.width),
-      height: inputNumberUnits(this.binder.styler.size.height),
-      bleed: inputNumberUnits(this.binder.styler.bleed),
+      top: inputNumberUnits(s.margin.top),
+      inner: inputNumberUnits(s.margin.inner),
+      outer: inputNumberUnits(s.margin.outer),
+      bottom: inputNumberUnits(s.margin.bottom),
+      width: inputNumberUnits(s.size.width),
+      height: inputNumberUnits(s.size.height),
+      bleed: inputNumberUnits(s.bleed),
     };
 
     const sizeControl = h(`.${c('row')}.${c('size')}`,
@@ -89,7 +79,7 @@ class Controls {
       marginPreview,
     );
 
-    layoutControl = h(c('.layout-control'),
+    const layoutControl = h(c('.layout-control'),
       sizeControl,
       marginControl
     );
@@ -97,19 +87,19 @@ class Controls {
     const bleedAmount = row('Bleed Amount', unitInputs.bleed);
 
 
-    const paperSize = row('Paper Size', select(
-      option('Letter'),
-      option({ disabled: true }, '8.5 x 11'),
-      option({ disabled: true }, ''),
-      option({ disabled: true }, 'Legal'),
-      option({ disabled: true }, '8.5 x 14'),
-      option({ disabled: true }, ''),
-      option({ disabled: true }, 'Tabloid'),
-      option({ disabled: true }, '11 x 17'),
-      option({ disabled: true }, ''),
-      option({ disabled: true }, 'A4'),
-      option({ disabled: true }, 'mm x mm'),
-    ));
+    // const paperSize = row('Paper Size', select(
+    //   option('Letter'),
+    //   option({ disabled: true }, '8.5 x 11'),
+    //   option({ disabled: true }, ''),
+    //   option({ disabled: true }, 'Legal'),
+    //   option({ disabled: true }, '8.5 x 14'),
+    //   option({ disabled: true }, ''),
+    //   option({ disabled: true }, 'Tabloid'),
+    //   option({ disabled: true }, '11 x 17'),
+    //   option({ disabled: true }, ''),
+    //   option({ disabled: true }, 'A4'),
+    //   option({ disabled: true }, 'mm x mm'),
+    // ));
 
     const arrangeSelect = select(
       option({ value: 'arrange_one' }, 'Pages'),
@@ -123,14 +113,14 @@ class Controls {
     });
     const arrangement = row('Sheet Layout', arrangeSelect);
 
-    const orientationSelect = select(
-      option({ value: 'landscape' }, 'Landscape'),
-      option({ value: 'portrait' }, 'Portrait'),
-    );
-    orientationSelect.addEventListener('change', () => {
-      viewer.setOrientation(orientationSelect.value);
-    });
-    const orientation = row('Orientation', orientationSelect);
+    // const orientationSelect = select(
+    //   option({ value: 'landscape' }, 'Landscape'),
+    //   option({ value: 'portrait' }, 'Portrait'),
+    // );
+    // orientationSelect.addEventListener('change', () => {
+    //   viewer.setOrientation(orientationSelect.value);
+    // });
+    // const orientation = row('Orientation', orientationSelect);
 
     const validCheck = h('div', { style: {
       display: 'none',
@@ -142,19 +132,19 @@ class Controls {
     } }, 'Updating...');
 
 
-    const paginate = () => {
+    const startPaginating = () => {
       inProgress.style.display = '';
-      forceRefresh.style.display = 'none';
-      forceRefreshDebug.style.display = 'none';
+      refreshPaginationBtn.style.display = 'none';
+      refreshPaginationBtnDebug.style.display = 'none';
       this.binder.makeBook(() => {
         inProgress.style.display = 'none';
-        forceRefresh.style.display = '';
-        forceRefreshDebug.style.display = '';
+        refreshPaginationBtn.style.display = '';
+        refreshPaginationBtnDebug.style.display = '';
       });
     }
-    const forceRefresh = btn({ onclick: () => {
+    const refreshPaginationBtn = btn({ onclick: () => {
       this.binder.debug = false;
-      paginate();
+      startPaginating();
     } }, 'Update Pagination');
 
     const viewModes = [
@@ -215,7 +205,7 @@ class Controls {
       headerContent.textContent = 'Paginating';
       validCheck.style.display = 'none';
       inProgress.style.display = '';
-      forceRefresh.style.display = 'none';
+      refreshPaginationBtn.style.display = 'none';
     };
 
     this.updateProgress = (count) => {
@@ -225,13 +215,13 @@ class Controls {
     this.setDone = () => {
       headerContent.textContent = `${viewer.book.pages.length} Pages`;
       inProgress.style.display = 'none';
-      forceRefresh.style.display = '';
+      refreshPaginationBtn.style.display = '';
       validCheck.style.display = 'none';
     };
 
     this.setInvalid = () => {
       validCheck.style.display = '';
-      forceRefresh.style.display = '';
+      refreshPaginationBtn.style.display = '';
       inProgress.style.display = 'none';
     };
 
@@ -274,7 +264,7 @@ class Controls {
     let updateDelay;
     const throttledUpdate = () => {
       clearTimeout(updateDelay);
-      updateDelay = setTimeout(updateLayout, 200);
+      updateDelay = setTimeout(updateLayout, 100);
     };
 
     Object.keys(unitInputs).forEach((k) => {
@@ -309,16 +299,15 @@ class Controls {
         window.binderyDebug.finish();
       },
     });
-    const forceRefreshDebug = btnLight('Debug', {
+    const refreshPaginationBtnDebug = btnLight('Debug', {
       onclick: () => {
         playSlow.style.display = 'none';
         step.style.display = 'none';
         pause.style.display = '';
         this.binder.debug = true;
-        paginate();
+        startPaginating();
       },
     });
-
 
     const debugControls = row(
       pause,
@@ -330,19 +319,11 @@ class Controls {
     printBtn.classList.add(c('btn-print'));
 
     const layoutState = h('div',
-      forceRefresh,
-      forceRefreshDebug,
+      refreshPaginationBtn,
+      refreshPaginationBtnDebug,
       validCheck,
       inProgress,
     );
-
-    // let debugToggle;
-    // const toggleDebug = () => {
-    //   debugToggle.classList.toggle('selected');
-    //   this.binder.debug = !this.binder.debug;
-    // };
-    // debugToggle = switchRow({ onclick: toggleDebug }, 'Debug');
-    // if (this.binder.debug) debugToggle.classList.add('selected');
 
     this.element = h(c('.controls'),
       header,

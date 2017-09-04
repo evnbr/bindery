@@ -19,11 +19,13 @@
     background: $background;
     padding: 50px 20px;
     z-index: 99;
-    overflow: scroll;
-    visibility: hidden;
-    top: 0;
+    // overflow: scroll;
+    // visibility: hidden;
+    // opacity: 0;
+    // pointer-events: none;
+    // top: 0;
     left: 0;
-    right: $sidebarWidth;
+    right: 0;
     bottom: 0;
 
     .#{$pre}-page {

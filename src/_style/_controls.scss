@@ -6,6 +6,7 @@
 
 .#{$pre}-controls {
   font: 14px / 1.4 $system;
+  display: none;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -18,10 +19,6 @@
   overflow: scroll;
   padding-bottom: 100px;
   -webkit-font-smoothing: antialiased;
-
-  .#{$pre}-in-progress & {
-    // pointer-events: none;
-  }
 
   * {
     font: inherit;
@@ -89,11 +86,6 @@
   &:active {
     background: rgba(0,0,0,0.14);
   }
-
-  // .#{$pre}-in-progress & {
-  //   opacity: 0.2;
-  //   pointer-events: none;
-  // }
 }
 
 .#{$pre}-btn-light {
@@ -125,12 +117,6 @@
 
 .#{$pre}-viewswitcher {
   padding: 12px 8px;
-  // position: fixed;
-  // bottom: 0;
-  // right: 0;
-  // z-index: 99;
-  // width: $sidebarWidth;
-  // background: $background;
 }
 
 .#{$pre}-viewmode {
@@ -416,14 +402,7 @@
     padding-bottom: 2em;
     top: unset;
   }
-  .#{$pre}-viewswitcher {
-    right: unset;
-  }
-  .#{$pre}-measure-area {
-    right: 0;
-  }
   .#{$pre}-btn-main {
     float: right;
   }
-
 }

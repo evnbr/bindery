@@ -23,13 +23,14 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const start = window.performance.now();
   const scheduler = new Scheduler(isDebugging);
   const cloneBreadcrumb = breadcrumbCloner(rules);
+  const measureArea = document.body.appendChild(h(c('.measure-area')));
+
   const state = {
     breadcrumb: [],
     pages: [],
     book: new Book(),
   };
 
-  const measureArea = document.body.appendChild(h(c('.measure-area')));
 
   let updatePaginationProgress;
   let finishPagination;
@@ -111,6 +112,15 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     return addedElement;
   };
 
+  // TODO:
+  // While this does catch overflows, it introduces a few new bugs.
+  // It is pretty aggressive to move the entire node to the next page.
+  // - 1. there is no guarentee it will fit on the new page
+  // - 2. if it has childNodes, those side effects will not be undone,
+  // which means footnotes will get left on previous page.
+  // - 3. if it is a large paragraph, it will leave a large gap. the
+  // ideal approach would be to only need to invalidate
+  // the last line of text.
   const applyAfterAddRules = (originalElement) => {
     let addedElement = originalElement;
     afterAddRules.forEach((rule) => {
@@ -120,15 +130,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
           state,
           continueOnNewPage,
           function overflowCallback(problemElement) {
-          // TODO:
-          // While this does catch overflows, it introduces a few new bugs.
-          // It is pretty aggressive to move the entire node to the next page.
-          // - 1. there is no guarentee it will fit on the new page
-          // - 2. if it has childNodes, those side effects will not be undone,
-          // which means footnotes will get left on previous page.
-          // - 3. if it is a large paragraph, it will leave a large gap. the
-          // ideal approach would be to only need to invalidate
-          // the last line of text.
             problemElement.parentNode.removeChild(problemElement);
             continueOnNewPage();
             currentFlowElement().appendChild(problemElement);
@@ -141,6 +142,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     });
     return addedElement;
   };
+
   const applyAfterBindRules = (book) => {
     afterBindRules.forEach((rule) => {
       book.pages.forEach((page) => {
@@ -251,6 +253,18 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     let pos = 0;
 
+    // Must be in viewport for caretRangeFromPoint
+    // measureArea.appendChild(state.currentPage.element);
+    //
+    // const flowBoxPos = state.currentPage.flowBox.getBoundingClientRect();
+    // const endX = flowBoxPos.left + flowBoxPos.width - 1;
+    // const endY = flowBoxPos.top + flowBoxPos.height - 30; // TODO: Real line height
+    // const range = document.caretRangeFromPoint(endX, endY);
+    // if (range && range.startContainer === textNode) {
+    //   console.log(`Predicted ${range.startOffset}: ${originalText.substr(0, range.startOffset)}`);
+    //   pos = range.startOffset;
+    // }
+
     const splitTextStep = () => {
       textNode.nodeValue = originalText.substr(0, pos);
 
@@ -265,6 +279,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
           undoAddTextNode();
           return;
         }
+
+        console.log(`Text breaks at ${pos}: ${originalText.substr(0, pos)}`);
 
         const fittingText = originalText.substr(0, pos);
         const overflowingText = originalText.substr(pos);
@@ -323,11 +339,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const addElementNode = (elementToAdd, doneCallback) => {
     if (state.currentPage.hasOverflowed()) {
       if (currentFlowElement().hasAttribute('data-bindery-larger-than-page')) {
-        // Do nothing. We just have to add nodes
-        // despite the page overflowing.
-        // TODO: we may need to walk up the tree
-        // to check if this element is the child of
-        // an oversized node
+        // Do nothing. We just have to add nodes despite the page overflowing.
       } else {
         state.currentPage.suppressErrors = true;
         continueOnNewPage();
@@ -390,12 +402,14 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();
-    addElementNode(content, finishPagination);
+    scheduler.throttle(() => {
+      addElementNode(content, finishPagination);
+    });
   };
   updatePaginationProgress = () => {
     annotatePages(state.pages);
     state.book.pages = state.pages;
-    applyAfterBindRules(state.book);
+    // applyAfterBindRules(state.book);
     progress(state.book);
   };
   finishPagination = () => {
