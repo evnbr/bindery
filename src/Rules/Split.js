@@ -8,8 +8,6 @@ import RuleOption from './RuleOption';
 
 class Split extends Rule {
   constructor(options) {
-    options.toNext = options.hasContinuationClass || 'split-to-next';
-    options.fromPrevious = options.isContinuationClass || 'split-from-previous';
     super(options);
 
     this.name = 'Split';
