@@ -6,16 +6,19 @@ import Viewer from './Viewer';
 import c from './utils/prefixClass';
 
 import Rules from './Rules/';
+import UserOption from './UserOption';
 
 require('./_style/main.scss');
 
-const DEFAULT_BLEED = '12pt';
-const DEFAULT_PAGE_SIZE = { width: '288pt', height: '432pt' };
-const DEFAULT_PAGE_MARGIN = {
-  inner: '24pt',
-  outer: '24pt',
-  bottom: '40pt',
-  top: '48pt',
+const defaultPageSetup = {
+  bleed: '12pt',
+  size: { width: '288pt', height: '432pt' },
+  margin: {
+    inner: '24pt',
+    outer: '24pt',
+    bottom: '40pt',
+    top: '48pt',
+  },
 };
 
 class Bindery {
@@ -27,10 +30,39 @@ class Bindery {
     this.debug = opts.debug || false;
 
     this.styler = new Styler();
-    this.styler.setSize(opts.pageSize || DEFAULT_PAGE_SIZE);
-    this.styler.setMargin(opts.pageMargin || DEFAULT_PAGE_MARGIN);
-    this.styler.setBleed(opts.bleed || DEFAULT_BLEED);
 
+    UserOption.validate(opts, {
+      name: 'makeBook',
+      autorun: UserOption.bool,
+      content: UserOption.any,
+      pageSetup: UserOption.shape({
+        name: 'pageSetup',
+        bleed: UserOption.string,
+        margin: UserOption.shape({
+          name: 'margin',
+          top: UserOption.string,
+          inner: UserOption.string,
+          outer: UserOption.string,
+          bottom: UserOption.string,
+        }),
+        size: UserOption.shape({
+          name: 'size',
+          width: UserOption.string,
+          height: UserOption.string,
+        }),
+      }),
+      rules: UserOption.array,
+    });
+
+    if (opts.pageSetup) {
+      this.styler.setSize(opts.pageSetup.size || defaultPageSetup.size);
+      this.styler.setMargin(opts.pageSetup.margin || defaultPageSetup.margin);
+      this.styler.setBleed(opts.pageSetup.bleed || defaultPageSetup.bleed);
+    } else {
+      this.styler.setSize(defaultPageSetup.size);
+      this.styler.setMargin(defaultPageSetup.margin);
+      this.styler.setBleed(defaultPageSetup.bleed);
+    }
 
     this.viewer = new Viewer({ bindery: this });
     this.controls = this.viewer.controls;
