@@ -1,3 +1,5 @@
+import h from 'hyperscript';
+
 import paginate from './paginate';
 import Styler from './Styler';
 import Viewer from './Viewer';
@@ -41,25 +43,25 @@ class Bindery {
     if (opts.rules) this.addRules(opts.rules);
 
 
-    if (!opts.source) {
-      this.viewer.displayError('Source not specified', 'You must include a source element, selector, or url');
+    if (!opts.content) {
+      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
       console.error('Bindery: You must include a source element or selector');
-    } else if (typeof opts.source === 'string') {
-      this.source = document.querySelector(opts.source);
+    } else if (typeof opts.content === 'string') {
+      this.source = document.querySelector(opts.content);
       if (!(this.source instanceof HTMLElement)) {
-        this.viewer.displayError('Source not specified', `Could not find element that matches selector "${opts.source}"`);
-        console.error(`Bindery: Could not find element that matches selector "${opts.source}"`);
+        this.viewer.displayError('Content not specified', `Could not find element that matches selector "${opts.content}"`);
+        console.error(`Bindery: Could not find element that matches selector "${opts.content}"`);
         return;
       }
       if (this.autorun) {
         this.makeBook();
       }
-    } else if (typeof opts.source === 'object' && opts.source.url) {
-      const url = opts.source.url;
-      const selector = opts.source.selector;
+    } else if (typeof opts.content === 'object' && opts.content.url) {
+      const url = opts.content.url;
+      const selector = opts.content.selector;
       this.fetchSource(url, selector);
-    } else if (opts.source instanceof HTMLElement) {
-      this.source = opts.source;
+    } else if (opts.content instanceof HTMLElement) {
+      this.source = opts.content;
       if (this.autorun) {
         this.makeBook();
       }
@@ -83,7 +85,7 @@ class Bindery {
       }
       return '';
     }).then((fetchedContent) => {
-      const wrapper = document.createElement('div');
+      const wrapper = h('div');
       wrapper.innerHTML = fetchedContent;
       this.source = wrapper.querySelector(selector);
       if (!(this.source instanceof HTMLElement)) {
