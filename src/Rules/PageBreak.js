@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import RuleOption from './RuleOption';
+import UserOption from '../UserOption';
 
 class PageBreak extends Rule {
   constructor(options) {
@@ -8,10 +8,10 @@ class PageBreak extends Rule {
     super(options);
 
     this.name = 'Page Break';
-    RuleOption.validate(options, {
-      selector: RuleOption.string,
-      continue: RuleOption.enum('any', 'left', 'right'),
-      position: RuleOption.enum('before', 'after', 'both', 'avoid'),
+    UserOption.validate(options, {
+      selector: UserOption.string,
+      continue: UserOption.enum('any', 'left', 'right'),
+      position: UserOption.enum('before', 'after', 'both', 'avoid'),
     });
   }
   get avoidSplit() {

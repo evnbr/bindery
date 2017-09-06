@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import RuleOption from './RuleOption';
+import UserOption from '../UserOption';
 
 // Options:
 // selector: String
@@ -8,13 +8,15 @@ import RuleOption from './RuleOption';
 
 class Split extends Rule {
   constructor(options) {
+    options.toNext = options.toNext || 'split-to-next';
+    options.fromPrevious = options.fromPrevious || 'split-from-previous';
     super(options);
 
     this.name = 'Split';
-    RuleOption.validate(options, {
-      selector: RuleOption.string,
-      toNext: RuleOption.string,
-      fromPrevious: RuleOption.string,
+    UserOption.validate(options, {
+      selector: UserOption.string,
+      toNext: UserOption.string,
+      fromPrevious: UserOption.string,
     });
   }
   get customContinuesClass() {

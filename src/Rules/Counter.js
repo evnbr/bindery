@@ -1,18 +1,18 @@
 import Rule from './Rule';
-import RuleOption from './RuleOption';
+import UserOption from '../UserOption';
 
 
 class Counter extends Rule {
   constructor(options) {
-    options.selector = '*';
     super(options);
+    this.selector = '*';
     this.counterValue = 0;
-    this.name = 'Counter';
-    RuleOption.validate(options, {
-      replaceEl: RuleOption.string,
-      resetEl: RuleOption.string,
-      incrementEl: RuleOption.string,
-      replace: RuleOption.func,
+    UserOption.validate(options, {
+      name: 'Counter',
+      replaceEl: UserOption.string,
+      resetEl: UserOption.string,
+      incrementEl: UserOption.string,
+      replace: UserOption.func,
     });
   }
   beforeAdd(el, state) {

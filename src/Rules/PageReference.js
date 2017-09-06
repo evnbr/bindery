@@ -1,5 +1,5 @@
 import Replace from './Replace';
-import RuleOption from './RuleOption';
+import UserOption from '../UserOption';
 import { makeRanges } from '../utils';
 
 // Options:
@@ -10,10 +10,10 @@ class PageReference extends Replace {
   constructor(options) {
     super(options);
     this.name = 'Page Reference';
-    RuleOption.validate(options, {
-      selector: RuleOption.string,
-      replace: RuleOption.func,
-      createTest: RuleOption.func,
+    UserOption.validate(options, {
+      selector: UserOption.string,
+      replace: UserOption.func,
+      createTest: UserOption.func,
     });
   }
   afterAdd(elmt, state) {
