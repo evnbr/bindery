@@ -97,6 +97,7 @@ class Viewer {
   set isShowingCropMarks(newVal) {
     if (newVal) {
       this.element.classList.add(c('show-crop'));
+      this.setPrint();
     } else {
       this.element.classList.remove(c('show-crop'));
     }
@@ -108,6 +109,7 @@ class Viewer {
   set isShowingBleedMarks(newVal) {
     if (newVal) {
       this.element.classList.add(c('show-bleed-marks'));
+      this.setPrint();
     } else {
       this.element.classList.remove(c('show-bleed-marks'));
     }

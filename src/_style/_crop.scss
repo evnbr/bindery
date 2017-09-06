@@ -70,48 +70,35 @@ $bleedOffset: $markOffset;
   }
 }
 
+.#{$pre}-crop-fold,
+.#{$pre}-crop-left,
+.#{$pre}-crop-right,
+.#{$pre}-bleed-left,
+.#{$pre}-bleed-right {
+  width: 1px;
+  margin: auto;
+  @include vertical-mark
+}
+.#{$pre}-crop-top,
+.#{$pre}-crop-bottom,
+.#{$pre}-bleed-top,
+.#{$pre}-bleed-bottom {
+  height: 1px;
+  @include horizontal-mark
+}
+
+
 
 .#{$pre}-crop {
-  &-fold,
-  &-left,
-  &-right {
-    // transform: scaleX(0.5);
-    width: 1px;
-    margin: auto;
-    @include vertical-mark
-  }
   &-fold { right: 0; left: 0; }
   &-left { left: 0; }
   &-right { right: 0; }
 
-
-  &-top,
-  &-bottom {
-    // transform: scaleY(0.5);
-    height: 1px;
-    @include horizontal-mark
-  }
 
   &-top {
     top: 0;
   }
   &-bottom {
     bottom: 0;
-  }
-}
-
-.#{$pre}-bleed {
-  &-left,
-  &-right {
-    width: 1px;
-    margin: auto;
-    @include vertical-mark
-  }
-
-
-  &-top,
-  &-bottom {
-    height: 1px;
-    @include horizontal-mark
   }
 }

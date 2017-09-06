@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html class="book" lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+  {% include head.html %}
+  <body>
+
+    <script type="text/javascript" src='/bindery/js/bindery.js'></script>
+    <script>
+      Bindery.makeBook({
+        content: {
+          url: '/bindery/book-content/',
+          selector: '.content',
+        },
+        rules: [
+          Bindery.PageBreak({
+            selector: 'h1, h2',
+            position: 'before',
+            continue: 'right',
+          }),
+          Bindery.PageBreak({
+            selector: '.toc-header',
+            position: 'before',
+            continue: 'right',
+          }),
+          Bindery.PageBreak({
+            selector: '#colophon',
+            position: 'before',
+            continue: 'right',
+          }),
+          Bindery.FullBleedPage({
+            selector: '.logo',
+            continue: 'right',
+          }),
+          // Bindery.PageBreak({
+          //   selector: '.logo',
+          //   position: 'after',
+          //   continue: 'right',
+          // }),
+          Bindery.PageBreak({
+            selector: '.highlight',
+            position: 'avoid',
+          }),
+          Bindery.PageReference({
+            selector: '.toc a',
+          }),
+          Bindery.RunningHeader(),
+          Bindery.Footnote({
+            selector: '.post-content a',
+            render: (element, number) => {
+              return '<i>' + number + '</i>: ' + element.href;
+            }
+          }),
+        ]
+      });
+    </script>
+    <script type='text/javascript' src='/bindery/js/moment.min.js'></script>
+    <script type='text/javascript' src='/bindery/js/colophon.js'></script>
+
+  </body>
+</html>

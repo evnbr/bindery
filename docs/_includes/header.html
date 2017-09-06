@@ -4,25 +4,27 @@
   <div class="site-title">
     <a href="{{ "/" | relative_url }}">
       <div class="logo"></div>
-      {{ site.title | escape }}
+      <!-- {{ site.title | escape }} -->
     </a>
-    <!-- &nbsp; · &nbsp; {{ page.title | escape }} -->
   </div>
 
   <nav class="site-nav">
     {% for p in pages_list %}
       {% if p.order %}
-      {% if p.url == page.url %}
-        <div class="nav-item nav-active">
-            <a href="{{ p.url | relative_url }}">{{ p.title | escape }}</a>
-        </div>
+        {% if p.url == page.url %}
+          <div class="nav-item nav-active">
         {% else %}
-        <div class="nav-item">
-            <a href="{{ p.url | relative_url }}">{{ p.title | escape }}</a>
-        </div>
+          <div class="nav-item">
         {% endif %}
+            <a href="{{ p.url | relative_url }}">
+              <span class='long-title'>{{ p.title | escape }}</span>
+              <span class='short-title'>{{ p.shortTitle | escape }}</span>
+            </a>
+          </div>
       {% endif %}
     {% endfor %}
   </nav>
+  <!-- <a class="btn make-book" href="/bindery/book">Make Book</a> -->
+  <div class="scroll-back"><a href="#">↑</a></div>
 
 </header>

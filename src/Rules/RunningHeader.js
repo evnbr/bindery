@@ -1,6 +1,6 @@
 import h from 'hyperscript';
 import Rule from './Rule';
-import RuleOption from './RuleOption';
+import UserOption from '../UserOption';
 import c from '../utils/prefixClass';
 
 // Options:
@@ -12,8 +12,8 @@ class RunningHeader extends Rule {
   constructor(options = {}) {
     super(options);
     this.name = 'Running Header';
-    RuleOption.validate(options, {
-      render: RuleOption.func,
+    UserOption.validate(options, {
+      render: UserOption.func,
     });
   }
   afterBind(page) {

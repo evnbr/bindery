@@ -1,7 +1,8 @@
 p.#{$pre}-continuation {
-  text-indent: 0 !important;
+  text-indent: unset !important;
 }
 
 li.#{$pre}-continuation {
   list-style: none !important;
+  text-indent: unset !important;
 }

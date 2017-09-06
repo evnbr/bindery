@@ -50,11 +50,13 @@
 	<script type="text/javascript" src="/bindery/js/bindery.js"></script>
 	<script>
 			Bindery.makeBook({
-			  source: {
+			  content: {
 					url: './content.html',
 					selector: ".content",
 				},
-				bleed: '0.25in',
+				pageSetup: {
+					bleed: '0.25in',
+				},
 			  rules: [
 					Bindery.RunningHeader(),
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),

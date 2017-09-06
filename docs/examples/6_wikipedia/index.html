@@ -9,7 +9,6 @@
 </head>
 
 <body>
-	<script type="text/javascript" src='/bindery/js/viewExampleSource.js'></script>
 	<script type="text/javascript" src="/bindery/js/bindery.js"></script>
 	<script type="text/javascript" src="getArticle.js"></script>
 	<script>
@@ -17,7 +16,7 @@
 			let originalArticle = article;
 
 			Bindery.makeBook({
-				source: originalArticle,
+				content: originalArticle,
 				rules: [
 					Bindery.PageBreak({ selector: '.vertical-navbox', position: 'before', continue: 'right' }),
 					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),

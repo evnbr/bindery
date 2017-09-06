@@ -39,12 +39,8 @@
     .#{$pre}-page::after {
       box-shadow: 0 0 0 1px magenta;
     }
-    .#{$pre}-flowbox {
-      box-shadow: 0 0 0 1px cyan;
-    }
-    .#{$pre}-footer {
-      box-shadow: 0 0 0 1px cyan;
-    }
+    .#{$pre}-flowbox,
+    .#{$pre}-footer,
     .#{$pre}-running-header {
       box-shadow: 0 0 0 1px cyan;
     }
@@ -81,30 +77,34 @@
     // }
     &::before {
       transition: none;
+
       content: "+";
+      display: block;
+      width: 12px;
+      margin: 0 auto -10px;
+      padding: 4px;
+      overflow: hidden;
+
       position: absolute;
       bottom: 0;
-      display: block;
-      margin: 0 auto -10px;
       left: 0;
       right: 0;
+      z-index: 999;
+
       text-align: center;
       font: 8px/1.3 $system;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.1em;
+
       color: #ad0000;
-      width: 12px;
       background: white;
-      z-index: 999;
       border-radius: 2px;
-      padding: 4px;
-      overflow: hidden;
       border: 1px solid currentColor;
     }
     &:hover::before {
       content: "Overflow";
-      width: 54px;
+      width: 64px;
     }
     .#{$pre}-content {
       transition: none;
@@ -133,7 +133,6 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  margin: auto;
 }
 
 .#{$pre}-flowbox {
@@ -156,15 +155,6 @@
   z-index: 2;
 }
 
-.#{$pre}-footer > :first-child:before {
-  content: "";
-  display: block;
-  width: 24pt;
-  height: 1px;
-  box-shadow: inset 0 0.5px 0 0 black;
-  margin-bottom: 8pt;
-}
-
 @mixin rotate-face-right {
   transform: rotate(-90deg) translate3d(-100%, 0, 0);
   transform-origin: top left;
@@ -175,11 +165,26 @@
   transform-origin: top left;
 }
 
+
+
+.#{$pre}-rotate-container.#{$pre}-rotate-clockwise,
+.#{$pre}-left .#{$pre}-rotate-container.#{$pre}-rotate-spread-clockwise,
+.#{$pre}-right .#{$pre}-rotate-container.#{$pre}-rotate-inward,
+.#{$pre}-left .#{$pre}-rotate-container.#{$pre}-rotate-outward {
+  @include rotate-face-left
+}
+
+.#{$pre}-rotate-container.#{$pre}-rotate-counterclockwise,
+.#{$pre}-left .#{$pre}-rotate-container.#{$pre}-rotate-spread-counterclockwise,
+.#{$pre}-left .#{$pre}-rotate-container.#{$pre}-rotate-inward,
+.#{$pre}-right .#{$pre}-rotate-container.#{$pre}-rotate-outward {
+  @include rotate-face-right
+}
+
 .#{$pre}-rotate-container {
   position: absolute;
 
   &.#{$pre}-rotate-clockwise {
-    @include rotate-face-left
     .#{$pre}-left & {
       .#{$pre}-background { bottom: 0; }
     }
@@ -189,7 +194,6 @@
   }
 
   &.#{$pre}-rotate-counterclockwise {
-    @include rotate-face-right
     .#{$pre}-left & {
       .#{$pre}-background { top: 0; }
     }
@@ -200,29 +204,13 @@
 
   &.#{$pre}-rotate-inward {
     .#{$pre}-background { bottom: 0; }
-    .#{$pre}-left & {
-      @include rotate-face-right
-    }
-    .#{$pre}-right & {
-      @include rotate-face-left
-    }
   }
 
   &.#{$pre}-rotate-outward {
     .#{$pre}-background { top: 0; }
-    .#{$pre}-left & {
-      @include rotate-face-left
-    }
-    .#{$pre}-right & {
-      @include rotate-face-right
-    }
   }
 
   &.#{$pre}-rotate-spread-clockwise {
-    .#{$pre}-left & {
-      transform: rotate(90deg) translate3d(0, -100%, 0);
-      transform-origin: top left;
-    }
     .#{$pre}-right & {
       transform: rotate(90deg) translate3d(0, -50%, 0);
       transform-origin: top left;
@@ -230,10 +218,6 @@
   }
 
   &.#{$pre}-rotate-spread-counterclockwise {
-    .#{$pre}-left & {
-      transform: rotate(-90deg) translate3d(-100%, 0%, 0);
-      transform-origin: top left;
-    }
     .#{$pre}-right & {
       transform: rotate(-90deg) translate3d(-100%, -50%, 0);
       transform-origin: top left;

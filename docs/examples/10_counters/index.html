@@ -16,20 +16,34 @@
 				url: '../example_shared/content.html',
 				selector: ".content",
 			},
-		  rules: [
+			rules: [
 				Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-				Bindery.Footnote({ selector: 'p' }),
-				Bindery.Footnote({
-					selector: 'p > a',
-					render: (elmt, number) => `<sup>${number}</sup> Link to <u>${elmt.getAttribute('href')}</u>`,
+				Bindery.RunningHeader(),
+				Bindery.Counter({
+					incrementEl: 'h2',
+					replaceEl: 'h2',
+					replace: (el, counterValue) => {
+						el.insertAdjacentHTML('beforeend', `<span style='color: lime;'>Title ${counterValue} </span>`);
+						return el;
+					}
 				}),
-				Bindery.FullBleedPage({ selector: '.med-figure' }),
-				Bindery.FullBleedSpread({ selector: '.big-figure' }),
-				Bindery.RunningHeader({
-					render: (page) => {
-						if (page.isLeft) return `${page.number} · ${page.heading.h1 || ''} `;
-						else if (page.isRight) return `${page.heading.h2 || ''} · ${page.number}`;
-					},
+				Bindery.Counter({
+					incrementEl: 'p',
+					replaceEl: 'p',
+					resetEl: 'h2',
+					replace: (el, counterValue) => {
+						el.insertAdjacentHTML('afterbegin', `<span style='color: red;'>P ${counterValue} </span>`);
+						return el;
+					}
+				}),
+				Bindery.Counter({
+					incrementEl: 'figure',
+					replaceEl: 'figcaption',
+					resetEl: 'h2',
+					replace: (el, counterValue) => {
+						el.insertAdjacentHTML('afterbegin', `<span style='color: blue;'>Fig ${counterValue} </span>`);
+						return el;
+					}
 				}),
 				Bindery.PageReference({
 					selector: ".toc a",
@@ -40,7 +54,7 @@
 						return row;
 					}
 				}),
-		  ],
+			],
 		});
 	</script>
 

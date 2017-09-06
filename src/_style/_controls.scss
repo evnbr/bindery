@@ -6,6 +6,7 @@
 
 .#{$pre}-controls {
   font: 14px / 1.4 $system;
+  display: none;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -17,10 +18,7 @@
   background: $background;
   overflow: scroll;
   padding-bottom: 100px;
-
-  .#{$pre}-in-progress & {
-    // pointer-events: none;
-  }
+  -webkit-font-smoothing: antialiased;
 
   * {
     font: inherit;
@@ -32,8 +30,13 @@
 }
 
 .#{$pre}-title {
-  padding: 20px;
+  padding: 20px 20px 8px;
   font-size: 18px;
+  & + .#{$pre}-expand-row {
+    position: absolute;
+    right: 8px;
+    top: 16px;
+  }
 }
 
 .#{$pre}-spinner {
@@ -59,7 +62,7 @@
 .#{$pre}-btn {
   -webkit-appearance: none;
   padding: 8px 16px;
-  color: #444;
+  color: black;
   border: none;
   background: rgba(0,0,0,0.06);
   cursor: pointer;
@@ -68,7 +71,6 @@
   font-weight: 500;
   display: inline-block;
   border-radius: 3px;
-  width: auto;
   margin-right: 8px;
   text-decoration: none;
   &:focus {
@@ -83,11 +85,9 @@
   &:active {
     background: rgba(0,0,0,0.14);
   }
-
-  // .#{$pre}-in-progress & {
-  //   opacity: 0.2;
-  //   pointer-events: none;
-  // }
+  &:last-child {
+    margin-right: 0;
+  }
 }
 
 .#{$pre}-btn-light {
@@ -95,6 +95,7 @@
 }
 
 .#{$pre}-btn-main {
+  margin-top: 4px;
   background: $accent;
   color: white;
 
@@ -118,17 +119,11 @@
 
 .#{$pre}-viewswitcher {
   padding: 12px 8px;
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  z-index: 99;
-  width: $sidebarWidth;
-  background: $background;
 }
 
 .#{$pre}-viewmode {
   height: 54px;
-  width: 25%;
+  width: 54px;
   display: inline-block;
   text-align: center;
   font-size: 10px;
@@ -165,7 +160,7 @@
 [bindery-view-mode='interactive'] .#{$pre}-flip,
 [bindery-view-mode='outline'] .#{$pre}-outline,
 [bindery-view-mode='print'] .#{$pre}-print {
-  color: $accent;
+  color: black;
 }
 
 
@@ -173,15 +168,18 @@
   position: relative;
   display: block;
   padding: 8px 12px;
-  margin: 4px 8px;
+  margin: 0 8px;
   cursor: pointer;
 
   select {
-    float: right;
+    opacity: 0.4;
+    position: absolute;
     border: none;
     background: transparent;
-    padding: 12px;
+    padding: 8px 12px;
     width: 100px;
+    top: 8px;
+    right: 12px;
     &:hover {
       background: $hover;
     }
@@ -220,8 +218,6 @@
 }
 
 .#{$pre}-expand-row {
-  color: transparentize($text, 0.6);
-  font-weight: 500;
   border-radius: 4px;
 
   &:hover {
@@ -236,6 +232,7 @@
     right: 12px;
     top: 2px;
     font-weight: 300;
+    opacity: 0.4;
   }
   &.selected {
     // background: $hover;
@@ -247,7 +244,7 @@
 
   &.selected + .#{$pre}-expand-area {
     opacity: 1;
-    max-height: 400px;
+    max-height: none;
     margin-bottom: 12px;
   }
 }
@@ -258,9 +255,8 @@
   // background: $hover;
   opacity: 0;
   max-height: 0;
-  margin: -4px 8px 0;
+  margin: 0 8px;
   border-radius: 0 0 4px 4px;
-  transition: max-height 0.3s, margin 0.3s, opacity 0.5s;
   overflow: hidden;
 
   .#{$pre}-row {
@@ -364,13 +360,13 @@
   height: 16px;
   background: rgba(0,0,0,0.2);
   border-radius: 8px;
-  margin-right: 5px;
   vertical-align: middle;
   float: right;
   transition: all 0.2s;
   position: relative;
 
-  &-handle {
+  &::after {
+    content: '';
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -382,10 +378,10 @@
     top: 0px;
   }
 
-  &:hover .#{$pre}-switch-handle {
+  &:hover::after  {
     box-shadow: 0 2px 3px rgba(0,0,0,0.3);
   }
-  &:active .#{$pre}-switch-handle {
+  &:active::after  {
     box-shadow: 0 2px 4px rgba(0,0,0,0.4);
   }
 }
@@ -394,7 +390,7 @@
   background: transparentize($accent, 0.4);
 }
 
-.#{$pre}-row.selected .#{$pre}-switch-handle {
+.#{$pre}-row.selected .#{$pre}-switch::after {
   background: $accent;
   left: 12px;
 }
@@ -407,17 +403,10 @@
     box-shadow: 0 0 2px rgba(0,0,0,0.3);
     left: 0;
     width: unset;
-    padding-bottom: 2em;
+    padding-bottom: 12px;
     top: unset;
   }
-  .#{$pre}-viewswitcher {
-    right: unset;
+  .#{$pre}-controls > .#{$pre}-row:last-child {
+    text-align: right;
   }
-  .#{$pre}-measure-area {
-    right: 0;
-  }
-  .#{$pre}-btn-main {
-    float: right;
-  }
-
 }

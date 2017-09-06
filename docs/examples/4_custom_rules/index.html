@@ -53,14 +53,14 @@
 		});
 
 		Bindery.makeBook({
-		  source: {
+		  content: {
 				url: "content.html",
 				selector: ".content"
 			},
-			startingView: "flip",
-			pageUnit: "in",
-			pageSize: { height: '4in', width: '4in' },
-			pageMargin: { top: '0.3in', inner: '0.3in', outer: '0.3in', bottom: '0.3in' },
+			pageSetup: {
+				size: { height: '4in', width: '4in' },
+				margin: { top: '0.3in', inner: '0.3in', outer: '0.3in', bottom: '0.3in' },
+			},
 		  rules: [
 				rainbowRule,
 				shrinkingRule,

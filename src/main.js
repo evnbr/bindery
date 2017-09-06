@@ -1,19 +1,24 @@
+import h from 'hyperscript';
+
 import paginate from './paginate';
 import Styler from './Styler';
 import Viewer from './Viewer';
 import c from './utils/prefixClass';
 
 import Rules from './Rules/';
+import UserOption from './UserOption';
 
 require('./_style/main.scss');
 
-const DEFAULT_BLEED = '12pt';
-const DEFAULT_PAGE_SIZE = { width: '288pt', height: '432pt' };
-const DEFAULT_PAGE_MARGIN = {
-  inner: '24pt',
-  outer: '32pt',
-  bottom: '54pt',
-  top: '48pt',
+const defaultPageSetup = {
+  bleed: '12pt',
+  size: { width: '288pt', height: '432pt' },
+  margin: {
+    inner: '24pt',
+    outer: '24pt',
+    bottom: '40pt',
+    top: '48pt',
+  },
 };
 
 class Bindery {
@@ -25,10 +30,39 @@ class Bindery {
     this.debug = opts.debug || false;
 
     this.styler = new Styler();
-    this.styler.setSize(opts.pageSize || DEFAULT_PAGE_SIZE);
-    this.styler.setMargin(opts.pageMargin || DEFAULT_PAGE_MARGIN);
-    this.styler.setBleed(opts.bleed || DEFAULT_BLEED);
 
+    UserOption.validate(opts, {
+      name: 'makeBook',
+      autorun: UserOption.bool,
+      content: UserOption.any,
+      pageSetup: UserOption.shape({
+        name: 'pageSetup',
+        bleed: UserOption.string,
+        margin: UserOption.shape({
+          name: 'margin',
+          top: UserOption.string,
+          inner: UserOption.string,
+          outer: UserOption.string,
+          bottom: UserOption.string,
+        }),
+        size: UserOption.shape({
+          name: 'size',
+          width: UserOption.string,
+          height: UserOption.string,
+        }),
+      }),
+      rules: UserOption.array,
+    });
+
+    if (opts.pageSetup) {
+      this.styler.setSize(opts.pageSetup.size || defaultPageSetup.size);
+      this.styler.setMargin(opts.pageSetup.margin || defaultPageSetup.margin);
+      this.styler.setBleed(opts.pageSetup.bleed || defaultPageSetup.bleed);
+    } else {
+      this.styler.setSize(defaultPageSetup.size);
+      this.styler.setMargin(defaultPageSetup.margin);
+      this.styler.setBleed(defaultPageSetup.bleed);
+    }
 
     this.viewer = new Viewer({ bindery: this });
     this.controls = this.viewer.controls;
@@ -41,25 +75,25 @@ class Bindery {
     if (opts.rules) this.addRules(opts.rules);
 
 
-    if (!opts.source) {
-      this.viewer.displayError('Source not specified', 'You must include a source element, selector, or url');
+    if (!opts.content) {
+      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
       console.error('Bindery: You must include a source element or selector');
-    } else if (typeof opts.source === 'string') {
-      this.source = document.querySelector(opts.source);
+    } else if (typeof opts.content === 'string') {
+      this.source = document.querySelector(opts.content);
       if (!(this.source instanceof HTMLElement)) {
-        this.viewer.displayError('Source not specified', `Could not find element that matches selector "${opts.source}"`);
-        console.error(`Bindery: Could not find element that matches selector "${opts.source}"`);
+        this.viewer.displayError('Content not specified', `Could not find element that matches selector "${opts.content}"`);
+        console.error(`Bindery: Could not find element that matches selector "${opts.content}"`);
         return;
       }
       if (this.autorun) {
         this.makeBook();
       }
-    } else if (typeof opts.source === 'object' && opts.source.url) {
-      const url = opts.source.url;
-      const selector = opts.source.selector;
+    } else if (typeof opts.content === 'object' && opts.content.url) {
+      const url = opts.content.url;
+      const selector = opts.content.selector;
       this.fetchSource(url, selector);
-    } else if (opts.source instanceof HTMLElement) {
-      this.source = opts.source;
+    } else if (opts.content instanceof HTMLElement) {
+      this.source = opts.content;
       if (this.autorun) {
         this.makeBook();
       }
@@ -83,7 +117,7 @@ class Bindery {
       }
       return '';
     }).then((fetchedContent) => {
-      const wrapper = document.createElement('div');
+      const wrapper = h('div');
       wrapper.innerHTML = fetchedContent;
       this.source = wrapper.querySelector(selector);
       if (!(this.source instanceof HTMLElement)) {

@@ -4,12 +4,13 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Bindery Ex 7 — Custom Continuation</title>
+	<title>Bindery Ex 7 — Custom Split</title>
   <link rel="stylesheet" type="text/css" href="style.css" />
 
 	<style>
 		.content {
 		  font-size: 20px;
+			line-height: 1.4em;
 		}
 
 		p {
@@ -50,16 +51,15 @@
 	<script type="text/javascript" src="/bindery/js/bindery.js"></script>
 	<script>
 		Bindery.makeBook({
-			source: {
+			content: {
 				url: '../example_shared/content.html',
 				selector: ".content",
 			},
 		  rules: [
-				Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-				Bindery.Continuation({
+				Bindery.Split({
 					selector: 'p',
-					hasContinuationClass: 'my-continues',
-					isContinuationClass: 'my-from',
+					toNext: 'my-continues',
+					fromPrevious: 'my-from',
 				}),
 		  ],
 		});

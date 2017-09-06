@@ -16,26 +16,19 @@ sheet.innerHTML = `
   background: transparent;
   box-shadow: none;
 }
-.📖-logo {
-  width: 32px;
-  height: 32px;
-  background: url(http://evanbrooks.info/bindery/assets/logo.svg) no-repeat;
-  background-size: contain;
-  vertical-align: middle;
-  margin-right: 0.8rem;
-  display: inline-block;
-}
 `;
+
+const segments = window.location.pathname.split('/');
+let id = segments.pop();
+if (id === '') id = segments.pop();
 
 const buttons = document.createElement('div');
 buttons.classList.add('📖-view-source-header');
 buttons.classList.add('📖-controls');
 buttons.id = 'viewSourceHeader';
 buttons.innerHTML = `
-  <a href="/bindery/"><div class="📖-logo"></div></a>
-  <a class="📖-btn" href="https://github.com/evnbr/bindery/tree/master/docs/examples/">View Source ↗</a>
+  <a class="📖-btn" href="https://github.com/evnbr/bindery/tree/master/docs/examples/${id}">View Source ↗</a>
 `;
 
-
-document.body.appendChild(buttons);
 document.head.appendChild(sheet);
+document.body.appendChild(buttons);
