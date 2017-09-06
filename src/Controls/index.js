@@ -102,16 +102,16 @@ class Controls {
     // ));
 
     const arrangeSelect = select(
-      option({ value: 'arrange_one' }, 'Pages'),
-      option({ value: 'arrange_two', selected: true }, 'Spreads'),
-      option({ value: 'arrange_booklet' }, 'Booklet'),
+      option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
+      option({ value: 'arrange_two' }, '1 Spread / Sheet'),
+      option({ value: 'arrange_booklet' }, 'Booklet Order'),
       option({ disabled: true }, 'Grid'),
       option({ disabled: true }, 'Signatures'),
     );
     arrangeSelect.addEventListener('change', () => {
       viewer.setPrintArrange(arrangeSelect.value);
     });
-    const arrangement = row('Sheet Layout', arrangeSelect);
+    const arrangement = row('Print', arrangeSelect);
 
     // const orientationSelect = select(
     //   option({ value: 'landscape' }, 'Landscape'),

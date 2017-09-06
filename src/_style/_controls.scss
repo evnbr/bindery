@@ -177,11 +177,12 @@
     border: none;
     background: transparent;
     padding: 8px 12px;
-    width: 100px;
+    width: 140px;
     top: 8px;
     right: 12px;
     &:hover {
       background: $hover;
+      opacity: 1;
     }
   }
 
