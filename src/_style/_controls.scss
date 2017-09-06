@@ -119,6 +119,7 @@
 
 .#{$pre}-viewswitcher {
   padding: 12px 8px;
+  user-select: none;
 }
 
 .#{$pre}-viewmode {
@@ -169,7 +170,8 @@
   display: block;
   padding: 8px 12px;
   margin: 0 8px;
-  cursor: pointer;
+  cursor: default;
+  user-select: none;
 
   select {
     opacity: 0.4;

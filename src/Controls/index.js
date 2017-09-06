@@ -342,7 +342,7 @@ class Controls {
           bleedAmount,
         ),
 
-        expandRow('Book Setup'),
+        expandRow('Page Setup'),
         expandArea(
           layoutControl,
           row(layoutState),
