@@ -6,15 +6,34 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Bindery Ex 8 — Creating an Index</title>
 		<style>
+		html {
+			font: 12pt / 1.3 Georgia, serif;
+		}
 		.content, .intro {
 		  margin: 20px auto;
 		  max-width: 900px;
 		  padding: 20px;
 		}
 
+		h2 {
+			margin: 0 0 1.3rem
+		}
+
 		p {
-		  text-indent: 1rem;
 		  margin: 0;
+		}
+
+		p + p {
+			text-indent: 1.3rem;
+		}
+
+		.index-content {
+			columns: 3;
+			font-size: 10pt;
+		}
+
+		.index-content h4 {
+			margin: 0;
 		}
 
 		.index-content ul, li {
@@ -23,9 +42,17 @@
 		  list-style: none;
 		}
 
+		.index-content ul {
+			margin-bottom: 1.3em;
+		}
+
 		.index-content li {
-		  text-indent: -1em;
-		  padding-left: 1em;
+		  text-indent: -1.3em;
+		  padding-left: 1.3em;
+		}
+
+		.index-content li span {
+			font-style: italic;
 		}
 	</style>
 </head>

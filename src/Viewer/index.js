@@ -41,7 +41,7 @@ class Viewer {
     this.element = h(c('.root'), this.zoomBox);
 
     this.doubleSided = true;
-    this.printArrange = ARRANGE_SPREAD;
+    this.printArrange = ARRANGE_ONE;
     this.isShowingCropMarks = true;
     this.isShowingBleedMarks = false;
     this.setOrientation('landscape');
