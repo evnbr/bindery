@@ -17,6 +17,7 @@ $narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
 $serif: T, Times, Times New Roman, serif;
+$mono: 'Input Mono', 'Source Code Pro', Menlo, Consolas, Monaco, monospace;
 
 * {
   margin: 0;
@@ -240,8 +241,9 @@ li {
     width: 4px;
     height: 4px;
     left: -1em;
-    top: 0.4em;
+    top: 0.65rem;
     border-radius: 50%;
+    display: none;
   }
 }
 
@@ -333,11 +335,6 @@ li {
   transition: opacity 0.25s;
 }
 
-.docs-scrolled .site-nav {
-  opacity: 0;
-  pointer-events: none;
-}
-
 .site-header a {
   &:hover {
     color: $accent;
@@ -386,7 +383,7 @@ h3 {
   margin: 4.5rem 0 1.5rem;
 
   &:first-child {
-    padding-top: 0;
+    margin-top: 1.5rem;
   }
 }
 
@@ -411,7 +408,7 @@ blockquote {
  */
 pre, code {
   line-height: 0.9rem;
-  font-family: Input, "Source Code Pro", Menlo, Consolas, Monaco, monospace;
+  font-family: $mono;
   letter-spacing: -0.015em;
   font-size: 0.6rem;
 }
@@ -513,6 +510,10 @@ p code, li code {
     right: 0;
     z-index: 99;
   }
+  .docs-scrolled .site-nav {
+    opacity: 0;
+    pointer-events: none;
+  }
   pre {
     width: calc(100vw - 8rem);
   }
@@ -543,6 +544,9 @@ p code, li code {
     &::-webkit-scrollbar {
       width: 0px;
       background: transparent; /* make scrollbar transparent */
+    }
+    .selected::before {
+      display: block;
     }
   }
 

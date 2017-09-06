@@ -1,3 +1,26 @@
+/* CODE */
+
+/* Regular */
+
+@font-face {
+    src: url('InputMonoNarrow-Light.woff2') format("woff2");
+    font-family: 'Input Mono';
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    src: url('InputMonoNarrow-LightItalic.woff2') format("woff2");
+    font-family: 'Input Mono';
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* Italic */
+
+
+/* BODY TEXT */
+
 /* Regular */
 @font-face {
   font-family: "T";
