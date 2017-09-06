@@ -1,6 +1,10 @@
-## [Bindery.js](http://evanbrooks.info/bindery/) · [Guide](http://evanbrooks.info/bindery/guide) · [Docs](http://evanbrooks.info/bindery/docs)
+## [Bindery.js](http://evanbrooks.info/bindery/)
 
-### About
+[Intro](http://evanbrooks.info/bindery/) ·
+[Guide](http://evanbrooks.info/bindery/guide) ·
+[Docs](http://evanbrooks.info/bindery/docs) ·
+[Demos](http://evanbrooks.info/bindery/demos) ·
+[About](http://evanbrooks.info/bindery/about) ·
 
 *Bindery.js* is a library for designing printable books with HTML and CSS.
 
@@ -34,10 +38,9 @@ If you're designing a website, think about books as an extension of the responsi
     content: '#content',
     rules: [
       Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-      Bindery.RunningHeader({ beginSection: 'h2' }),
       Bindery.Footnote({
         selector: 'p > a',
-        render: function(element, number) {
+        render: (element, number) -> {
           let href = element.getAttribute('href');
           return `<sup>${number}</sup> Link to ${href}`;
         },
@@ -47,10 +50,12 @@ If you're designing a website, think about books as an extension of the responsi
 </script>
 ```
 
+For more, see the [Guide](http://evanbrooks.info/bindery/guide) and [Docs](http://evanbrooks.info/bindery/docs).
 
 ### Developing
 
-Written in ES6, transpiled with babel, bundled with webpack. The only dependency is [Hyperscript](https://github.com/hyperhype/hyperscript), for templating the UI, which is included in the bundle by default.
+ES6 / babel, bundled with webpack. The only runtime dependency
+is [Hyperscript](https://github.com/hyperhype/hyperscript), for templating the UI, which is included in the bundle by default.
 
 When contributing, keep the following in mind: The goal of bindery.js is to provide an approachable jumping-off point for HTML-to-Print exploration. Because of this, it is intended to work out of the box as a script tag (without needing to run a dev server, set up a development environment, use preprocessors, or really know javascript at all).
 
@@ -60,7 +65,7 @@ When contributing, keep the following in mind: The goal of bindery.js is to prov
 - `npm run-script lint` - ESLint using the [Airbnb style guide](https://github.com/airbnb/javascript)
 - `npm run-script test` - Runs Jest
 
-Note that the pagination code in Bindery is inherently slow. Each step of pagination involves
+Note that the pagination code in Bindery is inherently fairly slow. Each step of pagination involves
 making a change, letting the browser recompute layout, measuring the
 new layout, and then making another change.
 This is the very definition of ['layout thrashing'](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing),
@@ -84,4 +89,4 @@ and the [W3C is working on it](https://drafts.csswg.org/css-page-3/). However, [
 #### Background
 
 bindery.js was originally written in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
-a publication from participants in "HTML Output" at RISD. It was based on the [now-abandoned](https://alistapart.com/blog/post/css-regions-considered-harmful) CSS Regions spec, [polyfill by Remy Francois](https://github.com/FremyCompany/css-regions-polyfill). With thanks to the contributions and feedback from [Catherine Leigh Schmidt](http://cath.land), [Lukas WinklerPrins](http://ltwp.net), and [John Caserta](http://johncaserta.com/).
+a publication from participants in "HTML Output" at RISD. For more, [see here](http://evanbrooks.info/bindery/about).
