@@ -28,8 +28,8 @@ gallery:
   - title: evanbrooks.info/bindery
     desc: A book from this site
     url: /bindery/book
-  - title: johncaserta.com
-    desc: Site and book for John Caserta's projects, writing, and teaching
-    url: //new.johncaserta.com/bindery.html
+#  - title: johncaserta.com
+#    desc: Site and book for John Caserta's projects, writing, and teaching
+#    url: //new.johncaserta.com/bindery.html
   - title: Add yours?
     url: https://github.com/evnbr/bindery
