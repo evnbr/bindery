@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.7 - Tuesday, September 5th, 2017, 10:02:56 PM  
+// [AIV]  Build version: 2.0.0-alpha.7 - Wednesday, September 6th, 2017, 8:52:05 AM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -4304,7 +4304,9 @@ var PageReference = function (_Replace) {
         // Temporary, to make sure it'll fit
         var parent = elmt.parentNode;
         var tempClone = elmt.cloneNode(true);
-        var temp = this.replace(tempClone, '###');
+        var tempNumbers = state.book.pagesForTest(test);
+        var tempRanges = (0, _utils.makeRanges)(tempNumbers);
+        var temp = this.replace(tempClone, tempRanges);
         parent.replaceChild(temp, elmt);
 
         state.book.onComplete(function () {
@@ -4337,7 +4339,7 @@ var PageReference = function (_Replace) {
   }, {
     key: 'replace',
     value: function replace(original, number) {
-      original.insertAdjacentHTML('beforeend', ', ' + number);
+      original.insertAdjacentHTML('beforeend', ', <span>' + number + '</span>');
       return original;
     }
   }]);

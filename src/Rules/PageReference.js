@@ -22,7 +22,9 @@ class PageReference extends Replace {
       // Temporary, to make sure it'll fit
       const parent = elmt.parentNode;
       const tempClone = elmt.cloneNode(true);
-      const temp = this.replace(tempClone, '###');
+      const tempNumbers = state.book.pagesForTest(test);
+      const tempRanges = makeRanges(tempNumbers);
+      const temp = this.replace(tempClone, tempRanges);
       parent.replaceChild(temp, elmt);
 
       state.book.onComplete(() => {
@@ -42,14 +44,14 @@ class PageReference extends Replace {
     let selector = element.getAttribute('href');
     if (selector) {
       selector = selector.replace('#', '');
-      // in case it starts with a number :( thanks wikipedia
+      // extra resilient in case it starts with a number ie wikipedia
       selector = `[id="${selector}"]`;
       return el => el.querySelector(selector);
     }
     return null;
   }
   replace(original, number) {
-    original.insertAdjacentHTML('beforeend', `, ${number}`);
+    original.insertAdjacentHTML('beforeend', `, <span>${number}</span>`);
     return original;
   }
 }
