@@ -1,33 +1,37 @@
-## Bindery.js - [Docs](http://evanbrooks.info/bindery/docs)
+## [Bindery.js](http://evanbrooks.info/bindery/) · [Guide](http://evanbrooks.info/bindery/guide) · [Docs](http://evanbrooks.info/bindery/docs)
 
 ### About
 
-bindery.js is a library for producing book layouts in the browser. The core library allows your HTML to flow over multiple pages, and provides an interface to preview and configure the resulting book. Bindery includes plugins that can express numbering, running headers, spreads, footnotes, tables of contents, and more. With just a couple lines of code, you can [convert URLs to footnotes](https://github.com/evnbr/bindery/tree/master/example), [generate fore-edge printing](https://github.com/evnbr/bindery/tree/master/example), [dynamic font sizes](https://github.com/evnbr/bindery/tree/master/example), and more.
+*Bindery.js* is a library for designing printable books with HTML and CSS.
+
+At its simplest, Bindery flows content over multiple pages. From there, the designer can create elements that depend on that flow, like running headers, footnotes, tables of contents, and indexes. Bindery also provides print options like bleed, crop marks, and booklet ordering.
+
+If you're designing a website, think about books as an extension of the responsive web. If you're designing a book, express your layous programmatically, with no need for InDesign.
 
 ### Getting Started
 
 ```html
-<div class="content">
+<div id="content">
   <!-- The whole content of your book -->
 </div>
 
 <script src="./bindery.min.js"></script>
 <script>
-  Bindery.makeBook({ source: ".content" });
+  Bindery.makeBook({ content: '#content' });
 </script>
 ```
 
 ### Using Rules
 
 ```html
-<div class="content">
+<div id="content">
   <!-- The whole content of your book -->
 </div>
 
 <script src="./bindery.min.js"></script>
 <script>
   Bindery.makeBook({
-    source: ".content",
+    content: '#content',
     rules: [
       Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
       Bindery.RunningHeader({ beginSection: 'h2' }),
@@ -55,6 +59,17 @@ When contributing, keep the following in mind: The goal of bindery.js is to prov
 - `npm run-script minify` - Updates minified production build
 - `npm run-script lint` - ESLint using the [Airbnb style guide](https://github.com/airbnb/javascript)
 - `npm run-script test` - Runs Jest
+
+Note that the pagination code in Bindery is inherently slow. Each step of pagination involves
+making a change, letting the browser recompute layout, measuring the
+new layout, and then making another change.
+This is the very definition of ['layout thrashing'](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing),
+which normally would be avoided. However, it's the only option that allows Bindery
+to work without reinventing the wheel — it lets you use any CSS your browser supports.
+
+Ideally, much of what bindery does would be handled natively with CSS,
+and the [W3C is working on it](https://drafts.csswg.org/css-page-3/). However, [bindery is not a CSS Polyfill](https://evanbrooks.info/bindery/about#what-bindery-is-not).
+
 
 #### To Do
 
