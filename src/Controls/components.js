@@ -60,7 +60,7 @@ const inputNumberUnits = function (val) {
 };
 
 // Switch
-const toggleSwitch = () => h(c('.switch'), h(c('.switch-handle')));
+const toggleSwitch = () => h(c('.switch'));
 
 const switchRow = function (...arg) {
   return h(c('.row'), ...arg, toggleSwitch);

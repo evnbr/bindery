@@ -160,7 +160,7 @@
 [bindery-view-mode='interactive'] .#{$pre}-flip,
 [bindery-view-mode='outline'] .#{$pre}-outline,
 [bindery-view-mode='print'] .#{$pre}-print {
-  color: $accent;
+  color: black;
 }
 
 
@@ -172,14 +172,14 @@
   cursor: pointer;
 
   select {
+    opacity: 0.4;
     position: absolute;
     border: none;
     background: transparent;
     padding: 8px 12px;
     width: 100px;
-    -webkit-appearance: none;
-    top: 0;
-    right: 0;
+    top: 8px;
+    right: 12px;
     &:hover {
       background: $hover;
     }
@@ -232,6 +232,7 @@
     right: 12px;
     top: 2px;
     font-weight: 300;
+    opacity: 0.4;
   }
   &.selected {
     // background: $hover;
@@ -364,7 +365,8 @@
   transition: all 0.2s;
   position: relative;
 
-  &-handle {
+  &::after {
+    content: '';
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -376,10 +378,10 @@
     top: 0px;
   }
 
-  &:hover .#{$pre}-switch-handle {
+  &:hover::after  {
     box-shadow: 0 2px 3px rgba(0,0,0,0.3);
   }
-  &:active .#{$pre}-switch-handle {
+  &:active::after  {
     box-shadow: 0 2px 4px rgba(0,0,0,0.4);
   }
 }
@@ -388,7 +390,7 @@
   background: transparentize($accent, 0.4);
 }
 
-.#{$pre}-row.selected .#{$pre}-switch-handle {
+.#{$pre}-row.selected .#{$pre}-switch::after {
   background: $accent;
   left: 12px;
 }
@@ -404,7 +406,7 @@
     padding-bottom: 12px;
     top: unset;
   }
-  .#{$pre}-row:last-child {
+  .#{$pre}-controls > .#{$pre}-row:last-child {
     text-align: right;
   }
 }
