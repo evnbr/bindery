@@ -1,11 +1,16 @@
 (function highlightAnchorScroll() {
-  const anchors = Array.from(document.querySelectorAll('h3, h4, h5'));
+  const scrollPct = el => (el.scrollTop + el.offsetHeight) / el.scrollHeight;
+  // eslint-disable-next-line no-confusing-arrow
+  const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + ((4 - (2 * t)) * t);
+
+  const anchors = Array.from(document.querySelectorAll('h2, h3, h4, h5'));
+  const nav = document.querySelector('.docs-nav');
   let currentAnchor;
   let throttleScroll;
 
-  // eslint-disable-next-line no-confusing-arrow
-  const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + ((4 - (2 * t)) * t);
   const scrollToAnchor = (anchor) => {
+    history.replaceState(undefined, undefined, `${anchor}`);
+
     const scroller = document.scrollingElement;
     const start = scroller.scrollTop;
     const end = anchor.length > 1 ? document.querySelector(anchor).offsetTop - 40 : 0;
@@ -22,22 +27,34 @@
 
   const updateAnchor = () => {
     const scrollPos = document.scrollingElement.scrollTop;
-    const inview = anchors.find(el => el.offsetTop > scrollPos);
-    if (inview) {
+    const i = anchors.findIndex(el => el.offsetTop > scrollPos);
+    if (i !== -1) {
+      let inview = anchors[i];
+      if (inview.offsetTop > scrollPos + window.innerHeight) {
+        inview = anchors[i - 1];
+      }
       const newAnchor = document.querySelector(`[href='#${inview.id}']`);
       if (newAnchor && newAnchor !== currentAnchor) {
         if (currentAnchor) currentAnchor.classList.remove('selected');
         newAnchor.classList.add('selected');
         currentAnchor = newAnchor;
+        history.replaceState(undefined, undefined, `#${inview.id}`);
       }
     }
+    // if (nav) {
+    //   const scroller = document.scrollingElement;
+    //   const pct = scroller.scrollTop / scroller.scrollHeight;
+    //   const navScrollMax = nav.scrollHeight - nav.offsetHeight;
+    //   nav.scrollTop = navScrollMax * pct;
+    //   console.log(pct);
+    // }
     if (scrollPos > 10) {
       document.body.classList.add('docs-scrolled');
     } else {
       document.body.classList.remove('docs-scrolled');
     }
   };
-  updateAnchor();
+  // updateAnchor();
 
   [...document.querySelectorAll('a')]
     .filter(a => a.getAttribute('href')[0] === '#')
