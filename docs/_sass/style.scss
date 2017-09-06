@@ -427,7 +427,15 @@ p code, li code {
   .nav-item {
     margin-right: 0.5em;
   }
-
+  div pre.highlight {
+    padding: 0 5%;
+    box-shadow: none;
+    margin: 1.5rem -5%;
+  }
+  pre, code {
+    font-size:  0.7rem;
+    line-height: 1.1rem;
+  }
 }
 
 @media (min-width: $narrow) {
