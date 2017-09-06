@@ -280,7 +280,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
           return;
         }
 
-        console.log(`Text breaks at ${pos}: ${originalText.substr(0, pos)}`);
+        // console.log(`Text breaks at ${pos}: ${originalText.substr(0, pos)}`);
 
         const fittingText = originalText.substr(0, pos);
         const overflowingText = originalText.substr(pos);

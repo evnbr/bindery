@@ -4,7 +4,7 @@
 [Guide](http://evanbrooks.info/bindery/guide) ·
 [Docs](http://evanbrooks.info/bindery/docs) ·
 [Demos](http://evanbrooks.info/bindery/demos) ·
-[About](http://evanbrooks.info/bindery/about) ·
+[About](http://evanbrooks.info/bindery/about)
 
 *Bindery.js* is a library for designing printable books with HTML and CSS.
 
