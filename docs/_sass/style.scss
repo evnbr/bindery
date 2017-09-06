@@ -2,11 +2,6 @@
 
 // Define defaults for each variable.
 
-@font-face {
-  font-family: 'Plantin';
-  src: url('plantin.woff2');
-}
-
 $black: black;
 $accent: #0000d0;
 $accent-dark: navy;
@@ -21,8 +16,7 @@ $wide-enough-for-side-nav: 50rem;
 $narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
-// $serif: Plantin, Minion Pro, Adobe Caslon Pro, Caslon, Times, Times New Roman, serif;
-$serif: Times, Times New Roman, serif;
+$serif: T, Times, Times New Roman, serif;
 
 * {
   margin: 0;
@@ -33,11 +27,7 @@ $serif: Times, Times New Roman, serif;
 }
 
 html {
-  // font: 16px/1.4 $system;
-  font: 24px/1.35 $serif;
-  font: 24px/1.5 Tiempos Headline Test, Minion Pro, Adobe Caslon Pro, Caslon, Times, Times New Roman, serif;
-  font: 24px/1.5 T, Minion Pro, Adobe Caslon Pro, Caslon, Times, Times New Roman, serif;
-  // font: 20px/1.7 Copernicus, Minion Pro, Adobe Caslon Pro, Caslon, Times, Times New Roman, serif;
+  font: 24px/1.5 $serif;
   letter-spacing: 0.007em;
   font-weight: 300;
 }
@@ -81,7 +71,6 @@ em {
   padding: 0.4rem 0.7rem 0.45rem;
   border-radius: 3px;
   border: 1px solid currentColor;
-  color: $black;
   background: transparent;
   font-weight: 400;
   text-shadow: none;
@@ -103,10 +92,9 @@ em {
   font: 0.6rem/1.4 $system;
 }
 .make-book {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  background: white;
+  position: absolute;
+  top: -0.7rem;
+  right: 0;
 }
 
 p + p {
@@ -114,7 +102,7 @@ p + p {
 }
 
 a {
-  color: black;
+  color: inherit;
   text-decoration: none;
   &:active {
     opacity: 0.4;
@@ -135,7 +123,7 @@ li {
   background-image: linear-gradient(to bottom, black 50%,rgba(0,0,0,0) 50%);
   background-repeat: repeat-x;
   background-size: 2px .06em;
-  background-position: 0 0.95em;
+  background-position: 0 1.18em;
   &:hover {
     color: $accent;
     background-image: linear-gradient(to bottom, $accent 50%,rgba(0,0,0,0) 50%);
@@ -175,7 +163,7 @@ li {
 .nav-item {
   display: inline-block;
   position: relative;
-  margin-right: 1.5rem;
+  margin-right: 1rem;
 
   &:last-child {
     margin-right: 0;
@@ -216,12 +204,7 @@ li {
     opacity: 1;
     pointer-events: all;
   }
-  .docs-nav & {
-    top: 1.9rem;
-    left: calc(5% + 2.5rem);
-  }
   a {
-    color: black;
     font-family: $system;
     font-size: 1rem;
     text-align: center;
@@ -240,13 +223,11 @@ li {
 
 .docs-nav {
   // font: 0.7rem / 1.5 $system;
-  background: white;
   z-index: 99;
   position: relative;
   display: inline-block;
   a {
     position: relative;
-    color: $black;
     &:hover {
       color: $accent;
       opacity: 1;
@@ -291,18 +272,20 @@ li {
 }
 
 
-.docs-content > ul > li > code:first-child {
+.docs-content > ul > li:not(.📖-continuation) > code:first-child {
   // color: #008080;
   font-weight: 500;
   position: relative;
   left: -1.5rem;
   display: block;
+  line-height: 1.5rem;
 }
+
 .docs-content > ul > li {
   margin: 0 0 1rem $docs-options-inset;
   text-indent: 0;
 }
-.docs-content > ul > li > code:first-child {
+.docs-content > ul > li:not(.📖-continuation) > code:first-child {
   position: absolute;
   left: -$docs-options-inset;
 }
@@ -356,7 +339,6 @@ li {
 }
 
 .site-header a {
-  color: $black;
   &:hover {
     color: $accent;
     opacity: 1;
@@ -373,32 +355,36 @@ figure > img {
 }
 
 h1 {
-  // font-size: 5.5rem;
-  font-size: 8vw;
-  // font-size: 2.5rem;
-  width: 90vw;
-  line-height: 1.1;
+  font-size: 2rem;
   margin: 2rem 0;
-  // font-family: $system;
-  // letter-spacing: -0.005em;
-  // font-style: italic;
 }
 
+// h2 {
+//   padding: 2rem 0 0;
+//   font: 0.9rem/1.5 $system;
+//   font-weight: 700;
+// }
 h2 {
+  margin: 3rem 0 1.5rem;
   font-size: 1.5rem;
   // font-style: italic;
-  padding: 0 0 3rem;
+  // letter-spacing: 0;
+}
+
+.docs-content h3 {
+  // box-shadow: inset 0 0.5px 0 0 black;
+  // width: 2rem;
+  // white-space: nowrap;
+  // margin: 3rem 0 0;
+  // padding: 1.5rem 0 1.5rem;
+  // font-size: 1.3rem;
+  font-style: italic;
 }
 
 h3 {
-  // font: 2rem/1.5 $system;
-  // font-weight: 500;
-  // font: 0.8rem/1.5 $system;
-  // font-weight: 500;
   font-style: italic;
+  margin: 4.5rem 0 1.5rem;
 
-  padding-top: 3rem;
-  padding-bottom: 1.5rem;
   &:first-child {
     padding-top: 0;
   }
@@ -424,13 +410,15 @@ blockquote {
  * Code formatting
  */
 pre, code {
-  line-height: 1.1rem;
+  line-height: 0.9rem;
   font-family: Input, "Source Code Pro", Menlo, Consolas, Monaco, monospace;
   letter-spacing: -0.015em;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
 }
 
-
+p code, li code {
+  font-size: 0.8rem;
+}
 
 @media (max-width: $narrow) {
   html {
@@ -438,19 +426,11 @@ pre, code {
   }
   .site-nav {
     margin: 1rem 0;
-    float: none;
   }
   .nav-item {
-    margin-right: 1em;
+    margin-right: 0.5em;
   }
-  h1 {
-    font-size: 3rem;
-  }
-  h2 {
-    font-size: 3rem;
-    line-height: 1;
-    margin: 1rem 0 1rem;
-  }
+
 }
 
 @media (min-width: $narrow) {
@@ -468,6 +448,17 @@ pre, code {
     width: 40px;
     -webkit-mask-size: 40px;
     -webkit-mask: url(logo40.svg) no-repeat 50% 50%;
+  }
+  .code-compare > div {
+      width: 45%;
+      display: inline-block;
+      vertical-align: top;
+      pre {
+        width: 100%;
+      }
+      &:last-child pre {
+        box-shadow: none;
+      }
   }
 }
 
@@ -535,21 +526,24 @@ pre, code {
     padding-left: 4rem;
   }
   .docs-content {
-    max-width: 28rem;
-    margin-left: $sidebar-width;
-    padding-left: 0;
+    // max-width: 28rem;
+    margin-right: $sidebar-width;
+    // padding-left: 0;
   }
 
   .docs-nav {
-    background: transparent;
     position: fixed;
-    top: 5rem;
-    max-height: calc(100% - 5rem);
+    top: 0;
+    max-height: 100%;
     overflow-y: scroll;
-    padding: 1rem 0 2rem;
+    padding: 6rem 0 2rem;
     width: $sidebar-width;
-    left: 0;
-    padding-left: 5%;
+    right: 0;
+    padding-left: 1rem;
+    &::-webkit-scrollbar {
+      width: 0px;
+      background: transparent; /* make scrollbar transparent */
+    }
   }
 
   .docs-nav h2 {
@@ -557,14 +551,18 @@ pre, code {
   }
 
 }
-
+@media (min-width: 80rem) {
+  .docs-nav {
+    left: calc(5% + 40rem);
+    right: unset;
+  }
+}
 
 .highlight pre, pre.highlight {
   // background-color: #f5f5ff;
   // padding: 1rem;
   padding-left: 1.5rem;
   padding-bottom: 0.1em;
-  // border-left: 1px solid #c0c0c0;
   box-shadow: inset 0.5px 0 0 0 black;
   margin: 1.5rem 0;
 }
@@ -601,7 +599,7 @@ html.book {
     padding: 0;
   }
   .highlighter-rouge:first-child .highlight {
-    margin-top: 0;
+    // margin-top: 0;
   }
   .post-content .btn {
     border: 0;

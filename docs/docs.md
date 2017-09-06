@@ -1,22 +1,21 @@
 ---
 layout: docs
-title:  Documentation
+title:  Docs
 shortTitle: Docs
 permalink: /docs/
 order: 2
 inBook: true
 ---
 
-### Setup
+## Make a Book
 
-##### `makeBook({ options })`
-Creates a book and displays it immediately on page load.
-It takes an object of options as listed below.
+Use `Bindery.makeBook({ options })` to create a book and display it
+immediately on page load. It takes an object of options as described below.
 
 ```js
 // With required options
 Bindery.makeBook({
-  source: '#content',
+  content: '#content',
 });
 ```
 
@@ -25,63 +24,65 @@ integrating Bindery with your own UI.
 
 ```js
 let bindery = new Bindery({
-  source: '#content',
+  content: '#content',
 });
 
 // Later, in your own event handler
 bindery.makeBook();
 ```
 
-#### Content Source
+### content
 
 If the content is on the same page, use a CSS selector or a reference to the node. If the content must be fetched from a remote page, pass an object in the form of `{ url: String, selector: String }`.
 
 ```js
 // CSS selector
 Bindery.makeBook({
-  source: '#content',
+  content: '#content',
 });
 
 // HTMLElement
-let el = document.getElementByID('content');
 Bindery.makeBook({
-  source: el,
+  content: document.getElementByID('content'),
 });
 
 // Fetch from a URL
 Bindery.makeBook({
-  source: {
+  content: {
     selector: '#content',
     url: '/posts.html',
   }
 });
 ```
 
-#### Page Setup
+### pageSetup
 
-- `pageSize` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
-- `pageMargin` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
+- `size` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
+- `margin` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
 - `bleed` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
 and [spreads](#fullbleedspread), and sets the position of bleed and
 crop marks.
+
 ```js
 Bindery.makeBook({
-  source: '#content',
-  pageSize: { width: '4in', height: '6in' },
-  pageMargin: { top: '12pt', inner: '12pt', outer: '16pt', bottom: '20pt' },
-  bleed: '12pt',
+  content: '#content',
+  pageSetup: {
+    size: { width: '4in', height: '6in' },
+    margin: { top: '12pt', inner: '12pt', outer: '16pt', bottom: '20pt' },
+    bleed: '12pt',
+  },
 });
 ```
 
 
 
-### Components
+## Rules
 
 You can set a series of rules that change the book flow and create related components.
 
 ```js
 Bindery.makeBook({
-  source: '#content',
+  content: '#content',
   rules: [
     Bindery.PageBreak({ selector: 'h2', position: 'before' }),
     Bindery.FullBleedSpread({ selector: '.big-figure' }),
@@ -102,23 +103,15 @@ let spreadRule = Bindery.FullBleedSpread({
 });
 
 Bindery.makeBook({
-  source: '#content',
+  content: '#content',
   rules: [ breakRule, spreadRule ],
 });
 ```
 
 
-##### `PageBreak`
+### PageBreak
+<!-- - `Bindery.PageBreak({})` -->
 Adds or avoids page breaks for the selected element.
-
-```js
-// Make sure chapter titles always start on a righthand page.
-Bindery.PageBreak({
-  selector: 'h2',
-  position: 'before',
-  continue: 'right'
-})
-```
 
 - `selector:` Which elements the rule should be applied to.
 - `position:`
@@ -131,28 +124,66 @@ on a specific page. `Optional`
   - `'left'`
   - `'right'`
 
-##### `Split`
+```js
+// Make sure chapter titles always start on a righthand page.
+Bindery.PageBreak({
+  selector: 'h2',
+  position: 'before',
+  continue: 'right'
+})
+```
+
+### Split
+<!-- - `Bindery.Split({})` -->
+
 Add a class when an element splits across two pages, to customize the styling.
+
 Bindery makes as few assumptions as possible about your intended design— by default,
 text-indent will be removed from `<p>`s that started on
-the previous page, and the number or bullet will be hidden for
-`<li>`s that started on the previous page.
-[See example](/bindery/example-viewer/#7_custom_split).
-```js
-Bindery.Split({
-  selector: 'p',
-  toNext: 'my-continues',
-  fromPrevious: 'my-from',
-}),
-```
+the previous page, and the bullet will be hidden for
+`<li>`s that started on the previous page. Everything else you should specify
+yourself—for example, you may want to remove margin, padding, or borders
+when your element splits.
+[See example](/bindery/examples/7_custom_split).
+
 - `selector:` Which elements the rule should be applied to.
 - `toNext:` Class applied to elements that will continue onto the next page. `Optional`
 - `fromPrevious:` Class applied to elements that started on a previous page. `Optional`
 
-##### `RunningHeader`
+```js
+Bindery.Split({
+  selector: 'p',
+  toNext: 'to-next',
+  fromPrevious: 'from-previous',
+}),
+```
+
+<div class='code-compare' markdown='1'>
+```html
+<!-- Before -->
+<p>
+  Some books are
+  saddle stitched...
+</p>
+```
+```html
+<!-- Page 1 -->
+<p class='to-next'>
+  Some books are
+</p>
+<!-- Page 2 -->
+<p class='from-previous'>
+  saddle stitched...
+</p>
+```
+</div>
+
+### RunningHeader
 An element added to each page. By default it will add a page number
 at the top right of each page, but you can use `render` to generate running
-headers using your section titles. Keep in mind you can also use multiple
+headers using your section titles.
+
+Keep in mind you can also use multiple
 `RunningHeaders` to create multiple elements— for example, to add both a page number
 at the bottom and a chapter title at the top.
 ```js
@@ -172,10 +203,18 @@ Bindery.RunningHeader({
 probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
 of the `Page` — see [`Page`](#page) for details. `Optional`
 
-##### `Footnote`
+### Footnote
 Add a footnote to the bottom of the flow area. Footnotes cut into the area for
 text, so note that very large footnotes may bump the entire element to the
 next page.
+
+- `selector:` Which elements the rule should be applied to.
+- `render:` A function that takes an element and number, and returns the
+footnote for that element. This footnote will be inserted at the bottom of the flow
+area.
+- `replace:` A function that takes the selected element and number, and returns
+an new element with a footnote indicator. By default, Bindery will simply insert
+the number as a superscript after the original element. `Optional`
 
 ```js
 Bindery.Footnote({
@@ -185,46 +224,97 @@ Bindery.Footnote({
   }
 }),
 ```
-- `selector:` Which elements the rule should be applied to.
-- `render:` A function that takes an element and number, and returns the
-footnote for that element. This footnote will be inserted at the bottom of the flow
-area.
-- `replace:` A function that takes the selected element and number, and returns
-an new element with a footnote indicator. By default, Bindery will simply insert
-the number as a superscript after the original element. `Optional`
 
-##### `Counter`
+### Counter
 Increment a counter as the book flows. This is useful for numbering figures or sections.
 Bindery's Counters can be used in place of
 [CSS counters](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters),
 which will not work as expected when the DOM is reordered to create a book.
-[See example](/bindery/examples/10_counters).
 - `incrementEl:` CSS Selector. Matching elements will increment the counter by 1.
 - `resetEl:`  CSS Selector. Matching elements will  set the counter to 0. `Optional`
 - `replaceEl:` CSS Selector. Matching elements will display the value of the counter.
 - `replace:` A function that takes the selected element and the counter value, and returns
 an new element. By default, Bindery will simply replace the contents with the value of the counter. `Optional`
 
+Here's how you could number all `<figure>`s, by replacing the
+existing `<span class='fig-num'>`s.
+
 ```js
-// Replace the contents of span.figure-number
 Bindery.Counter({
   incrementEl: 'figure',
-  replaceEl: 'span.figure-number',
+  replaceEl: '.fig-num',
 })
+```
 
-// Add a number before each paragraph, resetting each section
+<div class='code-compare' markdown='1'>
+```html
+<!-- Before -->
+<figure>
+  <img />
+  <figcaption>
+    <span class='fig-num'></span>
+    Here's the caption
+  </figcaption>
+</figure>
+```
+```html
+<!-- After -->
+<figure>
+  <img />
+  <figcaption>
+    <span class='fig-num'>1</span>
+    Here's the caption
+  </figcaption>
+</figure>
+```
+</div>
+
+
+Here's how you could number all `<p>`s, resetting each section,
+by inserting new markup. [See example](/bindery/examples/10_counters).
+
+```js
 Bindery.Counter({
   incrementEl: 'p',
   replaceEl: 'p',
   resetEl: 'h2',
   replace: (el, counterValue) => {
-    el.insertAdjacentHTML('afterbegin', `<span style='color: red;'>P ${counterValue} </span>`);
+    el.insertAdjacentHTML('afterbegin', `<i>P ${counterValue} </i>`);
     return el;
   }
 }),
 ```
+<div class='code-compare' markdown='1'>
+```html
+<!-- Before -->
+<h2>Section 1</h2>
+<p>Some books are
+saddle stitched.</p>
+<p>Other books are
+perfect bound.</p>
 
-##### `FullBleedPage`
+<h2>Section 2</h2>
+<p>eBooks are different
+altogether.</p>
+```
+```html
+<!-- After -->
+<h2>Section 1</h2>
+<p><i>P 1</i>
+Some books are
+saddle stitched.</p>
+<p><i>P 2</i>
+Other books are
+perfect bound.</p>
+
+<h2>Section 2</h2>
+<p><i>P 1</i>
+eBooks are different
+altogether.</p>
+```
+</div>
+
+### FullBleedPage
 Removes the selected element from the ordinary flow of the book and places it on its own
 page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
 - `selector:` Which elements the rule should be applied to.
@@ -248,7 +338,7 @@ Bindery.FullBleedPage({
 }),
 ```
 
-##### `FullBleedSpread`
+### FullBleedSpread
 The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
 - `selector:` Which elements the rule should be applied to.
 - `continue:` Where to resume the book flow after adding the
@@ -272,9 +362,9 @@ Bindery.FullBleedSpread({
 
 
 
-### Referencing Pages
+## Referencing Pages
 
-##### `PageReference`
+### PageReference
 Use PageReference to create a table of contents, index, endnotes, or anywhere
 you might otherwise use anchor links or in-page navigation on the web.
 - `selector:` Which elements the rule should be applied to.
@@ -287,17 +377,17 @@ reference can be found. By default, the test function will look for
 the anchor tag of the reference element's `href` property, which is useful for
 a table of contents. Use a custom function to create an index. `Optional`
 
-#### Creating a Table of Contents
-A table of contents is a reference that points to a specific page. By default, PageReference will look for anchor links. To create a table of
+### Creating a Table of Contents
+A table of contents is a [PageReference](#pagereference) that points to a specific page. By default, PageReference will look for anchor links. To create a table of
 contents, do this:
 
 ```js
 Bindery.PageReference({
-  selector'.table-of-contents a',
+  selector'.toc a',
   replace: (element, num) => {
     let row = document.createElement('div');
     row.innerHTML = element.textContent;
-    row.innerHTML += "<span class='page-num'>" + num + "</span>";
+    row.innerHTML += "<span class='num'>" + num + "</span>";
     return row;
   }
 })
@@ -305,25 +395,33 @@ Bindery.PageReference({
 
 This will transform these anchor links as below:
 
+<div class='code-compare' markdown='1'>
 ```html
 <!-- Before -->
-<ul class='table-of-contents'>
+<ul class='toc'>
   <li>
-    <a href='#chapter1'>Chapter 1</a>
-  </li>
-</ul>
-
-<!-- After -->
-<ul class='table-of-contents'>
-  <li>
-    <div>Chapter 1 <span class='page-num'>5</span></div>
+    <a href='#chapter1'>
+      Chapter 1
+    </a>
   </li>
 </ul>
 ```
+```html
+<!-- After -->
+<ul class='toc'>
+  <li>
+    <div>
+      Chapter 1
+      <span class='num'>5</span>
+    </div>
+  </li>
+</ul>
+```
+</div>
 
 
-#### Creating an Index
-An index is a reference that points to content on a range of pages. There are many way you might create an index. In the following example, rather than
+### Creating an Index
+An index is a [PageReference](#pagereference) that points to content on a range of pages. There are many way you might create an index. In the following example, rather than
 checking the `href`, Bindery will search the entire text of each page to see if contains the text of your reference element.
 
 ```js
@@ -341,33 +439,41 @@ Bindery.PageReference({
 
 This will transform the list items as below:
 
+<div class='code-compare' markdown='1'>
 ```html
 <!-- Before -->
-<p>Most books are perfect bound.</p>
-...
+<p>
+  Some books are
+  saddle stitched...
+</p>
+
 <ul class='index-content'>
   <li>Saddle Stitch</li>
 </ul>
 ```
-
 ```html
 <!-- After -->
-<p>Most books are perfect bound.</p>
-...
+<p>
+  Some books are
+  saddle stitched...
+</p>
+
 <ul class='index-content'>
   <li>Saddle Stitch, 5</li>
 </ul>
 ```
+</div>
 
 If you
-didn't want to match on the exact string, you could use other selectors or attribute, or use a fuzzier method of searching.
+didn't want to match on the exact string, you could use other selectors or attribute, or use a fuzzier method of searching. Just
+create your own testing function from the index entry.
 
 ```js
 Bindery.PageReference({
-  selector: '[data-index-reference]',
+  selector: '[data-ref]',
   createTest: (el) => {
-    let id = el.getAttribute('data-index-reference');
-    let selector = '[data-index-id=' + id + ']'
+    let ref = el.getAttribute('data-ref');
+    let selector = `[data-id='${ref}']`;
     return (pageEl) => {
       return pageEl.querySelector(selector);
     }
@@ -375,29 +481,40 @@ Bindery.PageReference({
 })
 ```
 
+<div class='code-compare' markdown='1'>
 ```html
-<!-- In your book markup -->
-<p data-index-id='perfectBind'>
+<!-- Before -->
+<p data-id='perfectBind'>
   Most books are perfect bound.
 </p>
 
-...
-
 <ul>
-  <li data-index-reference='perfectBind'>
-    Perfect Binding
+  <li data-ref='perfectBind'>
+    Binding, Perfect
   </li>
 </ul>
 ```
+```html
+<!-- After -->
+<p data-id='perfectBind'>
+  Most books are perfect bound.
+</p>
 
+<ul>
+  <li data-ref='perfectBind'>
+    Binding, Perfect: 5
+  </li>
+</ul>
+```
+</div>
 
 Note that we can't know what page something will end up on until the book layout
 is complete, so make sure that your `replace` function doesn't
 change the layout drastically.
 
-### Advanced
+## Advanced
 
-##### `Page`
+### Page
 You may receive instances of this class when using custom rules,
 but will not create them yourself.
 - `number` the page number, with the first page being 1
@@ -406,7 +523,7 @@ but will not create them yourself.
 - `isRight` `Bool` The page is on the right (the front of the leaf)
 - `isLeft` `Bool` The page is on the left (the back of the leaf)
 
-##### `Book`
+### Book
 You may receive instances of this class when using custom rules,
 but will not create them yourself.
 - `pages` Array of `Page`s

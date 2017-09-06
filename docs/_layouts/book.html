@@ -7,13 +7,13 @@
     <script type="text/javascript" src='/bindery/js/bindery.js'></script>
     <script>
       Bindery.makeBook({
-        source: {
+        content: {
           url: '/bindery/book-content/',
           selector: '.content',
         },
         rules: [
           Bindery.PageBreak({
-            selector: 'h2',
+            selector: 'h1, h2',
             position: 'before',
             continue: 'right',
           }),
@@ -53,5 +53,8 @@
         ]
       });
     </script>
+    <script type='text/javascript' src='/bindery/js/moment.min.js'></script>
+    <script type='text/javascript' src='/bindery/js/colophon.js'></script>
+
   </body>
 </html>

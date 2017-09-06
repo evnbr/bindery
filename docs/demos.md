@@ -1,8 +1,8 @@
 ---
 layout: page
-title:  Examples
-shortTitle: Examples
-permalink: /examples/
+title:  Demos
+shortTitle: Demos
+permalink: /demos/
 order: 3
 inBook: true
 ---

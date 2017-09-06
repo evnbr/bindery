@@ -7,14 +7,14 @@ simple:
     id: 3_using_configuration_options
   - title: Full-bleed spreads and images
     id: 9_spreads_and_images
-
-advanced:
-  - title: Create an index
-    id: 8_index
   - title: Customize how elements split across pages
     id: 7_custom_split
   - title: Use a Counter
     id: 10_counters
+
+advanced:
+  - title: Create an index
+    id: 8_index
   - title: Create your own rules
     id: 4_custom_rules
     desc: Change the background color per page, add fore-edge graphics
@@ -25,8 +25,11 @@ advanced:
     id: 5_maximum_content
 
 gallery:
+  - title: evanbrooks.info/bindery
+    desc: A book from this site
+    url: /bindery/book
   - title: johncaserta.com
-    desc: Site for John Caserta's projects, writing, and teaching
+    desc: Site and book for John Caserta's projects, writing, and teaching
     url: //new.johncaserta.com/bindery.html
   - title: Add yours?
-    url:
+    url: https://github.com/evnbr/bindery

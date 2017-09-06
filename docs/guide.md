@@ -1,8 +1,8 @@
 ---
 layout: page
-title:  Introduction
-shortTitle: Intro
-permalink: /intro/
+title:  Guide
+shortTitle: Guide
+permalink: /guide/
 order: 0
 inBook: true
 ---
@@ -26,7 +26,7 @@ file as your content, and you're ready to go.
 
 <script src="js/bindery.min.js"></script>
 <script>
-  Bindery.makeBook({ source: '#content' });
+  Bindery.makeBook({ content: '#content' });
 </script>
 ```
 
@@ -47,7 +47,7 @@ file. You can fetch it by passing in the URL, like this.
 <script src="./bindery.min.js"></script>
 <script>
   Bindery.makeBook({
-    source: {
+    content: {
       selector: '#content'
       url: '/content.html',
     },
@@ -91,8 +91,8 @@ to apply special book properties to your markup.
 
 ```js
 Bindery.makeBook({
-  source: {
-    selector: '.content'
+  content: {
+    selector: '#content'
     url: '/content.html',
   },
   rules: [
@@ -115,21 +115,24 @@ an HTML element, or the text to display.
 ```js
 let linksAsFootnotes = Bindery.Footnote({
   selector: 'p > a',
-  render: function(element, number) {
-    return number + ': Link to ' + element.href;
+  render: (element, number) => {
+    return `${number}: Link to ${element.href}`;
   }
 });
 
 let runningHeaders = Bindery.RunningHeader({
-  render: function(page) {
-    if (page.isLeft) { return page.number + ' · Roland Barthes'; }
-    else { return 'Mythologies · ' + page.number; }
+  render: (page) => {
+    if (page.isLeft) {
+      return `${page.number} · Jan Tschichold`;
+    } else {
+      return `The Form of the Book · ${page.number}`;
+    }
   },
 });
 
 Bindery.makeBook({
-  source: {
-    selector: '.content'
+  content: {
+    selector: '#content'
     url: '/content.html',
   },
   rules: [ linksAsFootnotes, runningHeaders ]
