@@ -17,10 +17,9 @@ const MODE_OUTLINE = 'outline';
 const ARRANGE_ONE = 'arrange_one';
 const ARRANGE_SPREAD = 'arrange_two';
 const ARRANGE_BOOKLET = 'arrange_booklet';
-// const ARRANGE_SIGNATURE = 'arrange_signature';
 
 
-const setOrientationCSS = (newValue) => {
+const setPrintPageCSS = (width, height) => {
   let sheet;
   const existing = document.querySelector('#binderyPrintSetup');
   if (existing) {
@@ -29,13 +28,17 @@ const setOrientationCSS = (newValue) => {
     sheet = document.createElement('style');
     sheet.id = 'binderyPrintSetup';
   }
-  sheet.innerHTML = `@page { size: ${newValue}; }`;
+  sheet.innerHTML = `
+    @page { size: ${width} ${height}; }
+    .${c('print-page')} { width: ${width}; height: ${height};}
+  `;
   document.head.appendChild(sheet);
 };
 
 class Viewer {
   constructor({ bindery }) {
     this.book = null;
+    this.styler = bindery.styler;
 
     this.zoomBox = h(c('.zoom-wrap'));
     this.element = h(c('.root'), this.zoomBox);
@@ -44,7 +47,6 @@ class Viewer {
     this.printArrange = ARRANGE_ONE;
     this.isShowingCropMarks = true;
     this.isShowingBleedMarks = false;
-    this.setOrientation('landscape');
 
     this.mode = MODE_PREVIEW;
     this.currentLeaf = 0;
@@ -90,6 +92,10 @@ class Viewer {
     });
   }
 
+  get isTwoUp() {
+    return this.printArrange !== ARRANGE_ONE;
+  }
+
   get isShowingCropMarks() {
     return this.element.classList.contains(c('show-crop'));
   }
@@ -115,14 +121,33 @@ class Viewer {
     }
   }
 
+  setSheetSize(newVal) {
+    const width = this.isTwoUp
+      ? this.styler.spreadSizeStyle().width
+      : this.styler.size.width;
+    const height = this.styler.size.height;
+    const b = this.styler.bleed;
 
-  setOrientation(newVal) {
-    if (newVal === this.orientation) return;
-    this.orientation = newVal;
-    setOrientationCSS(newVal);
-    if (this.mode === MODE_SHEET) {
-      this.render();
-    } else {
+    if (newVal === 'size_page') {
+      setPrintPageCSS(width, height);
+    } else if (newVal === 'size_page_bleed') {
+      setPrintPageCSS(
+        `calc(${width} + ${b} + ${b})`,
+        `calc(${height} + ${b} + ${b})`
+      );
+    } else if (newVal === 'size_page_marks') {
+      // TODO: 24pt marks is hardcoded
+      setPrintPageCSS(
+        `calc(${width} + ${b} + ${b} + 24pt)`,
+        `calc(${height} + ${b} + ${b} + 24pt)`
+      );
+    } else if (newVal === 'size_letter_l') {
+      setPrintPageCSS('11in', '8.5in');
+    } else if (newVal === 'size_letter_p') {
+      setPrintPageCSS('8.5in', '11in');
+    }
+
+    if (this.mode !== MODE_SHEET) {
       this.setPrint();
     }
   }
@@ -306,7 +331,6 @@ class Viewer {
 
     this.zoomBox.innerHTML = '';
 
-    const isTwoUp = this.printArrange !== ARRANGE_ONE;
     const isBooklet = this.printArrange === ARRANGE_BOOKLET;
     const orient = this.orientation;
 
@@ -317,7 +341,7 @@ class Viewer {
       pages = orderPagesBooklet(pages);
     }
 
-    const fragment = printLayout(pages, isTwoUp, orient, isBooklet);
+    const fragment = printLayout(pages, this.isTwoUp, orient, isBooklet);
     this.zoomBox.appendChild(fragment);
   }
 

@@ -17,7 +17,7 @@ const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
   const spread = isTwoUp ? twoPageSpread : onePageSpread;
 
   const printSheet = function (...arg) {
-    return h(c('.print-page') + c(`.letter-${orient}`),
+    return h(c('.print-page'),
       spread(...arg, marks())
     );
   };

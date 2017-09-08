@@ -243,11 +243,13 @@
     opacity: 0.4;
   }
   &.selected {
+    opacity: 0.4;
     // background: $hover;
     // border-radius: 4px 4px 0 0;
   }
   &.selected::after {
     content: '–';
+    opacity: 1;
   }
 
   &.selected + .#{$pre}-expand-area {

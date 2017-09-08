@@ -87,19 +87,49 @@ class Controls {
     const bleedAmount = row('Bleed Amount', unitInputs.bleed);
 
 
-    // const paperSize = row('Paper Size', select(
-    //   option('Letter'),
-    //   option({ disabled: true }, '8.5 x 11'),
-    //   option({ disabled: true }, ''),
-    //   option({ disabled: true }, 'Legal'),
-    //   option({ disabled: true }, '8.5 x 14'),
-    //   option({ disabled: true }, ''),
-    //   option({ disabled: true }, 'Tabloid'),
-    //   option({ disabled: true }, '11 x 17'),
-    //   option({ disabled: true }, ''),
-    //   option({ disabled: true }, 'A4'),
-    //   option({ disabled: true }, 'mm x mm'),
-    // ));
+    const sizePageOption = option({ disabled: true }, 'Page');
+    const sizePageBleedOption = option({ disabled: true }, 'Page + Bleed');
+    const sizePageMarkOption = option({ disabled: true }, 'Page + Bleed + Marks');
+
+    const sheetSizeSelect = select(
+      option({ value: 'size_page', selected: true }, 'Page'),
+      sizePageOption,
+      option({ disabled: true }, ''),
+      option({ value: 'size_page_bleed' }, 'Page + Bleed'),
+      sizePageBleedOption,
+      option({ disabled: true }, ''),
+      option({ value: 'size_page_marks' }, 'Page + Marks'),
+      sizePageMarkOption,
+      option({ disabled: true }, ''),
+      option({ value: 'size_letter_p' }, 'Letter Portrait'),
+      option({ value: 'size_letter_l' }, 'Letter Landscape'),
+    );
+
+    const sheetTooSmallAlert = row('Sheet is too small to see marks · ', h('a', {
+      href: '#',
+      onclick: () => {
+        sheetSizeSelect.value = 'size_page_marks';
+        updateSheetSize();
+      },
+    }, 'Change'));
+    const updateSheetSize = () => {
+      const newVal = sheetSizeSelect.value;
+      const marksHidden = (newVal === 'size_page' || newVal === 'size_page_bleed');
+      sheetTooSmallAlert.style.display = marksHidden ? 'block' : 'none';
+      viewer.setSheetSize(newVal);
+    };
+    sheetSizeSelect.addEventListener('change', updateSheetSize);
+
+    const sheetSize = row('Sheet', sheetSizeSelect);
+
+    const updateSheetSizeSelect = () => {
+      const { width, height } = this.binder.styler.size;
+      const bleed = this.binder.styler.bleed;
+      sizePageOption.textContent = `${width} x ${height}`;
+      sizePageBleedOption.textContent = `${width} x ${height} + ${bleed} bleed`;
+      sizePageMarkOption.textContent = `${width} x ${height} + ${bleed} bleed + 12pt`;
+    };
+    updateSheetSizeSelect();
 
     const arrangeSelect = select(
       option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
@@ -111,16 +141,7 @@ class Controls {
     arrangeSelect.addEventListener('change', () => {
       viewer.setPrintArrange(arrangeSelect.value);
     });
-    const arrangement = row('Print', arrangeSelect);
-
-    // const orientationSelect = select(
-    //   option({ value: 'landscape' }, 'Landscape'),
-    //   option({ value: 'portrait' }, 'Portrait'),
-    // );
-    // orientationSelect.addEventListener('change', () => {
-    //   viewer.setOrientation(orientationSelect.value);
-    // });
-    // const orientation = row('Orientation', orientationSelect);
+    const arrangement = row('Layout', arrangeSelect);
 
     const validCheck = h('div', { style: {
       display: 'none',
@@ -130,7 +151,6 @@ class Controls {
       display: 'none',
       'pointer-events': 'none',
     } }, 'Updating...');
-
 
     const startPaginating = () => {
       inProgress.style.display = '';
@@ -248,6 +268,9 @@ class Controls {
         this.binder.styler.setSize(newSize);
         this.binder.styler.setMargin(newMargin);
         this.binder.styler.setBleed(newBleed);
+
+        updateSheetSizeSelect();
+
         this.binder.styler.updateStylesheet();
         viewer.updateZoom();
 
@@ -329,25 +352,22 @@ class Controls {
       header,
       viewSwitcher,
 
-      // expandRow('⚙️'),
-      // expandArea(
-        arrangement,
-        // paperSize,
-        // orientation,
+      expandRow('Page Setup'),
+      expandArea(
+        layoutControl,
+        row(layoutState),
+      ),
 
-        expandRow('Marks and Bleed'),
-        expandArea(
-          cropToggle,
-          bleedMarkToggle,
-          bleedAmount,
-        ),
+      expandRow('Marks and Bleed'),
+      expandArea(
+        cropToggle,
+        bleedMarkToggle,
+        bleedAmount,
+        sheetTooSmallAlert,
+      ),
 
-        expandRow('Page Setup'),
-        expandArea(
-          layoutControl,
-          row(layoutState),
-        ),
-      // ),
+      arrangement,
+      sheetSize,
 
       debugControls,
 

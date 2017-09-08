@@ -64,17 +64,6 @@
      margin: 20px auto;
    }
 
-   .#{$pre}-letter {
-     &-landscape {
-       width: 11in;
-       height: 8.5in;
-     }
-     &-portrait {
-       width: 8.5in;
-       height: 11in;
-     }
-   }
-
    .#{$pre}-placeholder-pulse {
      animation: pulse 1s infinite;
    }
@@ -143,6 +132,8 @@ body.#{$pre}-viewing {
   page-break-after: always;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
 .#{$pre}-spread-wrapper {
