@@ -1,6 +1,7 @@
 import Replace from './Replace';
 import UserOption from '../UserOption';
 import { makeRanges } from '../utils';
+import c from '../utils/prefixClass';
 
 // Options:
 // selector: String
@@ -24,7 +25,8 @@ class PageReference extends Replace {
       const tempClone = elmt.cloneNode(true);
       const tempNumbers = state.book.pagesForTest(test);
       const tempRanges = makeRanges(tempNumbers);
-      const temp = this.replace(tempClone, tempRanges);
+      const temp = this.replace(tempClone, tempRanges || '###');
+      temp.classList.add(c('placeholder-pulse'));
       parent.replaceChild(temp, elmt);
 
       state.book.onComplete(() => {

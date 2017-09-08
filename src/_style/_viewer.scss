@@ -75,11 +75,22 @@
      }
    }
 
+   .#{$pre}-placeholder-pulse {
+     animation: pulse 1s infinite;
+   }
+
+
 }
 
 @keyframes fadeUp {
   0%   { opacity: 0; }
   100% { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%   { opacity: 0.2; }
+  50%  { opacity: 0.5; }
+  100% { opacity: 0.2; }
 }
 
 @page {

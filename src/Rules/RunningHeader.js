@@ -16,7 +16,7 @@ class RunningHeader extends Rule {
       render: UserOption.func,
     });
   }
-  afterBind(page) {
+  eachPage(page) {
     if (!page.runningHeader) {
       const el = h(c('.running-header'));
       page.element.appendChild(el);

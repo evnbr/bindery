@@ -73,6 +73,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       error('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
+    updatePaginationProgress(); // finished with this page, can display
 
     state.breadcrumb = cloneBreadcrumb(state.breadcrumb);
     const newPage = makeNewPage();
@@ -93,14 +94,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       }
     }
 
-    updatePaginationProgress();
-
     return newPage;
   };
 
   const beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
   const afterAddRules = rules.filter(r => r.selector && r.afterAdd);
-  const afterBindRules = rules.filter(r => r.afterBind);
+  const pageRules = rules.filter(r => r.eachPage);
 
   const applyBeforeAddRules = (element) => {
     let addedElement = element;
@@ -143,11 +142,17 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     return addedElement;
   };
 
-  const applyAfterBindRules = (book) => {
-    afterBindRules.forEach((rule) => {
+  const applyEachPageRules = (book) => {
+    pageRules.forEach((rule) => {
       book.pages.forEach((page) => {
-        rule.afterBind(page, book);
+        rule.eachPage(page, book);
       });
+    });
+  };
+
+  const applyPageRules = (page, book) => {
+    pageRules.forEach((rule) => {
+      rule.eachPage(page, book);
     });
   };
 
@@ -407,9 +412,13 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     });
   };
   updatePaginationProgress = () => {
+    state.pages = orderPages(state.pages, makeNewPage);
     annotatePages(state.pages);
     state.book.pages = state.pages;
-    // applyAfterBindRules(state.book);
+    if (state.currentPage) {
+      applyPageRules(state.currentPage, state.book);
+    }
+    // applyEachPageRules(state.book);
     progress(state.book);
   };
   finishPagination = () => {
@@ -420,7 +429,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     state.book.pages = orderedPages;
     state.book.setCompleted();
-    applyAfterBindRules(state.book);
+    applyEachPageRules(state.book);
 
     const end = window.performance.now();
     if (!isDebugging) {
