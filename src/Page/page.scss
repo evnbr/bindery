@@ -1,0 +1,104 @@
+@media screen {
+  .#{$pre}-page {
+    background: white;
+    outline: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
+    overflow: hidden;
+
+    .#{$pre}-show-bleed & {
+      box-shadow: none;
+      outline: none;
+      overflow: visible;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+  }
+}
+
+p.#{$pre}-continuation {
+  text-indent: unset !important;
+}
+
+li.#{$pre}-continuation {
+  list-style: none !important;
+  text-indent: unset !important;
+}
+
+.#{$pre}-out-of-flow {
+  display: none;
+}
+
+.#{$pre}-page {
+  width: 200px;
+  height: 300px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.#{$pre}-flowbox {
+  position: relative;
+  margin: 60px 40px;
+  margin-bottom: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.#{$pre}-content {
+  padding: 0.1px;   /* prevent margin collapse */
+  position: relative;
+}
+
+.#{$pre}-footer {
+  margin: 60px 40px;
+  margin-top: 8pt;
+  flex: 0 1 auto;
+  z-index: 2;
+}
+
+/*Bleed as layer*/
+.#{$pre}-background {
+  position: absolute;
+  z-index: 0;
+  overflow: hidden;
+  // '>' So this doesn't apply to rotated pages
+  .#{$pre}-left > & {
+    right: 0;
+  }
+  .#{$pre}-right > & {
+    left: 0;
+  }
+}
+
+.#{$pre}-sup {
+  font-size: 0.667em;
+}
+
+.#{$pre}-running-header, .#{$pre}-footer {
+  font-size: 10pt;
+}
+
+.#{$pre}-running-header {
+  position: absolute;
+  text-align: center;
+  top: 0.25in;
+
+  .#{$pre}-left & {
+    left: 18pt;
+    text-align: left;
+  }
+  .#{$pre}-right & {
+    right: 18pt;
+    text-align: right;
+  }
+}

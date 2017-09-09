@@ -154,16 +154,16 @@
   }
 
   &.#{$pre}-grid .#{$pre}-icon {
-    -webkit-mask: url('../_assets/icon-grid.svg') no-repeat 50% 50%;
+    -webkit-mask: url('./_assets/icon-grid.svg') no-repeat 50% 50%;
   }
   &.#{$pre}-flip .#{$pre}-icon {
-    -webkit-mask: url('../_assets/icon-flip.svg') no-repeat 50% 50%;
+    -webkit-mask: url('./_assets/icon-flip.svg') no-repeat 50% 50%;
   }
   &.#{$pre}-outline .#{$pre}-icon {
-    -webkit-mask: url('../_assets/icon-outline.svg') no-repeat 50% 50%;
+    -webkit-mask: url('./_assets/icon-outline.svg') no-repeat 50% 50%;
   }
   &.#{$pre}-print .#{$pre}-icon {
-    -webkit-mask: url('../_assets/icon-sheet.svg') no-repeat 50% 50%;
+    -webkit-mask: url('./_assets/icon-sheet.svg') no-repeat 50% 50%;
   }
 }
 

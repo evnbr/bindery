@@ -8,7 +8,7 @@ import c from './utils/prefixClass';
 import Rules from './Rules/';
 import UserOption from './UserOption';
 
-require('./_style/main.scss');
+require('./main.scss');
 
 class Bindery {
   constructor(opts) {
