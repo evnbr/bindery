@@ -1,6 +1,5 @@
 import Replace from './Replace';
-import UserOption from '../UserOption';
-import { makeRanges } from '../utils';
+import { OptionType, makeRanges } from '../utils';
 import c from '../utils/prefixClass';
 
 // Options:
@@ -11,10 +10,10 @@ class PageReference extends Replace {
   constructor(options) {
     super(options);
     this.name = 'Page Reference';
-    UserOption.validate(options, {
-      selector: UserOption.string,
-      replace: UserOption.func,
-      createTest: UserOption.func,
+    OptionType.validate(options, {
+      selector: OptionType.string,
+      replace: OptionType.func,
+      createTest: OptionType.func,
     });
   }
   afterAdd(elmt, state) {

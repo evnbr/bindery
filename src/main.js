@@ -6,7 +6,7 @@ import Viewer from './Viewer';
 import c from './utils/prefixClass';
 
 import Rules from './Rules/';
-import UserOption from './UserOption';
+import { OptionType } from './utils';
 
 require('./main.scss');
 
@@ -18,27 +18,27 @@ class Bindery {
     this.autoupdate = opts.autoupdate || false;
     this.debug = opts.debug || false;
 
-    UserOption.validate(opts, {
+    OptionType.validate(opts, {
       name: 'makeBook',
-      autorun: UserOption.bool,
-      content: UserOption.any,
-      pageSetup: UserOption.shape({
+      autorun: OptionType.bool,
+      content: OptionType.any,
+      pageSetup: OptionType.shape({
         name: 'pageSetup',
-        bleed: UserOption.string,
-        margin: UserOption.shape({
+        bleed: OptionType.length,
+        margin: OptionType.shape({
           name: 'margin',
-          top: UserOption.string,
-          inner: UserOption.string,
-          outer: UserOption.string,
-          bottom: UserOption.string,
+          top: OptionType.length,
+          inner: OptionType.length,
+          outer: OptionType.length,
+          bottom: OptionType.length,
         }),
-        size: UserOption.shape({
+        size: OptionType.shape({
           name: 'size',
-          width: UserOption.string,
-          height: UserOption.string,
+          width: OptionType.length,
+          height: OptionType.length,
         }),
       }),
-      rules: UserOption.array,
+      rules: OptionType.array,
     });
 
     this.pageSetup = new PageSetup(opts.pageSetup);

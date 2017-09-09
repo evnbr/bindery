@@ -1,10 +1,5 @@
 import Rule from './Rule';
-import UserOption from '../UserOption';
-
-// Options:
-// selector: String
-// isContinuationClass: String
-// hasContinuationClass: String
+import { OptionType } from '../utils';
 
 class Split extends Rule {
   constructor(options) {
@@ -13,10 +8,10 @@ class Split extends Rule {
     super(options);
 
     this.name = 'Split';
-    UserOption.validate(options, {
-      selector: UserOption.string,
-      toNext: UserOption.string,
-      fromPrevious: UserOption.string,
+    OptionType.validate(options, {
+      selector: OptionType.string,
+      toNext: OptionType.string,
+      fromPrevious: OptionType.string,
     });
   }
   get customContinuesClass() {

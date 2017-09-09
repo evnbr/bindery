@@ -1,6 +1,6 @@
 import h from 'hyperscript';
 import OutOfFlow from './OutOfFlow';
-import UserOption from '../UserOption';
+import { OptionType } from '../utils';
 import c from '../utils/prefixClass';
 
 // Options:
@@ -12,10 +12,10 @@ class FullBleedSpread extends OutOfFlow {
     options.rotate = options.rotate || 'none';
     super(options);
     this.name = 'Full Bleed Spread';
-    UserOption.validate(options, {
-      selector: UserOption.string,
-      continue: UserOption.enum('next', 'same', 'left', 'right'),
-      rotate: UserOption.enum('none', 'clockwise', 'counterclockwise'),
+    OptionType.validate(options, {
+      selector: OptionType.string,
+      continue: OptionType.enum('next', 'same', 'left', 'right'),
+      rotate: OptionType.enum('none', 'clockwise', 'counterclockwise'),
     });
   }
   addElementOutOfFlow(elmt, state, makeNewPage) {

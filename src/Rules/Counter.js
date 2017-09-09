@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import UserOption from '../UserOption';
+import { OptionType } from '../utils';
 
 
 class Counter extends Rule {
@@ -7,12 +7,12 @@ class Counter extends Rule {
     super(options);
     this.selector = '*';
     this.counterValue = 0;
-    UserOption.validate(options, {
+    OptionType.validate(options, {
       name: 'Counter',
-      replaceEl: UserOption.string,
-      resetEl: UserOption.string,
-      incrementEl: UserOption.string,
-      replace: UserOption.func,
+      replaceEl: OptionType.string,
+      resetEl: OptionType.string,
+      incrementEl: OptionType.string,
+      replace: OptionType.func,
     });
   }
   beforeAdd(el, state) {

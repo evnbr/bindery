@@ -1,6 +1,6 @@
 import h from 'hyperscript';
 import Replace from './Replace';
-import UserOption from '../UserOption';
+import { OptionType } from '../utils';
 
 // Options:
 // selector: String
@@ -11,10 +11,10 @@ class Footnote extends Replace {
   constructor(options) {
     super(options);
     this.name = 'Footnote';
-    UserOption.validate(options, {
-      selector: UserOption.string,
-      replace: UserOption.func,
-      render: UserOption.func,
+    OptionType.validate(options, {
+      selector: OptionType.string,
+      replace: OptionType.func,
+      render: OptionType.func,
     });
   }
   afterAdd(element, state, requestNewPage, overflowCallback) {
