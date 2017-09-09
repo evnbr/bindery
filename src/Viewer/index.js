@@ -18,27 +18,10 @@ const ARRANGE_ONE = 'arrange_one';
 const ARRANGE_SPREAD = 'arrange_two';
 const ARRANGE_BOOKLET = 'arrange_booklet';
 
-
-const setPrintPageCSS = (width, height) => {
-  let sheet;
-  const existing = document.querySelector('#binderyPrintSetup');
-  if (existing) {
-    sheet = existing;
-  } else {
-    sheet = document.createElement('style');
-    sheet.id = 'binderyPrintSetup';
-  }
-  sheet.innerHTML = `
-    @page { size: ${width} ${height}; }
-    .${c('print-page')} { width: ${width}; height: ${height};}
-  `;
-  document.head.appendChild(sheet);
-};
-
 class Viewer {
   constructor({ bindery }) {
     this.book = null;
-    this.styler = bindery.styler;
+    this.pageSetup = bindery.pageSetup;
 
     this.zoomBox = h(c('.zoom-wrap'));
     this.element = h(c('.root'), this.zoomBox);
@@ -122,39 +105,22 @@ class Viewer {
   }
 
   setSheetSize(newVal) {
-    const width = this.isTwoUp
-      ? this.styler.spreadSizeStyle().width
-      : this.styler.size.width;
-    const height = this.styler.size.height;
-    const b = this.styler.bleed;
-
-    if (newVal === 'size_page') {
-      setPrintPageCSS(width, height);
-    } else if (newVal === 'size_page_bleed') {
-      setPrintPageCSS(
-        `calc(${width} + ${b} + ${b})`,
-        `calc(${height} + ${b} + ${b})`
-      );
-    } else if (newVal === 'size_page_marks') {
-      // TODO: 24pt marks is hardcoded
-      setPrintPageCSS(
-        `calc(${width} + ${b} + ${b} + 24pt)`,
-        `calc(${height} + ${b} + ${b} + 24pt)`
-      );
-    } else if (newVal === 'size_letter_l') {
-      setPrintPageCSS('11in', '8.5in');
-    } else if (newVal === 'size_letter_p') {
-      setPrintPageCSS('8.5in', '11in');
-    }
+    this.pageSetup.setSheetSizeMode(newVal);
+    this.pageSetup.updateStylesheet();
 
     if (this.mode !== MODE_SHEET) {
       this.setPrint();
     }
+    this.updateZoom();
   }
 
   setPrintArrange(newVal) {
     if (newVal === this.printArrange) return;
     this.printArrange = newVal;
+
+    this.pageSetup.setPrintTwoUp(this.isTwoUp);
+    this.pageSetup.updateStylesheet();
+
     if (this.mode === MODE_SHEET) {
       this.render();
     } else {

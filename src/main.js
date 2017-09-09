@@ -1,7 +1,7 @@
 import h from 'hyperscript';
 
 import paginate from './paginate';
-import Styler from './Styler';
+import PageSetup from './PageSetup';
 import Viewer from './Viewer';
 import c from './utils/prefixClass';
 
@@ -10,17 +10,6 @@ import UserOption from './UserOption';
 
 require('./_style/main.scss');
 
-const defaultPageSetup = {
-  bleed: '12pt',
-  size: { width: '288pt', height: '432pt' },
-  margin: {
-    inner: '24pt',
-    outer: '24pt',
-    bottom: '40pt',
-    top: '48pt',
-  },
-};
-
 class Bindery {
   constructor(opts) {
     console.log(`Bindery ${'[AIV]{version}[/AIV]'}`);
@@ -28,8 +17,6 @@ class Bindery {
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
     this.debug = opts.debug || false;
-
-    this.styler = new Styler();
 
     UserOption.validate(opts, {
       name: 'makeBook',
@@ -54,15 +41,7 @@ class Bindery {
       rules: UserOption.array,
     });
 
-    if (opts.pageSetup) {
-      this.styler.setSize(opts.pageSetup.size || defaultPageSetup.size);
-      this.styler.setMargin(opts.pageSetup.margin || defaultPageSetup.margin);
-      this.styler.setBleed(opts.pageSetup.bleed || defaultPageSetup.bleed);
-    } else {
-      this.styler.setSize(defaultPageSetup.size);
-      this.styler.setMargin(defaultPageSetup.margin);
-      this.styler.setBleed(defaultPageSetup.bleed);
-    }
+    this.pageSetup = new PageSetup(opts.pageSetup);
 
     this.viewer = new Viewer({ bindery: this });
     this.controls = this.viewer.controls;
@@ -165,7 +144,7 @@ class Bindery {
       return;
     }
 
-    if (!this.styler.isSizeValid()) {
+    if (!this.pageSetup.isSizeValid()) {
       this.viewer.displayError(
         'Page is too small', `Size: ${JSON.stringify(this.pageSize)} \n Margin: ${JSON.stringify(this.pageMargin)} \n Try adjusting the sizes or units.`
       );
@@ -184,7 +163,7 @@ class Bindery {
     this.viewer.element.classList.add(c('in-progress'));
     if (this.debug) document.body.classList.add(c('debug'));
 
-    this.styler.updateStylesheet();
+    this.pageSetup.updateStylesheet();
 
     this.controls.setInProgress();
 

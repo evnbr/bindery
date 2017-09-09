@@ -54,7 +54,7 @@ class Controls {
       }
     } }, 'Done');
 
-    const s = this.binder.styler;
+    const s = this.binder.pageSetup;
     const unitInputs = {
       top: inputNumberUnits(s.margin.top),
       inner: inputNumberUnits(s.margin.inner),
@@ -86,21 +86,10 @@ class Controls {
 
     const bleedAmount = row('Bleed Amount', unitInputs.bleed);
 
-
-    const sizePageOption = option({ disabled: true }, 'Page');
-    const sizePageBleedOption = option({ disabled: true }, 'Page + Bleed');
-    const sizePageMarkOption = option({ disabled: true }, 'Page + Bleed + Marks');
-
     const sheetSizeSelect = select(
-      option({ value: 'size_page', selected: true }, 'Page'),
-      sizePageOption,
-      option({ disabled: true }, ''),
+      option({ value: 'size_page' }, 'Page'),
       option({ value: 'size_page_bleed' }, 'Page + Bleed'),
-      sizePageBleedOption,
-      option({ disabled: true }, ''),
-      option({ value: 'size_page_marks' }, 'Page + Marks'),
-      sizePageMarkOption,
-      option({ disabled: true }, ''),
+      option({ value: 'size_page_marks', selected: true }, 'Page + Marks'),
       option({ value: 'size_letter_p' }, 'Letter Portrait'),
       option({ value: 'size_letter_l' }, 'Letter Landscape'),
     );
@@ -112,24 +101,18 @@ class Controls {
         updateSheetSize();
       },
     }, 'Change'));
+    sheetTooSmallAlert.style.color = 'rgba(0,0,0,0.4)';
+
     const updateSheetSize = () => {
       const newVal = sheetSizeSelect.value;
       const marksHidden = (newVal === 'size_page' || newVal === 'size_page_bleed');
       sheetTooSmallAlert.style.display = marksHidden ? 'block' : 'none';
       viewer.setSheetSize(newVal);
+      this.binder.pageSetup.updateStylesheet();
     };
     sheetSizeSelect.addEventListener('change', updateSheetSize);
 
-    const sheetSize = row('Sheet', sheetSizeSelect);
-
-    const updateSheetSizeSelect = () => {
-      const { width, height } = this.binder.styler.size;
-      const bleed = this.binder.styler.bleed;
-      sizePageOption.textContent = `${width} x ${height}`;
-      sizePageBleedOption.textContent = `${width} x ${height} + ${bleed} bleed`;
-      sizePageMarkOption.textContent = `${width} x ${height} + ${bleed} bleed + 12pt`;
-    };
-    updateSheetSizeSelect();
+    const sheetSize = row('Sheet Size', sheetSizeSelect);
 
     const arrangeSelect = select(
       option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
@@ -161,7 +144,7 @@ class Controls {
         refreshPaginationBtn.style.display = '';
         refreshPaginationBtnDebug.style.display = '';
       });
-    }
+    };
     const refreshPaginationBtn = btn({ onclick: () => {
       this.binder.debug = false;
       startPaginating();
@@ -219,7 +202,7 @@ class Controls {
       marginPreview.style.left = `${i}px`;
       marginPreview.style.right = `${o}px`;
     };
-    updateLayoutPreview(this.binder.styler.size, this.binder.styler.margin);
+    updateLayoutPreview(this.binder.pageSetup.size, this.binder.pageSetup.margin);
 
     this.setInProgress = () => {
       headerContent.textContent = 'Paginating';
@@ -259,23 +242,21 @@ class Controls {
       const newBleed = unitInputs.bleed.value;
 
       const needsUpdate =
-        Object.keys(newMargin).some(k => this.binder.styler.margin[k] !== newMargin[k])
-        || Object.keys(newSize).some(k => this.binder.styler.size[k] !== newSize[k])
-        || this.binder.styler.bleed !== newBleed;
+        Object.keys(newMargin).some(k => this.binder.pageSetup.margin[k] !== newMargin[k])
+        || Object.keys(newSize).some(k => this.binder.pageSetup.size[k] !== newSize[k])
+        || this.binder.pageSetup.bleed !== newBleed;
 
       if (needsUpdate) {
         updateLayoutPreview(newSize, newMargin);
-        this.binder.styler.setSize(newSize);
-        this.binder.styler.setMargin(newMargin);
-        this.binder.styler.setBleed(newBleed);
+        this.binder.pageSetup.setSize(newSize);
+        this.binder.pageSetup.setMargin(newMargin);
+        this.binder.pageSetup.setBleed(newBleed);
 
-        updateSheetSizeSelect();
-
-        this.binder.styler.updateStylesheet();
+        this.binder.pageSetup.updateStylesheet();
         viewer.updateZoom();
 
         if (this.binder.autoupdate) {
-          if (this.binder.styler.isSizeValid()) {
+          if (this.binder.pageSetup.isSizeValid()) {
             this.binder.makeBook();
           } else {
             this.setInvalid();

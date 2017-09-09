@@ -27,6 +27,11 @@
     padding: 0;
     box-sizing: border-box;
   }
+
+  a {
+    color: $accent;
+    text-decoration: none;
+  }
 }
 
 .#{$pre}-title {
@@ -64,7 +69,7 @@
 }
 
 
-.#{$pre}-btn {
+.#{$pre}-controls .#{$pre}-btn {
   -webkit-appearance: none;
   padding: 8px 16px;
   color: black;
@@ -95,11 +100,11 @@
   }
 }
 
-.#{$pre}-btn-light {
+.#{$pre}-controls .#{$pre}-btn-light {
   background: none;
 }
 
-.#{$pre}-btn-main {
+.#{$pre}-controls .#{$pre}-btn-main {
   margin-top: 4px;
   background: $accent;
   color: white;
@@ -184,7 +189,7 @@
     border: none;
     background: transparent;
     padding: 8px 12px;
-    width: 140px;
+    width: 120px;
     top: 8px;
     right: 12px;
     &:hover {
