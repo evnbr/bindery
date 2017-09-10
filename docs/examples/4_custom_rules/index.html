@@ -23,14 +23,14 @@
 		});
 
 		let rainbowRule = Bindery.createRule({
-			afterBind: function(page, book) {
+			eachPage: function(page, book) {
 				let pct = page.number / book.pageCount;
 				page.background.style.backgroundColor = "hsl(" + (pct * 360) + ", 80%, 80%)";
 			}
 		});
 
 		let foreedgeRule = Bindery.createRule({
-			afterBind: function(page, book) {
+			eachPage: function(page, book) {
 				let edgePaint = document.createElement("div");
 				if (page.isRight) {
 					edgePaint.style.background = "url('img/forward.svg') no-repeat";
