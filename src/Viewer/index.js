@@ -303,7 +303,7 @@ class Viewer {
     let pages = this.book.pages.slice();
     if (this.printArrange === ARRANGE_SPREAD) {
       pages = padPages(pages);
-    } else if (this.printArrange === ARRANGE_BOOKLET) {
+    } else if (isBooklet) {
       pages = orderPagesBooklet(pages);
     }
 
@@ -329,7 +329,6 @@ class Viewer {
 
     this.element.classList.remove(c('show-bleed'));
     this.element.classList.remove(c('show-guides'));
-    this.zoomBox.classList.add(c('stage3d'));
 
     const pages = padPages(this.book.pages.slice());
 

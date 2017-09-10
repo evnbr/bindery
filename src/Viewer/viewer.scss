@@ -199,8 +199,15 @@ body.#{$pre}-viewing {
   font-size: 8pt;
 }
 
-.#{$pre}-stage3d {
-  perspective: 3000px;
+.#{$pre}-flap-holder {
+  perspective: 5000px;
+  transform-style: preserve-3d;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
   transform-style: preserve-3d;
 }
 
@@ -229,19 +236,14 @@ body.#{$pre}-viewing {
   .#{$pre}-page {
     position: absolute;
     backface-visibility: hidden;
+    box-shadow: none;
   }
 
   .#{$pre}-page3d-front {
     transform: rotateY(0);
-    &::after {
-      box-shadow: inset 12px 0 12px -12px rgba(0,0,0,0.4)
-    }
   }
 
   .#{$pre}-page3d-back {
     transform: rotateY(-180deg);
-    &::after {
-      box-shadow: inset -12px 0 12px -12px rgba(0,0,0,0.4)
-    }
   }
 }

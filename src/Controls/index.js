@@ -9,11 +9,10 @@ import {
   btn,
   btnMain,
   btnLight,
-  switchRow,
   row,
   viewMode,
-  expandRow,
-  expandArea,
+  // expandRow,
+  // expandArea,
   inputNumberUnits,
 } from './components';
 
@@ -28,23 +27,6 @@ class Controls {
     };
 
     const printBtn = btnMain({ onclick: print }, 'Print');
-
-    let cropToggle;
-    let bleedMarkToggle;
-
-    const toggleCropMarks = () => {
-      viewer.isShowingCropMarks = !viewer.isShowingCropMarks;
-      cropToggle.classList.toggle('selected');
-    };
-
-    const toggleBleedMarks = () => {
-      viewer.isShowingBleedMarks = !viewer.isShowingBleedMarks;
-      bleedMarkToggle.classList.toggle('selected');
-    };
-
-    cropToggle = switchRow({ onclick: toggleCropMarks }, 'Crop Marks');
-    cropToggle.classList.add('selected');
-    bleedMarkToggle = switchRow({ onclick: toggleBleedMarks }, 'Bleed Marks');
 
     const doneBtn = btn({ onclick: () => {
       if (this.binder.autorun) {
@@ -86,13 +68,22 @@ class Controls {
 
     const bleedAmount = row('Bleed Amount', unitInputs.bleed);
 
-    const sheetSizeSelect = select(
-      option({ value: 'size_page' }, 'Page'),
-      option({ value: 'size_page_bleed' }, 'Page + Bleed'),
-      option({ value: 'size_page_marks', selected: true }, 'Page + Marks'),
+    const sheetSizes = [
+      option({ value: 'size_page' }, 'Auto'),
+      option({ value: 'size_page_bleed' }, 'Auto + Bleed'),
+      option({ value: 'size_page_marks', selected: true }, 'Auto + Marks'),
       option({ value: 'size_letter_p' }, 'Letter Portrait'),
       option({ value: 'size_letter_l' }, 'Letter Landscape'),
-    );
+    ];
+    const sheetSizeSelect = select(...sheetSizes);
+
+    const updateSheetSizeNames = () => {
+      const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
+      sheetSizes[0].textContent = `${layout}`;
+      sheetSizes[1].textContent = `${layout} + Bleed`;
+      sheetSizes[2].textContent = `${layout} + Marks`;
+    };
+    updateSheetSizeNames();
 
     const sheetTooSmallAlert = row('Sheet is too small to see marks · ', h('a', {
       href: '#',
@@ -123,24 +114,49 @@ class Controls {
     );
     arrangeSelect.addEventListener('change', () => {
       viewer.setPrintArrange(arrangeSelect.value);
+      updateSheetSizeNames();
     });
     const arrangement = row('Layout', arrangeSelect);
+
+
+    const marksSelect = select(
+      option({ value: 'marks_none' }, 'None'),
+      option({ value: 'marks_crop', selected: true }, 'Crop'),
+      option({ value: 'marks_bleed' }, 'Bleed'),
+      option({ value: 'marks_both' }, 'Crop and Bleed'),
+    );
+    const marks = row('Marks', marksSelect);
+    marksSelect.addEventListener('change', () => {
+      switch (marksSelect.value) {
+      case 'marks_none':
+        viewer.isShowingCropMarks = false;
+        viewer.isShowingBleedMarks = false;
+        break;
+      case 'marks_crop':
+        viewer.isShowingCropMarks = true;
+        viewer.isShowingBleedMarks = false;
+        break;
+      case 'marks_bleed':
+        viewer.isShowingCropMarks = false;
+        viewer.isShowingBleedMarks = true;
+        break;
+      case 'marks_both':
+        viewer.isShowingCropMarks = true;
+        viewer.isShowingBleedMarks = true;
+        break;
+      default:
+      }
+    });
 
     const validCheck = h('div', { style: {
       display: 'none',
       color: '#e2b200',
     } }, 'Too Small');
-    const inProgress = btnLight({ style: {
-      display: 'none',
-      'pointer-events': 'none',
-    } }, 'Updating...');
 
     const startPaginating = () => {
-      inProgress.style.display = '';
       refreshPaginationBtn.style.display = 'none';
       refreshPaginationBtnDebug.style.display = 'none';
       this.binder.makeBook(() => {
-        inProgress.style.display = 'none';
         refreshPaginationBtn.style.display = '';
         refreshPaginationBtnDebug.style.display = '';
       });
@@ -151,7 +167,7 @@ class Controls {
     } }, 'Update Pagination');
 
     const viewModes = [
-      viewMode('grid', viewer.setGrid, 'Preview'),
+      viewMode('grid', viewer.setGrid, 'Grid'),
       viewMode('outline', viewer.setOutline, 'Outline'),
       viewMode('flip', viewer.setFlip, 'Flip'),
       viewMode('print', viewer.setPrint, 'Sheet'),
@@ -207,7 +223,6 @@ class Controls {
     this.setInProgress = () => {
       headerContent.textContent = 'Paginating';
       validCheck.style.display = 'none';
-      inProgress.style.display = '';
       refreshPaginationBtn.style.display = 'none';
     };
 
@@ -217,7 +232,6 @@ class Controls {
 
     this.setDone = () => {
       headerContent.textContent = `${viewer.book.pages.length} Pages`;
-      inProgress.style.display = 'none';
       refreshPaginationBtn.style.display = '';
       validCheck.style.display = 'none';
     };
@@ -225,7 +239,6 @@ class Controls {
     this.setInvalid = () => {
       validCheck.style.display = '';
       refreshPaginationBtn.style.display = '';
-      inProgress.style.display = 'none';
     };
 
     const updateLayout = () => {
@@ -326,29 +339,28 @@ class Controls {
       refreshPaginationBtn,
       refreshPaginationBtnDebug,
       validCheck,
-      inProgress,
     );
 
     this.element = h(c('.controls'),
       header,
       viewSwitcher,
 
-      expandRow('Page Setup'),
-      expandArea(
-        layoutControl,
-        row(layoutState),
-      ),
+      // expandRow('Page Setup'),
+      // expandArea(
+      //   layoutControl,
+      //   bleedAmount,
+      //   row(layoutState),
+      // ),
 
-      expandRow('Marks and Bleed'),
-      expandArea(
-        cropToggle,
-        bleedMarkToggle,
-        bleedAmount,
-        sheetTooSmallAlert,
-      ),
-
+      // expandRow('Marks and Bleed'),
+      // expandArea(
+      //   cropToggle,
+      //   bleedMarkToggle,
+      //   sheetTooSmallAlert,
+      // ),
       arrangement,
       sheetSize,
+      marks,
 
       debugControls,
 

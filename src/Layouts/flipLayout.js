@@ -3,8 +3,16 @@ import c from '../utils/prefixClass';
 
 const renderFlipLayout = (pages, doubleSided) => {
   const flipLayout = document.createDocumentFragment();
+  const flapHolder = h(c('.spread-size') + c('.flap-holder'));
+  flipLayout.appendChild(flapHolder);
   const flaps = [];
   let currentLeaf = -1;
+
+  let leftOffset = 4;
+  if (pages.length * leftOffset > 60) {
+    leftOffset = 60 / pages.length;
+  }
+  flapHolder.style.width = `${pages.length * leftOffset}px`;
 
   const setLeaf = (n) => {
     let newLeaf = n;
@@ -49,13 +57,10 @@ const renderFlipLayout = (pages, doubleSided) => {
     // Putting 1000s of elements onscreen
     // locks up the browser.
 
-    let leftOffset = 4;
-    if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
-
     flap.style.left = `${i * leftOffset}px`;
 
     flaps.push(flap);
-    flipLayout.appendChild(flap);
+    flapHolder.appendChild(flap);
   }
 
   setLeaf(0);
