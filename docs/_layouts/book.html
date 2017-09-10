@@ -43,7 +43,17 @@
           Bindery.PageReference({
             selector: '.toc a',
           }),
-          Bindery.RunningHeader(),
+          Bindery.RunningHeader({
+            render: (page) => {
+              if (page.isEmpty) return '';
+              if (page.isLeft) return `${page.number} · Bindery `;
+              else if (page.isRight) {
+                let section = Object.values(page.heading).join(' ‣ ');
+                if (section !== '') return `${section} · ${page.number}`;
+                else return `${page.number}`;
+              }
+            },
+          }),
           Bindery.Footnote({
             selector: '.post-content a',
             render: (element, number) => {
