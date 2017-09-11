@@ -55,6 +55,15 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     return newPage;
   };
 
+  const finishPage = () => {
+    // finished with this page, can display
+    state.pages = orderPages(state.pages, makeNewPage);
+    annotatePages(state.pages);
+    if (state.currentPage) {
+      applyPageRules(state.currentPage, state.book);
+    }
+  };
+
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   const continueOnNewPage = () => {
@@ -73,12 +82,20 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       error('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
-    updatePaginationProgress(); // finished with this page, can display
+
+    finishPage();
 
     state.breadcrumb = cloneBreadcrumb(state.breadcrumb);
     const newPage = makeNewPage();
-    state.pages.push(newPage);
+
     state.currentPage = newPage;
+
+    state.book.pages = state.pages;
+    state.book.pageInProgress = newPage;
+    updatePaginationProgress(); // finished with this page, can display
+
+    state.pages.push(newPage);
+
     if (state.breadcrumb[0]) {
       newPage.flowContent.appendChild(state.breadcrumb[0]);
     }
@@ -412,13 +429,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     });
   };
   updatePaginationProgress = () => {
-    state.pages = orderPages(state.pages, makeNewPage);
-    annotatePages(state.pages);
-    state.book.pages = state.pages;
-    if (state.currentPage) {
-      applyPageRules(state.currentPage, state.book);
-    }
-    // applyEachPageRules(state.book);
     progress(state.book);
   };
   finishPagination = () => {

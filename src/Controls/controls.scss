@@ -58,6 +58,9 @@ $controlborder: gray;
     opacity: 1;
     animation: spin 0.6s linear infinite;
   }
+  .#{$pre}-debug & {
+    animation: spin 2s linear infinite;
+  }
 }
 @keyframes spin {
   0%   { transform: rotateZ(0); }
@@ -123,6 +126,9 @@ $controlborder: gray;
   .#{$pre}-in-progress & {
     opacity: 0.5;
     pointer-events: none;
+  }
+  .#{$pre}-debug & {
+    display: none;
   }
 }
 
@@ -217,6 +223,10 @@ $controlborder: gray;
   margin: 0 8px;
   cursor: default;
   user-select: none;
+
+  &:last-child {
+    margin-top: 8px;
+  }
 
   select {
     position: absolute;
@@ -403,10 +413,30 @@ $controlborder: gray;
 //   }
 // }
 
+.#{$pre}-refresh-btns {
+  display: inline-block;
+  font-size: 12px;
+  margin-top: 8px;
+  float: right;
+  a {
+    color: rgba(0,0,0,0.4);
+    margin-left: 1em;
+    cursor: pointer;
+    &:hover {
+      color: black;
+    }
+  }
+}
 
 @media (max-width: 600px) {
   .#{$pre}-root {
     padding-right: 0;
+  }
+  .#{$pre}-zoom-wrap > :last-child {
+    margin-bottom: 100vh;
+  }
+  .#{$pre}-controls .#{$pre}-refresh {
+    display: none;
   }
   .#{$pre}-controls {
     box-shadow: 0 0 2px rgba(0,0,0,0.3);

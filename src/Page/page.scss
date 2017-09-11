@@ -44,6 +44,7 @@ li.#{$pre}-continuation {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  margin: auto;
 }
 
 .#{$pre}-flowbox {

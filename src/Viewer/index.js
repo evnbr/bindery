@@ -248,7 +248,8 @@ class Viewer {
     };
 
     this.book.pages.forEach((page, i) => {
-      if (!this.zoomBox.contains(page.element)) {
+      // If hasn't been added, or not in spread yet
+      if (!this.zoomBox.contains(page.element) || page.element.parentNode === this.zoomBox) {
         if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < 2) {
           this.lastSpreadInProgress.appendChild(page.element);
         } else {
@@ -259,11 +260,15 @@ class Viewer {
           } else {
             this.lastSpreadInProgress = twoPageSpread(page.element);
           }
-
           this.zoomBox.appendChild(this.lastSpreadInProgress);
         }
       }
     });
+
+    if (this.book.pageInProgress) {
+      this.zoomBox.appendChild(this.book.pageInProgress.element);
+    }
+
     this.updateZoom();
   }
 

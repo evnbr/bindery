@@ -161,10 +161,6 @@ class Controls {
         refreshPaginationBtnDebug.style.display = '';
       });
     };
-    const refreshPaginationBtn = btn({ onclick: () => {
-      this.binder.debug = false;
-      startPaginating();
-    } }, 'Update Pagination');
 
     const viewModes = [
       viewMode('grid', viewer.setGrid, 'Grid'),
@@ -176,7 +172,29 @@ class Controls {
     const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
 
     const headerContent = h('span', 'Loading');
-    const header = title(h(c('.spinner')), headerContent);
+
+    const refreshPaginationBtn = h('a', { onclick: () => {
+      this.binder.debug = false;
+      startPaginating();
+    } }, 'Refresh');
+    refreshPaginationBtn.classList.add(c('refresh'));
+    const refreshPaginationBtnDebug = h('a', 'Debug', {
+      onclick: () => {
+        playSlow.style.display = 'none';
+        step.style.display = 'none';
+        pause.style.display = '';
+        this.binder.debug = true;
+        startPaginating();
+      },
+    });
+    const header = title(
+      h(c('.spinner')),
+      headerContent,
+      h(c('.refresh-btns'),
+        refreshPaginationBtn,
+        refreshPaginationBtnDebug
+      )
+    );
     //
     // const updateLayoutPreview = (newSize, newMargin) => {
     //   const px = {
@@ -223,7 +241,6 @@ class Controls {
     this.setInProgress = () => {
       headerContent.textContent = 'Paginating';
       validCheck.style.display = 'none';
-      refreshPaginationBtn.style.display = 'none';
     };
 
     this.updateProgress = (count) => {
@@ -232,13 +249,11 @@ class Controls {
 
     this.setDone = () => {
       headerContent.textContent = `${viewer.book.pages.length} Pages`;
-      refreshPaginationBtn.style.display = '';
       validCheck.style.display = 'none';
     };
 
     this.setInvalid = () => {
       validCheck.style.display = '';
-      refreshPaginationBtn.style.display = '';
     };
     //
     // const updateLayout = () => {
@@ -311,18 +326,9 @@ class Controls {
         step.style.display = 'none';
       },
     });
-    const debugDone = btn('Done', {
+    const debugDone = btn('Finish', {
       onclick: () => {
         window.binderyDebug.finish();
-      },
-    });
-    const refreshPaginationBtnDebug = btnLight('Debug', {
-      onclick: () => {
-        playSlow.style.display = 'none';
-        step.style.display = 'none';
-        pause.style.display = '';
-        this.binder.debug = true;
-        startPaginating();
       },
     });
 
@@ -334,12 +340,6 @@ class Controls {
     );
     debugControls.classList.add(c('debug-controls'));
     printBtn.classList.add(c('btn-print'));
-
-    const layoutState = h('div',
-      refreshPaginationBtn,
-      refreshPaginationBtnDebug,
-      validCheck,
-    );
 
     this.element = h(c('.controls'),
       header,
@@ -364,7 +364,7 @@ class Controls {
 
       debugControls,
 
-      row(doneBtn, printBtn),
+      row(printBtn),
     );
   }
 
