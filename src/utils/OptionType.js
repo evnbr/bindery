@@ -1,12 +1,14 @@
+import { isValidLength } from './convertUnits';
+
 const validate = (opts, validOpts) => {
   Object.keys(opts).forEach((k) => {
     if (!validOpts[k]) {
-      console.error(`Bindery: '${validOpts.name}' doesn't have option '${k}'`);
+      console.error(`Bindery: '${validOpts.name}' doesn't have property '${k}'`);
     } else {
       const val = opts[k];
       const checker = validOpts[k];
       if (!checker(val)) {
-        console.error(`Bindery: In '${validOpts.name}.${k}', '${JSON.stringify(val)}' is not a valid ${checker.name}`);
+        console.error(`Bindery: For property '${validOpts.name}.${k}', '${JSON.stringify(val)}' is not a valid value of type ${checker.name}`);
       }
     }
   });
@@ -15,7 +17,7 @@ const validate = (opts, validOpts) => {
 
 const isObj = val => typeof val === 'object';
 
-const UserOption = {
+const OptionType = {
   enum(...enumCases) {
     return str => enumCases.includes(str);
   },
@@ -24,6 +26,9 @@ const UserOption = {
   },
   string(val) {
     return typeof val === 'string';
+  },
+  length(val) {
+    return isValidLength(val);
   },
   bool(val) {
     return typeof val === 'boolean';
@@ -41,4 +46,4 @@ const UserOption = {
   validate,
 };
 
-export default UserOption;
+export default OptionType;

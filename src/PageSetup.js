@@ -2,7 +2,28 @@ import Page from './Page';
 import { isValidSize, parseVal } from './utils/convertUnits';
 import c from './utils/prefixClass';
 
-class Styler {
+
+const defaultPageSetup = {
+  bleed: '12pt',
+  size: { width: '4in', height: '6in' },
+  margin: {
+    inner: '24pt',
+    outer: '24pt',
+    bottom: '40pt',
+    top: '48pt',
+  },
+};
+
+class PageSetup {
+
+  constructor(opts = {}) {
+    this.setSize(opts.size || defaultPageSetup.size);
+    this.setMargin(opts.margin || defaultPageSetup.margin);
+    this.setBleed(opts.bleed || defaultPageSetup.bleed);
+
+    this.printTwoUp = false;
+    this.sheetSizeMode = 'size_page_marks';
+  }
 
   setSize(size) {
     isValidSize(size);
@@ -16,6 +37,44 @@ class Styler {
 
   setBleed(newBleed) {
     this.bleed = newBleed;
+  }
+
+  setSheetSizeMode(mode) {
+    this.sheetSizeMode = mode;
+  }
+
+  setPrintTwoUp(newVal) {
+    this.printTwoUp = newVal;
+  }
+
+  get sheetSize() {
+    const width = this.printTwoUp
+      ? this.spreadSizeStyle().width
+      : this.size.width;
+    const height = this.size.height;
+    const b = this.bleed;
+
+    switch (this.sheetSizeMode) {
+    case 'size_page':
+      return { width, height };
+    case 'size_page_bleed':
+      return {
+        width: `calc(${width} + ${b} + ${b})`,
+        height: `calc(${height} + ${b} + ${b})`,
+      };
+    case 'size_page_marks':
+      // TODO: 24pt marks is hardcoded
+      return {
+        width: `calc(${width} + ${b} + ${b} + 24pt)`,
+        height: `calc(${height} + ${b} + ${b} + 24pt)`,
+      };
+    case 'size_letter_l':
+      return { width: '11in', height: '8.5in' };
+    case 'size_letter_p':
+      return { width: '8.5in', height: '11in' };
+    default:
+    }
+    return { width, height };
   }
 
   isSizeValid() {
@@ -43,6 +102,9 @@ class Styler {
     const w = parseVal(this.size.width);
 
     sheet.innerHTML = `
+@page { size: ${this.sheetSize.width} ${this.sheetSize.height}; }
+${c('.print-page')} { width: ${this.sheetSize.width}; height: ${this.sheetSize.height};}
+
 ${c('.show-crop')} ${c('.print-page')} ${c('.spread-wrapper')},
 ${c('.show-bleed-marks')} ${c('.print-page')} ${c('.spread-wrapper')} {
   margin: calc(${this.bleed} + 12pt) auto;
@@ -123,4 +185,4 @@ ${c('.spread')}${c('.left')} > ${c('.background')} {
   }
 }
 
-export default Styler;
+export default PageSetup;

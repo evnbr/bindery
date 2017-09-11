@@ -1,6 +1,6 @@
 import h from 'hyperscript';
 import OutOfFlow from './OutOfFlow';
-import UserOption from '../UserOption';
+import { OptionType } from '../utils';
 import c from '../utils/prefixClass';
 
 // Options:
@@ -12,10 +12,10 @@ class FullBleedPage extends OutOfFlow {
     options.rotate = options.rotate || 'none';
     super(options);
     this.name = 'Full Bleed Page';
-    UserOption.validate(options, {
-      selector: UserOption.string,
-      continue: UserOption.enum('next', 'same', 'left', 'right'),
-      rotate: UserOption.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise'),
+    OptionType.validate(options, {
+      selector: OptionType.string,
+      continue: OptionType.enum('next', 'same', 'left', 'right'),
+      rotate: OptionType.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise'),
     });
   }
 

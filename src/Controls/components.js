@@ -15,17 +15,17 @@ const row = function (...arg) {
   return h(c('.row'), ...arg);
 };
 
-const expandRow = function (...arg) {
-  return h(
-    `.${c('row')}.${c('expand-row')}`,
-    { onclick() {
-      this.classList.toggle('selected');
-    } },
-    ...arg);
-};
-const expandArea = function (...arg) {
-  return h(c('.expand-area'), ...arg);
-};
+// const expandRow = function (...arg) {
+//   return h(
+//     `.${c('row')}.${c('expand-row')}`,
+//     { onclick() {
+//       this.classList.toggle('selected');
+//     } },
+//     ...arg);
+// };
+// const expandArea = function (...arg) {
+//   return h(c('.expand-area'), ...arg);
+// };
 
 
 // Button
@@ -59,13 +59,6 @@ const inputNumberUnits = function (val) {
   });
 };
 
-// Switch
-const toggleSwitch = () => h(c('.switch'));
-
-const switchRow = function (...arg) {
-  return h(c('.row'), ...arg, toggleSwitch);
-};
-
 // View Swithcer
 const viewMode = function (id, action, text) {
   const sel = `.${c('viewmode')}.${c(id)}`;
@@ -79,15 +72,14 @@ const viewMode = function (id, action, text) {
 export {
   title,
   row,
-  expandRow,
-  expandArea,
+  // expandRow,
+  // expandArea,
   heading,
   btn,
   btnLight,
   btnMain,
   select,
   option,
-  switchRow,
   inputNumberUnits,
   viewMode,
 };

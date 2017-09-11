@@ -55,6 +55,15 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     return newPage;
   };
 
+  const finishPage = () => {
+    // finished with this page, can display
+    state.pages = orderPages(state.pages, makeNewPage);
+    annotatePages(state.pages);
+    if (state.currentPage) {
+      applyPageRules(state.currentPage, state.book);
+    }
+  };
+
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   const continueOnNewPage = () => {
@@ -74,10 +83,19 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
+    finishPage();
+
     state.breadcrumb = cloneBreadcrumb(state.breadcrumb);
     const newPage = makeNewPage();
-    state.pages.push(newPage);
+
     state.currentPage = newPage;
+
+    state.book.pages = state.pages;
+    state.book.pageInProgress = newPage;
+    updatePaginationProgress(); // finished with this page, can display
+
+    state.pages.push(newPage);
+
     if (state.breadcrumb[0]) {
       newPage.flowContent.appendChild(state.breadcrumb[0]);
     }
@@ -93,14 +111,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       }
     }
 
-    updatePaginationProgress();
-
     return newPage;
   };
 
   const beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
   const afterAddRules = rules.filter(r => r.selector && r.afterAdd);
-  const afterBindRules = rules.filter(r => r.afterBind);
+  const pageRules = rules.filter(r => r.eachPage);
 
   const applyBeforeAddRules = (element) => {
     let addedElement = element;
@@ -143,11 +159,17 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     return addedElement;
   };
 
-  const applyAfterBindRules = (book) => {
-    afterBindRules.forEach((rule) => {
+  const applyEachPageRules = (book) => {
+    pageRules.forEach((rule) => {
       book.pages.forEach((page) => {
-        rule.afterBind(page, book);
+        rule.eachPage(page, book);
       });
+    });
+  };
+
+  const applyPageRules = (page, book) => {
+    pageRules.forEach((rule) => {
+      rule.eachPage(page, book);
     });
   };
 
@@ -407,9 +429,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     });
   };
   updatePaginationProgress = () => {
-    annotatePages(state.pages);
-    state.book.pages = state.pages;
-    // applyAfterBindRules(state.book);
     progress(state.book);
   };
   finishPagination = () => {
@@ -420,7 +439,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     state.book.pages = orderedPages;
     state.book.setCompleted();
-    applyAfterBindRules(state.book);
+    applyEachPageRules(state.book);
 
     const end = window.performance.now();
     if (!isDebugging) {

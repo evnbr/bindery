@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-sheet-filled</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-sheet-filled" fill="#000000">
+            <path d="M13,7 L20,7 L20,9 L21,9 L21,7 L24,7 L24,10 L22,10 L22,11 L24,11 L24,21 L22,21 L22,22 L24,22 L24,25 L21,25 L21,23 L20,23 L20,25 L13,25 L13,23 L12,23 L12,25 L9,25 L9,22 L11,22 L11,21 L9,21 L9,11 L11,11 L11,10 L9,10 L9,7 L12,7 L12,9 L13,9 L13,7 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>

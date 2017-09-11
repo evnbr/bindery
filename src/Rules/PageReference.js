@@ -1,6 +1,6 @@
 import Replace from './Replace';
-import UserOption from '../UserOption';
-import { makeRanges } from '../utils';
+import { OptionType, makeRanges } from '../utils';
+import c from '../utils/prefixClass';
 
 // Options:
 // selector: String
@@ -10,10 +10,10 @@ class PageReference extends Replace {
   constructor(options) {
     super(options);
     this.name = 'Page Reference';
-    UserOption.validate(options, {
-      selector: UserOption.string,
-      replace: UserOption.func,
-      createTest: UserOption.func,
+    OptionType.validate(options, {
+      selector: OptionType.string,
+      replace: OptionType.func,
+      createTest: OptionType.func,
     });
   }
   afterAdd(elmt, state) {
@@ -24,7 +24,8 @@ class PageReference extends Replace {
       const tempClone = elmt.cloneNode(true);
       const tempNumbers = state.book.pagesForTest(test);
       const tempRanges = makeRanges(tempNumbers);
-      const temp = this.replace(tempClone, tempRanges);
+      const temp = this.replace(tempClone, tempRanges || '###');
+      temp.classList.add(c('placeholder-pulse'));
       parent.replaceChild(temp, elmt);
 
       state.book.onComplete(() => {

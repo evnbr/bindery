@@ -17,25 +17,11 @@ const MODE_OUTLINE = 'outline';
 const ARRANGE_ONE = 'arrange_one';
 const ARRANGE_SPREAD = 'arrange_two';
 const ARRANGE_BOOKLET = 'arrange_booklet';
-// const ARRANGE_SIGNATURE = 'arrange_signature';
-
-
-const setOrientationCSS = (newValue) => {
-  let sheet;
-  const existing = document.querySelector('#binderyPrintSetup');
-  if (existing) {
-    sheet = existing;
-  } else {
-    sheet = document.createElement('style');
-    sheet.id = 'binderyPrintSetup';
-  }
-  sheet.innerHTML = `@page { size: ${newValue}; }`;
-  document.head.appendChild(sheet);
-};
 
 class Viewer {
   constructor({ bindery }) {
     this.book = null;
+    this.pageSetup = bindery.pageSetup;
 
     this.zoomBox = h(c('.zoom-wrap'));
     this.element = h(c('.root'), this.zoomBox);
@@ -44,7 +30,6 @@ class Viewer {
     this.printArrange = ARRANGE_ONE;
     this.isShowingCropMarks = true;
     this.isShowingBleedMarks = false;
-    this.setOrientation('landscape');
 
     this.mode = MODE_PREVIEW;
     this.currentLeaf = 0;
@@ -90,6 +75,10 @@ class Viewer {
     });
   }
 
+  get isTwoUp() {
+    return this.printArrange !== ARRANGE_ONE;
+  }
+
   get isShowingCropMarks() {
     return this.element.classList.contains(c('show-crop'));
   }
@@ -115,21 +104,23 @@ class Viewer {
     }
   }
 
+  setSheetSize(newVal) {
+    this.pageSetup.setSheetSizeMode(newVal);
+    this.pageSetup.updateStylesheet();
 
-  setOrientation(newVal) {
-    if (newVal === this.orientation) return;
-    this.orientation = newVal;
-    setOrientationCSS(newVal);
-    if (this.mode === MODE_SHEET) {
-      this.render();
-    } else {
+    if (this.mode !== MODE_SHEET) {
       this.setPrint();
     }
+    this.updateZoom();
   }
 
   setPrintArrange(newVal) {
     if (newVal === this.printArrange) return;
     this.printArrange = newVal;
+
+    this.pageSetup.setPrintTwoUp(this.isTwoUp);
+    this.pageSetup.updateStylesheet();
+
     if (this.mode === MODE_SHEET) {
       this.render();
     } else {
@@ -257,7 +248,8 @@ class Viewer {
     };
 
     this.book.pages.forEach((page, i) => {
-      if (!this.zoomBox.contains(page.element)) {
+      // If hasn't been added, or not in spread yet
+      if (!this.zoomBox.contains(page.element) || page.element.parentNode === this.zoomBox) {
         if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < 2) {
           this.lastSpreadInProgress.appendChild(page.element);
         } else {
@@ -268,11 +260,15 @@ class Viewer {
           } else {
             this.lastSpreadInProgress = twoPageSpread(page.element);
           }
-
           this.zoomBox.appendChild(this.lastSpreadInProgress);
         }
       }
     });
+
+    if (this.book.pageInProgress) {
+      this.zoomBox.appendChild(this.book.pageInProgress.element);
+    }
+
     this.updateZoom();
   }
 
@@ -306,18 +302,17 @@ class Viewer {
 
     this.zoomBox.innerHTML = '';
 
-    const isTwoUp = this.printArrange !== ARRANGE_ONE;
     const isBooklet = this.printArrange === ARRANGE_BOOKLET;
     const orient = this.orientation;
 
     let pages = this.book.pages.slice();
     if (this.printArrange === ARRANGE_SPREAD) {
       pages = padPages(pages);
-    } else if (this.printArrange === ARRANGE_BOOKLET) {
+    } else if (isBooklet) {
       pages = orderPagesBooklet(pages);
     }
 
-    const fragment = printLayout(pages, isTwoUp, orient, isBooklet);
+    const fragment = printLayout(pages, this.isTwoUp, orient, isBooklet);
     this.zoomBox.appendChild(fragment);
   }
 
@@ -339,7 +334,6 @@ class Viewer {
 
     this.element.classList.remove(c('show-bleed'));
     this.element.classList.remove(c('show-guides'));
-    this.zoomBox.classList.add(c('stage3d'));
 
     const pages = padPages(this.book.pages.slice());
 
