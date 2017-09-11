@@ -43,7 +43,11 @@ class Scheduler {
       func();
     } else {
       this.numberOfCalls = 0;
-      requestAnimationFrame(func);
+      if (document.hidden) {
+        setTimeout(func, 1);
+      } else {
+        requestAnimationFrame(func);
+      }
     }
   }
   pause() {
