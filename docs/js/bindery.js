@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.7.1 - Wednesday, September 6th, 2017, 10:26:01 AM  
+// [AIV]  Build version: 2.0.0-alpha.8 - Sunday, September 10th, 2017, 5:26:23 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -62,7 +62,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -98,10 +98,10 @@ exports.default = c;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var split = __webpack_require__(11)
-var ClassList = __webpack_require__(12)
+var split = __webpack_require__(10)
+var ClassList = __webpack_require__(11)
 
-var w = typeof window === 'undefined' ? __webpack_require__(14) : window
+var w = typeof window === 'undefined' ? __webpack_require__(13) : window
 var document = w.document
 var Text = w.Text
 
@@ -270,65 +270,30 @@ function isArray (arr) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.OptionType = exports.makeRanges = exports.last = exports.arraysEqual = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _arraysEqual = __webpack_require__(15);
 
-var validate = function validate(opts, validOpts) {
-  Object.keys(opts).forEach(function (k) {
-    if (!validOpts[k]) {
-      console.error('Bindery: \'' + validOpts.name + '\' doesn\'t have option \'' + k + '\'');
-    } else {
-      var val = opts[k];
-      var checker = validOpts[k];
-      if (!checker(val)) {
-        console.error('Bindery: In \'' + validOpts.name + '.' + k + '\', \'' + JSON.stringify(val) + '\' is not a valid ' + checker.name);
-      }
-    }
-  });
-  return true;
-};
+var _arraysEqual2 = _interopRequireDefault(_arraysEqual);
 
-var isObj = function isObj(val) {
-  return (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
-};
+var _arrayLast = __webpack_require__(16);
 
-var UserOption = {
-  enum: function _enum() {
-    for (var _len = arguments.length, enumCases = Array(_len), _key = 0; _key < _len; _key++) {
-      enumCases[_key] = arguments[_key];
-    }
+var _arrayLast2 = _interopRequireDefault(_arrayLast);
 
-    return function (str) {
-      return enumCases.includes(str);
-    };
-  },
-  any: function any() {
-    return true;
-  },
-  string: function string(val) {
-    return typeof val === 'string';
-  },
-  bool: function bool(val) {
-    return typeof val === 'boolean';
-  },
-  func: function func(val) {
-    return typeof val === 'function';
-  },
+var _makeRanges = __webpack_require__(17);
 
-  obj: isObj,
-  array: function array(val) {
-    return Array.isArray(val);
-  },
-  shape: function shape(validShape) {
-    return function (userShape) {
-      return isObj(userShape) && validate(userShape, validShape);
-    };
-  },
+var _makeRanges2 = _interopRequireDefault(_makeRanges);
 
-  validate: validate
-};
+var _OptionType = __webpack_require__(18);
 
-exports.default = UserOption;
+var _OptionType2 = _interopRequireDefault(_OptionType);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.arraysEqual = _arraysEqual2.default;
+exports.last = _arrayLast2.default;
+exports.makeRanges = _makeRanges2.default;
+exports.OptionType = _OptionType2.default;
 
 /***/ }),
 /* 3 */
@@ -521,7 +486,6 @@ var convert = function convert(val, from, to) {
   return pxToUnit(unitToPx(val, from), to);
 };
 
-// const isValidRegEx = /^[+-]?[0-9]+.?([0-9]+)?(px|em|ex|%|in|cm|mm|pt|pc)$/;
 var cssNumberRegEx = /^([+-]?[0-9]+(.?[0-9]+)?)(px|in|cm|mm|pt|pc)$/;
 var cssNumberPattern = '^([+-]?[0-9]+(.?[0-9]+)?)(px|in|cm|mm|pt|pc)$';
 
@@ -685,36 +649,6 @@ exports.default = elementToString;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.makeRanges = exports.last = exports.arraysEqual = undefined;
-
-var _arraysEqual = __webpack_require__(16);
-
-var _arraysEqual2 = _interopRequireDefault(_arraysEqual);
-
-var _arrayLast = __webpack_require__(17);
-
-var _arrayLast2 = _interopRequireDefault(_arrayLast);
-
-var _makeRanges = __webpack_require__(18);
-
-var _makeRanges2 = _interopRequireDefault(_makeRanges);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.arraysEqual = _arraysEqual2.default;
-exports.last = _arrayLast2.default;
-exports.makeRanges = _makeRanges2.default;
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -781,7 +715,7 @@ var OutOfFlow = function (_Rule) {
 exports.default = OutOfFlow;
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -795,13 +729,13 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _paginate = __webpack_require__(15);
+var _paginate = __webpack_require__(14);
 
 var _paginate2 = _interopRequireDefault(_paginate);
 
-var _Styler = __webpack_require__(25);
+var _PageSetup = __webpack_require__(25);
 
-var _Styler2 = _interopRequireDefault(_Styler);
+var _PageSetup2 = _interopRequireDefault(_PageSetup);
 
 var _Viewer = __webpack_require__(26);
 
@@ -815,9 +749,7 @@ var _Rules = __webpack_require__(37);
 
 var _Rules2 = _interopRequireDefault(_Rules);
 
-var _UserOption = __webpack_require__(2);
-
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _utils = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -825,61 +757,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 __webpack_require__(46);
 
-var defaultPageSetup = {
-  bleed: '12pt',
-  size: { width: '288pt', height: '432pt' },
-  margin: {
-    inner: '24pt',
-    outer: '24pt',
-    bottom: '40pt',
-    top: '48pt'
-  }
-};
-
 var Bindery = function () {
   function Bindery(opts) {
     _classCallCheck(this, Bindery);
 
-    console.log('Bindery ' + '2.0.0-alpha.7.1');
+    console.log('Bindery ' + '2.0.0-alpha.8');
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
     this.debug = opts.debug || false;
 
-    this.styler = new _Styler2.default();
-
-    _UserOption2.default.validate(opts, {
+    _utils.OptionType.validate(opts, {
       name: 'makeBook',
-      autorun: _UserOption2.default.bool,
-      content: _UserOption2.default.any,
-      pageSetup: _UserOption2.default.shape({
+      autorun: _utils.OptionType.bool,
+      content: _utils.OptionType.any,
+      pageSetup: _utils.OptionType.shape({
         name: 'pageSetup',
-        bleed: _UserOption2.default.string,
-        margin: _UserOption2.default.shape({
+        bleed: _utils.OptionType.length,
+        margin: _utils.OptionType.shape({
           name: 'margin',
-          top: _UserOption2.default.string,
-          inner: _UserOption2.default.string,
-          outer: _UserOption2.default.string,
-          bottom: _UserOption2.default.string
+          top: _utils.OptionType.length,
+          inner: _utils.OptionType.length,
+          outer: _utils.OptionType.length,
+          bottom: _utils.OptionType.length
         }),
-        size: _UserOption2.default.shape({
+        size: _utils.OptionType.shape({
           name: 'size',
-          width: _UserOption2.default.string,
-          height: _UserOption2.default.string
+          width: _utils.OptionType.length,
+          height: _utils.OptionType.length
         })
       }),
-      rules: _UserOption2.default.array
+      rules: _utils.OptionType.array
     });
 
-    if (opts.pageSetup) {
-      this.styler.setSize(opts.pageSetup.size || defaultPageSetup.size);
-      this.styler.setMargin(opts.pageSetup.margin || defaultPageSetup.margin);
-      this.styler.setBleed(opts.pageSetup.bleed || defaultPageSetup.bleed);
-    } else {
-      this.styler.setSize(defaultPageSetup.size);
-      this.styler.setMargin(defaultPageSetup.margin);
-      this.styler.setBleed(defaultPageSetup.bleed);
-    }
+    this.pageSetup = new _PageSetup2.default(opts.pageSetup);
 
     this.viewer = new _Viewer2.default({ bindery: this });
     this.controls = this.viewer.controls;
@@ -983,7 +894,7 @@ var Bindery = function () {
         return;
       }
 
-      if (!this.styler.isSizeValid()) {
+      if (!this.pageSetup.isSizeValid()) {
         this.viewer.displayError('Page is too small', 'Size: ' + JSON.stringify(this.pageSize) + ' \n Margin: ' + JSON.stringify(this.pageMargin) + ' \n Try adjusting the sizes or units.');
         console.error('Bindery: Cancelled pagination. Page is too small.');
         return;
@@ -1000,7 +911,7 @@ var Bindery = function () {
       this.viewer.element.classList.add((0, _prefixClass2.default)('in-progress'));
       if (this.debug) document.body.classList.add((0, _prefixClass2.default)('debug'));
 
-      this.styler.updateStylesheet();
+      this.pageSetup.updateStylesheet();
 
       this.controls.setInProgress();
 
@@ -1048,7 +959,7 @@ Object.keys(_Rules2.default).forEach(function (rule) {
 module.exports = Bindery;
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1160,11 +1071,11 @@ module.exports = (function split(undef) {
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // contains, add, remove, toggle
-var indexof = __webpack_require__(13)
+var indexof = __webpack_require__(12)
 
 module.exports = ClassList
 
@@ -1265,7 +1176,7 @@ function isTruthy(value) {
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports) {
 
 
@@ -1280,13 +1191,13 @@ module.exports = function(arr, obj){
 };
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1308,7 +1219,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _utils = __webpack_require__(8);
+var _utils = __webpack_require__(2);
 
 var _Book = __webpack_require__(19);
 
@@ -1394,6 +1305,15 @@ var paginate = function paginate(_ref) {
     return newPage;
   };
 
+  var finishPage = function finishPage() {
+    // finished with this page, can display
+    state.pages = (0, _orderPages2.default)(state.pages, makeNewPage);
+    (0, _annotatePages2.default)(state.pages);
+    if (state.currentPage) {
+      applyPageRules(state.currentPage, state.book);
+    }
+  };
+
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   var continueOnNewPage = function continueOnNewPage() {
@@ -1413,10 +1333,19 @@ var paginate = function paginate(_ref) {
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
+    finishPage();
+
     state.breadcrumb = cloneBreadcrumb(state.breadcrumb);
     var newPage = makeNewPage();
-    state.pages.push(newPage);
+
     state.currentPage = newPage;
+
+    state.book.pages = state.pages;
+    state.book.pageInProgress = newPage;
+    updatePaginationProgress(); // finished with this page, can display
+
+    state.pages.push(newPage);
+
     if (state.breadcrumb[0]) {
       newPage.flowContent.appendChild(state.breadcrumb[0]);
     }
@@ -1432,8 +1361,6 @@ var paginate = function paginate(_ref) {
       }
     }
 
-    updatePaginationProgress();
-
     return newPage;
   };
 
@@ -1443,8 +1370,8 @@ var paginate = function paginate(_ref) {
   var afterAddRules = rules.filter(function (r) {
     return r.selector && r.afterAdd;
   });
-  var afterBindRules = rules.filter(function (r) {
-    return r.afterBind;
+  var pageRules = rules.filter(function (r) {
+    return r.eachPage;
   });
 
   var applyBeforeAddRules = function applyBeforeAddRules(element) {
@@ -1483,11 +1410,17 @@ var paginate = function paginate(_ref) {
     return addedElement;
   };
 
-  var applyAfterBindRules = function applyAfterBindRules(book) {
-    afterBindRules.forEach(function (rule) {
+  var applyEachPageRules = function applyEachPageRules(book) {
+    pageRules.forEach(function (rule) {
       book.pages.forEach(function (page) {
-        rule.afterBind(page, book);
+        rule.eachPage(page, book);
       });
+    });
+  };
+
+  var applyPageRules = function applyPageRules(page, book) {
+    pageRules.forEach(function (rule) {
+      rule.eachPage(page, book);
     });
   };
 
@@ -1753,9 +1686,6 @@ var paginate = function paginate(_ref) {
     });
   };
   updatePaginationProgress = function updatePaginationProgress() {
-    (0, _annotatePages2.default)(state.pages);
-    state.book.pages = state.pages;
-    // applyAfterBindRules(state.book);
     progress(state.book);
   };
   finishPagination = function finishPagination() {
@@ -1766,7 +1696,7 @@ var paginate = function paginate(_ref) {
 
     state.book.pages = orderedPages;
     state.book.setCompleted();
-    applyAfterBindRules(state.book);
+    applyEachPageRules(state.book);
 
     var end = window.performance.now();
     if (!isDebugging) {
@@ -1781,7 +1711,7 @@ var paginate = function paginate(_ref) {
 exports.default = paginate;
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1805,7 +1735,7 @@ var arraysEqual = function arraysEqual(a, b) {
 exports.default = arraysEqual;
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1821,7 +1751,7 @@ var last = function last(arr) {
 exports.default = last;
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1863,6 +1793,81 @@ var makeRanges = function makeRanges(arr) {
 };
 
 exports.default = makeRanges;
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _convertUnits = __webpack_require__(5);
+
+var validate = function validate(opts, validOpts) {
+  Object.keys(opts).forEach(function (k) {
+    if (!validOpts[k]) {
+      console.error('Bindery: \'' + validOpts.name + '\' doesn\'t have property \'' + k + '\'');
+    } else {
+      var val = opts[k];
+      var checker = validOpts[k];
+      if (!checker(val)) {
+        console.error('Bindery: For property \'' + validOpts.name + '.' + k + '\', \'' + JSON.stringify(val) + '\' is not a valid value of type ' + checker.name);
+      }
+    }
+  });
+  return true;
+};
+
+var isObj = function isObj(val) {
+  return (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
+};
+
+var OptionType = {
+  enum: function _enum() {
+    for (var _len = arguments.length, enumCases = Array(_len), _key = 0; _key < _len; _key++) {
+      enumCases[_key] = arguments[_key];
+    }
+
+    return function (str) {
+      return enumCases.includes(str);
+    };
+  },
+  any: function any() {
+    return true;
+  },
+  string: function string(val) {
+    return typeof val === 'string';
+  },
+  length: function length(val) {
+    return (0, _convertUnits.isValidLength)(val);
+  },
+  bool: function bool(val) {
+    return typeof val === 'boolean';
+  },
+  func: function func(val) {
+    return typeof val === 'function';
+  },
+
+  obj: isObj,
+  array: function array(val) {
+    return Array.isArray(val);
+  },
+  shape: function shape(validShape) {
+    return function (userShape) {
+      return isObj(userShape) && validate(userShape, validShape);
+    };
+  },
+
+  validate: validate
+};
+
+exports.default = OptionType;
 
 /***/ }),
 /* 19 */
@@ -2345,12 +2350,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Styler = function () {
-  function Styler() {
-    _classCallCheck(this, Styler);
+var defaultPageSetup = {
+  bleed: '12pt',
+  size: { width: '4in', height: '6in' },
+  margin: {
+    inner: '24pt',
+    outer: '24pt',
+    bottom: '40pt',
+    top: '48pt'
+  }
+};
+
+var PageSetup = function () {
+  function PageSetup() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, PageSetup);
+
+    this.setSize(opts.size || defaultPageSetup.size);
+    this.setMargin(opts.margin || defaultPageSetup.margin);
+    this.setBleed(opts.bleed || defaultPageSetup.bleed);
+
+    this.printTwoUp = false;
+    this.sheetSizeMode = 'size_page_marks';
   }
 
-  _createClass(Styler, [{
+  _createClass(PageSetup, [{
     key: 'setSize',
     value: function setSize(size) {
       (0, _convertUnits.isValidSize)(size);
@@ -2366,6 +2391,16 @@ var Styler = function () {
     key: 'setBleed',
     value: function setBleed(newBleed) {
       this.bleed = newBleed;
+    }
+  }, {
+    key: 'setSheetSizeMode',
+    value: function setSheetSizeMode(mode) {
+      this.sheetSizeMode = mode;
+    }
+  }, {
+    key: 'setPrintTwoUp',
+    value: function setPrintTwoUp(newVal) {
+      this.printTwoUp = newVal;
     }
   }, {
     key: 'isSizeValid',
@@ -2395,15 +2430,44 @@ var Styler = function () {
       }
       var w = (0, _convertUnits.parseVal)(this.size.width);
 
-      sheet.innerHTML = '\n' + (0, _prefixClass2.default)('.show-crop') + ' ' + (0, _prefixClass2.default)('.print-page') + ' ' + (0, _prefixClass2.default)('.spread-wrapper') + ',\n' + (0, _prefixClass2.default)('.show-bleed-marks') + ' ' + (0, _prefixClass2.default)('.print-page') + ' ' + (0, _prefixClass2.default)('.spread-wrapper') + ' {\n  margin: calc(' + this.bleed + ' + 12pt) auto;\n}\n' + (0, _prefixClass2.default)('.page-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + this.size.width + ';\n}\n' + (0, _prefixClass2.default)('.page-size-rotated') + ' {\n  height: ' + this.size.width + ';\n  width: ' + this.size.height + ';\n}\n' + (0, _prefixClass2.default)('.spread-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + w.val * 2 + w.unit + ';\n}\n' + (0, _prefixClass2.default)('.spread-size-rotated') + ' {\n  height: ' + w.val * 2 + w.unit + ';\n  width: ' + this.size.height + ';\n}\n' + (0, _prefixClass2.default)('.flowbox') + ',\n' + (0, _prefixClass2.default)('.footer') + ' {\n  margin-left: ' + this.margin.inner + ';\n  margin-right: ' + this.margin.outer + ';\n}\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.flowbox') + ',\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.footer') + ' {\n  margin-left: ' + this.margin.outer + ';\n  margin-right: ' + this.margin.inner + ';\n}\n\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n  left: ' + this.margin.outer + ';\n}\n' + (0, _prefixClass2.default)('.right') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n  right: ' + this.margin.outer + ';\n}\n\n' + (0, _prefixClass2.default)('.flowbox') + ' { margin-top: ' + this.margin.top + '; }\n' + (0, _prefixClass2.default)('.footer') + '{ margin-bottom: ' + this.margin.bottom + '; }\n\n' + (0, _prefixClass2.default)('.bleed-left') + ',\n' + (0, _prefixClass2.default)('.bleed-right') + ',\n' + (0, _prefixClass2.default)('.crop-left') + ',\n' + (0, _prefixClass2.default)('.crop-right') + ',\n' + (0, _prefixClass2.default)('.crop-fold') + ' {\n  top: calc( -12pt - ' + this.bleed + ' );\n  bottom: calc( -12pt - ' + this.bleed + ' );\n}\n\n' + (0, _prefixClass2.default)('.bleed-top') + ',\n' + (0, _prefixClass2.default)('.bleed-bottom') + ',\n' + (0, _prefixClass2.default)('.crop-top') + ',\n' + (0, _prefixClass2.default)('.crop-bottom') + ' {\n  left: calc( -12pt - ' + this.bleed + ' );\n  right: calc( -12pt - ' + this.bleed + ' );\n}\n' + (0, _prefixClass2.default)('.bleed-left') + '   { left: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-right') + '  { right: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-top') + '    { top: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-bottom') + ' { bottom: -' + this.bleed + '; }\n\n' + (0, _prefixClass2.default)('.background') + ' {\n  top: -' + this.bleed + ';\n  bottom: -' + this.bleed + ';\n  left: -' + this.bleed + ';\n  right: -' + this.bleed + ';\n}\n\n' + (0, _prefixClass2.default)('.spread') + (0, _prefixClass2.default)('.right') + ' > ' + (0, _prefixClass2.default)('.background') + ' {\n  left: calc(-100% - ' + this.bleed + ');\n}\n' + (0, _prefixClass2.default)('.spread') + (0, _prefixClass2.default)('.left') + ' > ' + (0, _prefixClass2.default)('.background') + ' {\n  right: calc(-100% - ' + this.bleed + ');\n}\n    ';
+      sheet.innerHTML = '\n@page { size: ' + this.sheetSize.width + ' ' + this.sheetSize.height + '; }\n' + (0, _prefixClass2.default)('.print-page') + ' { width: ' + this.sheetSize.width + '; height: ' + this.sheetSize.height + ';}\n\n' + (0, _prefixClass2.default)('.show-crop') + ' ' + (0, _prefixClass2.default)('.print-page') + ' ' + (0, _prefixClass2.default)('.spread-wrapper') + ',\n' + (0, _prefixClass2.default)('.show-bleed-marks') + ' ' + (0, _prefixClass2.default)('.print-page') + ' ' + (0, _prefixClass2.default)('.spread-wrapper') + ' {\n  margin: calc(' + this.bleed + ' + 12pt) auto;\n}\n' + (0, _prefixClass2.default)('.page-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + this.size.width + ';\n}\n' + (0, _prefixClass2.default)('.page-size-rotated') + ' {\n  height: ' + this.size.width + ';\n  width: ' + this.size.height + ';\n}\n' + (0, _prefixClass2.default)('.spread-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + w.val * 2 + w.unit + ';\n}\n' + (0, _prefixClass2.default)('.spread-size-rotated') + ' {\n  height: ' + w.val * 2 + w.unit + ';\n  width: ' + this.size.height + ';\n}\n' + (0, _prefixClass2.default)('.flowbox') + ',\n' + (0, _prefixClass2.default)('.footer') + ' {\n  margin-left: ' + this.margin.inner + ';\n  margin-right: ' + this.margin.outer + ';\n}\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.flowbox') + ',\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.footer') + ' {\n  margin-left: ' + this.margin.outer + ';\n  margin-right: ' + this.margin.inner + ';\n}\n\n' + (0, _prefixClass2.default)('.left') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n  left: ' + this.margin.outer + ';\n}\n' + (0, _prefixClass2.default)('.right') + ' ' + (0, _prefixClass2.default)('.running-header') + ' {\n  right: ' + this.margin.outer + ';\n}\n\n' + (0, _prefixClass2.default)('.flowbox') + ' { margin-top: ' + this.margin.top + '; }\n' + (0, _prefixClass2.default)('.footer') + '{ margin-bottom: ' + this.margin.bottom + '; }\n\n' + (0, _prefixClass2.default)('.bleed-left') + ',\n' + (0, _prefixClass2.default)('.bleed-right') + ',\n' + (0, _prefixClass2.default)('.crop-left') + ',\n' + (0, _prefixClass2.default)('.crop-right') + ',\n' + (0, _prefixClass2.default)('.crop-fold') + ' {\n  top: calc( -12pt - ' + this.bleed + ' );\n  bottom: calc( -12pt - ' + this.bleed + ' );\n}\n\n' + (0, _prefixClass2.default)('.bleed-top') + ',\n' + (0, _prefixClass2.default)('.bleed-bottom') + ',\n' + (0, _prefixClass2.default)('.crop-top') + ',\n' + (0, _prefixClass2.default)('.crop-bottom') + ' {\n  left: calc( -12pt - ' + this.bleed + ' );\n  right: calc( -12pt - ' + this.bleed + ' );\n}\n' + (0, _prefixClass2.default)('.bleed-left') + '   { left: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-right') + '  { right: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-top') + '    { top: -' + this.bleed + '; }\n' + (0, _prefixClass2.default)('.bleed-bottom') + ' { bottom: -' + this.bleed + '; }\n\n' + (0, _prefixClass2.default)('.background') + ' {\n  top: -' + this.bleed + ';\n  bottom: -' + this.bleed + ';\n  left: -' + this.bleed + ';\n  right: -' + this.bleed + ';\n}\n\n' + (0, _prefixClass2.default)('.spread') + (0, _prefixClass2.default)('.right') + ' > ' + (0, _prefixClass2.default)('.background') + ' {\n  left: calc(-100% - ' + this.bleed + ');\n}\n' + (0, _prefixClass2.default)('.spread') + (0, _prefixClass2.default)('.left') + ' > ' + (0, _prefixClass2.default)('.background') + ' {\n  right: calc(-100% - ' + this.bleed + ');\n}\n    ';
       document.head.appendChild(sheet);
+    }
+  }, {
+    key: 'sheetSize',
+    get: function get() {
+      var width = this.printTwoUp ? this.spreadSizeStyle().width : this.size.width;
+      var height = this.size.height;
+      var b = this.bleed;
+
+      switch (this.sheetSizeMode) {
+        case 'size_page':
+          return { width: width, height: height };
+        case 'size_page_bleed':
+          return {
+            width: 'calc(' + width + ' + ' + b + ' + ' + b + ')',
+            height: 'calc(' + height + ' + ' + b + ' + ' + b + ')'
+          };
+        case 'size_page_marks':
+          // TODO: 24pt marks is hardcoded
+          return {
+            width: 'calc(' + width + ' + ' + b + ' + ' + b + ' + 24pt)',
+            height: 'calc(' + height + ' + ' + b + ' + ' + b + ' + 24pt)'
+          };
+        case 'size_letter_l':
+          return { width: '11in', height: '8.5in' };
+        case 'size_letter_p':
+          return { width: '8.5in', height: '11in' };
+        default:
+      }
+      return { width: width, height: height };
     }
   }]);
 
-  return Styler;
+  return PageSetup;
 }();
 
-exports.default = Styler;
+exports.default = PageSetup;
 
 /***/ }),
 /* 26 */
@@ -2460,21 +2524,6 @@ var MODE_OUTLINE = 'outline';
 var ARRANGE_ONE = 'arrange_one';
 var ARRANGE_SPREAD = 'arrange_two';
 var ARRANGE_BOOKLET = 'arrange_booklet';
-// const ARRANGE_SIGNATURE = 'arrange_signature';
-
-
-var setOrientationCSS = function setOrientationCSS(newValue) {
-  var sheet = void 0;
-  var existing = document.querySelector('#binderyPrintSetup');
-  if (existing) {
-    sheet = existing;
-  } else {
-    sheet = document.createElement('style');
-    sheet.id = 'binderyPrintSetup';
-  }
-  sheet.innerHTML = '@page { size: ' + newValue + '; }';
-  document.head.appendChild(sheet);
-};
 
 var Viewer = function () {
   function Viewer(_ref) {
@@ -2483,6 +2532,7 @@ var Viewer = function () {
     _classCallCheck(this, Viewer);
 
     this.book = null;
+    this.pageSetup = bindery.pageSetup;
 
     this.zoomBox = (0, _hyperscript2.default)((0, _prefixClass2.default)('.zoom-wrap'));
     this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.root'), this.zoomBox);
@@ -2491,7 +2541,6 @@ var Viewer = function () {
     this.printArrange = ARRANGE_ONE;
     this.isShowingCropMarks = true;
     this.isShowingBleedMarks = false;
-    this.setOrientation('landscape');
 
     this.mode = MODE_PREVIEW;
     this.currentLeaf = 0;
@@ -2546,22 +2595,25 @@ var Viewer = function () {
       });
     }
   }, {
-    key: 'setOrientation',
-    value: function setOrientation(newVal) {
-      if (newVal === this.orientation) return;
-      this.orientation = newVal;
-      setOrientationCSS(newVal);
-      if (this.mode === MODE_SHEET) {
-        this.render();
-      } else {
+    key: 'setSheetSize',
+    value: function setSheetSize(newVal) {
+      this.pageSetup.setSheetSizeMode(newVal);
+      this.pageSetup.updateStylesheet();
+
+      if (this.mode !== MODE_SHEET) {
         this.setPrint();
       }
+      this.updateZoom();
     }
   }, {
     key: 'setPrintArrange',
     value: function setPrintArrange(newVal) {
       if (newVal === this.printArrange) return;
       this.printArrange = newVal;
+
+      this.pageSetup.setPrintTwoUp(this.isTwoUp);
+      this.pageSetup.updateStylesheet();
+
       if (this.mode === MODE_SHEET) {
         this.render();
       } else {
@@ -2721,7 +2773,8 @@ var Viewer = function () {
       };
 
       this.book.pages.forEach(function (page, i) {
-        if (!_this3.zoomBox.contains(page.element)) {
+        // If hasn't been added, or not in spread yet
+        if (!_this3.zoomBox.contains(page.element) || page.element.parentNode === _this3.zoomBox) {
           if (_this3.lastSpreadInProgress && _this3.lastSpreadInProgress.children.length < 2) {
             _this3.lastSpreadInProgress.appendChild(page.element);
           } else {
@@ -2732,11 +2785,15 @@ var Viewer = function () {
             } else {
               _this3.lastSpreadInProgress = twoPageSpread(page.element);
             }
-
             _this3.zoomBox.appendChild(_this3.lastSpreadInProgress);
           }
         }
       });
+
+      if (this.book.pageInProgress) {
+        this.zoomBox.appendChild(this.book.pageInProgress.element);
+      }
+
       this.updateZoom();
     }
   }, {
@@ -2773,18 +2830,17 @@ var Viewer = function () {
 
       this.zoomBox.innerHTML = '';
 
-      var isTwoUp = this.printArrange !== ARRANGE_ONE;
       var isBooklet = this.printArrange === ARRANGE_BOOKLET;
       var orient = this.orientation;
 
       var pages = this.book.pages.slice();
       if (this.printArrange === ARRANGE_SPREAD) {
         pages = (0, _padPages2.default)(pages);
-      } else if (this.printArrange === ARRANGE_BOOKLET) {
+      } else if (isBooklet) {
         pages = (0, _orderPagesBooklet2.default)(pages);
       }
 
-      var fragment = (0, _Layouts.printLayout)(pages, isTwoUp, orient, isBooklet);
+      var fragment = (0, _Layouts.printLayout)(pages, this.isTwoUp, orient, isBooklet);
       this.zoomBox.appendChild(fragment);
     }
   }, {
@@ -2808,12 +2864,16 @@ var Viewer = function () {
 
       this.element.classList.remove((0, _prefixClass2.default)('show-bleed'));
       this.element.classList.remove((0, _prefixClass2.default)('show-guides'));
-      this.zoomBox.classList.add((0, _prefixClass2.default)('stage3d'));
 
       var pages = (0, _padPages2.default)(this.book.pages.slice());
 
       var fragment = (0, _Layouts.flipLayout)(pages, this.doubleSided);
       this.zoomBox.appendChild(fragment);
+    }
+  }, {
+    key: 'isTwoUp',
+    get: function get() {
+      return this.printArrange !== ARRANGE_ONE;
     }
   }, {
     key: 'isShowingCropMarks',
@@ -2863,8 +2923,6 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _convertUnits = __webpack_require__(5);
-
 var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
@@ -2874,6 +2932,8 @@ var _components = __webpack_require__(28);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+// import { convertStrToPx } from '../utils/convertUnits';
+
 
 var Controls = function Controls(opts) {
   var _this = this;
@@ -2890,23 +2950,6 @@ var Controls = function Controls(opts) {
 
   var printBtn = (0, _components.btnMain)({ onclick: print }, 'Print');
 
-  var cropToggle = void 0;
-  var bleedMarkToggle = void 0;
-
-  var toggleCropMarks = function toggleCropMarks() {
-    viewer.isShowingCropMarks = !viewer.isShowingCropMarks;
-    cropToggle.classList.toggle('selected');
-  };
-
-  var toggleBleedMarks = function toggleBleedMarks() {
-    viewer.isShowingBleedMarks = !viewer.isShowingBleedMarks;
-    bleedMarkToggle.classList.toggle('selected');
-  };
-
-  cropToggle = (0, _components.switchRow)({ onclick: toggleCropMarks }, 'Crop Marks');
-  cropToggle.classList.add('selected');
-  bleedMarkToggle = (0, _components.switchRow)({ onclick: toggleBleedMarks }, 'Bleed Marks');
-
   var doneBtn = (0, _components.btn)({ onclick: function onclick() {
       if (_this.binder.autorun) {
         window.history.back();
@@ -2915,133 +2958,181 @@ var Controls = function Controls(opts) {
       }
     } }, 'Done');
 
-  var s = this.binder.styler;
-  var unitInputs = {
-    top: (0, _components.inputNumberUnits)(s.margin.top),
-    inner: (0, _components.inputNumberUnits)(s.margin.inner),
-    outer: (0, _components.inputNumberUnits)(s.margin.outer),
-    bottom: (0, _components.inputNumberUnits)(s.margin.bottom),
-    width: (0, _components.inputNumberUnits)(s.size.width),
-    height: (0, _components.inputNumberUnits)(s.size.height),
-    bleed: (0, _components.inputNumberUnits)(s.bleed)
+  // const s = this.binder.pageSetup;
+  // const unitInputs = {
+  //   top: inputNumberUnits(s.margin.top),
+  //   inner: inputNumberUnits(s.margin.inner),
+  //   outer: inputNumberUnits(s.margin.outer),
+  //   bottom: inputNumberUnits(s.margin.bottom),
+  //   width: inputNumberUnits(s.size.width),
+  //   height: inputNumberUnits(s.size.height),
+  //   bleed: inputNumberUnits(s.bleed),
+  // };
+  //
+  // const sizeControl = h(`.${c('row')}.${c('size')}`,
+  //   h('div', 'W', unitInputs.width),
+  //   h('div', 'H', unitInputs.height),
+  // );
+  //
+  // const marginPreview = h(c('.preview'));
+  // const marginControl = h(`.${c('row')}.${c('margin')}`,
+  //   h('.top', unitInputs.top),
+  //   h('.inner', unitInputs.inner),
+  //   h('.outer', unitInputs.outer),
+  //   h('.bottom', unitInputs.bottom),
+  //   marginPreview,
+  // );
+
+  // const layoutControl = h(c('.layout-control'),
+  //   sizeControl,
+  //   marginControl
+  // );
+  //
+  // const bleedAmount = row('Bleed Amount', unitInputs.bleed);
+
+  var sheetSizes = [(0, _components.option)({ value: 'size_page' }, 'Auto'), (0, _components.option)({ value: 'size_page_bleed' }, 'Auto + Bleed'), (0, _components.option)({ value: 'size_page_marks', selected: true }, 'Auto + Marks'), (0, _components.option)({ value: 'size_letter_p' }, 'Letter Portrait'), (0, _components.option)({ value: 'size_letter_l' }, 'Letter Landscape')];
+  var sheetSizeSelect = _components.select.apply(undefined, sheetSizes);
+
+  var updateSheetSizeNames = function updateSheetSizeNames() {
+    var layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
+    sheetSizes[0].textContent = '' + layout;
+    sheetSizes[1].textContent = layout + ' + Bleed';
+    sheetSizes[2].textContent = layout + ' + Marks';
   };
+  updateSheetSizeNames();
 
-  var sizeControl = (0, _hyperscript2.default)('.' + (0, _prefixClass2.default)('row') + '.' + (0, _prefixClass2.default)('size'), (0, _hyperscript2.default)('div', 'W', unitInputs.width), (0, _hyperscript2.default)('div', 'H', unitInputs.height));
+  var sheetTooSmallAlert = (0, _components.row)('Sheet is too small to see marks · ', (0, _hyperscript2.default)('a', {
+    href: '#',
+    onclick: function onclick() {
+      sheetSizeSelect.value = 'size_page_marks';
+      updateSheetSize();
+    }
+  }, 'Change'));
+  sheetTooSmallAlert.style.color = 'rgba(0,0,0,0.4)';
 
-  var marginPreview = (0, _hyperscript2.default)((0, _prefixClass2.default)('.preview'));
-  var marginControl = (0, _hyperscript2.default)('.' + (0, _prefixClass2.default)('row') + '.' + (0, _prefixClass2.default)('margin'), (0, _hyperscript2.default)('.top', unitInputs.top), (0, _hyperscript2.default)('.inner', unitInputs.inner), (0, _hyperscript2.default)('.outer', unitInputs.outer), (0, _hyperscript2.default)('.bottom', unitInputs.bottom), marginPreview);
+  var updateSheetSize = function updateSheetSize() {
+    var newVal = sheetSizeSelect.value;
+    var marksHidden = newVal === 'size_page' || newVal === 'size_page_bleed';
+    sheetTooSmallAlert.style.display = marksHidden ? 'block' : 'none';
+    viewer.setSheetSize(newVal);
+    _this.binder.pageSetup.updateStylesheet();
+  };
+  sheetSizeSelect.addEventListener('change', updateSheetSize);
 
-  var layoutControl = (0, _hyperscript2.default)((0, _prefixClass2.default)('.layout-control'), sizeControl, marginControl);
-
-  var bleedAmount = (0, _components.row)('Bleed Amount', unitInputs.bleed);
-
-  // const paperSize = row('Paper Size', select(
-  //   option('Letter'),
-  //   option({ disabled: true }, '8.5 x 11'),
-  //   option({ disabled: true }, ''),
-  //   option({ disabled: true }, 'Legal'),
-  //   option({ disabled: true }, '8.5 x 14'),
-  //   option({ disabled: true }, ''),
-  //   option({ disabled: true }, 'Tabloid'),
-  //   option({ disabled: true }, '11 x 17'),
-  //   option({ disabled: true }, ''),
-  //   option({ disabled: true }, 'A4'),
-  //   option({ disabled: true }, 'mm x mm'),
-  // ));
+  var sheetSize = (0, _components.row)('Sheet Size', sheetSizeSelect);
 
   var arrangeSelect = (0, _components.select)((0, _components.option)({ value: 'arrange_one', selected: true }, '1 Page / Sheet'), (0, _components.option)({ value: 'arrange_two' }, '1 Spread / Sheet'), (0, _components.option)({ value: 'arrange_booklet' }, 'Booklet Order'), (0, _components.option)({ disabled: true }, 'Grid'), (0, _components.option)({ disabled: true }, 'Signatures'));
   arrangeSelect.addEventListener('change', function () {
     viewer.setPrintArrange(arrangeSelect.value);
+    updateSheetSizeNames();
   });
-  var arrangement = (0, _components.row)('Print', arrangeSelect);
+  var arrangement = (0, _components.row)('Layout', arrangeSelect);
 
-  // const orientationSelect = select(
-  //   option({ value: 'landscape' }, 'Landscape'),
-  //   option({ value: 'portrait' }, 'Portrait'),
-  // );
-  // orientationSelect.addEventListener('change', () => {
-  //   viewer.setOrientation(orientationSelect.value);
-  // });
-  // const orientation = row('Orientation', orientationSelect);
+  var marksSelect = (0, _components.select)((0, _components.option)({ value: 'marks_none' }, 'None'), (0, _components.option)({ value: 'marks_crop', selected: true }, 'Crop'), (0, _components.option)({ value: 'marks_bleed' }, 'Bleed'), (0, _components.option)({ value: 'marks_both' }, 'Crop and Bleed'));
+  var marks = (0, _components.row)('Marks', marksSelect);
+  marksSelect.addEventListener('change', function () {
+    switch (marksSelect.value) {
+      case 'marks_none':
+        viewer.isShowingCropMarks = false;
+        viewer.isShowingBleedMarks = false;
+        break;
+      case 'marks_crop':
+        viewer.isShowingCropMarks = true;
+        viewer.isShowingBleedMarks = false;
+        break;
+      case 'marks_bleed':
+        viewer.isShowingCropMarks = false;
+        viewer.isShowingBleedMarks = true;
+        break;
+      case 'marks_both':
+        viewer.isShowingCropMarks = true;
+        viewer.isShowingBleedMarks = true;
+        break;
+      default:
+    }
+  });
 
   var validCheck = (0, _hyperscript2.default)('div', { style: {
       display: 'none',
       color: '#e2b200'
     } }, 'Too Small');
-  var inProgress = (0, _components.btnLight)({ style: {
-      display: 'none',
-      'pointer-events': 'none'
-    } }, 'Updating...');
 
   var startPaginating = function startPaginating() {
-    inProgress.style.display = '';
     refreshPaginationBtn.style.display = 'none';
     refreshPaginationBtnDebug.style.display = 'none';
     _this.binder.makeBook(function () {
-      inProgress.style.display = 'none';
       refreshPaginationBtn.style.display = '';
       refreshPaginationBtnDebug.style.display = '';
     });
   };
-  var refreshPaginationBtn = (0, _components.btn)({ onclick: function onclick() {
-      _this.binder.debug = false;
-      startPaginating();
-    } }, 'Update Pagination');
 
-  var viewModes = [(0, _components.viewMode)('grid', viewer.setGrid, 'Preview'), (0, _components.viewMode)('outline', viewer.setOutline, 'Outline'), (0, _components.viewMode)('flip', viewer.setFlip, 'Flip'), (0, _components.viewMode)('print', viewer.setPrint, 'Sheet')];
+  var viewModes = [(0, _components.viewMode)('grid', viewer.setGrid, 'Grid'), (0, _components.viewMode)('outline', viewer.setOutline, 'Outline'), (0, _components.viewMode)('flip', viewer.setFlip, 'Flip'), (0, _components.viewMode)('print', viewer.setPrint, 'Sheet')];
 
   var viewSwitcher = _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.viewswitcher')].concat(viewModes));
 
   var headerContent = (0, _hyperscript2.default)('span', 'Loading');
-  var header = (0, _components.title)((0, _hyperscript2.default)((0, _prefixClass2.default)('.spinner')), headerContent);
 
-  var updateLayoutPreview = function updateLayoutPreview(newSize, newMargin) {
-    var px = {
-      top: (0, _convertUnits.convertStrToPx)(newMargin.top),
-      inner: (0, _convertUnits.convertStrToPx)(newMargin.inner),
-      outer: (0, _convertUnits.convertStrToPx)(newMargin.outer),
-      bottom: (0, _convertUnits.convertStrToPx)(newMargin.bottom),
-      width: (0, _convertUnits.convertStrToPx)(newSize.width),
-      height: (0, _convertUnits.convertStrToPx)(newSize.height)
-    };
-
-    var BASE = 90;
-    var ratio = px.width / px.height;
-    ratio = Math.max(ratio, 0.6);
-    ratio = Math.min(ratio, 1.8);
-
-    var width = void 0;
-    var height = void 0;
-    if (ratio > 2) {
-      width = BASE * ratio;
-      height = BASE;
-    } else {
-      width = BASE;
-      height = BASE * 1 / ratio;
+  var refreshPaginationBtn = (0, _hyperscript2.default)('a', { onclick: function onclick() {
+      _this.binder.debug = false;
+      startPaginating();
+    } }, 'Refresh');
+  refreshPaginationBtn.classList.add((0, _prefixClass2.default)('refresh'));
+  var refreshPaginationBtnDebug = (0, _hyperscript2.default)('a', 'Debug', {
+    onclick: function onclick() {
+      playSlow.style.display = 'none';
+      step.style.display = 'none';
+      pause.style.display = '';
+      _this.binder.debug = true;
+      startPaginating();
     }
-
-    var t = px.top / px.height * height;
-    var b = px.bottom / px.height * height;
-    var o = px.outer / px.width * width;
-    var i = px.inner / px.width * width;
-
-    sizeControl.style.width = width + 'px';
-    sizeControl.style.height = height + 'px';
-    marginControl.style.width = width + 'px';
-    marginControl.style.height = height + 'px';
-
-    marginPreview.style.top = t + 'px';
-    marginPreview.style.bottom = b + 'px';
-    marginPreview.style.left = i + 'px';
-    marginPreview.style.right = o + 'px';
-  };
-  updateLayoutPreview(this.binder.styler.size, this.binder.styler.margin);
+  });
+  var header = (0, _components.title)((0, _hyperscript2.default)((0, _prefixClass2.default)('.spinner')), headerContent, (0, _hyperscript2.default)((0, _prefixClass2.default)('.refresh-btns'), refreshPaginationBtn, refreshPaginationBtnDebug));
+  //
+  // const updateLayoutPreview = (newSize, newMargin) => {
+  //   const px = {
+  //     top: convertStrToPx(newMargin.top),
+  //     inner: convertStrToPx(newMargin.inner),
+  //     outer: convertStrToPx(newMargin.outer),
+  //     bottom: convertStrToPx(newMargin.bottom),
+  //     width: convertStrToPx(newSize.width),
+  //     height: convertStrToPx(newSize.height),
+  //   };
+  //
+  //   const BASE = 90;
+  //   let ratio = px.width / px.height;
+  //   ratio = Math.max(ratio, 0.6);
+  //   ratio = Math.min(ratio, 1.8);
+  //
+  //   let width;
+  //   let height;
+  //   if (ratio > 2) {
+  //     width = BASE * ratio;
+  //     height = BASE;
+  //   } else {
+  //     width = BASE;
+  //     height = (BASE * 1) / ratio;
+  //   }
+  //
+  //   const t = (px.top / px.height) * height;
+  //   const b = (px.bottom / px.height) * height;
+  //   const o = (px.outer / px.width) * width;
+  //   const i = (px.inner / px.width) * width;
+  //
+  //   sizeControl.style.width = `${width}px`;
+  //   sizeControl.style.height = `${height}px`;
+  //   marginControl.style.width = `${width}px`;
+  //   marginControl.style.height = `${height}px`;
+  //
+  //   marginPreview.style.top = `${t}px`;
+  //   marginPreview.style.bottom = `${b}px`;
+  //   marginPreview.style.left = `${i}px`;
+  //   marginPreview.style.right = `${o}px`;
+  // };
+  // updateLayoutPreview(this.binder.pageSetup.size, this.binder.pageSetup.margin);
 
   this.setInProgress = function () {
     headerContent.textContent = 'Paginating';
     validCheck.style.display = 'none';
-    inProgress.style.display = '';
-    refreshPaginationBtn.style.display = 'none';
   };
 
   this.updateProgress = function (count) {
@@ -3050,64 +3141,60 @@ var Controls = function Controls(opts) {
 
   this.setDone = function () {
     headerContent.textContent = viewer.book.pages.length + ' Pages';
-    inProgress.style.display = 'none';
-    refreshPaginationBtn.style.display = '';
     validCheck.style.display = 'none';
   };
 
   this.setInvalid = function () {
     validCheck.style.display = '';
-    refreshPaginationBtn.style.display = '';
-    inProgress.style.display = 'none';
   };
+  //
+  // const updateLayout = () => {
+  //   const newMargin = {
+  //     top: unitInputs.top.value,
+  //     inner: unitInputs.inner.value,
+  //     outer: unitInputs.outer.value,
+  //     bottom: unitInputs.bottom.value,
+  //   };
+  //   const newSize = {
+  //     height: unitInputs.height.value,
+  //     width: unitInputs.width.value,
+  //   };
+  //   const newBleed = unitInputs.bleed.value;
+  //
+  //   const needsUpdate =
+  //     Object.keys(newMargin).some(k => this.binder.pageSetup.margin[k] !== newMargin[k])
+  //     || Object.keys(newSize).some(k => this.binder.pageSetup.size[k] !== newSize[k])
+  //     || this.binder.pageSetup.bleed !== newBleed;
+  //
+  //   if (needsUpdate) {
+  //     updateLayoutPreview(newSize, newMargin);
+  //     this.binder.pageSetup.setSize(newSize);
+  //     this.binder.pageSetup.setMargin(newMargin);
+  //     this.binder.pageSetup.setBleed(newBleed);
+  //
+  //     this.binder.pageSetup.updateStylesheet();
+  //     viewer.updateZoom();
+  //
+  //     if (this.binder.autoupdate) {
+  //       if (this.binder.pageSetup.isSizeValid()) {
+  //         this.binder.makeBook();
+  //       } else {
+  //         this.setInvalid();
+  //       }
+  //     }
+  //   }
+  // };
 
-  var updateLayout = function updateLayout() {
-    var newMargin = {
-      top: unitInputs.top.value,
-      inner: unitInputs.inner.value,
-      outer: unitInputs.outer.value,
-      bottom: unitInputs.bottom.value
-    };
-    var newSize = {
-      height: unitInputs.height.value,
-      width: unitInputs.width.value
-    };
-    var newBleed = unitInputs.bleed.value;
-
-    var needsUpdate = Object.keys(newMargin).some(function (k) {
-      return _this.binder.styler.margin[k] !== newMargin[k];
-    }) || Object.keys(newSize).some(function (k) {
-      return _this.binder.styler.size[k] !== newSize[k];
-    }) || _this.binder.styler.bleed !== newBleed;
-
-    if (needsUpdate) {
-      updateLayoutPreview(newSize, newMargin);
-      _this.binder.styler.setSize(newSize);
-      _this.binder.styler.setMargin(newMargin);
-      _this.binder.styler.setBleed(newBleed);
-      _this.binder.styler.updateStylesheet();
-      viewer.updateZoom();
-
-      if (_this.binder.autoupdate) {
-        if (_this.binder.styler.isSizeValid()) {
-          _this.binder.makeBook();
-        } else {
-          _this.setInvalid();
-        }
-      }
-    }
-  };
-
-  var updateDelay = void 0;
-  var throttledUpdate = function throttledUpdate() {
-    clearTimeout(updateDelay);
-    updateDelay = setTimeout(updateLayout, 100);
-  };
-
-  Object.keys(unitInputs).forEach(function (k) {
-    unitInputs[k].addEventListener('change', throttledUpdate);
-    unitInputs[k].addEventListener('keyup', throttledUpdate);
-  });
+  // let updateDelay;
+  // const throttledUpdate = () => {
+  //   clearTimeout(updateDelay);
+  //   updateDelay = setTimeout(updateLayout, 100);
+  // };
+  //
+  // Object.keys(unitInputs).forEach((k) => {
+  //   unitInputs[k].addEventListener('change', throttledUpdate);
+  //   unitInputs[k].addEventListener('keyup', throttledUpdate);
+  // });
 
   var playSlow = void 0;
   var step = (0, _components.btn)('→', {
@@ -3133,18 +3220,9 @@ var Controls = function Controls(opts) {
       step.style.display = 'none';
     }
   });
-  var debugDone = (0, _components.btn)('Done', {
+  var debugDone = (0, _components.btn)('Finish', {
     onclick: function onclick() {
       window.binderyDebug.finish();
-    }
-  });
-  var refreshPaginationBtnDebug = (0, _components.btnLight)('Debug', {
-    onclick: function onclick() {
-      playSlow.style.display = 'none';
-      step.style.display = 'none';
-      pause.style.display = '';
-      _this.binder.debug = true;
-      startPaginating();
     }
   });
 
@@ -3152,20 +3230,22 @@ var Controls = function Controls(opts) {
   debugControls.classList.add((0, _prefixClass2.default)('debug-controls'));
   printBtn.classList.add((0, _prefixClass2.default)('btn-print'));
 
-  var layoutState = (0, _hyperscript2.default)('div', refreshPaginationBtn, refreshPaginationBtnDebug, validCheck, inProgress);
-
   this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.controls'), header, viewSwitcher,
 
-  // expandRow('⚙️'),
+  // expandRow('Page Setup'),
   // expandArea(
-  arrangement,
-  // paperSize,
-  // orientation,
-
-  (0, _components.expandRow)('Marks and Bleed'), (0, _components.expandArea)(cropToggle, bleedMarkToggle, bleedAmount), (0, _components.expandRow)('Page Setup'), (0, _components.expandArea)(layoutControl, (0, _components.row)(layoutState)),
+  //   layoutControl,
+  //   bleedAmount,
+  //   row(layoutState),
   // ),
 
-  debugControls, (0, _components.row)(doneBtn, printBtn));
+  // expandRow('Marks and Bleed'),
+  // expandArea(
+  //   cropToggle,
+  //   bleedMarkToggle,
+  //   sheetTooSmallAlert,
+  // ),
+  arrangement, sheetSize, marks, debugControls, (0, _components.row)(printBtn));
 };
 
 exports.default = Controls;
@@ -3180,7 +3260,7 @@ exports.default = Controls;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.viewMode = exports.inputNumberUnits = exports.switchRow = exports.option = exports.select = exports.btnMain = exports.btnLight = exports.btn = exports.heading = exports.expandArea = exports.expandRow = exports.row = exports.title = undefined;
+exports.viewMode = exports.inputNumberUnits = exports.option = exports.select = exports.btnMain = exports.btnLight = exports.btn = exports.heading = exports.row = exports.title = undefined;
 
 var _hyperscript = __webpack_require__(1);
 
@@ -3219,45 +3299,39 @@ var row = function row() {
   return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.row')].concat(arg));
 };
 
-var expandRow = function expandRow() {
-  for (var _len4 = arguments.length, arg = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-    arg[_key4] = arguments[_key4];
-  }
+// const expandRow = function (...arg) {
+//   return h(
+//     `.${c('row')}.${c('expand-row')}`,
+//     { onclick() {
+//       this.classList.toggle('selected');
+//     } },
+//     ...arg);
+// };
+// const expandArea = function (...arg) {
+//   return h(c('.expand-area'), ...arg);
+// };
 
-  return _hyperscript2.default.apply(undefined, ['.' + (0, _prefixClass2.default)('row') + '.' + (0, _prefixClass2.default)('expand-row'), {
-    onclick: function onclick() {
-      this.classList.toggle('selected');
-    }
-  }].concat(arg));
-};
-var expandArea = function expandArea() {
-  for (var _len5 = arguments.length, arg = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-    arg[_key5] = arguments[_key5];
-  }
-
-  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.expand-area')].concat(arg));
-};
 
 // Button
 var btn = function btn() {
-  for (var _len6 = arguments.length, arg = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-    arg[_key6] = arguments[_key6];
+  for (var _len4 = arguments.length, arg = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+    arg[_key4] = arguments[_key4];
   }
 
   return _hyperscript2.default.apply(undefined, ['button.' + (0, _prefixClass2.default)('btn')].concat(arg));
 };
 
 var btnLight = function btnLight() {
-  for (var _len7 = arguments.length, arg = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-    arg[_key7] = arguments[_key7];
+  for (var _len5 = arguments.length, arg = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+    arg[_key5] = arguments[_key5];
   }
 
   return _hyperscript2.default.apply(undefined, ['button.' + (0, _prefixClass2.default)('btn') + '.' + (0, _prefixClass2.default)('btn-light')].concat(arg));
 };
 
 var btnMain = function btnMain() {
-  for (var _len8 = arguments.length, arg = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-    arg[_key8] = arguments[_key8];
+  for (var _len6 = arguments.length, arg = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+    arg[_key6] = arguments[_key6];
   }
 
   return _hyperscript2.default.apply(undefined, ['button.' + (0, _prefixClass2.default)('btn') + '.' + (0, _prefixClass2.default)('btn-main')].concat(arg));
@@ -3265,16 +3339,16 @@ var btnMain = function btnMain() {
 
 // Menu
 var select = function select() {
-  for (var _len9 = arguments.length, arg = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
-    arg[_key9] = arguments[_key9];
+  for (var _len7 = arguments.length, arg = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+    arg[_key7] = arguments[_key7];
   }
 
   return _hyperscript2.default.apply(undefined, ['select'].concat(arg));
 };
 
 var option = function option() {
-  for (var _len10 = arguments.length, arg = Array(_len10), _key10 = 0; _key10 < _len10; _key10++) {
-    arg[_key10] = arguments[_key10];
+  for (var _len8 = arguments.length, arg = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+    arg[_key8] = arguments[_key8];
   }
 
   return _hyperscript2.default.apply(undefined, ['option'].concat(arg));
@@ -3289,19 +3363,6 @@ var inputNumberUnits = function inputNumberUnits(val) {
   });
 };
 
-// Switch
-var toggleSwitch = function toggleSwitch() {
-  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.switch'));
-};
-
-var switchRow = function switchRow() {
-  for (var _len11 = arguments.length, arg = Array(_len11), _key11 = 0; _key11 < _len11; _key11++) {
-    arg[_key11] = arguments[_key11];
-  }
-
-  return _hyperscript2.default.apply(undefined, [(0, _prefixClass2.default)('.row')].concat(arg, [toggleSwitch]));
-};
-
 // View Swithcer
 var viewMode = function viewMode(id, action, text) {
   var sel = '.' + (0, _prefixClass2.default)('viewmode') + '.' + (0, _prefixClass2.default)(id);
@@ -3310,15 +3371,12 @@ var viewMode = function viewMode(id, action, text) {
 
 exports.title = title;
 exports.row = row;
-exports.expandRow = expandRow;
-exports.expandArea = expandArea;
 exports.heading = heading;
 exports.btn = btn;
 exports.btnLight = btnLight;
 exports.btnMain = btnMain;
 exports.select = select;
 exports.option = option;
-exports.switchRow = switchRow;
 exports.inputNumberUnits = inputNumberUnits;
 exports.viewMode = viewMode;
 
@@ -3334,7 +3392,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function (title, text) {
-  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.7.1'));
+  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.8'));
 };
 
 var _hyperscript = __webpack_require__(1);
@@ -3553,7 +3611,7 @@ var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBoo
       arg[_key3] = arguments[_key3];
     }
 
-    return (0, _hyperscript2.default)((0, _prefixClass2.default)('.print-page') + (0, _prefixClass2.default)('.letter-' + orient), spread.apply(undefined, arg.concat([marks()])));
+    return (0, _hyperscript2.default)((0, _prefixClass2.default)('.print-page'), spread.apply(undefined, arg.concat([marks()])));
   };
 
   if (isTwoUp) {
@@ -3647,8 +3705,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
   var flipLayout = document.createDocumentFragment();
+  var flapHolder = (0, _hyperscript2.default)((0, _prefixClass2.default)('.spread-size') + (0, _prefixClass2.default)('.flap-holder'));
+  flipLayout.appendChild(flapHolder);
   var flaps = [];
   var currentLeaf = -1;
+
+  var leftOffset = 4;
+  if (pages.length * leftOffset > 60) {
+    leftOffset = 60 / pages.length;
+  }
+  flapHolder.style.width = pages.length * leftOffset + 'px';
 
   var setLeaf = function setLeaf(n) {
     var newLeaf = n;
@@ -3694,13 +3760,10 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
     // Putting 1000s of elements onscreen
     // locks up the browser.
 
-    var leftOffset = 4;
-    if (pages.length * leftOffset > 300) leftOffset = 300 / pages.length;
-
     flap.style.left = i * leftOffset + 'px';
 
     flaps.push(flap);
-    flipLayout.appendChild(flap);
+    flapHolder.appendChild(flap);
   };
 
   for (var i = 1; i < pages.length - 1; i += doubleSided ? 2 : 1) {
@@ -3817,9 +3880,7 @@ var _Rule2 = __webpack_require__(3);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
-var _UserOption = __webpack_require__(2);
-
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _utils = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3828,11 +3889,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-// Options:
-// selector: String
-// isContinuationClass: String
-// hasContinuationClass: String
 
 var Split = function (_Rule) {
   _inherits(Split, _Rule);
@@ -3846,10 +3902,10 @@ var Split = function (_Rule) {
     var _this = _possibleConstructorReturn(this, (Split.__proto__ || Object.getPrototypeOf(Split)).call(this, options));
 
     _this.name = 'Split';
-    _UserOption2.default.validate(options, {
-      selector: _UserOption2.default.string,
-      toNext: _UserOption2.default.string,
-      fromPrevious: _UserOption2.default.string
+    _utils.OptionType.validate(options, {
+      selector: _utils.OptionType.string,
+      toNext: _utils.OptionType.string,
+      fromPrevious: _utils.OptionType.string
     });
     return _this;
   }
@@ -3888,9 +3944,7 @@ var _Rule2 = __webpack_require__(3);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
-var _UserOption = __webpack_require__(2);
-
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _utils = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3910,12 +3964,12 @@ var Counter = function (_Rule) {
 
     _this.selector = '*';
     _this.counterValue = 0;
-    _UserOption2.default.validate(options, {
+    _utils.OptionType.validate(options, {
       name: 'Counter',
-      replaceEl: _UserOption2.default.string,
-      resetEl: _UserOption2.default.string,
-      incrementEl: _UserOption2.default.string,
-      replace: _UserOption2.default.func
+      replaceEl: _utils.OptionType.string,
+      resetEl: _utils.OptionType.string,
+      incrementEl: _utils.OptionType.string,
+      replace: _utils.OptionType.func
     });
     return _this;
   }
@@ -3970,13 +4024,11 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _OutOfFlow2 = __webpack_require__(9);
+var _OutOfFlow2 = __webpack_require__(8);
 
 var _OutOfFlow3 = _interopRequireDefault(_OutOfFlow2);
 
-var _UserOption = __webpack_require__(2);
-
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _utils = __webpack_require__(2);
 
 var _prefixClass = __webpack_require__(0);
 
@@ -4005,10 +4057,10 @@ var FullBleedSpread = function (_OutOfFlow) {
     var _this = _possibleConstructorReturn(this, (FullBleedSpread.__proto__ || Object.getPrototypeOf(FullBleedSpread)).call(this, options));
 
     _this.name = 'Full Bleed Spread';
-    _UserOption2.default.validate(options, {
-      selector: _UserOption2.default.string,
-      continue: _UserOption2.default.enum('next', 'same', 'left', 'right'),
-      rotate: _UserOption2.default.enum('none', 'clockwise', 'counterclockwise')
+    _utils.OptionType.validate(options, {
+      selector: _utils.OptionType.string,
+      continue: _utils.OptionType.enum('next', 'same', 'left', 'right'),
+      rotate: _utils.OptionType.enum('none', 'clockwise', 'counterclockwise')
     });
     return _this;
   }
@@ -4075,13 +4127,11 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _OutOfFlow2 = __webpack_require__(9);
+var _OutOfFlow2 = __webpack_require__(8);
 
 var _OutOfFlow3 = _interopRequireDefault(_OutOfFlow2);
 
-var _UserOption = __webpack_require__(2);
-
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _utils = __webpack_require__(2);
 
 var _prefixClass = __webpack_require__(0);
 
@@ -4110,10 +4160,10 @@ var FullBleedPage = function (_OutOfFlow) {
     var _this = _possibleConstructorReturn(this, (FullBleedPage.__proto__ || Object.getPrototypeOf(FullBleedPage)).call(this, options));
 
     _this.name = 'Full Bleed Page';
-    _UserOption2.default.validate(options, {
-      selector: _UserOption2.default.string,
-      continue: _UserOption2.default.enum('next', 'same', 'left', 'right'),
-      rotate: _UserOption2.default.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise')
+    _utils.OptionType.validate(options, {
+      selector: _utils.OptionType.string,
+      continue: _utils.OptionType.enum('next', 'same', 'left', 'right'),
+      rotate: _utils.OptionType.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise')
     });
     return _this;
   }
@@ -4168,9 +4218,7 @@ var _Replace2 = __webpack_require__(6);
 
 var _Replace3 = _interopRequireDefault(_Replace2);
 
-var _UserOption = __webpack_require__(2);
-
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _utils = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4194,10 +4242,10 @@ var Footnote = function (_Replace) {
     var _this = _possibleConstructorReturn(this, (Footnote.__proto__ || Object.getPrototypeOf(Footnote)).call(this, options));
 
     _this.name = 'Footnote';
-    _UserOption2.default.validate(options, {
-      selector: _UserOption2.default.string,
-      replace: _UserOption2.default.func,
-      render: _UserOption2.default.func
+    _utils.OptionType.validate(options, {
+      selector: _utils.OptionType.string,
+      replace: _utils.OptionType.func,
+      render: _utils.OptionType.func
     });
     return _this;
   }
@@ -4259,11 +4307,11 @@ var _Replace2 = __webpack_require__(6);
 
 var _Replace3 = _interopRequireDefault(_Replace2);
 
-var _UserOption = __webpack_require__(2);
+var _utils = __webpack_require__(2);
 
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _prefixClass = __webpack_require__(0);
 
-var _utils = __webpack_require__(8);
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4286,10 +4334,10 @@ var PageReference = function (_Replace) {
     var _this = _possibleConstructorReturn(this, (PageReference.__proto__ || Object.getPrototypeOf(PageReference)).call(this, options));
 
     _this.name = 'Page Reference';
-    _UserOption2.default.validate(options, {
-      selector: _UserOption2.default.string,
-      replace: _UserOption2.default.func,
-      createTest: _UserOption2.default.func
+    _utils.OptionType.validate(options, {
+      selector: _utils.OptionType.string,
+      replace: _utils.OptionType.func,
+      createTest: _utils.OptionType.func
     });
     return _this;
   }
@@ -4306,7 +4354,8 @@ var PageReference = function (_Replace) {
         var tempClone = elmt.cloneNode(true);
         var tempNumbers = state.book.pagesForTest(test);
         var tempRanges = (0, _utils.makeRanges)(tempNumbers);
-        var temp = this.replace(tempClone, tempRanges);
+        var temp = this.replace(tempClone, tempRanges || '###');
+        temp.classList.add((0, _prefixClass2.default)('placeholder-pulse'));
         parent.replaceChild(temp, elmt);
 
         state.book.onComplete(function () {
@@ -4370,9 +4419,7 @@ var _Rule2 = __webpack_require__(3);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
-var _UserOption = __webpack_require__(2);
-
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _utils = __webpack_require__(2);
 
 var _prefixClass = __webpack_require__(0);
 
@@ -4402,15 +4449,15 @@ var RunningHeader = function (_Rule) {
     var _this = _possibleConstructorReturn(this, (RunningHeader.__proto__ || Object.getPrototypeOf(RunningHeader)).call(this, options));
 
     _this.name = 'Running Header';
-    _UserOption2.default.validate(options, {
-      render: _UserOption2.default.func
+    _utils.OptionType.validate(options, {
+      render: _utils.OptionType.func
     });
     return _this;
   }
 
   _createClass(RunningHeader, [{
-    key: 'afterBind',
-    value: function afterBind(page) {
+    key: 'eachPage',
+    value: function eachPage(page) {
       if (!page.runningHeader) {
         var el = (0, _hyperscript2.default)((0, _prefixClass2.default)('.running-header'));
         page.element.appendChild(el);
@@ -4447,9 +4494,7 @@ var _Rule2 = __webpack_require__(3);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
 
-var _UserOption = __webpack_require__(2);
-
-var _UserOption2 = _interopRequireDefault(_UserOption);
+var _utils = __webpack_require__(2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4471,10 +4516,10 @@ var PageBreak = function (_Rule) {
     var _this = _possibleConstructorReturn(this, (PageBreak.__proto__ || Object.getPrototypeOf(PageBreak)).call(this, options));
 
     _this.name = 'Page Break';
-    _UserOption2.default.validate(options, {
-      selector: _UserOption2.default.string,
-      continue: _UserOption2.default.enum('any', 'left', 'right'),
-      position: _UserOption2.default.enum('before', 'after', 'both', 'avoid')
+    _utils.OptionType.validate(options, {
+      selector: _utils.OptionType.string,
+      continue: _utils.OptionType.enum('any', 'left', 'right'),
+      position: _utils.OptionType.enum('before', 'after', 'both', 'avoid')
     });
     return _this;
   }
@@ -4525,14 +4570,14 @@ exports.default = PageBreak;
 var content = __webpack_require__(47);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(54)(content, {});
+var update = __webpack_require__(57)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
 	// When the styles change, update the <style> tags
 	if(!content.locals) {
-		module.hot.accept("!!../../node_modules/css-loader/index.js!../../node_modules/sass-loader/lib/loader.js!./main.scss", function() {
-			var newContent = require("!!../../node_modules/css-loader/index.js!../../node_modules/sass-loader/lib/loader.js!./main.scss");
+		module.hot.accept("!!../node_modules/css-loader/index.js!../node_modules/sass-loader/lib/loader.js!./main.scss", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!../node_modules/sass-loader/lib/loader.js!./main.scss");
 			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 			update(newContent);
 		});
@@ -4550,7 +4595,7 @@ exports = module.exports = __webpack_require__(48)();
 
 
 // module
-exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .📖-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n    .📖-show-bleed .📖-page {\n      box-shadow: none;\n      outline: none;\n      overflow: visible; }\n    .📖-page3d .📖-page {\n      overflow: hidden !important; }\n    .📖-page::after {\n      content: \"\";\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      pointer-events: none;\n      z-index: 999; }\n  .📖-zoom-wrap * {\n    transition: box-shadow 0.2s; }\n  .📖-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .📖-show-guides .📖-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .📖-show-guides .📖-flowbox,\n  .📖-show-guides .📖-footer,\n  .📖-show-guides .📖-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .📖-show-guides .📖-background {\n    box-shadow: 0 0 0 1px yellow; }\n  .📖-show-guides .📖-out-of-flow {\n    display: block;\n    outline: 1px solid cyan; }\n    .📖-show-guides .📖-out-of-flow::after {\n      font: 10px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      content: attr(data-bindery);\n      position: absolute;\n      background: rgba(0, 255, 255, 0.5);\n      padding: 4px; }\n  .📖-show-guides .📖-right .📖-out-of-flow::after {\n    left: 100%; }\n  .📖-show-guides .📖-left .📖-out-of-flow::after {\n    right: 100%; }\n  .📖-is-overflowing {\n    overflow: visible; }\n    .📖-is-overflowing::before {\n      transition: none;\n      content: \"+\";\n      display: block;\n      width: 12px;\n      margin: 0 auto -10px;\n      padding: 4px;\n      overflow: hidden;\n      position: absolute;\n      bottom: 0;\n      left: 0;\n      right: 0;\n      z-index: 999;\n      text-align: center;\n      font: 8px/1.3 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      font-weight: 500;\n      text-transform: uppercase;\n      letter-spacing: 0.1em;\n      color: #ad0000;\n      background: white;\n      border-radius: 2px;\n      border: 1px solid currentColor; }\n    .📖-is-overflowing:hover::before {\n      content: \"Overflow\";\n      width: 64px; }\n    .📖-is-overflowing .📖-content {\n      transition: none; }\n      .📖-is-overflowing .📖-content:hover::after {\n        box-shadow: inset 0 0 0 1px #ad0000;\n        background: rgba(173, 0, 0, 0.04);\n        content: '';\n        position: absolute;\n        top: 0;\n        left: 0;\n        right: 0;\n        bottom: 0; } }\n\n.📖-out-of-flow {\n  display: none; }\n\n.📖-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap; }\n\n.📖-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.📖-content {\n  padding: 0.1px;\n  /* prevent margin collapse */\n  position: relative; }\n\n.📖-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n.📖-rotate-container.📖-rotate-clockwise,\n.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,\n.📖-right .📖-rotate-container.📖-rotate-inward,\n.📖-left .📖-rotate-container.📖-rotate-outward {\n  transform: rotate(90deg) translate3d(0, -100%, 0);\n  transform-origin: top left; }\n\n.📖-rotate-container.📖-rotate-counterclockwise,\n.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,\n.📖-left .📖-rotate-container.📖-rotate-inward,\n.📖-right .📖-rotate-container.📖-rotate-outward {\n  transform: rotate(-90deg) translate3d(-100%, 0, 0);\n  transform-origin: top left; }\n\n.📖-rotate-container {\n  position: absolute; }\n  .📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background {\n    bottom: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background {\n    top: 0; }\n  .📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n    top: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n    bottom: 0; }\n  .📖-rotate-container.📖-rotate-inward .📖-background {\n    bottom: 0; }\n  .📖-rotate-container.📖-rotate-outward .📖-background {\n    top: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-clockwise {\n    transform: rotate(90deg) translate3d(0, -50%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, -50%, 0);\n    transform-origin: top left; }\n\n/*Bleed as layer*/\n.📖-background {\n  position: absolute;\n  z-index: 0;\n  overflow: hidden; }\n  .📖-left > .📖-background {\n    right: 0; }\n  .📖-right > .📖-background {\n    left: 0; }\n\n.📖-sup {\n  font-size: 0.667em; }\n\n.📖-running-header, .📖-footer {\n  font-size: 10pt; }\n\n.📖-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .📖-left .📖-running-header {\n    left: 18pt;\n    text-align: left; }\n  .📖-right .📖-running-header {\n    right: 18pt;\n    text-align: right; }\n\np.📖-continuation {\n  text-indent: unset !important; }\n\nli.📖-continuation {\n  list-style: none !important;\n  text-indent: unset !important; }\n\n.📖-print-mark-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .📖-show-crop .📖-print-mark-wrap,\n  .📖-show-bleed-marks .📖-print-mark-wrap {\n    display: block; }\n  .📖-show-crop .📖-print-mark-wrap > [class*='crop'] {\n    display: block; }\n  .📖-show-bleed-marks .📖-print-mark-wrap > [class*='bleed'] {\n    display: block; }\n  .📖-print-mark-wrap > div {\n    display: none;\n    position: absolute;\n    overflow: hidden; }\n    .📖-print-mark-wrap > div::before, .📖-print-mark-wrap > div::after {\n      content: \"\";\n      display: block;\n      position: absolute; }\n    .📖-print-mark-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .📖-print-mark-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.📖-crop-fold,\n.📖-crop-left,\n.📖-crop-right,\n.📖-bleed-left,\n.📖-bleed-right {\n  width: 1px;\n  margin: auto; }\n  .📖-crop-fold::before, .📖-crop-fold:after,\n  .📖-crop-left::before,\n  .📖-crop-left:after,\n  .📖-crop-right::before,\n  .📖-crop-right:after,\n  .📖-bleed-left::before,\n  .📖-bleed-left:after,\n  .📖-bleed-right::before,\n  .📖-bleed-right:after {\n    width: 1px;\n    height: 12pt;\n    background-image: linear-gradient(to right, black 0%, black 51%, transparent 51%);\n    background-size: 1px 100%; }\n\n.📖-crop-top,\n.📖-crop-bottom,\n.📖-bleed-top,\n.📖-bleed-bottom {\n  height: 1px; }\n  .📖-crop-top::before, .📖-crop-top:after,\n  .📖-crop-bottom::before,\n  .📖-crop-bottom:after,\n  .📖-bleed-top::before,\n  .📖-bleed-top:after,\n  .📖-bleed-bottom::before,\n  .📖-bleed-bottom:after {\n    width: 12pt;\n    height: 1px;\n    background-image: linear-gradient(to bottom, black 0%, black 51%, transparent 51%);\n    background-size: 100% 1px; }\n\n.📖-crop-fold {\n  right: 0;\n  left: 0; }\n\n.📖-crop-left {\n  left: 0; }\n\n.📖-crop-right {\n  right: 0; }\n\n.📖-crop-top {\n  top: 0; }\n\n.📖-crop-bottom {\n  bottom: 0; }\n\n@media screen {\n  .📖-viewing {\n    background: #f4f4f4 !important; }\n  .📖-root {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 240px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .📖-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    z-index: 99;\n    visibility: hidden;\n    left: 0;\n    right: 0;\n    bottom: 0; }\n    .📖-measure-area .📖-page {\n      margin: 0 auto 50px; }\n  .📖-print-page {\n    margin: 0 auto; }\n  .📖-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    background: url(" + __webpack_require__(49) + ") no-repeat 0% 0%;\n    background-size: 48px;\n    padding-top: 64px; }\n    .📖-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .📖-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .📖-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .📖-show-bleed .📖-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .📖-letter-landscape {\n    width: 11in;\n    height: 8.5in; }\n  .📖-letter-portrait {\n    width: 8.5in;\n    height: 11in; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .📖-root * {\n    -webkit-print-color-adjust: exact;\n    color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .📖-viewing > :not(.📖-root) {\n    display: none !important; }\n  .📖-controls {\n    display: none !important; }\n  .📖-print-page {\n    padding: 1px;\n    /* prevent margin collapse */\n    margin: 0; }\n  .📖-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.📖-viewing {\n  margin: 0; }\n\n.📖-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.📖-viewing > :not(.📖-root):not(.📖-measure-area) {\n  display: none !important; }\n\n.📖-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden; }\n\n.📖-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.📖-print-page .📖-spread-wrapper {\n  margin: 0 auto; }\n\n.📖-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.📖-stage3d {\n  perspective: 3000px;\n  transform-style: preserve-3d; }\n\n.📖-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .📖-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .📖-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .📖-page3d .📖-page {\n    position: absolute;\n    backface-visibility: hidden; }\n  .📖-page3d .📖-page3d-front {\n    transform: rotateY(0); }\n    .📖-page3d .📖-page3d-front::after {\n      box-shadow: inset 12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n  .📖-page3d .📖-page3d-back {\n    transform: rotateY(-180deg); }\n    .📖-page3d .📖-page3d-back::after {\n      box-shadow: inset -12px 0 12px -12px rgba(0, 0, 0, 0.4); }\n\n@media screen {\n  .📖-viewing .📖-controls {\n    display: block !important; } }\n\n.📖-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  display: none;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 240px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  padding-bottom: 100px;\n  -webkit-font-smoothing: antialiased; }\n  .📖-controls * {\n    font: inherit;\n    color: inherit;\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box; }\n\n.📖-title {\n  padding: 20px 20px 8px;\n  font-size: 18px; }\n  .📖-title + .📖-expand-row {\n    position: absolute;\n    right: 8px;\n    top: 16px; }\n\n.📖-spinner {\n  border: 1px solid transparent;\n  border-left-color: black;\n  width: 20px;\n  height: 20px;\n  border-radius: 50%;\n  margin-right: 0.5em;\n  display: none;\n  vertical-align: middle; }\n  .📖-in-progress .📖-spinner {\n    display: inline-block;\n    animation: spin 0.6s linear infinite; }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n.📖-btn {\n  -webkit-appearance: none;\n  padding: 8px 16px;\n  color: black;\n  border: none;\n  background: rgba(0, 0, 0, 0.06);\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 3px;\n  margin-right: 8px;\n  text-decoration: none; }\n  .📖-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .📖-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .📖-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n  .📖-btn:last-child {\n    margin-right: 0; }\n\n.📖-btn-light {\n  background: none; }\n\n.📖-btn-main {\n  margin-top: 4px;\n  background: #0000d0;\n  color: white; }\n  .📖-btn-main:hover {\n    background: #0000d0;\n    opacity: 0.7; }\n  .📖-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.📖-in-progress .📖-btn-print {\n  opacity: 0.5;\n  pointer-events: none; }\n\n.📖-viewswitcher {\n  padding: 12px 8px;\n  user-select: none; }\n\n.📖-viewmode {\n  height: 54px;\n  width: 54px;\n  display: inline-block;\n  text-align: center;\n  font-size: 10px;\n  color: #aaa;\n  cursor: pointer;\n  border-radius: 3px; }\n  .📖-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-viewmode .📖-icon {\n    height: 32px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .📖-viewmode.📖-grid .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(50) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-flip .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(51) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-outline .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(52) + ") no-repeat 50% 50%; }\n  .📖-viewmode.📖-print .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(53) + ") no-repeat 50% 50%; }\n\n[bindery-view-mode='grid'] .📖-grid,\n[bindery-view-mode='interactive'] .📖-flip,\n[bindery-view-mode='outline'] .📖-outline,\n[bindery-view-mode='print'] .📖-print {\n  color: black; }\n\n.📖-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 0 8px;\n  cursor: default;\n  user-select: none; }\n  .📖-row select {\n    opacity: 0.4;\n    position: absolute;\n    border: none;\n    background: transparent;\n    padding: 8px 12px;\n    width: 140px;\n    top: 8px;\n    right: 12px; }\n    .📖-row select:hover {\n      background: rgba(0, 0, 0, 0.04);\n      opacity: 1; }\n  .📖-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    background: none; }\n    .📖-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .📖-row input:invalid {\n      color: #bf5656; }\n\n.📖-row.📖-debug-controls {\n  display: none; }\n  .📖-debug .📖-in-progress .📖-row.📖-debug-controls {\n    display: block; }\n\n.📖-expand-row {\n  border-radius: 4px; }\n  .📖-expand-row:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-expand-row::after {\n    content: '+';\n    font-size: 1.5em;\n    padding: 0;\n    position: absolute;\n    right: 12px;\n    top: 2px;\n    font-weight: 300;\n    opacity: 0.4; }\n  .📖-expand-row.selected::after {\n    content: '\\2013'; }\n  .📖-expand-row.selected + .📖-expand-area {\n    opacity: 1;\n    max-height: none;\n    margin-bottom: 12px; }\n\n.📖-expand-area {\n  opacity: 0;\n  max-height: 0;\n  margin: 0 8px;\n  border-radius: 0 0 4px 4px;\n  overflow: hidden; }\n  .📖-expand-area .📖-row {\n    margin: 4px 0; }\n\n.📖-size, .📖-margin {\n  display: inline-block;\n  vertical-align: middle;\n  margin: 0;\n  min-height: 80px;\n  background: white;\n  outline: 1px solid #ddd;\n  height: 100px;\n  width: 100px; }\n\n.📖-size {\n  padding: 8px 0;\n  font-size: 12px; }\n  .📖-size div {\n    position: relative;\n    padding: 6px 12px;\n    color: #aaa; }\n\n.📖-layout-control {\n  margin: 4px 12px 8px; }\n\n.📖-margin {\n  overflow: hidden; }\n  .📖-margin > div {\n    position: absolute;\n    width: 54px;\n    height: 24px;\n    z-index: 5; }\n    .📖-margin > div:hover {\n      z-index: 99; }\n  .📖-margin .top {\n    left: 0;\n    right: 0;\n    margin: auto;\n    top: 0; }\n  .📖-margin .bottom {\n    left: 0;\n    right: 0;\n    margin: auto;\n    bottom: 0; }\n  .📖-margin .inner {\n    left: 0;\n    text-align: left;\n    top: calc(50% - 12px); }\n    .📖-margin .inner input {\n      text-align: left; }\n  .📖-margin .outer {\n    right: 0;\n    text-align: right;\n    top: calc(50% - 12px); }\n    .📖-margin .outer input {\n      text-align: right; }\n  .📖-margin .📖-preview {\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    border: 1px solid #a9a9ff;\n    height: auto;\n    width: auto;\n    z-index: 0;\n    pointer-events: none;\n    transition: border 0.2s; }\n\n.📖-margin input {\n  text-align: center;\n  padding: 4px;\n  font-size: 12px;\n  text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white; }\n  .📖-margin input:focus {\n    background: none !important; }\n\n.📖-switch {\n  width: 28px;\n  height: 16px;\n  background: rgba(0, 0, 0, 0.2);\n  border-radius: 8px;\n  vertical-align: middle;\n  float: right;\n  transition: all 0.2s;\n  position: relative; }\n  .📖-switch::after {\n    content: '';\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    background: white;\n    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n    transition: all 0.2s;\n    position: absolute;\n    left: 0px;\n    top: 0px; }\n  .📖-switch:hover::after {\n    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3); }\n  .📖-switch:active::after {\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); }\n\n.📖-row.selected .📖-switch {\n  background: rgba(0, 0, 208, 0.6); }\n\n.📖-row.selected .📖-switch::after {\n  background: #0000d0;\n  left: 12px; }\n\n@media (max-width: 500px) {\n  .📖-root {\n    padding-right: 0; }\n  .📖-controls {\n    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);\n    left: 0;\n    width: unset;\n    padding-bottom: 12px;\n    top: unset; }\n  .📖-controls > .📖-row:last-child {\n    text-align: right; } }\n", ""]);
+exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .📖-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n    .📖-show-bleed .📖-page {\n      box-shadow: none;\n      outline: none;\n      overflow: visible; }\n    .📖-page::after {\n      content: \"\";\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      pointer-events: none;\n      z-index: 999; } }\n\np.📖-continuation {\n  text-indent: unset !important; }\n\nli.📖-continuation {\n  list-style: none !important;\n  text-indent: unset !important; }\n\n.📖-out-of-flow {\n  display: none; }\n\n.📖-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.📖-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.📖-content {\n  padding: 0.1px;\n  /* prevent margin collapse */\n  position: relative; }\n\n.📖-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n/*Bleed as layer*/\n.📖-background {\n  position: absolute;\n  z-index: 0;\n  overflow: hidden; }\n  .📖-left > .📖-background {\n    right: 0; }\n  .📖-right > .📖-background {\n    left: 0; }\n\n.📖-sup {\n  font-size: 0.667em; }\n\n.📖-running-header, .📖-footer {\n  font-size: 10pt; }\n\n.📖-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .📖-left .📖-running-header {\n    left: 18pt;\n    text-align: left; }\n  .📖-right .📖-running-header {\n    right: 18pt;\n    text-align: right; }\n\n.📖-rotate-container.📖-rotate-clockwise,\n.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,\n.📖-right .📖-rotate-container.📖-rotate-inward,\n.📖-left .📖-rotate-container.📖-rotate-outward {\n  transform: rotate(90deg) translate3d(0, -100%, 0);\n  transform-origin: top left; }\n\n.📖-rotate-container.📖-rotate-counterclockwise,\n.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,\n.📖-left .📖-rotate-container.📖-rotate-inward,\n.📖-right .📖-rotate-container.📖-rotate-outward {\n  transform: rotate(-90deg) translate3d(-100%, 0, 0);\n  transform-origin: top left; }\n\n.📖-rotate-container {\n  position: absolute; }\n  .📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background {\n    bottom: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background {\n    top: 0; }\n  .📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n    top: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n    bottom: 0; }\n  .📖-rotate-container.📖-rotate-inward .📖-background {\n    bottom: 0; }\n  .📖-rotate-container.📖-rotate-outward .📖-background {\n    top: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-clockwise {\n    transform: rotate(90deg) translate3d(0, -50%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, -50%, 0);\n    transform-origin: top left; }\n\n.📖-print-mark-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .📖-show-crop .📖-print-mark-wrap,\n  .📖-show-bleed-marks .📖-print-mark-wrap {\n    display: block; }\n  .📖-show-crop .📖-print-mark-wrap > [class*='crop'] {\n    display: block; }\n  .📖-show-bleed-marks .📖-print-mark-wrap > [class*='bleed'] {\n    display: block; }\n  .📖-print-mark-wrap > div {\n    display: none;\n    position: absolute;\n    overflow: hidden; }\n    .📖-print-mark-wrap > div::before, .📖-print-mark-wrap > div::after {\n      content: \"\";\n      display: block;\n      position: absolute; }\n    .📖-print-mark-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .📖-print-mark-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.📖-crop-fold,\n.📖-crop-left,\n.📖-crop-right,\n.📖-bleed-left,\n.📖-bleed-right {\n  width: 1px;\n  margin: auto; }\n  .📖-crop-fold::before, .📖-crop-fold:after,\n  .📖-crop-left::before,\n  .📖-crop-left:after,\n  .📖-crop-right::before,\n  .📖-crop-right:after,\n  .📖-bleed-left::before,\n  .📖-bleed-left:after,\n  .📖-bleed-right::before,\n  .📖-bleed-right:after {\n    width: 1px;\n    height: 12pt;\n    background-image: linear-gradient(to right, black 0%, black 51%, transparent 51%);\n    background-size: 1px 100%; }\n\n.📖-crop-top,\n.📖-crop-bottom,\n.📖-bleed-top,\n.📖-bleed-bottom {\n  height: 1px; }\n  .📖-crop-top::before, .📖-crop-top:after,\n  .📖-crop-bottom::before,\n  .📖-crop-bottom:after,\n  .📖-bleed-top::before,\n  .📖-bleed-top:after,\n  .📖-bleed-bottom::before,\n  .📖-bleed-bottom:after {\n    width: 12pt;\n    height: 1px;\n    background-image: linear-gradient(to bottom, black 0%, black 51%, transparent 51%);\n    background-size: 100% 1px; }\n\n.📖-crop-fold {\n  right: 0;\n  left: 0; }\n\n.📖-crop-left {\n  left: 0; }\n\n.📖-crop-right {\n  right: 0; }\n\n.📖-crop-top {\n  top: 0; }\n\n.📖-crop-bottom {\n  bottom: 0; }\n\n@media screen {\n  .📖-viewing {\n    background: #f4f4f4 !important; }\n  .📖-root {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 280px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .📖-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    z-index: 99;\n    visibility: hidden;\n    left: 0;\n    right: 0;\n    bottom: 0; }\n    .📖-measure-area .📖-page {\n      margin: 0 auto 50px; }\n  .📖-zoom-wrap * {\n    transition: box-shadow 0.2s; }\n  .📖-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .📖-show-guides .📖-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .📖-show-guides .📖-flowbox,\n  .📖-show-guides .📖-footer,\n  .📖-show-guides .📖-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .📖-show-guides .📖-background {\n    box-shadow: 0 0 0 1px yellow; }\n  .📖-show-guides .📖-out-of-flow {\n    display: block;\n    outline: 1px solid cyan; }\n    .📖-show-guides .📖-out-of-flow::after {\n      font: 10px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      content: attr(data-bindery);\n      position: absolute;\n      background: rgba(0, 255, 255, 0.5);\n      padding: 4px; }\n  .📖-show-guides .📖-right .📖-out-of-flow::after {\n    left: 100%; }\n  .📖-show-guides .📖-left .📖-out-of-flow::after {\n    right: 100%; }\n  .📖-is-overflowing {\n    border-bottom: 1px solid magenta; }\n  .📖-print-page {\n    margin: 0 auto; }\n  .📖-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    padding-top: 64px; }\n    .📖-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .📖-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .📖-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .📖-show-bleed .📖-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .📖-placeholder-pulse {\n    animation: pulse 1s infinite; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@keyframes pulse {\n  0% {\n    opacity: 0.2; }\n  50% {\n    opacity: 0.5; }\n  100% {\n    opacity: 0.2; } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .📖-root * {\n    -webkit-print-color-adjust: exact;\n    color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .📖-viewing > :not(.📖-root) {\n    display: none !important; }\n  .📖-controls {\n    display: none !important; }\n  .📖-print-page {\n    padding: 1px;\n    /* prevent margin collapse */\n    margin: 0; }\n  .📖-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.📖-viewing {\n  margin: 0; }\n\n.📖-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.📖-viewing > :not(.📖-root):not(.📖-measure-area) {\n  display: none !important; }\n\n.📖-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  align-items: center;\n  justify-content: center; }\n\n.📖-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.📖-print-page .📖-spread-wrapper {\n  margin: 0 auto; }\n\n.📖-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.📖-flap-holder {\n  perspective: 5000px;\n  transform-style: preserve-3d;\n  position: absolute;\n  top: 0;\n  right: 0;\n  left: 0;\n  bottom: 0;\n  margin: auto;\n  transform-style: preserve-3d; }\n\n.📖-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .📖-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .📖-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .📖-page3d .📖-page {\n    position: absolute;\n    backface-visibility: hidden;\n    box-shadow: none; }\n  .📖-page3d .📖-page3d-front {\n    transform: rotateY(0); }\n  .📖-page3d .📖-page3d-back {\n    transform: rotateY(-180deg); }\n\n@media screen {\n  .📖-viewing .📖-controls {\n    display: block !important; } }\n\n.📖-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  display: none;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 280px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  -webkit-font-smoothing: antialiased; }\n  .📖-controls * {\n    font: inherit;\n    color: inherit;\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box; }\n  .📖-controls a {\n    color: #0000d0;\n    text-decoration: none; }\n\n.📖-title {\n  padding: 20px 20px 8px;\n  font-size: 18px; }\n\n.📖-spinner {\n  border: 1px solid transparent;\n  border-left-color: black;\n  width: 20px;\n  height: 20px;\n  border-radius: 50%;\n  display: inline-block;\n  opacity: 0;\n  pointer-events: none;\n  vertical-align: middle;\n  transition: all 0.2s;\n  margin-right: -20px; }\n  .📖-in-progress .📖-spinner {\n    margin-right: 0.5em;\n    opacity: 1;\n    animation: spin 0.6s linear infinite; }\n  .📖-debug .📖-spinner {\n    animation: spin 2s linear infinite; }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n.📖-controls .📖-btn {\n  -webkit-appearance: none;\n  padding: 10px 18px;\n  color: black;\n  border: none;\n  background: transparent;\n  border: 1px solid gray;\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 4px;\n  margin-right: 8px;\n  text-decoration: none; }\n  .📖-controls .📖-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .📖-controls .📖-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .📖-controls .📖-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n  .📖-controls .📖-btn:last-child {\n    margin-right: 0; }\n\n.📖-controls .📖-btn-light {\n  background: none;\n  border: none; }\n\n.📖-controls .📖-btn-main {\n  margin-top: 4px;\n  background: #0000d0;\n  border-color: #0000d0;\n  color: white; }\n  .📖-controls .📖-btn-main:hover {\n    background: #0000d0;\n    opacity: 0.7; }\n  .📖-controls .📖-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.📖-in-progress .📖-btn-print {\n  opacity: 0.5;\n  pointer-events: none; }\n\n.📖-debug .📖-btn-print {\n  display: none; }\n\n.📖-viewswitcher {\n  user-select: none;\n  margin: 20px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  font-size: 0;\n  overflow: hidden;\n  width: 240px;\n  max-width: 240px;\n  border: 1px solid gray;\n  border-radius: 4px; }\n\n.📖-viewmode {\n  display: inline-block;\n  color: gray;\n  cursor: pointer;\n  width: 25%;\n  font-size: 0;\n  border-right: 1px solid gray; }\n  .📖-viewmode:last-child {\n    border-right: 0; }\n  .📖-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-viewmode .📖-icon {\n    height: 36px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .📖-viewmode.📖-grid .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(49) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='grid'] .📖-viewmode.📖-grid .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(50) + "); }\n  .📖-viewmode.📖-flip .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(51) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='interactive'] .📖-viewmode.📖-flip .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(52) + "); }\n  .📖-viewmode.📖-outline .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(53) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='outline'] .📖-viewmode.📖-outline .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(54) + "); }\n  .📖-viewmode.📖-print .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(55) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='print'] .📖-viewmode.📖-print .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(56) + "); }\n\n[bindery-view-mode='grid'] .📖-grid,\n[bindery-view-mode='interactive'] .📖-flip,\n[bindery-view-mode='outline'] .📖-outline,\n[bindery-view-mode='print'] .📖-print {\n  color: white;\n  background: gray; }\n\n.📖-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 0 8px;\n  cursor: default;\n  user-select: none; }\n  .📖-row:last-child {\n    margin-top: 8px; }\n  .📖-row select {\n    position: absolute;\n    border: none;\n    background: transparent;\n    padding: 8px 12px;\n    width: 60%;\n    top: 8px;\n    right: 12px; }\n    .📖-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .📖-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    background: none; }\n    .📖-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .📖-row input:invalid {\n      color: #bf5656; }\n\n.📖-row.📖-debug-controls {\n  display: none; }\n  .📖-debug .📖-in-progress .📖-row.📖-debug-controls {\n    display: block; }\n\n.📖-refresh-btns {\n  display: inline-block;\n  font-size: 12px;\n  margin-top: 8px;\n  float: right; }\n  .📖-refresh-btns a {\n    color: rgba(0, 0, 0, 0.4);\n    margin-left: 1em;\n    cursor: pointer; }\n    .📖-refresh-btns a:hover {\n      color: black; }\n\n@media (max-width: 600px) {\n  .📖-root {\n    padding-right: 0; }\n  .📖-zoom-wrap > :last-child {\n    margin-bottom: 100vh; }\n  .📖-controls .📖-refresh {\n    display: none; }\n  .📖-controls {\n    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);\n    left: 0;\n    width: unset;\n    padding-bottom: 12px;\n    top: unset; }\n  .📖-viewswitcher {\n    z-index: 1;\n    left: 0;\n    right: 160px;\n    width: unset; }\n  .📖-controls > .📖-row:last-child {\n    text-align: right; } }\n", ""]);
 
 // exports
 
@@ -4615,13 +4660,13 @@ module.exports = function() {
 /* 49 */
 /***/ (function(module, exports) {
 
-module.exports = "\"data:image/svg+xml,%3Csvg width='36' height='36' viewBox='0 0 36 36' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cdefs%3E%3Cpath id='a' d='M0 4H15V27H0z'/%3E%3Cpath id='b' d='M15 4H30V27H15z'/%3E%3Cpath id='c' d='M14 4.07147535L27 0 27 22.9285247 14 27z'/%3E%3C/defs%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23a'/%3E%3Cpath stroke='%23000000' d='M0.5 4.5H14.5V26.5H0.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23b'/%3E%3Cpath stroke='%23000000' d='M15.5 4.5H29.5V26.5H15.5z'/%3E%3C/g%3E%3Cg transform='translate(3 2)'%3E%3Cuse fill='%23FFFFFF' xlink:href='%23c'/%3E%3Cpath stroke='%23000000' d='M14.5,4.43882867 L14.5,26.3194563 L26.5,22.5611713 L26.5,0.680543732 L14.5,4.43882867 Z'/%3E%3C/g%3E%3Cpath fill='%23000000' opacity='.3' d='M16.3241613 26.7071852L25.7154453 22.615177 26.1596848 4.74924377 28 4.30920273 28 27z' transform='translate(3 2)'/%3E%3Ccircle fill='%23000000' cx='11' cy='14' r='1'/%3E%3Ccircle fill='%23000000' cx='11' cy='21' r='1'/%3E%3Cpath d='M28.1793786,11.0743011 C24.667534,11.0743011 21.8206214,13.9212136 21.8206214,17.4330583' stroke='%23000000' transform='rotate(-45 25 14.254)'/%3E%3C/g%3E%3C/svg%3E\""
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
 /* 50 */
 /***/ (function(module, exports) {
 
-module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3C/svg%3E\""
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-rule='evenodd'%3E%3Cpath d='M5 8H16V24H5zM17 8H28V24H17z'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
 /* 51 */
@@ -4633,16 +4678,34 @@ module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 
 /* 52 */
 /***/ (function(module, exports) {
 
-module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23000000'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3Cpath stroke='%23000000' d='M8.5 13.5H13.5V20.5H8.5z'/%3E%3Cpath fill='%23000000' d='M8 11H14V12H8z'/%3E%3Cpath stroke='%23000000' d='M19.5 13.5H24.5V20.5H19.5z'/%3E%3Cpath fill='%23000000' d='M19 11H25V12H19z'/%3E%3C/g%3E%3C/svg%3E\""
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21,3 L23,3 L23,19 L14.8480012,19 L21,16.6930005 L21,3 Z M0,3 L11,3 L11,19 L0,19 L0,3 Z M12,3 L20,0 L20,16 L12,19 L12,3 Z' transform='translate(5 5)' fill='%23000000' fill-rule='evenodd'/%3E%3C/svg%3E\""
 
 /***/ }),
 /* 53 */
 /***/ (function(module, exports) {
 
-module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M4.5 5.5H28.5V24.5H4.5z'/%3E%3Cpath d='M7.5 8.5L9.5 8.5M14.5 8.5L16.5 8.5M14.5 21.5L16.5 21.5M16.5 8.5L18.5 8.5M16.5 21.5L18.5 21.5M23.5 8.5L25.5 8.5M23.5 21.5L25.5 21.5M7.5 21.5L9.5 21.5M7.5 8.5L7.5 10.5M25.5 8.5L25.5 10.5M16.5 8.5L16.5 10.5M7.5 19.5L7.5 21.5M25.5 19.5L25.5 21.5M16.5 19.5L16.5 21.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23000000'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3Cpath stroke='%23000000' d='M8.5 13.5H13.5V20.5H8.5z'/%3E%3Cpath fill='%23000000' d='M8 11H14V12H8z'/%3E%3Cpath stroke='%23000000' d='M19.5 13.5H24.5V20.5H19.5z'/%3E%3Cpath fill='%23000000' d='M19 11H25V12H19z'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
 /* 54 */
+/***/ (function(module, exports) {
+
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5,8 L16,8 L16,24 L5,24 L5,8 Z M17,8 L28,8 L28,24 L17,24 L17,8 Z M8,13 L8,21 L14,21 L14,13 L8,13 Z M8,11 L8,12 L14,12 L14,11 L8,11 Z M19,13 L19,21 L25,21 L25,13 L19,13 Z M19,11 L19,12 L25,12 L25,11 L19,11 Z M9,20 L9,14 L13,14 L13,20 L9,20 Z M20,20 L20,14 L24,14 L24,20 L20,20 Z' fill='%23000000' fill-rule='evenodd'/%3E%3C/svg%3E\""
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports) {
+
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M8.5 6.5H24.5V25.5H8.5z'/%3E%3Cpath d='M22.5 21.5L24.5 21.5M8.5 21.5L10.5 21.5M8.5 10.5L10.5 10.5M22.5 10.5L24.5 10.5M20.5 23.5L20.5 25.5M12.5 23.5L12.5 25.5M20.5 6.5L20.5 8.5M12.5 6.5L12.5 8.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports) {
+
+module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M13,7 L20,7 L20,9 L21,9 L21,7 L24,7 L24,10 L22,10 L22,11 L24,11 L24,21 L22,21 L22,22 L24,22 L24,25 L21,25 L21,23 L20,23 L20,25 L13,25 L13,23 L12,23 L12,25 L9,25 L9,22 L11,22 L11,21 L9,21 L9,11 L11,11 L11,10 L9,10 L9,7 L12,7 L12,9 L13,9 L13,7 Z' fill='%23000000' fill-rule='evenodd'/%3E%3C/svg%3E\""
+
+/***/ }),
+/* 57 */
 /***/ (function(module, exports) {
 
 /*
