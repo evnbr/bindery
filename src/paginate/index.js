@@ -145,6 +145,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
           addedElement,
           state,
           continueOnNewPage,
+          makeNewPage,
           function overflowCallback(problemElement) {
             problemElement.parentNode.removeChild(problemElement);
             continueOnNewPage();

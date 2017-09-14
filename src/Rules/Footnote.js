@@ -17,7 +17,7 @@ class Footnote extends Replace {
       render: OptionType.func,
     });
   }
-  afterAdd(element, state, requestNewPage, overflowCallback) {
+  afterAdd(element, state, requestNewPage, makeNewPage, overflowCallback) {
     const number = state.currentPage.footer.children.length + 1;
 
     const footnote = h('.footnote');

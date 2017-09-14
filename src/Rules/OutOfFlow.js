@@ -13,6 +13,11 @@ class OutOfFlow extends Rule {
     placeholder.setAttribute('data-bindery', `${elToStr(elmt)}`);
     // placeholder.textContent = '[Bindery: Element moved out of flow]';
 
+    elmt.setAttribute('data-bindery-larger-than-page', true);
+
+    return elmt;
+  }
+  afterAdd(elmt, state, continueOnNewPage, makeNewPage) {
     this.addElementOutOfFlow(elmt, state, makeNewPage);
 
     // Catches cases when we didn't need to create a new page. but unclear
@@ -23,9 +28,8 @@ class OutOfFlow extends Rule {
       }
     }
 
-    return placeholder;
+    return elmt;
   }
-
 }
 
 export default OutOfFlow;
