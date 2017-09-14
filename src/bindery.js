@@ -11,7 +11,7 @@ import { OptionType } from './utils';
 require('./main.scss');
 
 class Bindery {
-  constructor(opts) {
+  constructor(opts = {}) {
     console.log(`Bindery ${'[AIV]{version}[/AIV]'}`);
 
     this.autorun = opts.autorun || true;
@@ -193,9 +193,4 @@ class Bindery {
   }
 }
 
-
-Object.keys(Rules).forEach((rule) => {
-  Bindery[rule] = Rules[rule];
-});
-
-module.exports = Bindery;
+export default Bindery;
