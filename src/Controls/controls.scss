@@ -150,18 +150,9 @@ $controlborder: gray;
 }
 
 .#{$pre}-viewmode {
-  // height: 54px;
-  // width: 54px;
-  // display: inline-block;
-  // text-align: center;
-  // font-size: 10px;
-  // color: #aaa;
-  // cursor: pointer;
-  // border-radius: 3px;
   display: inline-block;
   color: $controlborder;
   cursor: pointer;
-  // margin-right: 12px;
   width: 25%;
   font-size: 0;
   border-right: 1px solid $controlborder;
@@ -273,146 +264,6 @@ $controlborder: gray;
   }
 }
 
-// .#{$pre}-expand-row {
-//   border-radius: 4px;
-//
-//   &:hover {
-//     background: $hover;
-//   }
-//
-//   &::after {
-//     content: '+';
-//     font-size: 1.5em;
-//     padding: 0;
-//     position: absolute;
-//     right: 12px;
-//     top: 2px;
-//     font-weight: 300;
-//     opacity: 0.4;
-//   }
-//   &.selected {
-//     opacity: 0.4;
-//     // background: $hover;
-//     // border-radius: 4px 4px 0 0;
-//   }
-//   &.selected::after {
-//     content: '–';
-//     opacity: 1;
-//   }
-//
-//   &.selected + .#{$pre}-expand-area {
-//     opacity: 1;
-//     max-height: none;
-//     margin-bottom: 12px;
-//   }
-// }
-//
-//
-// .#{$pre}-expand-area {
-//   // display: none;
-//   // background: $hover;
-//   opacity: 0;
-//   max-height: 0;
-//   margin: 0 8px;
-//   border-radius: 0 0 4px 4px;
-//   overflow: hidden;
-//
-//   .#{$pre}-row {
-//     margin: 4px 0;
-//   }
-// }
-//
-// .#{$pre}-size, .#{$pre}-margin {
-//   display: inline-block;
-//   vertical-align: middle;
-//   margin: 0;
-//   min-height: 80px;
-//   background: white;
-//   outline: 1px solid #ddd;
-//   height: 100px;
-//   width: 100px;
-// }
-//
-// .#{$pre}-size {
-//   padding: 8px 0;
-//   font-size: 12px;
-//   div {
-//     position: relative;
-//     padding: 6px 12px;
-//     color: #aaa;
-//   }
-// }
-//
-// .#{$pre}-layout-control {
-//   margin: 4px 12px 8px;
-// }
-//
-// .#{$pre}-margin {
-//   overflow: hidden;
-//
-//   > div {
-//     position: absolute;
-//     width: 54px;
-//     height: 24px;
-//     z-index: 5;
-//     &:hover {
-//       z-index: 99;
-//     }
-//   }
-//
-//   .top {
-//     left: 0;
-//     right: 0;
-//     margin: auto;
-//     top: 0;
-//   }
-//   .bottom {
-//     left: 0;
-//     right: 0;
-//     margin: auto;
-//     bottom: 0;
-//   }
-//   .inner {
-//     left: 0;
-//     text-align: left;
-//     top: calc(50% - 12px);
-//     input {
-//       text-align: left;
-//     }
-//   }
-//   .outer {
-//     right: 0;
-//     text-align: right;
-//     top: calc(50% - 12px);
-//     input {
-//       text-align: right;
-//     }
-//   }
-//   .#{$pre}-preview {
-//     top: 0;
-//     left: 0;
-//     right: 0;
-//     bottom: 0;
-//     border: 1px solid #a9a9ff;
-//     height: auto;
-//     width: auto;
-//     z-index: 0;
-//     pointer-events: none;
-//     transition: border 0.2s;
-//   }
-// }
-//
-// .#{$pre}-margin input {
-//   text-align: center;
-//   padding: 4px;
-//   font-size: 12px;
-//   text-shadow: 0 2px 0 white, 0 -2px 0 white, 2px 0 0 white, -2px 0 0 white;
-//
-//   &:focus {
-//     background: none !important;
-//   }
-// }
-
 .#{$pre}-refresh-btns {
   display: inline-block;
   font-size: 12px;
@@ -434,9 +285,6 @@ $controlborder: gray;
   }
   .#{$pre}-zoom-wrap > :last-child {
     margin-bottom: 100vh;
-  }
-  .#{$pre}-controls .#{$pre}-refresh {
-    display: none;
   }
   .#{$pre}-controls {
     box-shadow: 0 0 2px rgba(0,0,0,0.3);
