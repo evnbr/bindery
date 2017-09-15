@@ -47,6 +47,13 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     });
   };
 
+  const applyLayoutStartRules = () => {
+    rules.forEach((rule) => {
+      if (rule.layoutStart) rule.layoutStart();
+    });
+  };
+
+
   const makeNewPage = () => {
     const newPage = new Page();
     measureArea.appendChild(newPage.element);
@@ -422,6 +429,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   };
 
   const startPagination = () => {
+    applyLayoutStartRules();
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();

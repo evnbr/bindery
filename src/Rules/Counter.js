@@ -15,6 +15,9 @@ class Counter extends Rule {
       replace: OptionType.func,
     });
   }
+  layoutStart() {
+    this.counterValue = 0;
+  }
   beforeAdd(el, state) {
     if (el.matches(this.incrementEl)) {
       this.counterValue += 1;
