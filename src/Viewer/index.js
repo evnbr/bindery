@@ -32,6 +32,7 @@ class Viewer {
     this.isShowingBleedMarks = false;
 
     this.mode = MODE_PREVIEW;
+    this.element.setAttribute('bindery-view-mode', this.mode);
     this.currentLeaf = 0;
 
     this.listenForPrint();

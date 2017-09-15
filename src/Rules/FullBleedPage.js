@@ -19,7 +19,9 @@ class FullBleedPage extends OutOfFlow {
     });
   }
 
-  addElementOutOfFlow(elmt, state, makeNewPage) {
+  createOutOfFlowPages(elmt, state, makeNewPage) {
+    elmt.parentNode.removeChild(elmt);
+
     let newPage;
     if (state.currentPage.isEmpty) {
       newPage = state.currentPage;

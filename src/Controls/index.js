@@ -8,12 +8,8 @@ import {
   option,
   btn,
   btnMain,
-  btnLight,
   row,
   viewMode,
-  // expandRow,
-  // expandArea,
-  // inputNumberUnits,
 } from './components';
 
 class Controls {
@@ -35,38 +31,6 @@ class Controls {
         this.binder.cancel();
       }
     } }, 'Done');
-
-    // const s = this.binder.pageSetup;
-    // const unitInputs = {
-    //   top: inputNumberUnits(s.margin.top),
-    //   inner: inputNumberUnits(s.margin.inner),
-    //   outer: inputNumberUnits(s.margin.outer),
-    //   bottom: inputNumberUnits(s.margin.bottom),
-    //   width: inputNumberUnits(s.size.width),
-    //   height: inputNumberUnits(s.size.height),
-    //   bleed: inputNumberUnits(s.bleed),
-    // };
-    //
-    // const sizeControl = h(`.${c('row')}.${c('size')}`,
-    //   h('div', 'W', unitInputs.width),
-    //   h('div', 'H', unitInputs.height),
-    // );
-    //
-    // const marginPreview = h(c('.preview'));
-    // const marginControl = h(`.${c('row')}.${c('margin')}`,
-    //   h('.top', unitInputs.top),
-    //   h('.inner', unitInputs.inner),
-    //   h('.outer', unitInputs.outer),
-    //   h('.bottom', unitInputs.bottom),
-    //   marginPreview,
-    // );
-
-    // const layoutControl = h(c('.layout-control'),
-    //   sizeControl,
-    //   marginControl
-    // );
-    //
-    // const bleedAmount = row('Bleed Amount', unitInputs.bleed);
 
     const sheetSizes = [
       option({ value: 'size_page' }, 'Auto'),
@@ -195,48 +159,6 @@ class Controls {
         refreshPaginationBtnDebug
       )
     );
-    //
-    // const updateLayoutPreview = (newSize, newMargin) => {
-    //   const px = {
-    //     top: convertStrToPx(newMargin.top),
-    //     inner: convertStrToPx(newMargin.inner),
-    //     outer: convertStrToPx(newMargin.outer),
-    //     bottom: convertStrToPx(newMargin.bottom),
-    //     width: convertStrToPx(newSize.width),
-    //     height: convertStrToPx(newSize.height),
-    //   };
-    //
-    //   const BASE = 90;
-    //   let ratio = px.width / px.height;
-    //   ratio = Math.max(ratio, 0.6);
-    //   ratio = Math.min(ratio, 1.8);
-    //
-    //   let width;
-    //   let height;
-    //   if (ratio > 2) {
-    //     width = BASE * ratio;
-    //     height = BASE;
-    //   } else {
-    //     width = BASE;
-    //     height = (BASE * 1) / ratio;
-    //   }
-    //
-    //   const t = (px.top / px.height) * height;
-    //   const b = (px.bottom / px.height) * height;
-    //   const o = (px.outer / px.width) * width;
-    //   const i = (px.inner / px.width) * width;
-    //
-    //   sizeControl.style.width = `${width}px`;
-    //   sizeControl.style.height = `${height}px`;
-    //   marginControl.style.width = `${width}px`;
-    //   marginControl.style.height = `${height}px`;
-    //
-    //   marginPreview.style.top = `${t}px`;
-    //   marginPreview.style.bottom = `${b}px`;
-    //   marginPreview.style.left = `${i}px`;
-    //   marginPreview.style.right = `${o}px`;
-    // };
-    // updateLayoutPreview(this.binder.pageSetup.size, this.binder.pageSetup.margin);
 
     this.setInProgress = () => {
       headerContent.textContent = 'Paginating';
@@ -255,54 +177,6 @@ class Controls {
     this.setInvalid = () => {
       validCheck.style.display = '';
     };
-    //
-    // const updateLayout = () => {
-    //   const newMargin = {
-    //     top: unitInputs.top.value,
-    //     inner: unitInputs.inner.value,
-    //     outer: unitInputs.outer.value,
-    //     bottom: unitInputs.bottom.value,
-    //   };
-    //   const newSize = {
-    //     height: unitInputs.height.value,
-    //     width: unitInputs.width.value,
-    //   };
-    //   const newBleed = unitInputs.bleed.value;
-    //
-    //   const needsUpdate =
-    //     Object.keys(newMargin).some(k => this.binder.pageSetup.margin[k] !== newMargin[k])
-    //     || Object.keys(newSize).some(k => this.binder.pageSetup.size[k] !== newSize[k])
-    //     || this.binder.pageSetup.bleed !== newBleed;
-    //
-    //   if (needsUpdate) {
-    //     updateLayoutPreview(newSize, newMargin);
-    //     this.binder.pageSetup.setSize(newSize);
-    //     this.binder.pageSetup.setMargin(newMargin);
-    //     this.binder.pageSetup.setBleed(newBleed);
-    //
-    //     this.binder.pageSetup.updateStylesheet();
-    //     viewer.updateZoom();
-    //
-    //     if (this.binder.autoupdate) {
-    //       if (this.binder.pageSetup.isSizeValid()) {
-    //         this.binder.makeBook();
-    //       } else {
-    //         this.setInvalid();
-    //       }
-    //     }
-    //   }
-    // };
-
-    // let updateDelay;
-    // const throttledUpdate = () => {
-    //   clearTimeout(updateDelay);
-    //   updateDelay = setTimeout(updateLayout, 100);
-    // };
-    //
-    // Object.keys(unitInputs).forEach((k) => {
-    //   unitInputs[k].addEventListener('change', throttledUpdate);
-    //   unitInputs[k].addEventListener('keyup', throttledUpdate);
-    // });
 
     let playSlow;
     const step = btn('→', {
@@ -345,19 +219,6 @@ class Controls {
       header,
       viewSwitcher,
 
-      // expandRow('Page Setup'),
-      // expandArea(
-      //   layoutControl,
-      //   bleedAmount,
-      //   row(layoutState),
-      // ),
-
-      // expandRow('Marks and Bleed'),
-      // expandArea(
-      //   cropToggle,
-      //   bleedMarkToggle,
-      //   sheetTooSmallAlert,
-      // ),
       arrangement,
       sheetSize,
       marks,

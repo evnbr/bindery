@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.8 - Sunday, September 10th, 2017, 5:26:23 PM  
+// [AIV]  Build version: 2.0.0-alpha.8.1 - Thursday, September 14th, 2017, 11:01:07 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -62,7 +62,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -98,10 +98,10 @@ exports.default = c;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var split = __webpack_require__(10)
-var ClassList = __webpack_require__(11)
+var split = __webpack_require__(12)
+var ClassList = __webpack_require__(13)
 
-var w = typeof window === 'undefined' ? __webpack_require__(13) : window
+var w = typeof window === 'undefined' ? __webpack_require__(15) : window
 var document = w.document
 var Text = w.Text
 
@@ -272,19 +272,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.OptionType = exports.makeRanges = exports.last = exports.arraysEqual = undefined;
 
-var _arraysEqual = __webpack_require__(15);
+var _arraysEqual = __webpack_require__(17);
 
 var _arraysEqual2 = _interopRequireDefault(_arraysEqual);
 
-var _arrayLast = __webpack_require__(16);
+var _arrayLast = __webpack_require__(18);
 
 var _arrayLast2 = _interopRequireDefault(_arrayLast);
 
-var _makeRanges = __webpack_require__(17);
+var _makeRanges = __webpack_require__(19);
 
 var _makeRanges2 = _interopRequireDefault(_makeRanges);
 
-var _OptionType = __webpack_require__(18);
+var _OptionType = __webpack_require__(20);
 
 var _OptionType2 = _interopRequireDefault(_OptionType);
 
@@ -573,7 +573,7 @@ var Replace = function (_Rule) {
 
   _createClass(Replace, [{
     key: 'afterAdd',
-    value: function afterAdd(element, state, requestNewPage, overflowCallback) {
+    value: function afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
       var parent = element.parentNode;
       if (!parent) {
         throw Error('Bindery: Rule assumes element has been added but it has no parent.', element);
@@ -650,6 +650,93 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _Split2 = __webpack_require__(39);
+
+var _Split3 = _interopRequireDefault(_Split2);
+
+var _Counter2 = __webpack_require__(40);
+
+var _Counter3 = _interopRequireDefault(_Counter2);
+
+var _FullBleedSpread2 = __webpack_require__(41);
+
+var _FullBleedSpread3 = _interopRequireDefault(_FullBleedSpread2);
+
+var _FullBleedPage2 = __webpack_require__(42);
+
+var _FullBleedPage3 = _interopRequireDefault(_FullBleedPage2);
+
+var _Footnote2 = __webpack_require__(43);
+
+var _Footnote3 = _interopRequireDefault(_Footnote2);
+
+var _PageReference2 = __webpack_require__(44);
+
+var _PageReference3 = _interopRequireDefault(_PageReference2);
+
+var _RunningHeader2 = __webpack_require__(45);
+
+var _RunningHeader3 = _interopRequireDefault(_RunningHeader2);
+
+var _Replace2 = __webpack_require__(6);
+
+var _Replace3 = _interopRequireDefault(_Replace2);
+
+var _Rule = __webpack_require__(3);
+
+var _Rule2 = _interopRequireDefault(_Rule);
+
+var _PageBreak2 = __webpack_require__(46);
+
+var _PageBreak3 = _interopRequireDefault(_PageBreak2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+  Rule: _Rule2.default,
+  Split: function Split(options) {
+    return new _Split3.default(options);
+  },
+  Counter: function Counter(options) {
+    return new _Counter3.default(options);
+  },
+  FullBleedPage: function FullBleedPage(options) {
+    return new _FullBleedPage3.default(options);
+  },
+  Footnote: function Footnote(options) {
+    return new _Footnote3.default(options);
+  },
+  RunningHeader: function RunningHeader(options) {
+    return new _RunningHeader3.default(options);
+  },
+  Replace: function Replace(options) {
+    return new _Replace3.default(options);
+  },
+  FullBleedSpread: function FullBleedSpread(options) {
+    return new _FullBleedSpread3.default(options);
+  },
+  PageBreak: function PageBreak(options) {
+    return new _PageBreak3.default(options);
+  },
+  PageReference: function PageReference(options) {
+    return new _PageReference3.default(options);
+  },
+  createRule: function createRule(options) {
+    return new _Rule2.default(options);
+  }
+};
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _hyperscript = __webpack_require__(1);
@@ -690,12 +777,14 @@ var OutOfFlow = function (_Rule) {
 
   _createClass(OutOfFlow, [{
     key: 'beforeAdd',
-    value: function beforeAdd(elmt, state, continueOnNewPage, makeNewPage) {
-      var placeholder = (0, _hyperscript2.default)((0, _prefixClass2.default)('.out-of-flow'));
-      placeholder.setAttribute('data-bindery', '' + (0, _elementToString2.default)(elmt));
-      // placeholder.textContent = '[Bindery: Element moved out of flow]';
-
-      this.addElementOutOfFlow(elmt, state, makeNewPage);
+    value: function beforeAdd(elmt) {
+      elmt.setAttribute('data-ignore-overflow', true);
+      return elmt;
+    }
+  }, {
+    key: 'afterAdd',
+    value: function afterAdd(elmt, state, continueOnNewPage, makeNewPage) {
+      this.createOutOfFlowPages(elmt, state, makeNewPage);
 
       // Catches cases when we didn't need to create a new page. but unclear
       if (this.continue !== 'same' || state.currentPage.hasOutOfFlowContent) {
@@ -705,7 +794,7 @@ var OutOfFlow = function (_Rule) {
         }
       }
 
-      return placeholder;
+      return elmt;
     }
   }]);
 
@@ -715,11 +804,29 @@ var OutOfFlow = function (_Rule) {
 exports.default = OutOfFlow;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+
+var Bindery = __webpack_require__(11).default;
+var Rules = __webpack_require__(8).default;
+
+var _exports = Object.assign(Bindery, Rules);
+
+module.exports = _exports;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -729,15 +836,15 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _paginate = __webpack_require__(14);
+var _paginate = __webpack_require__(16);
 
 var _paginate2 = _interopRequireDefault(_paginate);
 
-var _PageSetup = __webpack_require__(25);
+var _PageSetup = __webpack_require__(27);
 
 var _PageSetup2 = _interopRequireDefault(_PageSetup);
 
-var _Viewer = __webpack_require__(26);
+var _Viewer = __webpack_require__(28);
 
 var _Viewer2 = _interopRequireDefault(_Viewer);
 
@@ -745,7 +852,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _Rules = __webpack_require__(37);
+var _Rules = __webpack_require__(8);
 
 var _Rules2 = _interopRequireDefault(_Rules);
 
@@ -755,13 +862,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-__webpack_require__(46);
+__webpack_require__(47);
 
 var Bindery = function () {
-  function Bindery(opts) {
+  function Bindery() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     _classCallCheck(this, Bindery);
 
-    console.log('Bindery ' + '2.0.0-alpha.8');
+    console.log('Bindery ' + '2.0.0-alpha.8.1');
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
@@ -952,14 +1061,10 @@ var Bindery = function () {
   return Bindery;
 }();
 
-Object.keys(_Rules2.default).forEach(function (rule) {
-  Bindery[rule] = _Rules2.default[rule];
-});
-
-module.exports = Bindery;
+exports.default = Bindery;
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1071,11 +1176,11 @@ module.exports = (function split(undef) {
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // contains, add, remove, toggle
-var indexof = __webpack_require__(12)
+var indexof = __webpack_require__(14)
 
 module.exports = ClassList
 
@@ -1176,7 +1281,7 @@ function isTruthy(value) {
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports) {
 
 
@@ -1191,13 +1296,13 @@ module.exports = function(arr, obj){
 };
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1221,7 +1326,7 @@ var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
 var _utils = __webpack_require__(2);
 
-var _Book = __webpack_require__(19);
+var _Book = __webpack_require__(21);
 
 var _Book2 = _interopRequireDefault(_Book);
 
@@ -1229,23 +1334,23 @@ var _Page = __webpack_require__(4);
 
 var _Page2 = _interopRequireDefault(_Page);
 
-var _Scheduler = __webpack_require__(20);
+var _Scheduler = __webpack_require__(22);
 
 var _Scheduler2 = _interopRequireDefault(_Scheduler);
 
-var _orderPages = __webpack_require__(21);
+var _orderPages = __webpack_require__(23);
 
 var _orderPages2 = _interopRequireDefault(_orderPages);
 
-var _annotatePages = __webpack_require__(22);
+var _annotatePages = __webpack_require__(24);
 
 var _annotatePages2 = _interopRequireDefault(_annotatePages);
 
-var _breadcrumbCloner = __webpack_require__(23);
+var _breadcrumbCloner = __webpack_require__(25);
 
 var _breadcrumbCloner2 = _interopRequireDefault(_breadcrumbCloner);
 
-var _waitForImage = __webpack_require__(24);
+var _waitForImage = __webpack_require__(26);
 
 var _waitForImage2 = _interopRequireDefault(_waitForImage);
 
@@ -1294,6 +1399,12 @@ var paginate = function paginate(_ref) {
   var applyNewPageRules = function applyNewPageRules(pg) {
     rules.forEach(function (rule) {
       if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
+    });
+  };
+
+  var applyLayoutStartRules = function applyLayoutStartRules() {
+    rules.forEach(function (rule) {
+      if (rule.layoutStart) rule.layoutStart();
     });
   };
 
@@ -1397,11 +1508,11 @@ var paginate = function paginate(_ref) {
     var addedElement = originalElement;
     afterAddRules.forEach(function (rule) {
       if (addedElement.matches(rule.selector)) {
-        addedElement = rule.afterAdd(addedElement, state, continueOnNewPage, function overflowCallback(problemElement) {
+        addedElement = rule.afterAdd(addedElement, state, continueOnNewPage, makeNewPage, function overflowCallback(problemElement) {
           problemElement.parentNode.removeChild(problemElement);
           continueOnNewPage();
           currentFlowElement().appendChild(problemElement);
-          return rule.afterAdd(problemElement, state, continueOnNewPage, function () {
+          return rule.afterAdd(problemElement, state, continueOnNewPage, makeNewPage, function () {
             console.log('Couldn\'t apply ' + rule.name + ' to ' + (0, _elementToString2.default)(problemElement) + '. Caused overflows twice.');
           });
         });
@@ -1480,7 +1591,7 @@ var paginate = function paginate(_ref) {
 
     if (state.currentPage.isEmpty) {
       // Fail to move to next page, instead continue here
-      nodeToMove.setAttribute('data-bindery-larger-than-page', true);
+      nodeToMove.setAttribute('data-ignore-overflow', true);
     } else {
       if (state.currentPage.hasOverflowed()) {
         state.currentPage.suppressErrors = true;
@@ -1522,7 +1633,7 @@ var paginate = function paginate(_ref) {
       scheduler.throttle(doneCallback);
       return;
     }
-    if (currentFlowElement().hasAttribute('data-bindery-larger-than-page')) {
+    if (currentFlowElement().hasAttribute('data-ignore-overflow')) {
       scheduler.throttle(doneCallback);
       return;
     }
@@ -1618,7 +1729,7 @@ var paginate = function paginate(_ref) {
   // one by one recursively until thet overflow the page
   var addElementNode = function addElementNode(elementToAdd, doneCallback) {
     if (state.currentPage.hasOverflowed()) {
-      if (currentFlowElement().hasAttribute('data-bindery-larger-than-page')) {
+      if (currentFlowElement().hasAttribute('data-ignore-overflow')) {
         // Do nothing. We just have to add nodes despite the page overflowing.
       } else {
         state.currentPage.suppressErrors = true;
@@ -1678,6 +1789,7 @@ var paginate = function paginate(_ref) {
   };
 
   var startPagination = function startPagination() {
+    applyLayoutStartRules();
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();
@@ -1711,7 +1823,7 @@ var paginate = function paginate(_ref) {
 exports.default = paginate;
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1735,7 +1847,7 @@ var arraysEqual = function arraysEqual(a, b) {
 exports.default = arraysEqual;
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1751,7 +1863,7 @@ var last = function last(arr) {
 exports.default = last;
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1795,7 +1907,7 @@ var makeRanges = function makeRanges(arr) {
 exports.default = makeRanges;
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1870,7 +1982,7 @@ var OptionType = {
 exports.default = OptionType;
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1944,7 +2056,7 @@ var Book = function () {
 exports.default = Book;
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2008,7 +2120,11 @@ var Scheduler = function () {
         func();
       } else {
         this.numberOfCalls = 0;
-        requestAnimationFrame(func);
+        if (document.hidden) {
+          setTimeout(func, 1);
+        } else {
+          requestAnimationFrame(func);
+        }
       }
     }
   }, {
@@ -2083,7 +2199,7 @@ var Scheduler = function () {
 exports.default = Scheduler;
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2140,7 +2256,7 @@ var orderPages = function orderPages(pages, makeNewPage) {
 exports.default = orderPages;
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2197,7 +2313,7 @@ var annotatePages = function annotatePages(pages) {
 exports.default = annotatePages;
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2293,7 +2409,7 @@ var breadcrumbCloner = function breadcrumbCloner(rules) {
 exports.default = breadcrumbCloner;
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2324,7 +2440,7 @@ var waitForImage = function waitForImage(image, done) {
 exports.default = waitForImage;
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2470,7 +2586,7 @@ var PageSetup = function () {
 exports.default = PageSetup;
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2490,7 +2606,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _Controls = __webpack_require__(27);
+var _Controls = __webpack_require__(29);
 
 var _Controls2 = _interopRequireDefault(_Controls);
 
@@ -2498,19 +2614,19 @@ var _Page = __webpack_require__(4);
 
 var _Page2 = _interopRequireDefault(_Page);
 
-var _error = __webpack_require__(29);
+var _error = __webpack_require__(31);
 
 var _error2 = _interopRequireDefault(_error);
 
-var _orderPagesBooklet = __webpack_require__(30);
+var _orderPagesBooklet = __webpack_require__(32);
 
 var _orderPagesBooklet2 = _interopRequireDefault(_orderPagesBooklet);
 
-var _padPages = __webpack_require__(31);
+var _padPages = __webpack_require__(33);
 
 var _padPages2 = _interopRequireDefault(_padPages);
 
-var _Layouts = __webpack_require__(32);
+var _Layouts = __webpack_require__(34);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2543,6 +2659,7 @@ var Viewer = function () {
     this.isShowingBleedMarks = false;
 
     this.mode = MODE_PREVIEW;
+    this.element.setAttribute('bindery-view-mode', this.mode);
     this.currentLeaf = 0;
 
     this.listenForPrint();
@@ -2909,7 +3026,7 @@ var Viewer = function () {
 exports.default = Viewer;
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2927,7 +3044,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _components = __webpack_require__(28);
+var _components = __webpack_require__(30);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2957,38 +3074,6 @@ var Controls = function Controls(opts) {
         _this.binder.cancel();
       }
     } }, 'Done');
-
-  // const s = this.binder.pageSetup;
-  // const unitInputs = {
-  //   top: inputNumberUnits(s.margin.top),
-  //   inner: inputNumberUnits(s.margin.inner),
-  //   outer: inputNumberUnits(s.margin.outer),
-  //   bottom: inputNumberUnits(s.margin.bottom),
-  //   width: inputNumberUnits(s.size.width),
-  //   height: inputNumberUnits(s.size.height),
-  //   bleed: inputNumberUnits(s.bleed),
-  // };
-  //
-  // const sizeControl = h(`.${c('row')}.${c('size')}`,
-  //   h('div', 'W', unitInputs.width),
-  //   h('div', 'H', unitInputs.height),
-  // );
-  //
-  // const marginPreview = h(c('.preview'));
-  // const marginControl = h(`.${c('row')}.${c('margin')}`,
-  //   h('.top', unitInputs.top),
-  //   h('.inner', unitInputs.inner),
-  //   h('.outer', unitInputs.outer),
-  //   h('.bottom', unitInputs.bottom),
-  //   marginPreview,
-  // );
-
-  // const layoutControl = h(c('.layout-control'),
-  //   sizeControl,
-  //   marginControl
-  // );
-  //
-  // const bleedAmount = row('Bleed Amount', unitInputs.bleed);
 
   var sheetSizes = [(0, _components.option)({ value: 'size_page' }, 'Auto'), (0, _components.option)({ value: 'size_page_bleed' }, 'Auto + Bleed'), (0, _components.option)({ value: 'size_page_marks', selected: true }, 'Auto + Marks'), (0, _components.option)({ value: 'size_letter_p' }, 'Letter Portrait'), (0, _components.option)({ value: 'size_letter_l' }, 'Letter Landscape')];
   var sheetSizeSelect = _components.select.apply(undefined, sheetSizes);
@@ -3087,48 +3172,6 @@ var Controls = function Controls(opts) {
     }
   });
   var header = (0, _components.title)((0, _hyperscript2.default)((0, _prefixClass2.default)('.spinner')), headerContent, (0, _hyperscript2.default)((0, _prefixClass2.default)('.refresh-btns'), refreshPaginationBtn, refreshPaginationBtnDebug));
-  //
-  // const updateLayoutPreview = (newSize, newMargin) => {
-  //   const px = {
-  //     top: convertStrToPx(newMargin.top),
-  //     inner: convertStrToPx(newMargin.inner),
-  //     outer: convertStrToPx(newMargin.outer),
-  //     bottom: convertStrToPx(newMargin.bottom),
-  //     width: convertStrToPx(newSize.width),
-  //     height: convertStrToPx(newSize.height),
-  //   };
-  //
-  //   const BASE = 90;
-  //   let ratio = px.width / px.height;
-  //   ratio = Math.max(ratio, 0.6);
-  //   ratio = Math.min(ratio, 1.8);
-  //
-  //   let width;
-  //   let height;
-  //   if (ratio > 2) {
-  //     width = BASE * ratio;
-  //     height = BASE;
-  //   } else {
-  //     width = BASE;
-  //     height = (BASE * 1) / ratio;
-  //   }
-  //
-  //   const t = (px.top / px.height) * height;
-  //   const b = (px.bottom / px.height) * height;
-  //   const o = (px.outer / px.width) * width;
-  //   const i = (px.inner / px.width) * width;
-  //
-  //   sizeControl.style.width = `${width}px`;
-  //   sizeControl.style.height = `${height}px`;
-  //   marginControl.style.width = `${width}px`;
-  //   marginControl.style.height = `${height}px`;
-  //
-  //   marginPreview.style.top = `${t}px`;
-  //   marginPreview.style.bottom = `${b}px`;
-  //   marginPreview.style.left = `${i}px`;
-  //   marginPreview.style.right = `${o}px`;
-  // };
-  // updateLayoutPreview(this.binder.pageSetup.size, this.binder.pageSetup.margin);
 
   this.setInProgress = function () {
     headerContent.textContent = 'Paginating';
@@ -3147,54 +3190,6 @@ var Controls = function Controls(opts) {
   this.setInvalid = function () {
     validCheck.style.display = '';
   };
-  //
-  // const updateLayout = () => {
-  //   const newMargin = {
-  //     top: unitInputs.top.value,
-  //     inner: unitInputs.inner.value,
-  //     outer: unitInputs.outer.value,
-  //     bottom: unitInputs.bottom.value,
-  //   };
-  //   const newSize = {
-  //     height: unitInputs.height.value,
-  //     width: unitInputs.width.value,
-  //   };
-  //   const newBleed = unitInputs.bleed.value;
-  //
-  //   const needsUpdate =
-  //     Object.keys(newMargin).some(k => this.binder.pageSetup.margin[k] !== newMargin[k])
-  //     || Object.keys(newSize).some(k => this.binder.pageSetup.size[k] !== newSize[k])
-  //     || this.binder.pageSetup.bleed !== newBleed;
-  //
-  //   if (needsUpdate) {
-  //     updateLayoutPreview(newSize, newMargin);
-  //     this.binder.pageSetup.setSize(newSize);
-  //     this.binder.pageSetup.setMargin(newMargin);
-  //     this.binder.pageSetup.setBleed(newBleed);
-  //
-  //     this.binder.pageSetup.updateStylesheet();
-  //     viewer.updateZoom();
-  //
-  //     if (this.binder.autoupdate) {
-  //       if (this.binder.pageSetup.isSizeValid()) {
-  //         this.binder.makeBook();
-  //       } else {
-  //         this.setInvalid();
-  //       }
-  //     }
-  //   }
-  // };
-
-  // let updateDelay;
-  // const throttledUpdate = () => {
-  //   clearTimeout(updateDelay);
-  //   updateDelay = setTimeout(updateLayout, 100);
-  // };
-  //
-  // Object.keys(unitInputs).forEach((k) => {
-  //   unitInputs[k].addEventListener('change', throttledUpdate);
-  //   unitInputs[k].addEventListener('keyup', throttledUpdate);
-  // });
 
   var playSlow = void 0;
   var step = (0, _components.btn)('→', {
@@ -3230,28 +3225,13 @@ var Controls = function Controls(opts) {
   debugControls.classList.add((0, _prefixClass2.default)('debug-controls'));
   printBtn.classList.add((0, _prefixClass2.default)('btn-print'));
 
-  this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.controls'), header, viewSwitcher,
-
-  // expandRow('Page Setup'),
-  // expandArea(
-  //   layoutControl,
-  //   bleedAmount,
-  //   row(layoutState),
-  // ),
-
-  // expandRow('Marks and Bleed'),
-  // expandArea(
-  //   cropToggle,
-  //   bleedMarkToggle,
-  //   sheetTooSmallAlert,
-  // ),
-  arrangement, sheetSize, marks, debugControls, (0, _components.row)(printBtn));
+  this.element = (0, _hyperscript2.default)((0, _prefixClass2.default)('.controls'), header, viewSwitcher, arrangement, sheetSize, marks, debugControls, (0, _components.row)(printBtn));
 };
 
 exports.default = Controls;
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3381,7 +3361,7 @@ exports.inputNumberUnits = inputNumberUnits;
 exports.viewMode = viewMode;
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3392,7 +3372,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function (title, text) {
-  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.8'));
+  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.8.1'));
 };
 
 var _hyperscript = __webpack_require__(1);
@@ -3406,7 +3386,7 @@ var _prefixClass2 = _interopRequireDefault(_prefixClass);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3444,7 +3424,7 @@ var orderPagesBooklet = function orderPagesBooklet(pages) {
 exports.default = orderPagesBooklet;
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3478,7 +3458,7 @@ var padPages = function padPages(pages) {
 exports.default = padPages;
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3489,15 +3469,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.flipLayout = exports.printLayout = exports.gridLayout = undefined;
 
-var _gridLayout = __webpack_require__(33);
+var _gridLayout = __webpack_require__(35);
 
 var _gridLayout2 = _interopRequireDefault(_gridLayout);
 
-var _printLayout = __webpack_require__(34);
+var _printLayout = __webpack_require__(36);
 
 var _printLayout2 = _interopRequireDefault(_printLayout);
 
-var _flipLayout = __webpack_require__(36);
+var _flipLayout = __webpack_require__(38);
 
 var _flipLayout2 = _interopRequireDefault(_flipLayout);
 
@@ -3508,7 +3488,7 @@ exports.printLayout = _printLayout2.default;
 exports.flipLayout = _flipLayout2.default;
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3563,7 +3543,7 @@ var renderGridLayout = function renderGridLayout(pages, isTwoUp) {
 exports.default = renderGridLayout;
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3581,7 +3561,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _printMarks = __webpack_require__(35);
+var _printMarks = __webpack_require__(37);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3636,7 +3616,7 @@ var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBoo
 exports.default = renderPrintLayout;
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3683,7 +3663,7 @@ exports.printMarksSpread = printMarksSpread;
 exports.bookletMeta = bookletMeta;
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3777,94 +3757,7 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
 exports.default = renderFlipLayout;
 
 /***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _Split2 = __webpack_require__(38);
-
-var _Split3 = _interopRequireDefault(_Split2);
-
-var _Counter2 = __webpack_require__(39);
-
-var _Counter3 = _interopRequireDefault(_Counter2);
-
-var _FullBleedSpread2 = __webpack_require__(40);
-
-var _FullBleedSpread3 = _interopRequireDefault(_FullBleedSpread2);
-
-var _FullBleedPage2 = __webpack_require__(41);
-
-var _FullBleedPage3 = _interopRequireDefault(_FullBleedPage2);
-
-var _Footnote2 = __webpack_require__(42);
-
-var _Footnote3 = _interopRequireDefault(_Footnote2);
-
-var _PageReference2 = __webpack_require__(43);
-
-var _PageReference3 = _interopRequireDefault(_PageReference2);
-
-var _RunningHeader2 = __webpack_require__(44);
-
-var _RunningHeader3 = _interopRequireDefault(_RunningHeader2);
-
-var _Replace2 = __webpack_require__(6);
-
-var _Replace3 = _interopRequireDefault(_Replace2);
-
-var _Rule = __webpack_require__(3);
-
-var _Rule2 = _interopRequireDefault(_Rule);
-
-var _PageBreak2 = __webpack_require__(45);
-
-var _PageBreak3 = _interopRequireDefault(_PageBreak2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = {
-  Rule: _Rule2.default,
-  Split: function Split(options) {
-    return new _Split3.default(options);
-  },
-  Counter: function Counter(options) {
-    return new _Counter3.default(options);
-  },
-  FullBleedPage: function FullBleedPage(options) {
-    return new _FullBleedPage3.default(options);
-  },
-  Footnote: function Footnote(options) {
-    return new _Footnote3.default(options);
-  },
-  RunningHeader: function RunningHeader(options) {
-    return new _RunningHeader3.default(options);
-  },
-  Replace: function Replace(options) {
-    return new _Replace3.default(options);
-  },
-  FullBleedSpread: function FullBleedSpread(options) {
-    return new _FullBleedSpread3.default(options);
-  },
-  PageBreak: function PageBreak(options) {
-    return new _PageBreak3.default(options);
-  },
-  PageReference: function PageReference(options) {
-    return new _PageReference3.default(options);
-  },
-  createRule: function createRule(options) {
-    return new _Rule2.default(options);
-  }
-};
-
-/***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3928,7 +3821,7 @@ var Split = function (_Rule) {
 exports.default = Split;
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3975,6 +3868,11 @@ var Counter = function (_Rule) {
   }
 
   _createClass(Counter, [{
+    key: 'layoutStart',
+    value: function layoutStart() {
+      this.counterValue = 0;
+    }
+  }, {
     key: 'beforeAdd',
     value: function beforeAdd(el, state) {
       if (el.matches(this.incrementEl)) {
@@ -4008,7 +3906,7 @@ var Counter = function (_Rule) {
 exports.default = Counter;
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4024,7 +3922,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _OutOfFlow2 = __webpack_require__(8);
+var _OutOfFlow2 = __webpack_require__(9);
 
 var _OutOfFlow3 = _interopRequireDefault(_OutOfFlow2);
 
@@ -4066,9 +3964,11 @@ var FullBleedSpread = function (_OutOfFlow) {
   }
 
   _createClass(FullBleedSpread, [{
-    key: 'addElementOutOfFlow',
-    value: function addElementOutOfFlow(elmt, state, makeNewPage) {
+    key: 'createOutOfFlowPages',
+    value: function createOutOfFlowPages(elmt, state, makeNewPage) {
       var _this2 = this;
+
+      elmt.parentNode.removeChild(elmt);
 
       var leftPage = void 0;
       if (state.currentPage.isEmpty) {
@@ -4111,7 +4011,7 @@ var FullBleedSpread = function (_OutOfFlow) {
 exports.default = FullBleedSpread;
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4127,7 +4027,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _OutOfFlow2 = __webpack_require__(8);
+var _OutOfFlow2 = __webpack_require__(9);
 
 var _OutOfFlow3 = _interopRequireDefault(_OutOfFlow2);
 
@@ -4169,8 +4069,10 @@ var FullBleedPage = function (_OutOfFlow) {
   }
 
   _createClass(FullBleedPage, [{
-    key: 'addElementOutOfFlow',
-    value: function addElementOutOfFlow(elmt, state, makeNewPage) {
+    key: 'createOutOfFlowPages',
+    value: function createOutOfFlowPages(elmt, state, makeNewPage) {
+      elmt.parentNode.removeChild(elmt);
+
       var newPage = void 0;
       if (state.currentPage.isEmpty) {
         newPage = state.currentPage;
@@ -4196,7 +4098,7 @@ var FullBleedPage = function (_OutOfFlow) {
 exports.default = FullBleedPage;
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4252,7 +4154,7 @@ var Footnote = function (_Replace) {
 
   _createClass(Footnote, [{
     key: 'afterAdd',
-    value: function afterAdd(element, state, requestNewPage, overflowCallback) {
+    value: function afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
       var number = state.currentPage.footer.children.length + 1;
 
       var footnote = (0, _hyperscript2.default)('.footnote');
@@ -4261,7 +4163,7 @@ var Footnote = function (_Replace) {
 
       state.currentPage.footer.appendChild(footnote);
 
-      return _get(Footnote.prototype.__proto__ || Object.getPrototypeOf(Footnote.prototype), 'afterAdd', this).call(this, element, state, requestNewPage, function (overflowEl) {
+      return _get(Footnote.prototype.__proto__ || Object.getPrototypeOf(Footnote.prototype), 'afterAdd', this).call(this, element, state, continueOnNewPage, makeNewPage, function (overflowEl) {
         state.currentPage.footer.removeChild(footnote);
         return overflowCallback(overflowEl);
       });
@@ -4291,7 +4193,7 @@ var Footnote = function (_Replace) {
 exports.default = Footnote;
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4399,7 +4301,7 @@ var PageReference = function (_Replace) {
 exports.default = PageReference;
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4478,7 +4380,7 @@ var RunningHeader = function (_Rule) {
 exports.default = RunningHeader;
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4561,16 +4463,16 @@ var PageBreak = function (_Rule) {
 exports.default = PageBreak;
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(47);
+var content = __webpack_require__(48);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(57)(content, {});
+var update = __webpack_require__(58)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -4587,21 +4489,21 @@ if(false) {
 }
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(48)();
+exports = module.exports = __webpack_require__(49)();
 // imports
 
 
 // module
-exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .📖-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n    .📖-show-bleed .📖-page {\n      box-shadow: none;\n      outline: none;\n      overflow: visible; }\n    .📖-page::after {\n      content: \"\";\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      pointer-events: none;\n      z-index: 999; } }\n\np.📖-continuation {\n  text-indent: unset !important; }\n\nli.📖-continuation {\n  list-style: none !important;\n  text-indent: unset !important; }\n\n.📖-out-of-flow {\n  display: none; }\n\n.📖-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.📖-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.📖-content {\n  padding: 0.1px;\n  /* prevent margin collapse */\n  position: relative; }\n\n.📖-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n/*Bleed as layer*/\n.📖-background {\n  position: absolute;\n  z-index: 0;\n  overflow: hidden; }\n  .📖-left > .📖-background {\n    right: 0; }\n  .📖-right > .📖-background {\n    left: 0; }\n\n.📖-sup {\n  font-size: 0.667em; }\n\n.📖-running-header, .📖-footer {\n  font-size: 10pt; }\n\n.📖-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .📖-left .📖-running-header {\n    left: 18pt;\n    text-align: left; }\n  .📖-right .📖-running-header {\n    right: 18pt;\n    text-align: right; }\n\n.📖-rotate-container.📖-rotate-clockwise,\n.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,\n.📖-right .📖-rotate-container.📖-rotate-inward,\n.📖-left .📖-rotate-container.📖-rotate-outward {\n  transform: rotate(90deg) translate3d(0, -100%, 0);\n  transform-origin: top left; }\n\n.📖-rotate-container.📖-rotate-counterclockwise,\n.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,\n.📖-left .📖-rotate-container.📖-rotate-inward,\n.📖-right .📖-rotate-container.📖-rotate-outward {\n  transform: rotate(-90deg) translate3d(-100%, 0, 0);\n  transform-origin: top left; }\n\n.📖-rotate-container {\n  position: absolute; }\n  .📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background {\n    bottom: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background {\n    top: 0; }\n  .📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n    top: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n    bottom: 0; }\n  .📖-rotate-container.📖-rotate-inward .📖-background {\n    bottom: 0; }\n  .📖-rotate-container.📖-rotate-outward .📖-background {\n    top: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-clockwise {\n    transform: rotate(90deg) translate3d(0, -50%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, -50%, 0);\n    transform-origin: top left; }\n\n.📖-print-mark-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .📖-show-crop .📖-print-mark-wrap,\n  .📖-show-bleed-marks .📖-print-mark-wrap {\n    display: block; }\n  .📖-show-crop .📖-print-mark-wrap > [class*='crop'] {\n    display: block; }\n  .📖-show-bleed-marks .📖-print-mark-wrap > [class*='bleed'] {\n    display: block; }\n  .📖-print-mark-wrap > div {\n    display: none;\n    position: absolute;\n    overflow: hidden; }\n    .📖-print-mark-wrap > div::before, .📖-print-mark-wrap > div::after {\n      content: \"\";\n      display: block;\n      position: absolute; }\n    .📖-print-mark-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .📖-print-mark-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.📖-crop-fold,\n.📖-crop-left,\n.📖-crop-right,\n.📖-bleed-left,\n.📖-bleed-right {\n  width: 1px;\n  margin: auto; }\n  .📖-crop-fold::before, .📖-crop-fold:after,\n  .📖-crop-left::before,\n  .📖-crop-left:after,\n  .📖-crop-right::before,\n  .📖-crop-right:after,\n  .📖-bleed-left::before,\n  .📖-bleed-left:after,\n  .📖-bleed-right::before,\n  .📖-bleed-right:after {\n    width: 1px;\n    height: 12pt;\n    background-image: linear-gradient(to right, black 0%, black 51%, transparent 51%);\n    background-size: 1px 100%; }\n\n.📖-crop-top,\n.📖-crop-bottom,\n.📖-bleed-top,\n.📖-bleed-bottom {\n  height: 1px; }\n  .📖-crop-top::before, .📖-crop-top:after,\n  .📖-crop-bottom::before,\n  .📖-crop-bottom:after,\n  .📖-bleed-top::before,\n  .📖-bleed-top:after,\n  .📖-bleed-bottom::before,\n  .📖-bleed-bottom:after {\n    width: 12pt;\n    height: 1px;\n    background-image: linear-gradient(to bottom, black 0%, black 51%, transparent 51%);\n    background-size: 100% 1px; }\n\n.📖-crop-fold {\n  right: 0;\n  left: 0; }\n\n.📖-crop-left {\n  left: 0; }\n\n.📖-crop-right {\n  right: 0; }\n\n.📖-crop-top {\n  top: 0; }\n\n.📖-crop-bottom {\n  bottom: 0; }\n\n@media screen {\n  .📖-viewing {\n    background: #f4f4f4 !important; }\n  .📖-root {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 280px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .📖-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    z-index: 99;\n    visibility: hidden;\n    left: 0;\n    right: 0;\n    bottom: 0; }\n    .📖-measure-area .📖-page {\n      margin: 0 auto 50px; }\n  .📖-zoom-wrap * {\n    transition: box-shadow 0.2s; }\n  .📖-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .📖-show-guides .📖-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .📖-show-guides .📖-flowbox,\n  .📖-show-guides .📖-footer,\n  .📖-show-guides .📖-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .📖-show-guides .📖-background {\n    box-shadow: 0 0 0 1px yellow; }\n  .📖-show-guides .📖-out-of-flow {\n    display: block;\n    outline: 1px solid cyan; }\n    .📖-show-guides .📖-out-of-flow::after {\n      font: 10px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      content: attr(data-bindery);\n      position: absolute;\n      background: rgba(0, 255, 255, 0.5);\n      padding: 4px; }\n  .📖-show-guides .📖-right .📖-out-of-flow::after {\n    left: 100%; }\n  .📖-show-guides .📖-left .📖-out-of-flow::after {\n    right: 100%; }\n  .📖-is-overflowing {\n    border-bottom: 1px solid magenta; }\n  .📖-print-page {\n    margin: 0 auto; }\n  .📖-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    padding-top: 64px; }\n    .📖-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .📖-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .📖-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .📖-show-bleed .📖-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .📖-placeholder-pulse {\n    animation: pulse 1s infinite; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@keyframes pulse {\n  0% {\n    opacity: 0.2; }\n  50% {\n    opacity: 0.5; }\n  100% {\n    opacity: 0.2; } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .📖-root * {\n    -webkit-print-color-adjust: exact;\n    color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .📖-viewing > :not(.📖-root) {\n    display: none !important; }\n  .📖-controls {\n    display: none !important; }\n  .📖-print-page {\n    padding: 1px;\n    /* prevent margin collapse */\n    margin: 0; }\n  .📖-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.📖-viewing {\n  margin: 0; }\n\n.📖-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.📖-viewing > :not(.📖-root):not(.📖-measure-area) {\n  display: none !important; }\n\n.📖-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  align-items: center;\n  justify-content: center; }\n\n.📖-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.📖-print-page .📖-spread-wrapper {\n  margin: 0 auto; }\n\n.📖-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.📖-flap-holder {\n  perspective: 5000px;\n  transform-style: preserve-3d;\n  position: absolute;\n  top: 0;\n  right: 0;\n  left: 0;\n  bottom: 0;\n  margin: auto;\n  transform-style: preserve-3d; }\n\n.📖-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .📖-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .📖-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .📖-page3d .📖-page {\n    position: absolute;\n    backface-visibility: hidden;\n    box-shadow: none; }\n  .📖-page3d .📖-page3d-front {\n    transform: rotateY(0); }\n  .📖-page3d .📖-page3d-back {\n    transform: rotateY(-180deg); }\n\n@media screen {\n  .📖-viewing .📖-controls {\n    display: block !important; } }\n\n.📖-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  display: none;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 280px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  -webkit-font-smoothing: antialiased; }\n  .📖-controls * {\n    font: inherit;\n    color: inherit;\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box; }\n  .📖-controls a {\n    color: #0000d0;\n    text-decoration: none; }\n\n.📖-title {\n  padding: 20px 20px 8px;\n  font-size: 18px; }\n\n.📖-spinner {\n  border: 1px solid transparent;\n  border-left-color: black;\n  width: 20px;\n  height: 20px;\n  border-radius: 50%;\n  display: inline-block;\n  opacity: 0;\n  pointer-events: none;\n  vertical-align: middle;\n  transition: all 0.2s;\n  margin-right: -20px; }\n  .📖-in-progress .📖-spinner {\n    margin-right: 0.5em;\n    opacity: 1;\n    animation: spin 0.6s linear infinite; }\n  .📖-debug .📖-spinner {\n    animation: spin 2s linear infinite; }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n.📖-controls .📖-btn {\n  -webkit-appearance: none;\n  padding: 10px 18px;\n  color: black;\n  border: none;\n  background: transparent;\n  border: 1px solid gray;\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 4px;\n  margin-right: 8px;\n  text-decoration: none; }\n  .📖-controls .📖-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .📖-controls .📖-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .📖-controls .📖-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n  .📖-controls .📖-btn:last-child {\n    margin-right: 0; }\n\n.📖-controls .📖-btn-light {\n  background: none;\n  border: none; }\n\n.📖-controls .📖-btn-main {\n  margin-top: 4px;\n  background: #0000d0;\n  border-color: #0000d0;\n  color: white; }\n  .📖-controls .📖-btn-main:hover {\n    background: #0000d0;\n    opacity: 0.7; }\n  .📖-controls .📖-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.📖-in-progress .📖-btn-print {\n  opacity: 0.5;\n  pointer-events: none; }\n\n.📖-debug .📖-btn-print {\n  display: none; }\n\n.📖-viewswitcher {\n  user-select: none;\n  margin: 20px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  font-size: 0;\n  overflow: hidden;\n  width: 240px;\n  max-width: 240px;\n  border: 1px solid gray;\n  border-radius: 4px; }\n\n.📖-viewmode {\n  display: inline-block;\n  color: gray;\n  cursor: pointer;\n  width: 25%;\n  font-size: 0;\n  border-right: 1px solid gray; }\n  .📖-viewmode:last-child {\n    border-right: 0; }\n  .📖-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-viewmode .📖-icon {\n    height: 36px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .📖-viewmode.📖-grid .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(49) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='grid'] .📖-viewmode.📖-grid .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(50) + "); }\n  .📖-viewmode.📖-flip .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(51) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='interactive'] .📖-viewmode.📖-flip .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(52) + "); }\n  .📖-viewmode.📖-outline .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(53) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='outline'] .📖-viewmode.📖-outline .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(54) + "); }\n  .📖-viewmode.📖-print .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(55) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='print'] .📖-viewmode.📖-print .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(56) + "); }\n\n[bindery-view-mode='grid'] .📖-grid,\n[bindery-view-mode='interactive'] .📖-flip,\n[bindery-view-mode='outline'] .📖-outline,\n[bindery-view-mode='print'] .📖-print {\n  color: white;\n  background: gray; }\n\n.📖-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 0 8px;\n  cursor: default;\n  user-select: none; }\n  .📖-row:last-child {\n    margin-top: 8px; }\n  .📖-row select {\n    position: absolute;\n    border: none;\n    background: transparent;\n    padding: 8px 12px;\n    width: 60%;\n    top: 8px;\n    right: 12px; }\n    .📖-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .📖-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    background: none; }\n    .📖-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .📖-row input:invalid {\n      color: #bf5656; }\n\n.📖-row.📖-debug-controls {\n  display: none; }\n  .📖-debug .📖-in-progress .📖-row.📖-debug-controls {\n    display: block; }\n\n.📖-refresh-btns {\n  display: inline-block;\n  font-size: 12px;\n  margin-top: 8px;\n  float: right; }\n  .📖-refresh-btns a {\n    color: rgba(0, 0, 0, 0.4);\n    margin-left: 1em;\n    cursor: pointer; }\n    .📖-refresh-btns a:hover {\n      color: black; }\n\n@media (max-width: 600px) {\n  .📖-root {\n    padding-right: 0; }\n  .📖-zoom-wrap > :last-child {\n    margin-bottom: 100vh; }\n  .📖-controls .📖-refresh {\n    display: none; }\n  .📖-controls {\n    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);\n    left: 0;\n    width: unset;\n    padding-bottom: 12px;\n    top: unset; }\n  .📖-viewswitcher {\n    z-index: 1;\n    left: 0;\n    right: 160px;\n    width: unset; }\n  .📖-controls > .📖-row:last-child {\n    text-align: right; } }\n", ""]);
+exports.push([module.i, "@charset \"UTF-8\";\n@media screen {\n  .📖-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    overflow: hidden; }\n    .📖-show-bleed .📖-page {\n      box-shadow: none;\n      outline: none;\n      overflow: visible; }\n    .📖-page::after {\n      content: \"\";\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      pointer-events: none;\n      z-index: 999; } }\n\np.📖-continuation {\n  text-indent: unset !important; }\n\nli.📖-continuation {\n  list-style: none !important;\n  text-indent: unset !important; }\n\n.📖-out-of-flow {\n  display: none; }\n\n.📖-page {\n  width: 200px;\n  height: 300px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  flex-wrap: nowrap;\n  margin: auto; }\n\n.📖-flowbox {\n  position: relative;\n  margin: 60px 40px;\n  margin-bottom: 0;\n  flex: 1 1 auto;\n  min-height: 0; }\n\n.📖-content {\n  padding: 0.1px;\n  /* prevent margin collapse */\n  position: relative; }\n\n.📖-footer {\n  margin: 60px 40px;\n  margin-top: 8pt;\n  flex: 0 1 auto;\n  z-index: 2; }\n\n/*Bleed as layer*/\n.📖-background {\n  position: absolute;\n  z-index: 0;\n  overflow: hidden; }\n  .📖-left > .📖-background {\n    right: 0; }\n  .📖-right > .📖-background {\n    left: 0; }\n\n.📖-sup {\n  font-size: 0.667em; }\n\n.📖-running-header, .📖-footer {\n  font-size: 10pt; }\n\n.📖-running-header {\n  position: absolute;\n  text-align: center;\n  top: 0.25in; }\n  .📖-left .📖-running-header {\n    left: 18pt;\n    text-align: left; }\n  .📖-right .📖-running-header {\n    right: 18pt;\n    text-align: right; }\n\n.📖-rotate-container.📖-rotate-clockwise,\n.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,\n.📖-right .📖-rotate-container.📖-rotate-inward,\n.📖-left .📖-rotate-container.📖-rotate-outward {\n  transform: rotate(90deg) translate3d(0, -100%, 0);\n  transform-origin: top left; }\n\n.📖-rotate-container.📖-rotate-counterclockwise,\n.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,\n.📖-left .📖-rotate-container.📖-rotate-inward,\n.📖-right .📖-rotate-container.📖-rotate-outward {\n  transform: rotate(-90deg) translate3d(-100%, 0, 0);\n  transform-origin: top left; }\n\n.📖-rotate-container {\n  position: absolute; }\n  .📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background {\n    bottom: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background {\n    top: 0; }\n  .📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n    top: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background {\n    bottom: 0; }\n  .📖-rotate-container.📖-rotate-inward .📖-background {\n    bottom: 0; }\n  .📖-rotate-container.📖-rotate-outward .📖-background {\n    top: 0; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-clockwise {\n    transform: rotate(90deg) translate3d(0, -50%, 0);\n    transform-origin: top left; }\n  .📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise {\n    transform: rotate(-90deg) translate3d(-100%, -50%, 0);\n    transform-origin: top left; }\n\n.📖-print-mark-wrap {\n  display: none;\n  position: absolute;\n  pointer-events: none;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 999; }\n  .📖-show-crop .📖-print-mark-wrap,\n  .📖-show-bleed-marks .📖-print-mark-wrap {\n    display: block; }\n  .📖-show-crop .📖-print-mark-wrap > [class*='crop'] {\n    display: block; }\n  .📖-show-bleed-marks .📖-print-mark-wrap > [class*='bleed'] {\n    display: block; }\n  .📖-print-mark-wrap > div {\n    display: none;\n    position: absolute;\n    overflow: hidden; }\n    .📖-print-mark-wrap > div::before, .📖-print-mark-wrap > div::after {\n      content: \"\";\n      display: block;\n      position: absolute; }\n    .📖-print-mark-wrap > div:before {\n      top: 0;\n      left: 0; }\n    .📖-print-mark-wrap > div:after {\n      bottom: 0;\n      right: 0; }\n\n.📖-crop-fold,\n.📖-crop-left,\n.📖-crop-right,\n.📖-bleed-left,\n.📖-bleed-right {\n  width: 1px;\n  margin: auto; }\n  .📖-crop-fold::before, .📖-crop-fold:after,\n  .📖-crop-left::before,\n  .📖-crop-left:after,\n  .📖-crop-right::before,\n  .📖-crop-right:after,\n  .📖-bleed-left::before,\n  .📖-bleed-left:after,\n  .📖-bleed-right::before,\n  .📖-bleed-right:after {\n    width: 1px;\n    height: 12pt;\n    background-image: linear-gradient(to right, black 0%, black 51%, transparent 51%);\n    background-size: 1px 100%; }\n\n.📖-crop-top,\n.📖-crop-bottom,\n.📖-bleed-top,\n.📖-bleed-bottom {\n  height: 1px; }\n  .📖-crop-top::before, .📖-crop-top:after,\n  .📖-crop-bottom::before,\n  .📖-crop-bottom:after,\n  .📖-bleed-top::before,\n  .📖-bleed-top:after,\n  .📖-bleed-bottom::before,\n  .📖-bleed-bottom:after {\n    width: 12pt;\n    height: 1px;\n    background-image: linear-gradient(to bottom, black 0%, black 51%, transparent 51%);\n    background-size: 100% 1px; }\n\n.📖-crop-fold {\n  right: 0;\n  left: 0; }\n\n.📖-crop-left {\n  left: 0; }\n\n.📖-crop-right {\n  right: 0; }\n\n.📖-crop-top {\n  top: 0; }\n\n.📖-crop-bottom {\n  bottom: 0; }\n\n@media screen {\n  .📖-viewing {\n    background: #f4f4f4 !important; }\n  .📖-root {\n    transition: opacity 0.2s;\n    opacity: 1;\n    background: #f4f4f4;\n    padding: 20px;\n    z-index: 99;\n    position: relative;\n    padding-right: 280px;\n    animation: fadeUp 0.3s;\n    min-height: 90vh; }\n  .📖-measure-area {\n    position: fixed;\n    background: #f4f4f4;\n    padding: 50px 20px;\n    z-index: 99;\n    visibility: hidden;\n    left: 0;\n    right: 0;\n    bottom: 0; }\n    .📖-measure-area .📖-page {\n      margin: 0 auto 50px; }\n  .📖-zoom-wrap * {\n    transition: box-shadow 0.2s; }\n  .📖-show-guides .bindery-zoom-wrap * {\n    box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2); }\n  .📖-show-guides .📖-page::after {\n    box-shadow: 0 0 0 1px magenta; }\n  .📖-show-guides .📖-flowbox,\n  .📖-show-guides .📖-footer,\n  .📖-show-guides .📖-running-header {\n    box-shadow: 0 0 0 1px cyan; }\n  .📖-show-guides .📖-content {\n    box-shadow: inset 0 0 0 1px blue; }\n  .📖-show-guides .📖-background {\n    box-shadow: 0 0 0 1px yellow; }\n  .📖-show-guides .📖-out-of-flow {\n    display: block;\n    outline: 1px solid cyan; }\n    .📖-show-guides .📖-out-of-flow::after {\n      font: 10px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n      content: attr(data-bindery);\n      position: absolute;\n      background: rgba(0, 255, 255, 0.5);\n      padding: 4px; }\n  .📖-show-guides .📖-right .📖-out-of-flow::after {\n    left: 100%; }\n  .📖-show-guides .📖-left .📖-out-of-flow::after {\n    right: 100%; }\n  .📖-is-overflowing {\n    border-bottom: 1px solid magenta; }\n  .📖-print-page {\n    margin: 0 auto; }\n  .📖-error {\n    font: 16px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n    margin: 15vh 15vw;\n    max-width: 500px;\n    padding-top: 64px; }\n    .📖-error-title {\n      font-size: 1.5em;\n      margin-bottom: 16px; }\n    .📖-error-text {\n      margin-bottom: 16px;\n      white-space: pre-line; }\n    .📖-error-footer {\n      opacity: 0.5;\n      font-size: 0.66em;\n      text-transform: uppercase;\n      letter-spacing: 0.02em; }\n  .📖-show-bleed .📖-print-page {\n    background: white;\n    outline: 1px solid rgba(0, 0, 0, 0.1);\n    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);\n    margin: 20px auto; }\n  .📖-placeholder-pulse {\n    animation: pulse 1s infinite; } }\n\n@keyframes fadeUp {\n  0% {\n    opacity: 0; }\n  100% {\n    opacity: 1; } }\n\n@keyframes pulse {\n  0% {\n    opacity: 0.2; }\n  50% {\n    opacity: 0.5; }\n  100% {\n    opacity: 0.2; } }\n\n@page {\n  margin: 0; }\n\n@media print {\n  .📖-root * {\n    -webkit-print-color-adjust: exact;\n    color-adjust: exact; }\n  /* Don't print anything that hasn't been exported. This hides extra controls/ */\n  .📖-viewing > :not(.📖-root) {\n    display: none !important; }\n  .📖-controls {\n    display: none !important; }\n  .📖-print-page {\n    padding: 1px;\n    /* prevent margin collapse */\n    margin: 0; }\n  .📖-zoom-wrap[style] {\n    transform: none !important; } }\n\nbody.📖-viewing {\n  margin: 0; }\n\n.📖-zoom-wrap {\n  transform-origin: top left;\n  transform-style: preserve-3d;\n  height: calc(100vh - 40px);\n  /* adjust scrollheight on scaled down */ }\n\n/* Don't print anything that hasn't been exported. This hides extra controls */\n/* TODO: make selectors more reasonable */\n.📖-viewing > :not(.📖-root):not(.📖-measure-area) {\n  display: none !important; }\n\n.📖-print-page {\n  page-break-after: always;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  align-items: center;\n  justify-content: center; }\n\n.📖-spread-wrapper {\n  position: relative;\n  display: flex;\n  width: 800px;\n  margin: 0 auto 50px; }\n\n.📖-print-page .📖-spread-wrapper {\n  margin: 0 auto; }\n\n.📖-print-meta {\n  padding: 12pt;\n  text-align: center;\n  font-family: -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  font-size: 8pt; }\n\n.📖-flap-holder {\n  perspective: 5000px;\n  transform-style: preserve-3d;\n  position: absolute;\n  top: 0;\n  right: 0;\n  left: 0;\n  bottom: 0;\n  margin: auto;\n  transform-style: preserve-3d; }\n\n.📖-page3d {\n  margin: auto;\n  width: 400px;\n  height: 600px;\n  transform: rotateY(0);\n  transform-style: preserve-3d;\n  transform-origin: left;\n  transition: transform 0.5s, box-shadow 0.1s;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0; }\n  .📖-page3d:hover {\n    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2); }\n  .📖-page3d.flipped {\n    transform: rotateY(-180deg); }\n  .📖-page3d .📖-page {\n    position: absolute;\n    backface-visibility: hidden;\n    box-shadow: none; }\n  .📖-page3d .📖-page3d-front {\n    transform: rotateY(0); }\n  .📖-page3d .📖-page3d-back {\n    transform: rotateY(-180deg); }\n\n@media screen {\n  .📖-viewing .📖-controls {\n    display: block !important; } }\n\n.📖-controls {\n  font: 14px/1.4 -apple-system, BlinkMacSystemFont, \"Roboto\", sans-serif;\n  display: none;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  width: 280px;\n  z-index: 999;\n  margin: auto;\n  color: black;\n  background: #f4f4f4;\n  overflow: scroll;\n  -webkit-font-smoothing: antialiased; }\n  .📖-controls * {\n    font: inherit;\n    color: inherit;\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box; }\n  .📖-controls a {\n    color: #0000d0;\n    text-decoration: none; }\n\n.📖-title {\n  padding: 20px 20px 8px;\n  font-size: 18px; }\n\n.📖-spinner {\n  border: 1px solid transparent;\n  border-left-color: black;\n  width: 20px;\n  height: 20px;\n  border-radius: 50%;\n  display: inline-block;\n  opacity: 0;\n  pointer-events: none;\n  vertical-align: middle;\n  transition: all 0.2s;\n  margin-right: -20px; }\n  .📖-in-progress .📖-spinner {\n    margin-right: 0.5em;\n    opacity: 1;\n    animation: spin 0.6s linear infinite; }\n  .📖-debug .📖-spinner {\n    animation: spin 2s linear infinite; }\n\n@keyframes spin {\n  0% {\n    transform: rotateZ(0); }\n  100% {\n    transform: rotateZ(360deg); } }\n\n.📖-controls .📖-btn {\n  -webkit-appearance: none;\n  padding: 10px 18px;\n  color: black;\n  border: none;\n  background: transparent;\n  border: 1px solid gray;\n  cursor: pointer;\n  font-size: 12px;\n  letter-spacing: 0.01em;\n  font-weight: 500;\n  display: inline-block;\n  border-radius: 4px;\n  margin-right: 8px;\n  text-decoration: none; }\n  .📖-controls .📖-btn:focus {\n    outline: none;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); }\n  .📖-controls .📖-btn:hover {\n    background: rgba(0, 0, 0, 0.1); }\n  .📖-controls .📖-btn:active {\n    background: rgba(0, 0, 0, 0.14); }\n  .📖-controls .📖-btn:last-child {\n    margin-right: 0; }\n\n.📖-controls .📖-btn-light {\n  background: none;\n  border: none; }\n\n.📖-controls .📖-btn-main {\n  margin-top: 4px;\n  background: #0000d0;\n  border-color: #0000d0;\n  color: white; }\n  .📖-controls .📖-btn-main:hover {\n    background: #0000d0;\n    opacity: 0.7; }\n  .📖-controls .📖-btn-main:active {\n    background: black;\n    opacity: 1; }\n\n.📖-in-progress .📖-btn-print {\n  opacity: 0.5;\n  pointer-events: none; }\n\n.📖-debug .📖-btn-print {\n  display: none; }\n\n.📖-viewswitcher {\n  user-select: none;\n  margin: 20px;\n  position: fixed;\n  bottom: 0;\n  right: 0;\n  font-size: 0;\n  overflow: hidden;\n  width: 240px;\n  max-width: 240px;\n  border: 1px solid gray;\n  border-radius: 4px; }\n\n.📖-viewmode {\n  display: inline-block;\n  color: gray;\n  cursor: pointer;\n  width: 25%;\n  font-size: 0;\n  border-right: 1px solid gray; }\n  .📖-viewmode:last-child {\n    border-right: 0; }\n  .📖-viewmode:hover {\n    background: rgba(0, 0, 0, 0.04); }\n  .📖-viewmode .📖-icon {\n    height: 36px;\n    width: 32px;\n    background: currentColor;\n    margin: 0 auto; }\n  .📖-viewmode.📖-grid .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(50) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='grid'] .📖-viewmode.📖-grid .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(51) + "); }\n  .📖-viewmode.📖-flip .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(52) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='interactive'] .📖-viewmode.📖-flip .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(53) + "); }\n  .📖-viewmode.📖-outline .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(54) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='outline'] .📖-viewmode.📖-outline .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(55) + "); }\n  .📖-viewmode.📖-print .📖-icon {\n    -webkit-mask: url(" + __webpack_require__(56) + ") no-repeat 50% 50%; }\n    [bindery-view-mode='print'] .📖-viewmode.📖-print .📖-icon {\n      -webkit-mask-image: url(" + __webpack_require__(57) + "); }\n\n[bindery-view-mode='grid'] .📖-grid,\n[bindery-view-mode='interactive'] .📖-flip,\n[bindery-view-mode='outline'] .📖-outline,\n[bindery-view-mode='print'] .📖-print {\n  color: white;\n  background: gray; }\n\n.📖-row {\n  position: relative;\n  display: block;\n  padding: 8px 12px;\n  margin: 0 8px;\n  cursor: default;\n  user-select: none; }\n  .📖-row:last-child {\n    margin-top: 8px; }\n  .📖-row select {\n    position: absolute;\n    border: none;\n    background: transparent;\n    padding: 8px 12px;\n    width: 60%;\n    top: 8px;\n    right: 12px; }\n    .📖-row select:hover {\n      background: rgba(0, 0, 0, 0.04); }\n  .📖-row input {\n    width: 85px;\n    padding: 4px 6px 4px 8px;\n    text-align: right;\n    border: none;\n    position: absolute;\n    top: 0;\n    right: 0;\n    height: 100%;\n    width: 100%;\n    color: black;\n    background: none; }\n    .📖-row input:focus {\n      outline: none;\n      background: rgba(0, 0, 0, 0.04); }\n    .📖-row input:invalid {\n      color: #bf5656; }\n\n.📖-row.📖-debug-controls {\n  display: none; }\n  .📖-debug .📖-in-progress .📖-row.📖-debug-controls {\n    display: block; }\n\n.📖-refresh-btns {\n  display: inline-block;\n  font-size: 12px;\n  margin-top: 8px;\n  float: right; }\n  .📖-refresh-btns a {\n    color: rgba(0, 0, 0, 0.4);\n    margin-left: 1em;\n    cursor: pointer; }\n    .📖-refresh-btns a:hover {\n      color: black; }\n\n@media (max-width: 600px) {\n  .📖-root {\n    padding-right: 0; }\n  .📖-zoom-wrap > :last-child {\n    margin-bottom: 100vh; }\n  .📖-controls {\n    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);\n    left: 0;\n    width: unset;\n    padding-bottom: 12px;\n    top: unset; }\n  .📖-viewswitcher {\n    z-index: 1;\n    left: 0;\n    right: 160px;\n    width: unset; }\n  .📖-controls > .📖-row:last-child {\n    text-align: right; } }\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports) {
 
 /*
@@ -4657,55 +4559,55 @@ module.exports = function() {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-rule='evenodd'%3E%3Cpath d='M5 8H16V24H5zM17 8H28V24H17z'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M0.5 0.5H11.5V15.5H0.5z' transform='translate(5 8)'/%3E%3Cpath d='M22.5,15.5 L22.5,0.5' stroke-linecap='square' transform='translate(5 8)'/%3E%3Cpath d='M16.5,8.5 L16.5,23.5 L16.9093327,23.5 L24.5,20.6534998 L24.5,5.72150023 L17.1755617,8.46816459 L17,8.5 L16.5,8.5 Z'/%3E%3Cpath d='M27.5 23.5L16.5 23.5M24.5 8.5L27.5 8.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21,3 L23,3 L23,19 L14.8480012,19 L21,16.6930005 L21,3 Z M0,3 L11,3 L11,19 L0,19 L0,3 Z M12,3 L20,0 L20,16 L12,19 L12,3 Z' transform='translate(5 5)' fill='%23000000' fill-rule='evenodd'/%3E%3C/svg%3E\""
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23000000'%3E%3Cpath d='M.5.5H11.5V15.5H.5zM11.5.5H22.5V15.5H11.5z' transform='translate(5 8)'/%3E%3C/g%3E%3Cpath stroke='%23000000' d='M8.5 13.5H13.5V20.5H8.5z'/%3E%3Cpath fill='%23000000' d='M8 11H14V12H8z'/%3E%3Cpath stroke='%23000000' d='M19.5 13.5H24.5V20.5H19.5z'/%3E%3Cpath fill='%23000000' d='M19 11H25V12H19z'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5,8 L16,8 L16,24 L5,24 L5,8 Z M17,8 L28,8 L28,24 L17,24 L17,8 Z M8,13 L8,21 L14,21 L14,13 L8,13 Z M8,11 L8,12 L14,12 L14,11 L8,11 Z M19,13 L19,21 L25,21 L25,13 L19,13 Z M19,11 L19,12 L25,12 L25,11 L19,11 Z M9,20 L9,14 L13,14 L13,20 L9,20 Z M20,20 L20,14 L24,14 L24,20 L20,20 Z' fill='%23000000' fill-rule='evenodd'/%3E%3C/svg%3E\""
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M8.5 6.5H24.5V25.5H8.5z'/%3E%3Cpath d='M22.5 21.5L24.5 21.5M8.5 21.5L10.5 21.5M8.5 10.5L10.5 10.5M22.5 10.5L24.5 10.5M20.5 23.5L20.5 25.5M12.5 23.5L12.5 25.5M20.5 6.5L20.5 8.5M12.5 6.5L12.5 8.5' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\""
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M13,7 L20,7 L20,9 L21,9 L21,7 L24,7 L24,10 L22,10 L22,11 L24,11 L24,21 L22,21 L22,22 L24,22 L24,25 L21,25 L21,23 L20,23 L20,25 L13,25 L13,23 L12,23 L12,25 L9,25 L9,22 L11,22 L11,21 L9,21 L9,11 L11,11 L11,10 L9,10 L9,7 L12,7 L12,9 L13,9 L13,7 Z' fill='%23000000' fill-rule='evenodd'/%3E%3C/svg%3E\""
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 /*

@@ -1,6 +1,6 @@
 {
   "name": "bindery",
-  "version": "2.0.0-alpha.8",
+  "version": "2.0.0-alpha.8.1",
   "description": "",
   "main": "dist/bindery.min.js",
   "repository": {

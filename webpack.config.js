@@ -4,7 +4,7 @@ const isProd = process.argv.indexOf('-p') !== -1;
 
 module.exports = {
   devtool: 'source-map',
-  entry: './src/main.js',
+  entry: './src/',
   output: {
     filename: isProd ? 'bindery.min.js' : 'bindery.js',
     libraryTarget: 'var',

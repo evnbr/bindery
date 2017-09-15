@@ -18,7 +18,9 @@ class FullBleedSpread extends OutOfFlow {
       rotate: OptionType.enum('none', 'clockwise', 'counterclockwise'),
     });
   }
-  addElementOutOfFlow(elmt, state, makeNewPage) {
+  createOutOfFlowPages(elmt, state, makeNewPage) {
+    elmt.parentNode.removeChild(elmt);
+
     let leftPage;
     if (state.currentPage.isEmpty) {
       leftPage = state.currentPage;

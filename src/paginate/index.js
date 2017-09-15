@@ -47,6 +47,13 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     });
   };
 
+  const applyLayoutStartRules = () => {
+    rules.forEach((rule) => {
+      if (rule.layoutStart) rule.layoutStart();
+    });
+  };
+
+
   const makeNewPage = () => {
     const newPage = new Page();
     measureArea.appendChild(newPage.element);
@@ -145,11 +152,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
           addedElement,
           state,
           continueOnNewPage,
+          makeNewPage,
           function overflowCallback(problemElement) {
             problemElement.parentNode.removeChild(problemElement);
             continueOnNewPage();
             currentFlowElement().appendChild(problemElement);
-            return rule.afterAdd(problemElement, state, continueOnNewPage, () => {
+            return rule.afterAdd(problemElement, state, continueOnNewPage, makeNewPage, () => {
               console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
             });
           }
@@ -226,7 +234,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     if (state.currentPage.isEmpty) {
       // Fail to move to next page, instead continue here
-      nodeToMove.setAttribute('data-bindery-larger-than-page', true);
+      nodeToMove.setAttribute('data-ignore-overflow', true);
     } else {
       if (state.currentPage.hasOverflowed()) {
         state.currentPage.suppressErrors = true;
@@ -268,7 +276,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       scheduler.throttle(doneCallback);
       return;
     }
-    if (currentFlowElement().hasAttribute('data-bindery-larger-than-page')) {
+    if (currentFlowElement().hasAttribute('data-ignore-overflow')) {
       scheduler.throttle(doneCallback);
       return;
     }
@@ -360,7 +368,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   // one by one recursively until thet overflow the page
   const addElementNode = (elementToAdd, doneCallback) => {
     if (state.currentPage.hasOverflowed()) {
-      if (currentFlowElement().hasAttribute('data-bindery-larger-than-page')) {
+      if (currentFlowElement().hasAttribute('data-ignore-overflow')) {
         // Do nothing. We just have to add nodes despite the page overflowing.
       } else {
         state.currentPage.suppressErrors = true;
@@ -421,6 +429,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   };
 
   const startPagination = () => {
+    applyLayoutStartRules();
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();

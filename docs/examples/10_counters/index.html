@@ -18,6 +18,8 @@
 			},
 			rules: [
 				Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+				Bindery.FullBleedPage({ selector: '.med-figure' }),
+				Bindery.FullBleedSpread({ selector: '.big-figure', continue: 'same' }),
 				Bindery.RunningHeader(),
 				Bindery.Counter({
 					incrementEl: 'h2',

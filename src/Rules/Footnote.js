@@ -17,7 +17,7 @@ class Footnote extends Replace {
       render: OptionType.func,
     });
   }
-  afterAdd(element, state, requestNewPage, overflowCallback) {
+  afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
     const number = state.currentPage.footer.children.length + 1;
 
     const footnote = h('.footnote');
@@ -27,7 +27,7 @@ class Footnote extends Replace {
 
     state.currentPage.footer.appendChild(footnote);
 
-    return super.afterAdd(element, state, requestNewPage, (overflowEl) => {
+    return super.afterAdd(element, state, continueOnNewPage, makeNewPage, (overflowEl) => {
       state.currentPage.footer.removeChild(footnote);
       return overflowCallback(overflowEl);
     });

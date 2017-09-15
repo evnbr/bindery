@@ -1,9 +1,9 @@
-h1 {
-  font-size: 4rem;
+* {
+  box-sizing: border-box;
 }
 
-.content * {
-  box-sizing: border-box;
+h1 {
+  font-size: 4rem;
 }
 
 .content, .intro {
@@ -13,7 +13,7 @@ h1 {
 }
 
 p {
-  text-indent: 1rem;
+  text-indent: 1.5rem;
   margin: 0;
 }
 
@@ -21,10 +21,9 @@ figure {
   margin: 0;
   background: #eee;
   width: 100%;
-  height: 200px;
-  position: relative;
+  height: 100%;
   margin: 1em 0;
-  padding: 10px;
+  padding: 3rem;
 }
 
 figure img {

@@ -8,12 +8,12 @@ class OutOfFlow extends Rule {
     super(options);
     this.name = 'Out of Flow';
   }
-  beforeAdd(elmt, state, continueOnNewPage, makeNewPage) {
-    const placeholder = h(c('.out-of-flow'));
-    placeholder.setAttribute('data-bindery', `${elToStr(elmt)}`);
-    // placeholder.textContent = '[Bindery: Element moved out of flow]';
-
-    this.addElementOutOfFlow(elmt, state, makeNewPage);
+  beforeAdd(elmt) {
+    elmt.setAttribute('data-ignore-overflow', true);
+    return elmt;
+  }
+  afterAdd(elmt, state, continueOnNewPage, makeNewPage) {
+    this.createOutOfFlowPages(elmt, state, makeNewPage);
 
     // Catches cases when we didn't need to create a new page. but unclear
     if (this.continue !== 'same' || state.currentPage.hasOutOfFlowContent) {
@@ -23,9 +23,8 @@ class OutOfFlow extends Rule {
       }
     }
 
-    return placeholder;
+    return elmt;
   }
-
 }
 
 export default OutOfFlow;
