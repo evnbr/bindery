@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.8.1 - Thursday, September 14th, 2017, 8:36:58 PM  
+// [AIV]  Build version: 2.0.0-alpha.8.1 - Thursday, September 14th, 2017, 11:01:07 PM  
  var Bindery =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -573,7 +573,7 @@ var Replace = function (_Rule) {
 
   _createClass(Replace, [{
     key: 'afterAdd',
-    value: function afterAdd(element, state, requestNewPage, overflowCallback) {
+    value: function afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
       var parent = element.parentNode;
       if (!parent) {
         throw Error('Bindery: Rule assumes element has been added but it has no parent.', element);
@@ -2659,6 +2659,7 @@ var Viewer = function () {
     this.isShowingBleedMarks = false;
 
     this.mode = MODE_PREVIEW;
+    this.element.setAttribute('bindery-view-mode', this.mode);
     this.currentLeaf = 0;
 
     this.listenForPrint();
@@ -4153,7 +4154,7 @@ var Footnote = function (_Replace) {
 
   _createClass(Footnote, [{
     key: 'afterAdd',
-    value: function afterAdd(element, state, requestNewPage, makeNewPage, overflowCallback) {
+    value: function afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
       var number = state.currentPage.footer.children.length + 1;
 
       var footnote = (0, _hyperscript2.default)('.footnote');
@@ -4162,7 +4163,7 @@ var Footnote = function (_Replace) {
 
       state.currentPage.footer.appendChild(footnote);
 
-      return _get(Footnote.prototype.__proto__ || Object.getPrototypeOf(Footnote.prototype), 'afterAdd', this).call(this, element, state, requestNewPage, function (overflowEl) {
+      return _get(Footnote.prototype.__proto__ || Object.getPrototypeOf(Footnote.prototype), 'afterAdd', this).call(this, element, state, continueOnNewPage, makeNewPage, function (overflowEl) {
         state.currentPage.footer.removeChild(footnote);
         return overflowCallback(overflowEl);
       });
