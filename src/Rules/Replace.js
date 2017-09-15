@@ -9,7 +9,7 @@ class Replace extends Rule {
     super(options);
     this.name = 'Replace';
   }
-  afterAdd(element, state, requestNewPage, overflowCallback) {
+  afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
     const parent = element.parentNode;
     if (!parent) {
       throw Error('Bindery: Rule assumes element has been added but it has no parent.', element);
