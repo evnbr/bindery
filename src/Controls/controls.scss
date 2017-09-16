@@ -36,8 +36,9 @@ $controlborder: gray;
 }
 
 .#{$pre}-title {
-  padding: 20px 20px 8px;
+  margin: 20px 20px 8px;
   font-size: 18px;
+  position: relative;
 }
 
 .#{$pre}-spinner {
@@ -46,15 +47,16 @@ $controlborder: gray;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  display: inline-block;
+  position: absolute;
+  right: 0;
+  bottom: 0;
   opacity: 0;
   pointer-events: none;
   vertical-align: middle;
   transition: all 0.2s;
-  margin-right: -20px;
+  transform: scale(0.4);
   .#{$pre}-in-progress & {
     // display: inline-block;
-    margin-right: 0.5em;
     opacity: 1;
     animation: spin 0.6s linear infinite;
   }
@@ -265,10 +267,12 @@ $controlborder: gray;
 }
 
 .#{$pre}-refresh-btns {
-  display: inline-block;
   font-size: 12px;
   margin-top: 8px;
   float: right;
+  .#{$pre}-in-progress & {
+    display: none;
+  }
   a {
     color: rgba(0,0,0,0.4);
     margin-left: 1em;

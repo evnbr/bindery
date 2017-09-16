@@ -138,11 +138,43 @@ class Bindery {
     });
   }
 
+  updateBookSilent() {
+    this.layoutComplete = false;
+
+    this.source.style.display = '';
+    const content = this.source.cloneNode(true);
+    this.source.style.display = 'none';
+
+    document.body.classList.add(c('viewing'));
+
+    this.pageSetup.updateStylesheet();
+
+    paginate({
+      content,
+      rules: this.rules,
+      success: (book) => {
+        this.viewer.book = book;
+        this.viewer.render();
+        this.controls.setDone();
+        this.layoutComplete = true;
+      },
+      progress: () => {
+      },
+      error: (error) => {
+        this.layoutComplete = true;
+        this.viewer.displayError('Layout couldn\'t complete', error);
+      },
+      isDebugging: this.debug,
+    });
+  }
+
   makeBook(doneBinding) {
     if (!this.source) {
       document.body.classList.add(c('viewing'));
       return;
     }
+
+    this.layoutComplete = false;
 
     if (!this.pageSetup.isSizeValid()) {
       this.viewer.displayError(
@@ -174,6 +206,7 @@ class Bindery {
         this.viewer.book = book;
         this.viewer.render();
 
+        this.layoutComplete = true;
         this.controls.setDone();
         if (doneBinding) doneBinding();
         this.viewer.element.classList.remove(c('in-progress'));
@@ -185,6 +218,7 @@ class Bindery {
         this.viewer.renderProgress();
       },
       error: (error) => {
+        this.layoutComplete = true;
         this.viewer.element.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
       },

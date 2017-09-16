@@ -118,11 +118,7 @@ class Controls {
     } }, 'Too Small');
 
     const startPaginating = () => {
-      refreshPaginationBtn.style.display = 'none';
-      refreshPaginationBtnDebug.style.display = 'none';
       this.binder.makeBook(() => {
-        refreshPaginationBtn.style.display = '';
-        refreshPaginationBtnDebug.style.display = '';
       });
     };
 
@@ -152,12 +148,12 @@ class Controls {
       },
     });
     const header = title(
-      h(c('.spinner')),
       headerContent,
       h(c('.refresh-btns'),
         refreshPaginationBtn,
         refreshPaginationBtnDebug
-      )
+      ),
+      h(c('.spinner')),
     );
 
     this.setInProgress = () => {
