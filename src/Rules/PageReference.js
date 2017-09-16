@@ -16,22 +16,22 @@ class PageReference extends Replace {
       createTest: OptionType.func,
     });
   }
-  afterAdd(elmt, state) {
+  afterAdd(elmt, book) {
     const test = this.createTest(elmt);
     if (test) {
       // Temporary, to make sure it'll fit
       const parent = elmt.parentNode;
       const tempClone = elmt.cloneNode(true);
-      const tempNumbers = state.book.pagesForTest(test);
+      const tempNumbers = book.pagesForTest(test);
       const tempRanges = makeRanges(tempNumbers);
       const temp = this.replace(tempClone, tempRanges || '###');
       temp.classList.add(c('placeholder-pulse'));
       parent.replaceChild(temp, elmt);
 
-      state.book.onComplete(() => {
+      book.onComplete(() => {
         const tempParent = temp.parentNode;
         const finalClone = elmt.cloneNode(true);
-        const pageNumbers = state.book.pagesForTest(test);
+        const pageNumbers = book.pagesForTest(test);
         const pageRanges = makeRanges(pageNumbers);
         const newEl = this.replace(finalClone, pageRanges);
         tempParent.replaceChild(newEl, temp);

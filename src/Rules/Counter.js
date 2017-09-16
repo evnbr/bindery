@@ -18,7 +18,7 @@ class Counter extends Rule {
   layoutStart() {
     this.counterValue = 0;
   }
-  beforeAdd(el, state) {
+  beforeAdd(el) {
     if (el.matches(this.incrementEl)) {
       this.counterValue += 1;
     }
@@ -26,12 +26,11 @@ class Counter extends Rule {
       this.counterValue = 0;
     }
     if (el.matches(this.replaceEl)) {
-      // return super.afterAdd(el, state, requestNewPage, overflowCallback);
-      return this.createReplacement(state, el);
+      return this.createReplacement(el);
     }
     return el;
   }
-  createReplacement(state, element) {
+  createReplacement(element) {
     return this.replace(element, this.counterValue);
   }
   replace(element, counterValue) {
