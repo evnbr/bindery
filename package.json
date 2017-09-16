@@ -34,8 +34,9 @@
     "stats": "webpack --json > stats.json",
     "moduleSize": "webpack --config webpack.config.js -p --display-modules",
     "build": "webpack --config webpack.config.js && cp dist/bindery.js docs/js && cp dist/bindery.js.map docs/js",
+    "buildumd": "webpack --config webpack.umd.config.js",
     "minify": "webpack --config webpack.config.js -p",
-    "dist": "webpack --config webpack.config.js && webpack --config webpack.config.js -p && cp dist/bindery.js docs/js",
+    "dist": "webpack --config webpack.config.js && webpack --config webpack.config.js -p && webpack --config webpack.umd.config.js && webpack --config webpack.umd.config.js -p && cp dist/bindery.js docs/js",
     "docs": "cd docs && jekyll serve",
     "lint": "eslint src/ webpack.*.js --cache"
   },

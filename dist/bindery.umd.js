@@ -1,6 +1,15 @@
-// [AIV]  Build version: 2.0.0-alpha.8.1 - Saturday, September 16th, 2017, 4:44:22 PM  
- var Bindery =
-/******/ (function(modules) { // webpackBootstrap
+// [AIV]  Build version: 2.0.0-alpha.8.1 - Saturday, September 16th, 2017, 4:19:55 PM  
+ (function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["Bindery"] = factory();
+	else
+		root["Bindery"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -62,7 +71,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -98,10 +107,10 @@ exports.default = c;
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var split = __webpack_require__(11)
-var ClassList = __webpack_require__(12)
+var split = __webpack_require__(12)
+var ClassList = __webpack_require__(13)
 
-var w = typeof window === 'undefined' ? __webpack_require__(14) : window
+var w = typeof window === 'undefined' ? __webpack_require__(15) : window
 var document = w.document
 var Text = w.Text
 
@@ -573,16 +582,16 @@ var Replace = function (_Rule) {
 
   _createClass(Replace, [{
     key: 'afterAdd',
-    value: function afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
+    value: function afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
       var parent = element.parentNode;
       if (!parent) {
         throw Error('Bindery: Rule assumes element has been added but it has no parent.', element);
       }
       var defensiveClone = element.cloneNode(true);
-      var replacement = this.createReplacement(book, defensiveClone);
+      var replacement = this.createReplacement(state, defensiveClone);
       parent.replaceChild(replacement, element);
 
-      if (book.pageInProgress.hasOverflowed()) {
+      if (state.currentPage.hasOverflowed()) {
         parent.replaceChild(element, replacement);
 
         return overflowCallback(element);
@@ -592,7 +601,7 @@ var Replace = function (_Rule) {
     }
   }, {
     key: 'createReplacement',
-    value: function createReplacement(book, element) {
+    value: function createReplacement(state, element) {
       return this.replace(element);
     }
   }, {
@@ -610,6 +619,37 @@ exports.default = Replace;
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var elementToString = function elementToString(node) {
+  var tag = node.tagName.toLowerCase();
+  var id = node.id ? '#' + node.id : '';
+
+  var classes = '';
+  if (node.classList.length > 0) {
+    classes = '.' + [].concat(_toConsumableArray(node.classList)).join('.');
+  }
+
+  var text = '';
+  if (id.length < 1 && classes.length < 2) {
+    text = '("' + node.textContent.substr(0, 30).replace(/\s+/g, ' ') + '...")';
+  }
+  return tag + id + classes + text;
+};
+
+exports.default = elementToString;
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -696,7 +736,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -708,9 +748,21 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _hyperscript = __webpack_require__(1);
+
+var _hyperscript2 = _interopRequireDefault(_hyperscript);
+
 var _Rule2 = __webpack_require__(3);
 
 var _Rule3 = _interopRequireDefault(_Rule2);
+
+var _prefixClass = __webpack_require__(0);
+
+var _prefixClass2 = _interopRequireDefault(_prefixClass);
+
+var _elementToString = __webpack_require__(7);
+
+var _elementToString2 = _interopRequireDefault(_elementToString);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -740,14 +792,14 @@ var OutOfFlow = function (_Rule) {
     }
   }, {
     key: 'afterAdd',
-    value: function afterAdd(elmt, book, continueOnNewPage, makeNewPage) {
-      this.createOutOfFlowPages(elmt, book, makeNewPage);
+    value: function afterAdd(elmt, state, continueOnNewPage, makeNewPage) {
+      this.createOutOfFlowPages(elmt, state, makeNewPage);
 
       // Catches cases when we didn't need to create a new page. but unclear
-      if (this.continue !== 'same' || book.pageInProgress.hasOutOfFlowContent) {
+      if (this.continue !== 'same' || state.currentPage.hasOutOfFlowContent) {
         continueOnNewPage();
         if (this.continue === 'left' || this.continue === 'right') {
-          book.pageInProgress.setPreference(this.continue);
+          state.currentPage.setPreference(this.continue);
         }
       }
 
@@ -761,21 +813,21 @@ var OutOfFlow = function (_Rule) {
 exports.default = OutOfFlow;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Bindery = __webpack_require__(10).default;
-var Rules = __webpack_require__(7).default;
+var Bindery = __webpack_require__(11).default;
+var Rules = __webpack_require__(8).default;
 
 var BinderyWithRules = Object.assign(Bindery, Rules);
 
 module.exports = BinderyWithRules;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -793,7 +845,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _paginate = __webpack_require__(15);
+var _paginate = __webpack_require__(16);
 
 var _paginate2 = _interopRequireDefault(_paginate);
 
@@ -809,7 +861,7 @@ var _prefixClass = __webpack_require__(0);
 
 var _prefixClass2 = _interopRequireDefault(_prefixClass);
 
-var _Rules = __webpack_require__(7);
+var _Rules = __webpack_require__(8);
 
 var _Rules2 = _interopRequireDefault(_Rules);
 
@@ -1057,7 +1109,7 @@ var Bindery = function () {
 exports.default = Bindery;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 /*!
@@ -1169,11 +1221,11 @@ module.exports = (function split(undef) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // contains, add, remove, toggle
-var indexof = __webpack_require__(13)
+var indexof = __webpack_require__(14)
 
 module.exports = ClassList
 
@@ -1274,7 +1326,7 @@ function isTruthy(value) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 
@@ -1289,13 +1341,13 @@ module.exports = function(arr, obj){
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1309,7 +1361,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _elementToString = __webpack_require__(16);
+var _elementToString = __webpack_require__(7);
 
 var _elementToString2 = _interopRequireDefault(_elementToString);
 
@@ -1376,19 +1428,22 @@ var paginate = function paginate(_ref) {
   var cloneBreadcrumb = (0, _breadcrumbCloner2.default)(rules);
   var measureArea = document.body.appendChild((0, _hyperscript2.default)((0, _prefixClass2.default)('.measure-area')));
 
-  var breadcrumb = []; // Keep track of position in original tree
-  var book = new _Book2.default();
+  var state = {
+    breadcrumb: [],
+    pages: [],
+    book: new _Book2.default()
+  };
 
   var updatePaginationProgress = void 0;
   var finishPagination = void 0;
 
   var currentFlowElement = function currentFlowElement() {
-    return breadcrumb[0] ? (0, _utils.last)(breadcrumb) : book.pageInProgress.flowContent;
+    return state.breadcrumb[0] ? (0, _utils.last)(state.breadcrumb) : state.currentPage.flowContent;
   };
 
   var applyNewPageRules = function applyNewPageRules(pg) {
     rules.forEach(function (rule) {
-      if (rule.afterPageCreated) rule.afterPageCreated(pg, book);
+      if (rule.afterPageCreated) rule.afterPageCreated(pg, state);
     });
   };
 
@@ -1408,44 +1463,47 @@ var paginate = function paginate(_ref) {
 
   var finishPage = function finishPage() {
     // finished with this page, can display
-    book.pages = (0, _orderPages2.default)(book.pages, makeNewPage);
-    (0, _annotatePages2.default)(book.pages);
-    if (book.pageInProgress) {
-      applyPageRules(book.pageInProgress);
+    state.pages = (0, _orderPages2.default)(state.pages, makeNewPage);
+    (0, _annotatePages2.default)(state.pages);
+    if (state.currentPage) {
+      applyPageRules(state.currentPage, state.book);
     }
   };
 
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   var continueOnNewPage = function continueOnNewPage() {
-    if (book.pageInProgress && book.pageInProgress.hasOverflowed()) {
-      console.warn('Bindery: Page overflowing', book.pageInProgress.element);
-      if (!book.pageInProgress.suppressErrors) {
+    if (state.currentPage && state.currentPage.hasOverflowed()) {
+      console.warn('Bindery: Page overflowing', state.currentPage.element);
+      if (!state.currentPage.suppressErrors) {
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
 
-    if (book.pages.length === 500) {
+    if (state.pages.length === 500) {
       console.warn('Bindery: More than 500 pages, performance may be slow.');
-    } else if (book.pages.length === 1000) {
+    } else if (state.pages.length === 1000) {
       console.warn('Bindery: More than 1000 pages, performance may be slow.');
-    } else if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
+    } else if (state.pages.length > MAXIMUM_PAGE_LIMIT) {
       error('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
     finishPage();
 
-    breadcrumb = cloneBreadcrumb(breadcrumb);
+    state.breadcrumb = cloneBreadcrumb(state.breadcrumb);
     var newPage = makeNewPage();
 
-    book.pageInProgress = newPage;
+    state.currentPage = newPage;
+
+    state.book.pages = state.pages;
+    state.book.pageInProgress = newPage;
     updatePaginationProgress(); // finished with this page, can display
 
-    book.pages.push(newPage);
+    state.pages.push(newPage);
 
-    if (breadcrumb[0]) {
-      newPage.flowContent.appendChild(breadcrumb[0]);
+    if (state.breadcrumb[0]) {
+      newPage.flowContent.appendChild(state.breadcrumb[0]);
     }
 
     // make sure the cloned page is valid.
@@ -1476,7 +1534,7 @@ var paginate = function paginate(_ref) {
     var addedElement = element;
     beforeAddRules.forEach(function (rule) {
       if (addedElement.matches(rule.selector)) {
-        addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
+        addedElement = rule.beforeAdd(addedElement, state, continueOnNewPage, makeNewPage);
       }
     });
     return addedElement;
@@ -1495,11 +1553,11 @@ var paginate = function paginate(_ref) {
     var addedElement = originalElement;
     afterAddRules.forEach(function (rule) {
       if (addedElement.matches(rule.selector)) {
-        addedElement = rule.afterAdd(addedElement, book, continueOnNewPage, makeNewPage, function overflowCallback(problemElement) {
+        addedElement = rule.afterAdd(addedElement, state, continueOnNewPage, makeNewPage, function overflowCallback(problemElement) {
           problemElement.parentNode.removeChild(problemElement);
           continueOnNewPage();
           currentFlowElement().appendChild(problemElement);
-          return rule.afterAdd(problemElement, book, continueOnNewPage, makeNewPage, function () {
+          return rule.afterAdd(problemElement, state, continueOnNewPage, makeNewPage, function () {
             console.log('Couldn\'t apply ' + rule.name + ' to ' + (0, _elementToString2.default)(problemElement) + '. Caused overflows twice.');
           });
         });
@@ -1508,7 +1566,7 @@ var paginate = function paginate(_ref) {
     return addedElement;
   };
 
-  var applyEachPageRules = function applyEachPageRules() {
+  var applyEachPageRules = function applyEachPageRules(book) {
     pageRules.forEach(function (rule) {
       book.pages.forEach(function (page) {
         rule.eachPage(page, book);
@@ -1516,7 +1574,7 @@ var paginate = function paginate(_ref) {
     });
   };
 
-  var applyPageRules = function applyPageRules(page) {
+  var applyPageRules = function applyPageRules(page, book) {
     pageRules.forEach(function (rule) {
       rule.eachPage(page, book);
     });
@@ -1547,18 +1605,18 @@ var paginate = function paginate(_ref) {
 
   var moveElementToNextPage = function moveElementToNextPage(nodeToMove) {
     // So this node won't get cloned. TODO: this is unclear
-    breadcrumb.pop();
+    state.breadcrumb.pop();
 
-    if (breadcrumb.length < 1) {
+    if (state.breadcrumb.length < 1) {
       throw Error('Bindery: Attempting to move the top-level element is not allowed');
     }
 
     // find the nearest splittable parent
     var willMove = nodeToMove;
     var pathToRestore = [];
-    while (breadcrumb.length > 1 && !isSplittable(currentFlowElement())) {
+    while (state.breadcrumb.length > 1 && !isSplittable(currentFlowElement())) {
       // console.log('Not OK to split:', currentFlowElement());
-      willMove = breadcrumb.pop();
+      willMove = state.breadcrumb.pop();
       pathToRestore.unshift(willMove);
     }
 
@@ -1569,19 +1627,19 @@ var paginate = function paginate(_ref) {
     var parent = willMove.parentNode;
     parent.removeChild(willMove);
 
-    if (breadcrumb.length > 1 && currentFlowElement().textContent.trim() === '') {
+    if (state.breadcrumb.length > 1 && currentFlowElement().textContent.trim() === '') {
       parent.appendChild(willMove);
-      willMove = breadcrumb.pop();
+      willMove = state.breadcrumb.pop();
       pathToRestore.unshift(willMove);
       willMove.parentNode.removeChild(willMove);
     }
 
-    if (book.pageInProgress.isEmpty) {
+    if (state.currentPage.isEmpty) {
       // Fail to move to next page, instead continue here
       nodeToMove.setAttribute('data-ignore-overflow', true);
     } else {
-      if (book.pageInProgress.hasOverflowed()) {
-        book.pageInProgress.suppressErrors = true;
+      if (state.currentPage.hasOverflowed()) {
+        state.currentPage.suppressErrors = true;
       }
       continueOnNewPage();
     }
@@ -1591,18 +1649,18 @@ var paginate = function paginate(_ref) {
 
     // restore subpath
     pathToRestore.forEach(function (restore) {
-      breadcrumb.push(restore);
+      state.breadcrumb.push(restore);
     });
 
     // TODO: Confusing. If we didn't pop this node above, we don't
     // need to push it back again.
-    breadcrumb.push(nodeToMove);
+    state.breadcrumb.push(nodeToMove);
   };
 
   var addTextNode = function addTextNode(textNode, doneCallback, undoAddTextNode) {
     currentFlowElement().appendChild(textNode);
 
-    if (book.pageInProgress.hasOverflowed()) {
+    if (state.currentPage.hasOverflowed()) {
       textNode.parentNode.removeChild(textNode);
       undoAddTextNode();
     } else {
@@ -1616,7 +1674,7 @@ var paginate = function paginate(_ref) {
     var originalText = textNode.nodeValue;
     currentFlowElement().appendChild(textNode);
 
-    if (!book.pageInProgress.hasOverflowed()) {
+    if (!state.currentPage.hasOverflowed()) {
       scheduler.throttle(doneCallback);
       return;
     }
@@ -1628,9 +1686,9 @@ var paginate = function paginate(_ref) {
     var pos = 0;
 
     // Must be in viewport for caretRangeFromPoint
-    // measureArea.appendChild(book.pageInProgress.element);
+    // measureArea.appendChild(state.currentPage.element);
     //
-    // const flowBoxPos = book.pageInProgress.flowBox.getBoundingClientRect();
+    // const flowBoxPos = state.currentPage.flowBox.getBoundingClientRect();
     // const endX = flowBoxPos.left + flowBoxPos.width - 1;
     // const endY = flowBoxPos.top + flowBoxPos.height - 30; // TODO: Real line height
     // const range = document.caretRangeFromPoint(endX, endY);
@@ -1642,7 +1700,7 @@ var paginate = function paginate(_ref) {
     var splitTextStep = function splitTextStep() {
       textNode.nodeValue = originalText.substr(0, pos);
 
-      if (book.pageInProgress.hasOverflowed()) {
+      if (state.currentPage.hasOverflowed()) {
         // Back out to word boundary
         if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
         while (originalText.charAt(pos) !== ' ' && pos > 0) {
@@ -1683,14 +1741,14 @@ var paginate = function paginate(_ref) {
   var addTextChild = function addTextChild(parent, child, next) {
     var forceAddTextNode = function forceAddTextNode() {
       currentFlowElement().appendChild(child);
-      book.pageInProgress.suppressErrors = true;
+      state.currentPage.suppressErrors = true;
       continueOnNewPage();
       scheduler.throttle(next);
     };
 
     if (isSplittable(parent)) {
       var undoAddTextNode = function undoAddTextNode() {
-        if (breadcrumb.length > 1) {
+        if (state.breadcrumb.length > 1) {
           moveElementToNextPage(parent);
           scheduler.throttle(function () {
             return addTextNodeIncremental(child, next, forceAddTextNode);
@@ -1715,11 +1773,11 @@ var paginate = function paginate(_ref) {
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
   var addElementNode = function addElementNode(elementToAdd, doneCallback) {
-    if (book.pageInProgress.hasOverflowed()) {
+    if (state.currentPage.hasOverflowed()) {
       if (currentFlowElement().hasAttribute('data-ignore-overflow')) {
         // Do nothing. We just have to add nodes despite the page overflowing.
       } else {
-        book.pageInProgress.suppressErrors = true;
+        state.currentPage.suppressErrors = true;
         continueOnNewPage();
       }
     }
@@ -1727,13 +1785,13 @@ var paginate = function paginate(_ref) {
 
     currentFlowElement().appendChild(element);
 
-    breadcrumb.push(element);
+    state.breadcrumb.push(element);
 
     var childNodes = [].concat(_toConsumableArray(element.childNodes));
     element.innerHTML = '';
 
     // Overflows when empty
-    if (book.pageInProgress.hasOverflowed()) {
+    if (state.currentPage.hasOverflowed()) {
       moveElementToNextPage(element);
     }
 
@@ -1742,10 +1800,10 @@ var paginate = function paginate(_ref) {
       if (!(index < childNodes.length)) {
         // We're now done with this element and its children,
         // so we pop up a level
-        var addedChild = breadcrumb.pop();
+        var addedChild = state.breadcrumb.pop();
         applyAfterAddRules(addedChild);
 
-        if (book.pageInProgress.hasOverflowed()) {
+        if (state.currentPage.hasOverflowed()) {
           // console.log('Bindery: Added element despite overflowing');
         }
 
@@ -1785,60 +1843,29 @@ var paginate = function paginate(_ref) {
     });
   };
   updatePaginationProgress = function updatePaginationProgress() {
-    progress(book);
+    progress(state.book);
   };
   finishPagination = function finishPagination() {
     document.body.removeChild(measureArea);
 
-    var orderedPages = (0, _orderPages2.default)(book.pages, makeNewPage);
+    var orderedPages = (0, _orderPages2.default)(state.pages, makeNewPage);
     (0, _annotatePages2.default)(orderedPages);
 
-    book.pages = orderedPages;
-    book.setCompleted();
-    applyEachPageRules();
+    state.book.pages = orderedPages;
+    state.book.setCompleted();
+    applyEachPageRules(state.book);
 
     var end = window.performance.now();
     if (!isDebugging) {
       console.log('Bindery: Pages created in ' + (end - start) / 1000 + 's');
     }
 
-    success(book);
+    success(state.book);
   };
   startPagination();
 };
 
 exports.default = paginate;
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var elementToString = function elementToString(node) {
-  var tag = node.tagName.toLowerCase();
-  var id = node.id ? '#' + node.id : '';
-
-  var classes = '';
-  if (node.classList.length > 0) {
-    classes = '.' + [].concat(_toConsumableArray(node.classList)).join('.');
-  }
-
-  var text = '';
-  if (id.length < 1 && classes.length < 2) {
-    text = '("' + node.textContent.substr(0, 30).replace(/\s+/g, ' ') + '...")';
-  }
-  return tag + id + classes + text;
-};
-
-exports.default = elementToString;
 
 /***/ }),
 /* 17 */
@@ -3887,7 +3914,7 @@ var Counter = function (_Rule) {
     }
   }, {
     key: 'beforeAdd',
-    value: function beforeAdd(el) {
+    value: function beforeAdd(el, state) {
       if (el.matches(this.incrementEl)) {
         this.counterValue += 1;
       }
@@ -3895,13 +3922,14 @@ var Counter = function (_Rule) {
         this.counterValue = 0;
       }
       if (el.matches(this.replaceEl)) {
-        return this.createReplacement(el);
+        // return super.afterAdd(el, state, requestNewPage, overflowCallback);
+        return this.createReplacement(state, el);
       }
       return el;
     }
   }, {
     key: 'createReplacement',
-    value: function createReplacement(element) {
+    value: function createReplacement(state, element) {
       return this.replace(element, this.counterValue);
     }
   }, {
@@ -3934,7 +3962,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _OutOfFlow2 = __webpack_require__(8);
+var _OutOfFlow2 = __webpack_require__(9);
 
 var _OutOfFlow3 = _interopRequireDefault(_OutOfFlow2);
 
@@ -3977,21 +4005,21 @@ var FullBleedSpread = function (_OutOfFlow) {
 
   _createClass(FullBleedSpread, [{
     key: 'createOutOfFlowPages',
-    value: function createOutOfFlowPages(elmt, book, makeNewPage) {
+    value: function createOutOfFlowPages(elmt, state, makeNewPage) {
       var _this2 = this;
 
       elmt.parentNode.removeChild(elmt);
 
       var leftPage = void 0;
-      if (book.pageInProgress.isEmpty) {
-        leftPage = book.pageInProgress;
+      if (state.currentPage.isEmpty) {
+        leftPage = state.currentPage;
       } else {
         leftPage = makeNewPage();
-        book.pages.push(leftPage);
+        state.pages.push(leftPage);
       }
 
       var rightPage = makeNewPage();
-      book.pages.push(rightPage);
+      state.pages.push(rightPage);
 
       if (this.rotate !== 'none') {
         [leftPage, rightPage].forEach(function (page) {
@@ -4039,7 +4067,7 @@ var _hyperscript = __webpack_require__(1);
 
 var _hyperscript2 = _interopRequireDefault(_hyperscript);
 
-var _OutOfFlow2 = __webpack_require__(8);
+var _OutOfFlow2 = __webpack_require__(9);
 
 var _OutOfFlow3 = _interopRequireDefault(_OutOfFlow2);
 
@@ -4082,16 +4110,15 @@ var FullBleedPage = function (_OutOfFlow) {
 
   _createClass(FullBleedPage, [{
     key: 'createOutOfFlowPages',
-    value: function createOutOfFlowPages(elmt, book, makeNewPage) {
+    value: function createOutOfFlowPages(elmt, state, makeNewPage) {
       elmt.parentNode.removeChild(elmt);
 
       var newPage = void 0;
-      console.log(book);
-      if (book.pageInProgress.isEmpty) {
-        newPage = book.pageInProgress;
+      if (state.currentPage.isEmpty) {
+        newPage = state.currentPage;
       } else {
         newPage = makeNewPage();
-        book.pages.push(newPage);
+        state.pages.push(newPage);
       }
       if (this.rotate !== 'none') {
         var rotateContainer = (0, _hyperscript2.default)((0, _prefixClass2.default)('.rotate-container'));
@@ -4167,24 +4194,24 @@ var Footnote = function (_Replace) {
 
   _createClass(Footnote, [{
     key: 'afterAdd',
-    value: function afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
-      var number = book.pageInProgress.footer.children.length + 1;
+    value: function afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
+      var number = state.currentPage.footer.children.length + 1;
 
       var footnote = (0, _hyperscript2.default)('.footnote');
       var contents = this.render(element, number);
       if (contents instanceof HTMLElement) footnote.appendChild(contents);else footnote.innerHTML = contents;
 
-      book.pageInProgress.footer.appendChild(footnote);
+      state.currentPage.footer.appendChild(footnote);
 
-      return _get(Footnote.prototype.__proto__ || Object.getPrototypeOf(Footnote.prototype), 'afterAdd', this).call(this, element, book, continueOnNewPage, makeNewPage, function (overflowEl) {
-        book.pageInProgress.footer.removeChild(footnote);
+      return _get(Footnote.prototype.__proto__ || Object.getPrototypeOf(Footnote.prototype), 'afterAdd', this).call(this, element, state, continueOnNewPage, makeNewPage, function (overflowEl) {
+        state.currentPage.footer.removeChild(footnote);
         return overflowCallback(overflowEl);
       });
     }
   }, {
     key: 'createReplacement',
-    value: function createReplacement(book, element) {
-      var number = book.pageInProgress.footer.children.length;
+    value: function createReplacement(state, element) {
+      var number = state.currentPage.footer.children.length;
       return this.replace(element, number);
     }
   }, {
@@ -4259,7 +4286,7 @@ var PageReference = function (_Replace) {
 
   _createClass(PageReference, [{
     key: 'afterAdd',
-    value: function afterAdd(elmt, book) {
+    value: function afterAdd(elmt, state) {
       var _this2 = this;
 
       var test = this.createTest(elmt);
@@ -4267,16 +4294,16 @@ var PageReference = function (_Replace) {
         // Temporary, to make sure it'll fit
         var parent = elmt.parentNode;
         var tempClone = elmt.cloneNode(true);
-        var tempNumbers = book.pagesForTest(test);
+        var tempNumbers = state.book.pagesForTest(test);
         var tempRanges = (0, _utils.makeRanges)(tempNumbers);
         var temp = this.replace(tempClone, tempRanges || '###');
         temp.classList.add((0, _prefixClass2.default)('placeholder-pulse'));
         parent.replaceChild(temp, elmt);
 
-        book.onComplete(function () {
+        state.book.onComplete(function () {
           var tempParent = temp.parentNode;
           var finalClone = elmt.cloneNode(true);
-          var pageNumbers = book.pagesForTest(test);
+          var pageNumbers = state.book.pagesForTest(test);
           var pageRanges = (0, _utils.makeRanges)(pageNumbers);
           var newEl = _this2.replace(finalClone, pageRanges);
           tempParent.replaceChild(newEl, temp);
@@ -4441,20 +4468,20 @@ var PageBreak = function (_Rule) {
 
   _createClass(PageBreak, [{
     key: 'beforeAdd',
-    value: function beforeAdd(elmt, book, requestNewPage) {
+    value: function beforeAdd(elmt, state, requestNewPage) {
       if (this.position === 'before' || this.position === 'both') {
-        if (!book.pageInProgress.isEmpty) {
+        if (!state.currentPage.isEmpty) {
           requestNewPage();
         }
         if (this.continue !== 'any') {
-          book.pageInProgress.setPreference(this.continue);
+          state.currentPage.setPreference(this.continue);
         }
       }
       return elmt;
     }
   }, {
     key: 'afterAdd',
-    value: function afterAdd(elmt, book, requestNewPage) {
+    value: function afterAdd(elmt, state, requestNewPage) {
       if (this.position === 'after' || this.position === 'both') {
         var newPage = requestNewPage();
         if (this.continue !== 'any') {
@@ -4873,4 +4900,5 @@ function updateLink(linkElement, obj) {
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=bindery.js.map 
+});
+//# sourceMappingURL=bindery.umd.js.map 
