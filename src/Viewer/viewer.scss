@@ -192,13 +192,6 @@ body.#{$pre}-viewing {
   margin: 0 auto;
 }
 
-.#{$pre}-print-meta {
-  padding: 12pt;
-  text-align: center;
-  font-family: $system;
-  font-size: 8pt;
-}
-
 .#{$pre}-flap-holder {
   perspective: 5000px;
   transform-style: preserve-3d;

@@ -56,7 +56,10 @@ class Controls {
         marksSelect.value = 'marks_none';
         marksSelect.disabled = true;
       } else {
-        marksSelect.value = 'marks_crop';
+        if (marksSelect.value === 'marks_none') {
+          marksSelect.value = 'marks_crop';
+          updateMarks();
+        }
         marksSelect.disabled = false;
       }
 
@@ -87,7 +90,7 @@ class Controls {
       option({ value: 'marks_both' }, 'Crop and Bleed'),
     );
     const marks = row('Marks', marksSelect);
-    marksSelect.addEventListener('change', () => {
+    const updateMarks = () => {
       switch (marksSelect.value) {
       case 'marks_none':
         viewer.isShowingCropMarks = false;
@@ -107,7 +110,8 @@ class Controls {
         break;
       default:
       }
-    });
+    };
+    marksSelect.addEventListener('change', updateMarks);
 
     const validCheck = h('div', { style: {
       display: 'none',

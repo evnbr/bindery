@@ -18,22 +18,23 @@ const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
 
   const printSheet = function (...arg) {
     return h(c('.print-page'),
-      spread(...arg, marks())
+      spread(...arg)
     );
   };
 
   if (isTwoUp) {
     for (let i = 0; i < pages.length; i += 2) {
-      const sheet = printSheet(pages[i].element, pages[i + 1].element);
-      printLayout.appendChild(sheet);
+      const spreadMarks = marks();
       if (isBooklet) {
         const meta = bookletMeta(i, pages.length);
-        sheet.appendChild(meta);
+        spreadMarks.appendChild(meta);
       }
+      const sheet = printSheet(pages[i].element, pages[i + 1].element, spreadMarks);
+      printLayout.appendChild(sheet);
     }
   } else {
     pages.forEach((pg) => {
-      const sheet = printSheet(pg.element);
+      const sheet = printSheet(pg.element, marks());
       printLayout.appendChild(sheet);
     });
   }
