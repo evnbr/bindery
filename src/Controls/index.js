@@ -49,20 +49,17 @@ class Controls {
     };
     updateSheetSizeNames();
 
-    const sheetTooSmallAlert = row('Sheet is too small to see marks · ', h('a', {
-      href: '#',
-      onclick: () => {
-        sheetSizeSelect.value = 'size_page_marks';
-        updateSheetSize();
-      },
-    }, 'Change'));
-    sheetTooSmallAlert.style.color = 'rgba(0,0,0,0.4)';
-
     const updateSheetSize = () => {
       const newVal = sheetSizeSelect.value;
-      const marksHidden = (newVal === 'size_page' || newVal === 'size_page_bleed');
-      sheetTooSmallAlert.style.display = marksHidden ? 'block' : 'none';
       viewer.setSheetSize(newVal);
+      if (newVal === 'size_page' || newVal === 'size_page_bleed') {
+        marksSelect.value = 'marks_none';
+        marksSelect.disabled = true;
+      } else {
+        marksSelect.value = 'marks_crop';
+        marksSelect.disabled = false;
+      }
+
       this.binder.pageSetup.updateStylesheet();
     };
     sheetSizeSelect.addEventListener('change', updateSheetSize);
@@ -213,14 +210,11 @@ class Controls {
 
     this.element = h(c('.controls'),
       header,
-      viewSwitcher,
-
       arrangement,
       sheetSize,
       marks,
-
       debugControls,
-
+      viewSwitcher,
       row(printBtn),
     );
   }

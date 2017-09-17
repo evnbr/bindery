@@ -232,6 +232,12 @@ $controlborder: gray;
     &:hover {
       background: $hover;
     }
+    &[disabled] {
+      opacity: 0.5;
+      &:hover {
+        background: transparent;
+      }
+    }
   }
 
   input {
@@ -286,9 +292,6 @@ $controlborder: gray;
 @media (max-width: 600px) {
   .#{$pre}-root {
     padding-right: 0;
-  }
-  .#{$pre}-zoom-wrap > :last-child {
-    margin-bottom: 100vh;
   }
   .#{$pre}-controls {
     box-shadow: 0 0 2px rgba(0,0,0,0.3);
