@@ -23,7 +23,6 @@ class FullBleedPage extends OutOfFlow {
     elmt.parentNode.removeChild(elmt);
 
     let newPage;
-    console.log(book);
     if (book.pageInProgress.isEmpty) {
       newPage = book.pageInProgress;
     } else {

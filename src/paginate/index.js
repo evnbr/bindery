@@ -116,6 +116,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
   const afterAddRules = rules.filter(r => r.selector && r.afterAdd);
   const pageRules = rules.filter(r => r.eachPage);
+  const selectorsNotToSplit = rules.filter(rule => rule.avoidSplit).map(rule => rule.selector);
 
   const applyBeforeAddRules = (element) => {
     let addedElement = element;
@@ -181,10 +182,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   // Walk up the tree to see if we can safely
   // insert a split into this node.
-  const selectorsNotToSplit = rules
-    .filter(rule => rule.avoidSplit)
-    .map(rule => rule.selector);
-
   const isSplittable = (node) => {
     if (selectorsNotToSplit.some(sel => node.matches(sel))) {
       if (node.hasAttribute('data-bindery-did-move')
@@ -253,12 +250,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     breadcrumb.push(nodeToMove);
   };
 
-  const addTextNode = (textNode, doneCallback, undoAddTextNode) => {
+  const addTextNode = (textNode, doneCallback, failure) => {
     currentFlowElement().appendChild(textNode);
 
     if (book.pageInProgress.hasOverflowed()) {
       textNode.parentNode.removeChild(textNode);
-      undoAddTextNode();
+      failure();
     } else {
       scheduler.throttle(doneCallback);
     }
@@ -266,7 +263,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   // Adds an text node by incrementally adding words
   // until it just barely doesnt overflow
-  const addTextNodeIncremental = (textNode, doneCallback, undoAddTextNode) => {
+  const addTextNodeIncremental = (textNode, doneCallback, failure) => {
     const originalText = textNode.nodeValue;
     currentFlowElement().appendChild(textNode);
 
@@ -304,7 +301,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         if (pos < 1) {
           textNode.nodeValue = originalText;
           textNode.parentNode.removeChild(textNode);
-          undoAddTextNode();
+          failure();
           return;
         }
 
@@ -317,7 +314,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         // Start on new page
         continueOnNewPage();
         const remainingTextNode = document.createTextNode(overflowingText);
-        addTextNodeIncremental(remainingTextNode, doneCallback, undoAddTextNode);
+        addTextNodeIncremental(remainingTextNode, doneCallback, failure);
         return;
       }
       if (pos > originalText.length - 1) {
@@ -343,7 +340,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     };
 
     if (isSplittable(parent)) {
-      const undoAddTextNode = () => {
+      const failure = () => {
         if (breadcrumb.length > 1) {
           moveElementToNextPage(parent);
           scheduler.throttle(() => addTextNodeIncremental(child, next, forceAddTextNode));
@@ -352,13 +349,13 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         }
       };
 
-      addTextNodeIncremental(child, next, undoAddTextNode);
+      addTextNodeIncremental(child, next, failure);
     } else {
-      const undoAddTextNode = () => {
+      const failure = () => {
         moveElementToNextPage(parent);
         scheduler.throttle(() => addTextNode(child, next, forceAddTextNode));
       };
-      addTextNode(child, next, undoAddTextNode);
+      addTextNode(child, next, failure);
     }
   };
 
@@ -395,9 +392,9 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         const addedChild = breadcrumb.pop();
         applyAfterAddRules(addedChild);
 
-        if (book.pageInProgress.hasOverflowed()) {
+        // if (book.pageInProgress.hasOverflowed()) {
           // console.log('Bindery: Added element despite overflowing');
-        }
+        // }
 
         doneCallback();
         return;
@@ -441,15 +438,14 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   finishPagination = () => {
     document.body.removeChild(measureArea);
 
-    const orderedPages = orderPages(book.pages, makeNewPage);
-    annotatePages(orderedPages);
+    book.pages = orderPages(book.pages, makeNewPage);
+    annotatePages(book.pages);
 
-    book.pages = orderedPages;
     book.setCompleted();
     applyEachPageRules();
 
-    const end = window.performance.now();
     if (!isDebugging) {
+      const end = window.performance.now();
       console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
     }
 
