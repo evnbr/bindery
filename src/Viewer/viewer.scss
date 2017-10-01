@@ -163,7 +163,11 @@ body.#{$pre}-viewing {
 .#{$pre}-zoom-wrap {
   transform-origin: top left;
   transform-style: preserve-3d;
-  height: calc(100vh - 40px); /* adjust scrollheight on scaled down */
+  height: calc(100vh - 120px); /* adjust scrollheight on scaled down */
+}
+
+[bindery-view-mode="interactive"] .#{$pre}-zoom-wrap {
+  transform-origin: center left;
 }
 
 /* Don't print anything that hasn't been exported. This hides extra controls */
@@ -203,6 +207,13 @@ body.#{$pre}-viewing {
   margin: auto;
   transform-style: preserve-3d;
 }
+.#{$pre}-flip-sizer {
+  position: relative;
+  margin: auto;
+  padding: 0 20px;
+  box-sizing: content-box;
+}
+
 
 .#{$pre}-page3d {
   margin: auto;
@@ -229,6 +240,7 @@ body.#{$pre}-viewing {
   .#{$pre}-page {
     position: absolute;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     box-shadow: none;
   }
 
