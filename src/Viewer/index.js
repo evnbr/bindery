@@ -278,8 +278,7 @@ class Viewer {
       const scrollPct = document.body.scrollTop / document.body.scrollHeight;
       const viewerRect = this.zoomBox.getBoundingClientRect();
       const contentW = this.zoomBox.firstElementChild.getBoundingClientRect().width;
-
-      const scale = Math.min(1, viewerRect.width / (contentW + 20));
+      const scale = Math.min(1, viewerRect.width / (contentW));
 
       this.zoomBox.style.transform = `scale(${scale})`;
       document.body.scrollTop = document.body.scrollHeight * scrollPct;

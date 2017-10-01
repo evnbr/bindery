@@ -43,7 +43,7 @@ const btnMain = function (...arg) {
 
 // Menu
 const select = function (...arg) {
-  return h('select', ...arg);
+  return h(`select.${c('select')}`, ...arg);
 };
 
 const option = function (...arg) {
@@ -64,7 +64,7 @@ const viewMode = function (id, action, text) {
   const sel = `.${c('viewmode')}.${c(id)}`;
   return h(sel,
     { onclick: action },
-    h(c('.icon')),
+    // h(c('.icon')),
     text
   );
 };

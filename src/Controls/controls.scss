@@ -1,23 +1,31 @@
 @media screen {
   .#{$pre}-viewing .#{$pre}-controls {
-    display: block !important;
+    display: flex !important;
   }
 }
 
-$controlborder: gray;
+$btn-border: #444;
+$btn-pad: 8px 16px;
+$btn-hover: #f4f4f4;
+$btn-active: #eee;
 
 .#{$pre}-controls {
   font: 14px / 1.4 $system;
   display: none;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: start;
+
   position: fixed;
   top: 0;
-  bottom: 0;
+  left: 0;
   right: 0;
-  width: $sidebarWidth;
+  // width: $sidebarWidth;
   z-index: 999;
   margin: auto;
   color: $text;
-  background: $background;
+  // background: $background;
+  padding: 10px;
   overflow: scroll;
   -webkit-font-smoothing: antialiased;
 
@@ -36,9 +44,10 @@ $controlborder: gray;
 }
 
 .#{$pre}-title {
-  margin: 20px 20px 8px;
-  font-size: 18px;
+  // margin: 20px 20px 8px;
+  // font-size: 18px;
   position: relative;
+  margin-right: auto;
 }
 
 .#{$pre}-spinner {
@@ -72,17 +81,16 @@ $controlborder: gray;
 
 .#{$pre}-controls .#{$pre}-btn {
   -webkit-appearance: none;
-  padding: 10px 18px;
+  padding: $btn-pad;
   color: black;
-  border: none;
-  background: transparent;
-  border: 1px solid $controlborder;
+  background: white;
+  border: 1px solid $btn-border;
   cursor: pointer;
-  font-size: 12px;
-  letter-spacing: 0.01em;
-  font-weight: 500;
+  // font-size: 12px;
+  // letter-spacing: 0.01em;
+  // font-weight: 500;
   display: inline-block;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-right: 8px;
   text-decoration: none;
   &:focus {
@@ -91,11 +99,11 @@ $controlborder: gray;
   }
 
   &:hover {
-    background: rgba(0,0,0,0.1);
+    background: $btn-hover;
   }
 
   &:active {
-    background: rgba(0,0,0,0.14);
+    background: $btn-active;
   }
   &:last-child {
     margin-right: 0;
@@ -108,7 +116,6 @@ $controlborder: gray;
 }
 
 .#{$pre}-controls .#{$pre}-btn-main {
-  margin-top: 4px;
   background: $accent;
   border-color: $accent;
   color: white;
@@ -137,34 +144,41 @@ $controlborder: gray;
 .#{$pre}-viewswitcher {
   user-select: none;
 
-  margin: 20px;
-  position: fixed;
-  bottom: 0;
-  right: 0;
+  // margin: 20px;
+  // position: fixed;
+  // bottom: 0;
+  // right: 0;
 
-  font-size: 0;
+  // font-size: 0;
   overflow: hidden;
-  width: $sidebarWidth - 40px;
-  max-width: 240px;
+  // width: $sidebarWidth - 40px;
+  // max-width: 240px;
 
-  border: 1px solid $controlborder;
-  border-radius: 4px;
+  border: 1px solid $btn-border;
+  background: white;
+  display: flex;
+  flex-direction: row;
+  border-radius: 2px;
 }
 
 .#{$pre}-viewmode {
-  display: inline-block;
-  color: $controlborder;
+  // display: inline-block;
+  color: $btn-border;
   cursor: pointer;
-  width: 25%;
-  font-size: 0;
-  border-right: 1px solid $controlborder;
+  // width: 25%;
+  // font-size: 0;s
+  // border-right: 1px solid $btn-border;
+  padding: $btn-pad;
 
-  &:last-child {
-    border-right: 0;
-  }
+  // &:last-child {
+  //   border-right: 0;
+  // }
 
   &:hover {
-    background: $hover;
+    background: $btn-hover;
+  }
+  &:active {
+    background: $btn-active;
   }
 
   .#{$pre}-icon {
@@ -205,61 +219,59 @@ $controlborder: gray;
 [bindery-view-mode='outline'] .#{$pre}-outline,
 [bindery-view-mode='print'] .#{$pre}-print {
   color: white;
-  background: $controlborder;
+  background: $btn-border;
 }
 
 
 .#{$pre}-row {
   position: relative;
-  display: block;
-  padding: 8px 12px;
-  margin: 0 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  // padding: 8px 12px;
+  // margin: 0 8px;
   cursor: default;
   user-select: none;
+  margin-left: 8px;
 
-  &:last-child {
-    margin-top: 8px;
+  // &:last-child {
+  //   margin-top: 8px;
+  // }
+}
+
+.#{$pre}-select {
+  -webkit-appearance: none;
+  -moz-appearance:none;
+  padding: $btn-pad;
+  padding-right: 28px;
+  color: black;
+  border: 1px solid $btn-border;
+  border-radius: 2px;
+  transition: all 0.2s;
+  max-width: 200px;
+  background: url('./_assets/icon-carat.svg') no-repeat 50% 50%;
+  background-color: white;
+  background-position: right;
+
+  &.#{$pre}-hidden-select {
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    color: transparent;
   }
 
-  select {
-    position: absolute;
-    border: none;
-    background: transparent;
-    padding: 8px 12px;
-    width: 60%;
-    top: 8px;
-    right: 12px;
+  &:hover {
+    background-color: $btn-hover;
+  }
+  &:active {
+    background-color: $btn-hover;
+  }
+  &[disabled] {
+    color: rgba(0,0,0,0.3);
     &:hover {
-      background: $hover;
-    }
-    &[disabled] {
-      opacity: 0.5;
-      &:hover {
-        background: transparent;
-      }
-    }
-  }
-
-  input {
-    width: 85px;
-    padding: 4px 6px 4px 8px;
-    text-align: right;
-    border: none;
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 100%;
-    color: black;
-    background: none;
-
-    &:focus {
-      outline: none;
-      background: $hover;
-    }
-
-    &:invalid {
-      color: $invalid;
+      background: white;
     }
   }
 }
@@ -273,9 +285,9 @@ $controlborder: gray;
 }
 
 .#{$pre}-refresh-btns {
-  font-size: 12px;
-  margin-top: 8px;
-  float: right;
+  // font-size: 12px;
+  // margin-top: 8px;
+  // float: right;
   .#{$pre}-in-progress & {
     display: none;
   }
@@ -289,24 +301,24 @@ $controlborder: gray;
   }
 }
 
-@media (max-width: 600px) {
-  .#{$pre}-root {
-    padding-right: 0;
-  }
-  .#{$pre}-controls {
-    box-shadow: 0 0 2px rgba(0,0,0,0.3);
-    left: 0;
-    width: unset;
-    padding-bottom: 12px;
-    top: unset;
-  }
-  .#{$pre}-viewswitcher {
-    z-index: 1;
-    left: 0;
-    right: 160px;
-    width: unset;
-  }
-  .#{$pre}-controls > .#{$pre}-row:last-child {
-    text-align: right;
-  }
-}
+// @media (max-width: 600px) {
+//   .#{$pre}-root {
+//     padding-right: 0;
+//   }
+//   .#{$pre}-controls {
+//     box-shadow: 0 0 2px rgba(0,0,0,0.3);
+//     left: 0;
+//     width: unset;
+//     padding-bottom: 12px;
+//     top: unset;
+//   }
+//   .#{$pre}-viewswitcher {
+//     z-index: 1;
+//     left: 0;
+//     right: 160px;
+//     width: unset;
+//   }
+//   .#{$pre}-controls > .#{$pre}-row:last-child {
+//     text-align: right;
+//   }
+// }

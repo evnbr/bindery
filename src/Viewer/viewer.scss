@@ -9,7 +9,8 @@
     padding: 20px;
     z-index: 99;
     position: relative;
-    padding-right: $sidebarWidth;
+    // padding-right: $sidebarWidth;
+    padding-top: 100px;
     animation: fadeUp 0.3s;
     min-height: 90vh;
   }

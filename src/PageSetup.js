@@ -47,6 +47,20 @@ class PageSetup {
     this.printTwoUp = newVal;
   }
 
+  get displaySize() {
+    const width = this.printTwoUp
+      ? this.spreadSizeStyle().width
+      : this.size.width;
+    const height = this.size.height;
+    const bleed = this.bleed;
+
+    return {
+      width,
+      height,
+      bleed,
+    };
+  }
+
   get sheetSize() {
     const width = this.printTwoUp
       ? this.spreadSizeStyle().width

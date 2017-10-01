@@ -33,19 +33,21 @@ class Controls {
     } }, 'Done');
 
     const sheetSizes = [
-      option({ value: 'size_page' }, 'Auto'),
+      option({ value: 'size_page', selected: true }, 'Auto'),
       option({ value: 'size_page_bleed' }, 'Auto + Bleed'),
-      option({ value: 'size_page_marks', selected: true }, 'Auto + Marks'),
+      option({ value: 'size_page_marks' }, 'Auto + Marks'),
       option({ value: 'size_letter_p' }, 'Letter Portrait'),
       option({ value: 'size_letter_l' }, 'Letter Landscape'),
     ];
     const sheetSizeSelect = select(...sheetSizes);
 
     const updateSheetSizeNames = () => {
-      const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
-      sheetSizes[0].textContent = `${layout}`;
-      sheetSizes[1].textContent = `${layout} + Bleed`;
-      sheetSizes[2].textContent = `${layout} + Marks`;
+      // const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
+      const size = this.binder.pageSetup.displaySize;
+      const sizeName = `${size.width} × ${size.height}`;
+      sheetSizes[0].textContent = `${sizeName}`;
+      sheetSizes[1].textContent = `${sizeName} + Bleed`;
+      sheetSizes[2].textContent = `${sizeName} + Marks`;
     };
     updateSheetSizeNames();
 
@@ -53,13 +55,11 @@ class Controls {
       const newVal = sheetSizeSelect.value;
       viewer.setSheetSize(newVal);
       if (newVal === 'size_page' || newVal === 'size_page_bleed') {
-        marksSelect.value = 'marks_none';
+        // marksSelect.value = 'marks_none';
         marksSelect.disabled = true;
+        marksSelect.classList.add(c('hidden-select'));
       } else {
-        if (marksSelect.value === 'marks_none') {
-          marksSelect.value = 'marks_crop';
-          updateMarks();
-        }
+        marksSelect.classList.remove(c('hidden-select'));
         marksSelect.disabled = false;
       }
 
@@ -67,7 +67,6 @@ class Controls {
     };
     sheetSizeSelect.addEventListener('change', updateSheetSize);
 
-    const sheetSize = row('Sheet Size', sheetSizeSelect);
 
     const arrangeSelect = select(
       option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
@@ -80,16 +79,18 @@ class Controls {
       viewer.setPrintArrange(arrangeSelect.value);
       updateSheetSizeNames();
     });
-    const arrangement = row('Layout', arrangeSelect);
+    const arrangement = row(arrangeSelect);
 
 
     const marksSelect = select(
-      option({ value: 'marks_none' }, 'None'),
-      option({ value: 'marks_crop', selected: true }, 'Crop'),
-      option({ value: 'marks_bleed' }, 'Bleed'),
+      option({ value: 'marks_none' }, 'No Marks'),
+      option({ value: 'marks_crop', selected: true }, 'Crop Marks'),
+      option({ value: 'marks_bleed' }, 'Bleed Marks'),
       option({ value: 'marks_both' }, 'Crop and Bleed'),
     );
-    const marks = row('Marks', marksSelect);
+    const marks = row(marksSelect);
+    const sheetSize = row(sheetSizeSelect);
+
     const updateMarks = () => {
       switch (marksSelect.value) {
       case 'marks_none':
@@ -125,7 +126,7 @@ class Controls {
 
     const viewModes = [
       viewMode('grid', viewer.setGrid, 'Grid'),
-      viewMode('outline', viewer.setOutline, 'Outline'),
+      // viewMode('outline', viewer.setOutline, 'Outline'),
       viewMode('flip', viewer.setFlip, 'Flip'),
       viewMode('print', viewer.setPrint, 'Sheet'),
     ];
@@ -133,47 +134,6 @@ class Controls {
     const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
 
     const headerContent = h('span', 'Loading');
-
-    const refreshPaginationBtn = h('a', { onclick: () => {
-      this.binder.debug = false;
-      startPaginating();
-    } }, 'Refresh');
-    refreshPaginationBtn.classList.add(c('refresh'));
-    const refreshPaginationBtnDebug = h('a', 'Debug', {
-      onclick: () => {
-        playSlow.style.display = 'none';
-        step.style.display = 'none';
-        pause.style.display = '';
-        this.binder.debug = true;
-        startPaginating();
-      },
-    });
-    const header = title(
-      headerContent,
-      h(c('.refresh-btns'),
-        refreshPaginationBtn,
-        refreshPaginationBtnDebug
-      ),
-      h(c('.spinner')),
-    );
-
-    this.setInProgress = () => {
-      headerContent.textContent = 'Paginating';
-      validCheck.style.display = 'none';
-    };
-
-    this.updateProgress = (count) => {
-      headerContent.textContent = `${count} Pages`;
-    };
-
-    this.setDone = () => {
-      headerContent.textContent = `${viewer.book.pages.length} Pages`;
-      validCheck.style.display = 'none';
-    };
-
-    this.setInvalid = () => {
-      validCheck.style.display = '';
-    };
 
     let playSlow;
     const step = btn('→', {
@@ -210,15 +170,59 @@ class Controls {
       debugDone,
     );
     debugControls.classList.add(c('debug-controls'));
+
+    const refreshPaginationBtn = h('a', { onclick: () => {
+      this.binder.debug = false;
+      startPaginating();
+    } }, 'Refresh');
+    refreshPaginationBtn.classList.add(c('refresh'));
+    const refreshPaginationBtnDebug = h('a', 'Debug', {
+      onclick: () => {
+        playSlow.style.display = 'none';
+        step.style.display = 'none';
+        pause.style.display = '';
+        this.binder.debug = true;
+        startPaginating();
+      },
+    });
+    const header = title(
+      headerContent,
+      h(c('.refresh-btns'),
+        refreshPaginationBtn,
+        refreshPaginationBtnDebug
+      ),
+      debugControls,
+      h(c('.spinner')),
+    );
+
+    this.setInProgress = () => {
+      headerContent.textContent = 'Paginating';
+      validCheck.style.display = 'none';
+    };
+
+    this.updateProgress = (count) => {
+      headerContent.textContent = `${count} Pages`;
+    };
+
+    this.setDone = () => {
+      headerContent.textContent = `${viewer.book.pages.length} Pages`;
+      validCheck.style.display = 'none';
+    };
+
+    this.setInvalid = () => {
+      validCheck.style.display = '';
+    };
+
     printBtn.classList.add(c('btn-print'));
 
     this.element = h(c('.controls'),
       header,
-      arrangement,
-      sheetSize,
-      marks,
-      debugControls,
-      viewSwitcher,
+      row(
+        arrangement,
+        sheetSize,
+        marks
+      ),
+      row(viewSwitcher),
       row(printBtn),
     );
   }
