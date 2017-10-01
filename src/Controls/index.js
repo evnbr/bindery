@@ -38,6 +38,8 @@ class Controls {
       option({ value: 'size_page_marks' }, 'Auto + Marks'),
       option({ value: 'size_letter_p' }, 'Letter Portrait'),
       option({ value: 'size_letter_l' }, 'Letter Landscape'),
+      option({ value: 'size_a4_p' }, 'A4 Portrait'),
+      option({ value: 'size_a4_l' }, 'A4 Landscape'),
     ];
     const sheetSizeSelect = select(...sheetSizes);
 
