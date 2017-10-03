@@ -16,6 +16,8 @@ const defaultPageSetup = {
   },
 };
 
+const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
+
 class PageSetup {
 
   constructor(opts = {}) {
@@ -24,7 +26,7 @@ class PageSetup {
     this.setBleed(opts.bleed || defaultPageSetup.bleed);
 
     this.printTwoUp = false;
-    this.sheetSizeMode = 'size_page';
+    this.sheetSizeMode = supportsCustomPageSize ? 'size_page' : 'size_letter_p';
   }
 
   setSize(size) {

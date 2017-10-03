@@ -12,6 +12,8 @@ import {
   viewMode,
 } from './components';
 
+const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
+
 class Controls {
   constructor(opts) {
     this.binder = opts.binder;
@@ -32,7 +34,7 @@ class Controls {
       }
     } }, 'Done');
 
-    const sheetSizes = [
+    const sheetSizes = supportsCustomPageSize ? [
       option({ value: 'size_page', selected: true }, 'Auto'),
       option({ value: 'size_page_bleed' }, 'Auto + Bleed'),
       option({ value: 'size_page_marks' }, 'Auto + Marks'),
@@ -40,10 +42,14 @@ class Controls {
       option({ value: 'size_letter_l' }, 'Letter Landscape'),
       option({ value: 'size_a4_p' }, 'A4 Portrait'),
       option({ value: 'size_a4_l' }, 'A4 Landscape'),
+    ] : [
+      option({ value: 'size_letter_p', selected: true }, 'Default Page Size *'),
+      option({ disabled: true }, 'Only Chrome supports custom page sizes. Set in your browser\'s print dialog instead.'),
     ];
 
     const updateSheetSizeNames = () => {
       // const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
+      if (!supportsCustomPageSize) return;
       const size = this.binder.pageSetup.displaySize;
       const sizeName = `${size.width} × ${size.height}`;
       sheetSizes[0].textContent = `${sizeName}`;
@@ -66,6 +72,7 @@ class Controls {
 
       this.binder.pageSetup.updateStylesheet();
     };
+
     const sheetSizeSelect = select({ onchange: updateSheetSize }, ...sheetSizes);
 
     const arrangeSelect = select(
@@ -110,7 +117,9 @@ class Controls {
       option({ value: 'marks_bleed' }, 'Bleed Marks'),
       option({ value: 'marks_both' }, 'Crop and Bleed'),
     );
-    marksSelect.classList.add(c('hidden-select'));
+    if (supportsCustomPageSize) {
+      marksSelect.classList.add(c('hidden-select'));
+    }
     const marks = row(marksSelect);
     const sheetSize = row(sheetSizeSelect);
 

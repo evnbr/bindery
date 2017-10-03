@@ -56,7 +56,6 @@ $btn-active: #ddd;
 
 .#{$pre}-title {
   position: relative;
-  opacity: 0;
   display: flex;
   padding: $btn-pad;
   transition: opacity 0.2s;
@@ -64,6 +63,10 @@ $btn-active: #ddd;
   white-space: nowrap;
   overflow: hidden;
   margin-right: auto;
+  opacity: 0;
+  // [bindery-view-mode='print'] & {
+  //   opacity: 0;
+  // }
   .#{$pre}-in-progress & {
     opacity: 1;
     display: flex;
@@ -84,8 +87,6 @@ $btn-active: #ddd;
 
 .#{$pre}-print-options {
   opacity: 1;
-  transition: all 0.8s;
-  transition-delay: 0.2s;
   display: none;
   [bindery-view-mode='print'] & {
     display: flex;
@@ -352,7 +353,7 @@ $btn-active: #ddd;
 
   .#{$pre}-print-options {
     background: $background;
-    top: 60px;
+    top: 56px;
     left: 0;
     right: 0;
     position: fixed;
