@@ -113,6 +113,7 @@ class Viewer {
       this.setPrint();
     }
     this.updateZoom();
+    setTimeout(() => { this.updateZoom(); }, 300);
   }
 
   setPrintArrange(newVal) {

@@ -8,11 +8,10 @@ sheet.innerHTML = `
 }
 .📖-view-source-header {
   display: none;
-  top: 0;
+  bottom: 0;
   left: 0;
   right: unset;
-  bottom: unset;
-  padding: 1em;
+  top: unset;
   background: transparent;
   box-shadow: none;
 }

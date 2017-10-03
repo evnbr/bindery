@@ -41,7 +41,6 @@ class Controls {
       option({ value: 'size_a4_p' }, 'A4 Portrait'),
       option({ value: 'size_a4_l' }, 'A4 Landscape'),
     ];
-    const sheetSizeSelect = select(...sheetSizes);
 
     const updateSheetSizeNames = () => {
       // const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
@@ -53,8 +52,8 @@ class Controls {
     };
     updateSheetSizeNames();
 
-    const updateSheetSize = () => {
-      const newVal = sheetSizeSelect.value;
+    const updateSheetSize = (e) => {
+      const newVal = e.target.value;
       viewer.setSheetSize(newVal);
       if (newVal === 'size_page' || newVal === 'size_page_bleed') {
         // marksSelect.value = 'marks_none';
@@ -67,34 +66,23 @@ class Controls {
 
       this.binder.pageSetup.updateStylesheet();
     };
-    sheetSizeSelect.addEventListener('change', updateSheetSize);
-
+    const sheetSizeSelect = select({ onchange: updateSheetSize }, ...sheetSizes);
 
     const arrangeSelect = select(
+      { onchange: (e) => {
+        viewer.setPrintArrange(e.target.value);
+        updateSheetSizeNames();
+      } },
       option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
       option({ value: 'arrange_two' }, '1 Spread / Sheet'),
-      option({ value: 'arrange_booklet' }, 'Booklet Order'),
-      option({ disabled: true }, 'Grid'),
-      option({ disabled: true }, 'Signatures'),
+      option({ value: 'arrange_booklet' }, 'Booklet Sheets'),
+      // option({ disabled: true }, 'Grid'),
+      // option({ disabled: true }, 'Signatures'),
     );
-    arrangeSelect.addEventListener('change', () => {
-      viewer.setPrintArrange(arrangeSelect.value);
-      updateSheetSizeNames();
-    });
     const arrangement = row(arrangeSelect);
 
-
-    const marksSelect = select(
-      option({ value: 'marks_none' }, 'No Marks'),
-      option({ value: 'marks_crop', selected: true }, 'Crop Marks'),
-      option({ value: 'marks_bleed' }, 'Bleed Marks'),
-      option({ value: 'marks_both' }, 'Crop and Bleed'),
-    );
-    const marks = row(marksSelect);
-    const sheetSize = row(sheetSizeSelect);
-
-    const updateMarks = () => {
-      switch (marksSelect.value) {
+    const updateMarks = (e) => {
+      switch (e.target.value) {
       case 'marks_none':
         viewer.isShowingCropMarks = false;
         viewer.isShowingBleedMarks = false;
@@ -114,7 +102,17 @@ class Controls {
       default:
       }
     };
-    marksSelect.addEventListener('change', updateMarks);
+
+    const marksSelect = select(
+      { onchange: updateMarks },
+      option({ value: 'marks_none' }, 'No Marks'),
+      option({ value: 'marks_crop', selected: true }, 'Crop Marks'),
+      option({ value: 'marks_bleed' }, 'Bleed Marks'),
+      option({ value: 'marks_both' }, 'Crop and Bleed'),
+    );
+    marksSelect.classList.add(c('hidden-select'));
+    const marks = row(marksSelect);
+    const sheetSize = row(sheetSizeSelect);
 
     const validCheck = h('div', { style: {
       display: 'none',
@@ -165,7 +163,7 @@ class Controls {
       },
     });
 
-    const debugControls = row(
+    const debugControls = h('div',
       pause,
       playSlow,
       step,
@@ -178,7 +176,7 @@ class Controls {
       startPaginating();
     } }, 'Refresh');
     refreshPaginationBtn.classList.add(c('refresh'));
-    const refreshPaginationBtnDebug = h('a', 'Debug', {
+    const refreshPaginationBtnDebug = h('a', '🐞', {
       onclick: () => {
         playSlow.style.display = 'none';
         step.style.display = 'none';
@@ -188,13 +186,13 @@ class Controls {
       },
     });
     const header = title(
+      h(c('.spinner')),
       headerContent,
       h(c('.refresh-btns'),
         refreshPaginationBtn,
         refreshPaginationBtnDebug
       ),
       debugControls,
-      h(c('.spinner')),
     );
 
     this.setInProgress = () => {
@@ -216,16 +214,19 @@ class Controls {
     };
 
     printBtn.classList.add(c('btn-print'));
+    const options = row(
+      arrangement,
+      sheetSize,
+      marks
+    );
+    options.classList.add(c('print-options'));
+
 
     this.element = h(c('.controls'),
+      viewSwitcher,
+      options,
       header,
-      row(
-        arrangement,
-        sheetSize,
-        marks
-      ),
-      row(viewSwitcher),
-      row(printBtn),
+      printBtn,
     );
   }
 

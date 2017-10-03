@@ -6,11 +6,11 @@
     transition: opacity 0.2s;
     opacity: 1;
     background: $background;
-    padding: 20px;
+    padding: 10px;
     z-index: 99;
     position: relative;
     // padding-right: $sidebarWidth;
-    padding-top: 100px;
+    padding-top: 80px;
     animation: fadeUp 0.3s;
     min-height: 90vh;
   }
@@ -184,6 +184,8 @@ body.#{$pre}-viewing {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  transition: all 0.2s;
 }
 
 .#{$pre}-spread-wrapper {

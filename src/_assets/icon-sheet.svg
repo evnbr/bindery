@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
-    <title>icon-sheet</title>
+    <title>icon-print</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="icon-sheet" stroke="#000000">
-            <rect id="Rectangle-2-Copy-13" x="8.5" y="6.5" width="16" height="19"></rect>
-            <path d="M22.5,21.5 L24.5,21.5" id="Line" stroke-linecap="square"></path>
-            <path d="M8.5,21.5 L10.5,21.5" id="Line-Copy-7" stroke-linecap="square"></path>
-            <path d="M8.5,10.5 L10.5,10.5" id="Line-Copy-8" stroke-linecap="square"></path>
-            <path d="M22.5,10.5 L24.5,10.5" id="Line-Copy" stroke-linecap="square"></path>
-            <path d="M20.5,23.5 L20.5,25.5" id="Line" stroke-linecap="square"></path>
-            <path d="M12.5,23.5 L12.5,25.5" id="Line-Copy-5" stroke-linecap="square"></path>
-            <path d="M20.5,6.5 L20.5,8.5" id="Line-Copy-2" stroke-linecap="square"></path>
-            <path d="M12.5,6.5 L12.5,8.5" id="Line-Copy-6" stroke-linecap="square"></path>
+        <g id="icon-print">
+            <rect id="Rectangle-2-Copy" stroke="#000000" x="9.5" y="5.5" width="13" height="6"></rect>
+            <path d="M22.5,22.5 L26,22.5 C26.8284271,22.5 27.5,21.8284271 27.5,21 L27.5,13 C27.5,12.1715729 26.8284271,11.5 26,11.5 L6,11.5 C5.17157288,11.5 4.5,12.1715729 4.5,13 L4.5,21 C4.5,21.8284271 5.17157288,22.5 6,22.5 L9.5,22.5 L9.5,17.5 L22.5,17.5 L22.5,22.5 Z" id="Combined-Shape" stroke="#000000"></path>
+            <circle id="Oval" fill="#000000" cx="25" cy="14" r="1"></circle>
+            <rect id="Rectangle-2-Copy" stroke="#000000" x="9.5" y="17.5" width="13" height="8"></rect>
         </g>
     </g>
 </svg>

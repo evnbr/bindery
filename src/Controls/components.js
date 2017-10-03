@@ -42,9 +42,23 @@ const btnMain = function (...arg) {
 };
 
 // Menu
+// const select = function (...arg) {
+//   return h(`select.${c('select')}`, ...arg);
+// };
 const select = function (...arg) {
-  return h(`select.${c('select')}`, ...arg);
+  const selectVal = h(c('.select-val'), 'Value');
+  const selectEl = h(`select.${c('select')}`, ...arg);
+  const updateVal = () => {
+    selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
+  };
+  selectEl.addEventListener('change', updateVal);
+  updateVal();
+  return h(c('.select-wrap'),
+    selectVal,
+    selectEl
+  );
 };
+
 
 const option = function (...arg) {
   return h('option', ...arg);
@@ -64,8 +78,8 @@ const viewMode = function (id, action, text) {
   const sel = `.${c('viewmode')}.${c(id)}`;
   return h(sel,
     { onclick: action },
-    // h(c('.icon')),
-    text
+    h(c('.icon')),
+    // text
   );
 };
 
