@@ -342,7 +342,7 @@ $btn-active: #ddd;
   display: none;
 }
 
-@media (max-width: 720px) {
+@media screen and (max-width: 720px) {
 
   [bindery-view-mode='print'].#{$pre}-root {
     padding-top: 120px;
@@ -365,7 +365,7 @@ $btn-active: #ddd;
 
 }
 
-@media (max-width: 500px) {
+@media screen and (max-width: 500px) {
   [bindery-view-mode='print'].#{$pre}-root {
     padding-top: 190px;
   }
