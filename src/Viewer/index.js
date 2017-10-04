@@ -113,6 +113,7 @@ class Viewer {
       this.setPrint();
     }
     this.updateZoom();
+    setTimeout(() => { this.updateZoom(); }, 300);
   }
 
   setPrintArrange(newVal) {
@@ -276,10 +277,9 @@ class Viewer {
   updateZoom() {
     if (this.zoomBox.firstElementChild) {
       const scrollPct = document.body.scrollTop / document.body.scrollHeight;
-      const exportW = this.zoomBox.getBoundingClientRect().width;
+      const viewerRect = this.zoomBox.getBoundingClientRect();
       const contentW = this.zoomBox.firstElementChild.getBoundingClientRect().width;
-
-      const scale = Math.min(1, exportW / (contentW + 20));
+      const scale = Math.min(1, viewerRect.width / (contentW));
 
       this.zoomBox.style.transform = `scale(${scale})`;
       document.body.scrollTop = document.body.scrollHeight * scrollPct;

@@ -3,8 +3,10 @@ import c from '../utils/prefixClass';
 
 const renderFlipLayout = (pages, doubleSided) => {
   const flipLayout = document.createDocumentFragment();
+  const sizer = h(c('.spread-size') + c('.flip-sizer'));
   const flapHolder = h(c('.spread-size') + c('.flap-holder'));
-  flipLayout.appendChild(flapHolder);
+  sizer.appendChild(flapHolder);
+  flipLayout.appendChild(sizer);
   const flaps = [];
   let currentLeaf = -1;
 

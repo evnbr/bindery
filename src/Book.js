@@ -31,6 +31,7 @@ class Book {
     this.queued.forEach((func) => {
       func();
     });
+    this.queued = [];
   }
 }
 

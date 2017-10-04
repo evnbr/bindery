@@ -17,18 +17,18 @@ class PageBreak extends Rule {
   get avoidSplit() {
     return this.position === 'avoid';
   }
-  beforeAdd(elmt, state, requestNewPage) {
+  beforeAdd(elmt, book, requestNewPage) {
     if (this.position === 'before' || this.position === 'both') {
-      if (!state.currentPage.isEmpty) {
+      if (!book.pageInProgress.isEmpty) {
         requestNewPage();
       }
       if (this.continue !== 'any') {
-        state.currentPage.setPreference(this.continue);
+        book.pageInProgress.setPreference(this.continue);
       }
     }
     return elmt;
   }
-  afterAdd(elmt, state, requestNewPage) {
+  afterAdd(elmt, book, requestNewPage) {
     if (this.position === 'after' || this.position === 'both') {
       const newPage = requestNewPage();
       if (this.continue !== 'any') {

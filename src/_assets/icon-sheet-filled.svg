@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
-    <title>icon-sheet-filled</title>
+    <title>icon-print-filled</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="icon-sheet-filled" fill="#000000">
-            <path d="M13,7 L20,7 L20,9 L21,9 L21,7 L24,7 L24,10 L22,10 L22,11 L24,11 L24,21 L22,21 L22,22 L24,22 L24,25 L21,25 L21,23 L20,23 L20,25 L13,25 L13,23 L12,23 L12,25 L9,25 L9,22 L11,22 L11,21 L9,21 L9,11 L11,11 L11,10 L9,10 L9,7 L12,7 L12,9 L13,9 L13,7 Z" id="Combined-Shape"></path>
+        <g id="icon-print-filled" fill="#000000">
+            <rect id="Rectangle-2-Copy" x="9" y="5" width="14" height="5"></rect>
+            <path d="M24,23 L24,18 L8,18 L8,23 L6,23 L6,23 C4.8954305,23 4,22.1045695 4,21 L4,21 L4,13 C4,11.8954305 4.8954305,11 6,11 L26,11 C27.1045695,11 28,11.8954305 28,13 L28,21 C28,22.1045695 27.1045695,23 26,23 L24,23 Z M25,15 C25.5522847,15 26,14.5522847 26,14 C26,13.4477153 25.5522847,13 25,13 C24.4477153,13 24,13.4477153 24,14 C24,14.5522847 24.4477153,15 25,15 Z" id="Combined-Shape"></path>
+            <rect id="Rectangle-2-Copy" x="9" y="19" width="14" height="8"></rect>
         </g>
     </g>
 </svg>

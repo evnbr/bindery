@@ -19,15 +19,15 @@ class FullBleedPage extends OutOfFlow {
     });
   }
 
-  createOutOfFlowPages(elmt, state, makeNewPage) {
+  createOutOfFlowPages(elmt, book, makeNewPage) {
     elmt.parentNode.removeChild(elmt);
 
     let newPage;
-    if (state.currentPage.isEmpty) {
-      newPage = state.currentPage;
+    if (book.pageInProgress.isEmpty) {
+      newPage = book.pageInProgress;
     } else {
       newPage = makeNewPage();
-      state.pages.push(newPage);
+      book.pages.push(newPage);
     }
     if (this.rotate !== 'none') {
       const rotateContainer = h(c('.rotate-container'));

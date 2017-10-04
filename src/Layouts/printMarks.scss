@@ -100,3 +100,15 @@ $markLen: 12pt;
     bottom: 0;
   }
 }
+
+.#{$pre}-print-meta {
+  padding: 12pt;
+  text-align: center;
+  font-family: $system;
+  font-size: 8pt;
+  display: block !important;
+  position: absolute;
+  bottom: -60pt;
+  left: 0;
+  right: 0;
+}

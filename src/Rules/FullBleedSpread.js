@@ -18,19 +18,19 @@ class FullBleedSpread extends OutOfFlow {
       rotate: OptionType.enum('none', 'clockwise', 'counterclockwise'),
     });
   }
-  createOutOfFlowPages(elmt, state, makeNewPage) {
+  createOutOfFlowPages(elmt, book, makeNewPage) {
     elmt.parentNode.removeChild(elmt);
 
     let leftPage;
-    if (state.currentPage.isEmpty) {
-      leftPage = state.currentPage;
+    if (book.pageInProgress.isEmpty) {
+      leftPage = book.pageInProgress;
     } else {
       leftPage = makeNewPage();
-      state.pages.push(leftPage);
+      book.pages.push(leftPage);
     }
 
     const rightPage = makeNewPage();
-    state.pages.push(rightPage);
+    book.pages.push(rightPage);
 
     if (this.rotate !== 'none') {
       [leftPage, rightPage].forEach((page) => {

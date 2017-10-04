@@ -3,6 +3,8 @@ import { isValidSize, parseVal } from './utils/convertUnits';
 import c from './utils/prefixClass';
 
 
+const letter = { width: '8.5in', height: '11in' };
+const a4 = { width: '210mm', height: '297mm' };
 const defaultPageSetup = {
   bleed: '12pt',
   size: { width: '4in', height: '6in' },
@@ -14,6 +16,8 @@ const defaultPageSetup = {
   },
 };
 
+const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
+
 class PageSetup {
 
   constructor(opts = {}) {
@@ -22,7 +26,7 @@ class PageSetup {
     this.setBleed(opts.bleed || defaultPageSetup.bleed);
 
     this.printTwoUp = false;
-    this.sheetSizeMode = 'size_page_marks';
+    this.sheetSizeMode = supportsCustomPageSize ? 'size_page' : 'size_page_marks';
   }
 
   setSize(size) {
@@ -47,6 +51,20 @@ class PageSetup {
     this.printTwoUp = newVal;
   }
 
+  get displaySize() {
+    const width = this.printTwoUp
+      ? this.spreadSizeStyle().width
+      : this.size.width;
+    const height = this.size.height;
+    const bleed = this.bleed;
+
+    return {
+      width,
+      height,
+      bleed,
+    };
+  }
+
   get sheetSize() {
     const width = this.printTwoUp
       ? this.spreadSizeStyle().width
@@ -69,9 +87,13 @@ class PageSetup {
         height: `calc(${height} + ${b} + ${b} + 24pt)`,
       };
     case 'size_letter_l':
-      return { width: '11in', height: '8.5in' };
+      return { width: letter.height, height: letter.width };
     case 'size_letter_p':
-      return { width: '8.5in', height: '11in' };
+      return letter;
+    case 'size_a4_p':
+      return a4;
+    case 'size_a4_l':
+      return { width: a4.height, height: a4.width };
     default:
     }
     return { width, height };

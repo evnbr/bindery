@@ -43,7 +43,7 @@ class Scheduler {
       func();
     } else {
       this.numberOfCalls = 0;
-      if (document.hidden) {
+      if (document.hidden) {  // Tab in background
         setTimeout(func, 1);
       } else {
         requestAnimationFrame(func);

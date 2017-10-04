@@ -11,7 +11,7 @@ import c from '../utils/prefixClass';
 // to create the illusion that nodes are continuing from page
 // to page.
 //
-// The transition can be customized by setting a Continuation rule,
+// The transition can be customized by setting a Split rule,
 // which lets you add classes to the original and cloned element
 // to customize styling.
 
@@ -41,12 +41,6 @@ const breadcrumbCloner = (rules) => {
 
       markAsContinues(original);
       markAsContinuation(clone);
-
-      // Special case for IDs
-      if (clone.id) {
-        // console.warn(`Bindery: Added a break to ${elToStr(clone)},
-        // so "${clone.id}" is no longer a unique ID.`);
-      }
 
       // Special case for ordered lists
       if (clone.tagName === 'OL') {

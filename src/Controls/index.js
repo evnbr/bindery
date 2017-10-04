@@ -12,6 +12,8 @@ import {
   viewMode,
 } from './components';
 
+const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
+
 class Controls {
   constructor(opts) {
     this.binder = opts.binder;
@@ -32,66 +34,62 @@ class Controls {
       }
     } }, 'Done');
 
-    const sheetSizes = [
-      option({ value: 'size_page' }, 'Auto'),
+    const sheetSizes = supportsCustomPageSize ? [
+      option({ value: 'size_page', selected: true }, 'Auto'),
       option({ value: 'size_page_bleed' }, 'Auto + Bleed'),
-      option({ value: 'size_page_marks', selected: true }, 'Auto + Marks'),
+      option({ value: 'size_page_marks' }, 'Auto + Marks'),
       option({ value: 'size_letter_p' }, 'Letter Portrait'),
       option({ value: 'size_letter_l' }, 'Letter Landscape'),
+      option({ value: 'size_a4_p' }, 'A4 Portrait'),
+      option({ value: 'size_a4_l' }, 'A4 Landscape'),
+    ] : [
+      option({ value: 'size_letter_p', selected: true }, 'Default Page Size *'),
+      option({ disabled: true }, 'Only Chrome supports custom page sizes. Set in your browser\'s print dialog instead.'),
     ];
-    const sheetSizeSelect = select(...sheetSizes);
 
     const updateSheetSizeNames = () => {
-      const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
-      sheetSizes[0].textContent = `${layout}`;
-      sheetSizes[1].textContent = `${layout} + Bleed`;
-      sheetSizes[2].textContent = `${layout} + Marks`;
+      // const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
+      if (!supportsCustomPageSize) return;
+      const size = this.binder.pageSetup.displaySize;
+      const sizeName = `${size.width} × ${size.height}`;
+      sheetSizes[0].textContent = `${sizeName}`;
+      sheetSizes[1].textContent = `${sizeName} + Bleed`;
+      sheetSizes[2].textContent = `${sizeName} + Marks`;
     };
     updateSheetSizeNames();
 
-    const sheetTooSmallAlert = row('Sheet is too small to see marks · ', h('a', {
-      href: '#',
-      onclick: () => {
-        sheetSizeSelect.value = 'size_page_marks';
-        updateSheetSize();
-      },
-    }, 'Change'));
-    sheetTooSmallAlert.style.color = 'rgba(0,0,0,0.4)';
-
-    const updateSheetSize = () => {
-      const newVal = sheetSizeSelect.value;
-      const marksHidden = (newVal === 'size_page' || newVal === 'size_page_bleed');
-      sheetTooSmallAlert.style.display = marksHidden ? 'block' : 'none';
+    const updateSheetSize = (e) => {
+      const newVal = e.target.value;
       viewer.setSheetSize(newVal);
+      if (newVal === 'size_page' || newVal === 'size_page_bleed') {
+        // marksSelect.value = 'marks_none';
+        marksSelect.disabled = true;
+        marksSelect.classList.add(c('hidden-select'));
+      } else {
+        marksSelect.classList.remove(c('hidden-select'));
+        marksSelect.disabled = false;
+      }
+
       this.binder.pageSetup.updateStylesheet();
     };
-    sheetSizeSelect.addEventListener('change', updateSheetSize);
 
-    const sheetSize = row('Sheet Size', sheetSizeSelect);
+    const sheetSizeSelect = select({ onchange: updateSheetSize }, ...sheetSizes);
 
     const arrangeSelect = select(
+      { onchange: (e) => {
+        viewer.setPrintArrange(e.target.value);
+        updateSheetSizeNames();
+      } },
       option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
       option({ value: 'arrange_two' }, '1 Spread / Sheet'),
-      option({ value: 'arrange_booklet' }, 'Booklet Order'),
-      option({ disabled: true }, 'Grid'),
-      option({ disabled: true }, 'Signatures'),
+      option({ value: 'arrange_booklet' }, 'Booklet Sheets'),
+      // option({ disabled: true }, 'Grid'),
+      // option({ disabled: true }, 'Signatures'),
     );
-    arrangeSelect.addEventListener('change', () => {
-      viewer.setPrintArrange(arrangeSelect.value);
-      updateSheetSizeNames();
-    });
-    const arrangement = row('Layout', arrangeSelect);
+    const arrangement = row(arrangeSelect);
 
-
-    const marksSelect = select(
-      option({ value: 'marks_none' }, 'None'),
-      option({ value: 'marks_crop', selected: true }, 'Crop'),
-      option({ value: 'marks_bleed' }, 'Bleed'),
-      option({ value: 'marks_both' }, 'Crop and Bleed'),
-    );
-    const marks = row('Marks', marksSelect);
-    marksSelect.addEventListener('change', () => {
-      switch (marksSelect.value) {
+    const updateMarks = (e) => {
+      switch (e.target.value) {
       case 'marks_none':
         viewer.isShowingCropMarks = false;
         viewer.isShowingBleedMarks = false;
@@ -110,7 +108,20 @@ class Controls {
         break;
       default:
       }
-    });
+    };
+
+    const marksSelect = select(
+      { onchange: updateMarks },
+      option({ value: 'marks_none' }, 'No Marks'),
+      option({ value: 'marks_crop', selected: true }, 'Crop Marks'),
+      option({ value: 'marks_bleed' }, 'Bleed Marks'),
+      option({ value: 'marks_both' }, 'Crop and Bleed'),
+    );
+    if (supportsCustomPageSize) {
+      marksSelect.classList.add(c('hidden-select'));
+    }
+    const marks = row(marksSelect);
+    const sheetSize = row(sheetSizeSelect);
 
     const validCheck = h('div', { style: {
       display: 'none',
@@ -118,17 +129,13 @@ class Controls {
     } }, 'Too Small');
 
     const startPaginating = () => {
-      refreshPaginationBtn.style.display = 'none';
-      refreshPaginationBtnDebug.style.display = 'none';
       this.binder.makeBook(() => {
-        refreshPaginationBtn.style.display = '';
-        refreshPaginationBtnDebug.style.display = '';
       });
     };
 
     const viewModes = [
       viewMode('grid', viewer.setGrid, 'Grid'),
-      viewMode('outline', viewer.setOutline, 'Outline'),
+      // viewMode('outline', viewer.setOutline, 'Outline'),
       viewMode('flip', viewer.setFlip, 'Flip'),
       viewMode('print', viewer.setPrint, 'Sheet'),
     ];
@@ -136,47 +143,6 @@ class Controls {
     const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
 
     const headerContent = h('span', 'Loading');
-
-    const refreshPaginationBtn = h('a', { onclick: () => {
-      this.binder.debug = false;
-      startPaginating();
-    } }, 'Refresh');
-    refreshPaginationBtn.classList.add(c('refresh'));
-    const refreshPaginationBtnDebug = h('a', 'Debug', {
-      onclick: () => {
-        playSlow.style.display = 'none';
-        step.style.display = 'none';
-        pause.style.display = '';
-        this.binder.debug = true;
-        startPaginating();
-      },
-    });
-    const header = title(
-      h(c('.spinner')),
-      headerContent,
-      h(c('.refresh-btns'),
-        refreshPaginationBtn,
-        refreshPaginationBtnDebug
-      )
-    );
-
-    this.setInProgress = () => {
-      headerContent.textContent = 'Paginating';
-      validCheck.style.display = 'none';
-    };
-
-    this.updateProgress = (count) => {
-      headerContent.textContent = `${count} Pages`;
-    };
-
-    this.setDone = () => {
-      headerContent.textContent = `${viewer.book.pages.length} Pages`;
-      validCheck.style.display = 'none';
-    };
-
-    this.setInvalid = () => {
-      validCheck.style.display = '';
-    };
 
     let playSlow;
     const step = btn('→', {
@@ -206,26 +172,70 @@ class Controls {
       },
     });
 
-    const debugControls = row(
+    const debugControls = h('div',
       pause,
       playSlow,
       step,
       debugDone,
     );
     debugControls.classList.add(c('debug-controls'));
+
+    const refreshPaginationBtn = h('a', { onclick: () => {
+      this.binder.debug = false;
+      startPaginating();
+    } }, 'Refresh');
+    refreshPaginationBtn.classList.add(c('refresh'));
+    const refreshPaginationBtnDebug = h('a', '🐞', {
+      onclick: () => {
+        playSlow.style.display = 'none';
+        step.style.display = 'none';
+        pause.style.display = '';
+        this.binder.debug = true;
+        startPaginating();
+      },
+    });
+    const header = title(
+      h(c('.spinner')),
+      headerContent,
+      h(c('.refresh-btns'),
+        refreshPaginationBtn,
+        refreshPaginationBtnDebug
+      ),
+      debugControls,
+    );
+
+    this.setInProgress = () => {
+      headerContent.textContent = 'Paginating';
+      validCheck.style.display = 'none';
+    };
+
+    this.updateProgress = (count) => {
+      headerContent.textContent = `${count} Pages`;
+    };
+
+    this.setDone = () => {
+      headerContent.textContent = `${viewer.book.pages.length} Pages`;
+      validCheck.style.display = 'none';
+    };
+
+    this.setInvalid = () => {
+      validCheck.style.display = '';
+    };
+
     printBtn.classList.add(c('btn-print'));
-
-    this.element = h(c('.controls'),
-      header,
-      viewSwitcher,
-
+    const options = row(
       arrangement,
       sheetSize,
-      marks,
+      marks
+    );
+    options.classList.add(c('print-options'));
 
-      debugControls,
 
-      row(printBtn),
+    this.element = h(c('.controls'),
+      viewSwitcher,
+      options,
+      header,
+      printBtn,
     );
   }
 

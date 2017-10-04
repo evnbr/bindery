@@ -1,6 +1,15 @@
-// [AIV]  Build version: 2.0.0-alpha.9 - Tuesday, October 3rd, 2017, 7:27:15 PM  
- var Bindery =
-/******/ (function(modules) { // webpackBootstrap
+// [AIV]  Build version: 2.0.0-alpha.9 - Tuesday, October 3rd, 2017, 7:27:24 PM  
+ (function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["Bindery"] = factory();
+	else
+		root["Bindery"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -4922,4 +4931,5 @@ function updateLink(linkElement, obj) {
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=bindery.js.map 
+});
+//# sourceMappingURL=bindery.umd.js.map 

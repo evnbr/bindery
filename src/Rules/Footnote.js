@@ -17,23 +17,23 @@ class Footnote extends Replace {
       render: OptionType.func,
     });
   }
-  afterAdd(element, state, continueOnNewPage, makeNewPage, overflowCallback) {
-    const number = state.currentPage.footer.children.length + 1;
+  afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
+    const number = book.pageInProgress.footer.children.length + 1;
 
     const footnote = h('.footnote');
     const contents = this.render(element, number);
     if (contents instanceof HTMLElement) footnote.appendChild(contents);
     else footnote.innerHTML = contents;
 
-    state.currentPage.footer.appendChild(footnote);
+    book.pageInProgress.footer.appendChild(footnote);
 
-    return super.afterAdd(element, state, continueOnNewPage, makeNewPage, (overflowEl) => {
-      state.currentPage.footer.removeChild(footnote);
+    return super.afterAdd(element, book, continueOnNewPage, makeNewPage, (overflowEl) => {
+      book.pageInProgress.footer.removeChild(footnote);
       return overflowCallback(overflowEl);
     });
   }
-  createReplacement(state, element) {
-    const number = state.currentPage.footer.children.length;
+  createReplacement(book, element) {
+    const number = book.pageInProgress.footer.children.length;
     return this.replace(element, number);
   }
   replace(element, number) {

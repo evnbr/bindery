@@ -1,24 +1,32 @@
 @media screen {
   .#{$pre}-viewing .#{$pre}-controls {
-    display: block !important;
+    display: flex !important;
   }
 }
 
-$controlborder: gray;
+$btn-border: #444;
+$btn-pad: 8px 16px;
+$btn-hover: #eee;
+$btn-active: #ddd;
 
 .#{$pre}-controls {
   font: 14px / 1.4 $system;
   display: none;
+  flex-direction: row;
+  // flex-wrap: wrap;
+  align-items: start;
+
   position: fixed;
   top: 0;
-  bottom: 0;
+  left: 0;
   right: 0;
-  width: $sidebarWidth;
+  // width: $sidebarWidth;
   z-index: 999;
   margin: auto;
   color: $text;
-  background: $background;
-  overflow: scroll;
+  // background: $background;
+  padding: 10px;
+  overflow: visible;
   -webkit-font-smoothing: antialiased;
 
   * {
@@ -35,10 +43,60 @@ $controlborder: gray;
   }
 }
 
-.#{$pre}-title {
-  padding: 20px 20px 8px;
-  font-size: 18px;
+.#{$pre}-row {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  cursor: default;
+  user-select: none;
+  margin-left: 8px;
+  margin-bottom: 8px;
 }
+
+.#{$pre}-title {
+  position: relative;
+  display: flex;
+  padding: $btn-pad;
+  transition: opacity 0.2s;
+  display: none;
+  white-space: nowrap;
+  overflow: hidden;
+  margin-right: auto;
+  opacity: 0;
+  // [bindery-view-mode='print'] & {
+  //   opacity: 0;
+  // }
+  .#{$pre}-in-progress & {
+    opacity: 1;
+    display: flex;
+  }
+}
+
+.#{$pre}-title span {
+  transition: all 0.2s;
+}
+.#{$pre}-title:hover {
+  .#{$pre}-refresh-btns {
+    opacity: 1;
+  }
+  span {
+    opacity: 0;
+  }
+}
+
+.#{$pre}-print-options {
+  opacity: 1;
+  display: none;
+  [bindery-view-mode='print'] & {
+    display: flex;
+  }
+  .#{$pre}-in-progress & {
+    opacity: 0;
+    display: none;
+  }
+}
+
 
 .#{$pre}-spinner {
   border: 1px solid transparent;
@@ -46,15 +104,17 @@ $controlborder: gray;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  display: inline-block;
+  // position: absolute;
+  // right: 0;
+  // top: 8px;
+  vertical-align: middle;
   opacity: 0;
   pointer-events: none;
-  vertical-align: middle;
   transition: all 0.2s;
-  margin-right: -20px;
+  transform: scale(0.4);
+  margin-right: 16px;
   .#{$pre}-in-progress & {
     // display: inline-block;
-    margin-right: 0.5em;
     opacity: 1;
     animation: spin 0.6s linear infinite;
   }
@@ -70,17 +130,14 @@ $controlborder: gray;
 
 .#{$pre}-controls .#{$pre}-btn {
   -webkit-appearance: none;
-  padding: 10px 18px;
   color: black;
-  border: none;
-  background: transparent;
-  border: 1px solid $controlborder;
+  padding: $btn-pad;
+  // background: white;
+  // border: 1px solid $btn-border;
+  border: 0;
   cursor: pointer;
-  font-size: 12px;
-  letter-spacing: 0.01em;
-  font-weight: 500;
   display: inline-block;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-right: 8px;
   text-decoration: none;
   &:focus {
@@ -89,11 +146,11 @@ $controlborder: gray;
   }
 
   &:hover {
-    background: rgba(0,0,0,0.1);
+    background: $btn-hover;
   }
 
   &:active {
-    background: rgba(0,0,0,0.14);
+    background: $btn-active;
   }
   &:last-child {
     margin-right: 0;
@@ -106,7 +163,6 @@ $controlborder: gray;
 }
 
 .#{$pre}-controls .#{$pre}-btn-main {
-  margin-top: 4px;
   background: $accent;
   border-color: $accent;
   color: white;
@@ -123,6 +179,8 @@ $controlborder: gray;
 }
 
 .#{$pre}-btn-print {
+  margin-left: auto;
+  transition: all 0.8s;
   .#{$pre}-in-progress & {
     opacity: 0.5;
     pointer-events: none;
@@ -133,36 +191,39 @@ $controlborder: gray;
 }
 
 .#{$pre}-viewswitcher {
+  .#{$pre}-in-progress & {
+    // opacity: 0;
+    // transform: scale(0.95);
+    pointer-events: none;
+  }
+  opacity: 1;
+  transform: scale(1);
+  transition: all 0.8s;
+  transition-delay: 0.2s;
   user-select: none;
 
-  margin: 20px;
-  position: fixed;
-  bottom: 0;
-  right: 0;
-
-  font-size: 0;
+  // margin: 20px;
+  // position: absolute;
+  // padding: 10px;
+  // top: 0;
+  // left: 0;
   overflow: hidden;
-  width: $sidebarWidth - 40px;
-  max-width: 240px;
-
-  border: 1px solid $controlborder;
-  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  border-radius: 2px;
 }
 
 .#{$pre}-viewmode {
-  display: inline-block;
-  color: $controlborder;
+  color: $btn-border;
   cursor: pointer;
-  width: 25%;
-  font-size: 0;
-  border-right: 1px solid $controlborder;
-
-  &:last-child {
-    border-right: 0;
-  }
+  padding: 0 8px;
+  border-radius: 2px;
 
   &:hover {
-    background: $hover;
+    background: $btn-hover;
+  }
+  &:active {
+    background: $btn-active;
   }
 
   .#{$pre}-icon {
@@ -202,62 +263,56 @@ $controlborder: gray;
 [bindery-view-mode='interactive'] .#{$pre}-flip,
 [bindery-view-mode='outline'] .#{$pre}-outline,
 [bindery-view-mode='print'] .#{$pre}-print {
-  color: white;
-  background: $controlborder;
+  // color: white;
+  // background: $btn-border;
+  color: $accent;
 }
 
+.#{$pre}-select-wrap {
+  padding: $btn-pad;
+  padding-right: 28px;
+  background: url('./_assets/icon-carat.svg') no-repeat 50% 50%;
+  background-color: $background; //white;
+  background-position: right;
+  border-radius: 2px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  width: 100%;
 
-.#{$pre}-row {
-  position: relative;
-  display: block;
-  padding: 8px 12px;
-  margin: 0 8px;
-  cursor: default;
-  user-select: none;
-
-  &:last-child {
-    margin-top: 8px;
+  &:hover {
+    background-color: $btn-hover;
+  }
+  &:active {
+    background-color: $btn-hover;
   }
 
-  select {
-    position: absolute;
-    border: none;
-    background: transparent;
-    padding: 8px 12px;
-    width: 60%;
-    top: 8px;
-    right: 12px;
-    &:hover {
-      background: $hover;
-    }
-  }
-
-  input {
-    width: 85px;
-    padding: 4px 6px 4px 8px;
-    text-align: right;
-    border: none;
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 100%;
-    color: black;
-    background: none;
-
-    &:focus {
-      outline: none;
-      background: $hover;
-    }
-
-    &:invalid {
-      color: $invalid;
-    }
+  &.#{$pre}-hidden-select {
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    color: transparent;
   }
 }
 
 
-.#{$pre}-row.#{$pre}-debug-controls {
+.#{$pre}-select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+
+  -webkit-appearance: none;
+  -moz-appearance:none;
+  padding: $btn-pad;
+  color: black;
+  border: transparent; // 1px solid $btn-border;
+  width: 100%;
+}
+
+
+.#{$pre}-debug-controls {
   display: none;
   .#{$pre}-debug .#{$pre}-in-progress & {
     display: block;
@@ -265,12 +320,16 @@ $controlborder: gray;
 }
 
 .#{$pre}-refresh-btns {
-  display: inline-block;
-  font-size: 12px;
-  margin-top: 8px;
-  float: right;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 8px 0;
+  transition: all 0.2s;
+  .#{$pre}-in-progress & {
+    display: none;
+  }
   a {
-    color: rgba(0,0,0,0.4);
     margin-left: 1em;
     cursor: pointer;
     &:hover {
@@ -279,27 +338,47 @@ $controlborder: gray;
   }
 }
 
-@media (max-width: 600px) {
-  .#{$pre}-root {
-    padding-right: 0;
-  }
-  .#{$pre}-zoom-wrap > :last-child {
-    margin-bottom: 100vh;
+.#{$pre}-controls .#{$pre}-options-toggle {
+  display: none;
+}
+
+@media (max-width: 720px) {
+
+  [bindery-view-mode='print'].#{$pre}-root {
+    padding-top: 120px;
   }
   .#{$pre}-controls {
-    box-shadow: 0 0 2px rgba(0,0,0,0.3);
-    left: 0;
-    width: unset;
-    padding-bottom: 12px;
-    top: unset;
+    background: $background;
   }
-  .#{$pre}-viewswitcher {
-    z-index: 1;
+
+  .#{$pre}-print-options {
+    background: $background;
+    top: 56px;
     left: 0;
-    right: 160px;
-    width: unset;
+    right: 0;
+    position: fixed;
+    margin: 0 8px 0 0;
+    &.#{$pre}-options-hidden {
+      display: none;
+    }
   }
-  .#{$pre}-controls > .#{$pre}-row:last-child {
-    text-align: right;
+
+}
+
+@media (max-width: 500px) {
+  [bindery-view-mode='print'].#{$pre}-root {
+    padding-top: 190px;
+  }
+
+  .#{$pre}-controls {
+    // font-size: 12px;
+  }
+  .#{$pre}-print-options {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  &.#{$pre}-hidden-select {
+    max-width: none;
+    max-height: 0;
   }
 }
