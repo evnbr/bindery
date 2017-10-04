@@ -26,7 +26,7 @@ class PageSetup {
     this.setBleed(opts.bleed || defaultPageSetup.bleed);
 
     this.printTwoUp = false;
-    this.sheetSizeMode = supportsCustomPageSize ? 'size_page' : 'size_letter_p';
+    this.sheetSizeMode = supportsCustomPageSize ? 'size_page' : 'size_page_marks';
   }
 
   setSize(size) {

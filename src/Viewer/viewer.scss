@@ -148,7 +148,7 @@
 
   .#{$pre}-print-page {
     padding: 1px;   /* prevent margin collapse */
-    margin: 0;
+    margin: 0 auto;
   }
 
   .#{$pre}-zoom-wrap[style] {
