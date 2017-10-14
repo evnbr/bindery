@@ -135,9 +135,8 @@ class Viewer {
       document.body.appendChild(this.element);
     }
     if (!this.error) {
-      this.zoomBox.innerHTML = '';
       this.error = errorView(title, text);
-      this.zoomBox.appendChild(this.error);
+      this.element.appendChild(this.error);
     }
   }
   clear() {

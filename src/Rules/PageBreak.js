@@ -28,9 +28,9 @@ class PageBreak extends Rule {
     }
     return elmt;
   }
-  afterAdd(elmt, book, requestNewPage) {
+  afterAdd(elmt, book, continueOnNewPage) {
     if (this.position === 'after' || this.position === 'both') {
-      const newPage = requestNewPage();
+      const newPage = continueOnNewPage();
       if (this.continue !== 'any') {
         newPage.setPreference(this.continue);
       }

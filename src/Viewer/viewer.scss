@@ -82,9 +82,14 @@
 
    .#{$pre}-error {
      font: 16px / 1.4 $system;
-     margin: 15vh 15vw;
-     max-width: 500px;
-     padding-top: 64px;
+     padding: 15vh 15vw;
+     z-index: 999;
+     position: fixed;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background: rgba(244, 244, 244, 0.7);
 
      &-title {
        font-size: 1.5em;

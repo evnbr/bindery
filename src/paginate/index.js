@@ -73,6 +73,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     if (book.pageInProgress && book.pageInProgress.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
       if (!book.pageInProgress.suppressErrors) {
+        error('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }

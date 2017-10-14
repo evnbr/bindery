@@ -162,7 +162,7 @@ class Bindery {
       },
       error: (error) => {
         this.layoutComplete = true;
-        this.viewer.displayError('Layout couldn\'t complete', error);
+        this.viewer.displayError('Layout failed', error);
       },
       isDebugging: this.debug,
     });
