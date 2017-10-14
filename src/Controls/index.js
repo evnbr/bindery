@@ -21,7 +21,7 @@ class Controls {
 
     const print = () => {
       viewer.setPrint();
-      window.print();
+      setTimeout(window.print, 10);
     };
 
     const printBtn = btnMain({ onclick: print }, 'Print');
