@@ -172,13 +172,12 @@ class Controls {
       },
     });
 
-    const debugControls = h('div',
+    const debugControls = h(c('.debug-controls'),
       pause,
       playSlow,
       step,
       debugDone,
     );
-    debugControls.classList.add(c('debug-controls'));
 
     const refreshPaginationBtn = h('a', { onclick: () => {
       this.binder.debug = false;
@@ -201,7 +200,6 @@ class Controls {
         refreshPaginationBtn,
         refreshPaginationBtnDebug
       ),
-      debugControls,
     );
 
     this.setInProgress = () => {
@@ -235,6 +233,7 @@ class Controls {
       viewSwitcher,
       options,
       header,
+      debugControls,
       printBtn,
     );
   }

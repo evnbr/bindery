@@ -73,18 +73,6 @@ $btn-active: #ddd;
   }
 }
 
-.#{$pre}-title span {
-  transition: all 0.2s;
-}
-.#{$pre}-title:hover {
-  .#{$pre}-refresh-btns {
-    opacity: 1;
-  }
-  span {
-    opacity: 0;
-  }
-}
-
 .#{$pre}-print-options {
   opacity: 1;
   display: none;
@@ -132,7 +120,7 @@ $btn-active: #ddd;
   -webkit-appearance: none;
   color: black;
   padding: $btn-pad;
-  // background: white;
+  background: white;
   // border: 1px solid $btn-border;
   border: 0;
   cursor: pointer;
@@ -182,7 +170,7 @@ $btn-active: #ddd;
   margin-left: auto;
   transition: all 0.8s;
   .#{$pre}-in-progress & {
-    opacity: 0.5;
+    background: gray;
     pointer-events: none;
   }
   .#{$pre}-debug & {
@@ -192,8 +180,6 @@ $btn-active: #ddd;
 
 .#{$pre}-viewswitcher {
   .#{$pre}-in-progress & {
-    // opacity: 0;
-    // transform: scale(0.95);
     pointer-events: none;
   }
   opacity: 1;
@@ -202,11 +188,6 @@ $btn-active: #ddd;
   transition-delay: 0.2s;
   user-select: none;
 
-  // margin: 20px;
-  // position: absolute;
-  // padding: 10px;
-  // top: 0;
-  // left: 0;
   overflow: hidden;
   display: flex;
   flex-direction: row;
@@ -231,6 +212,10 @@ $btn-active: #ddd;
     width: 32px;
     background: currentColor;
     margin: 0 auto;
+
+    .#{$pre}-in-progress & {
+      color: gray !important;
+    }
   }
 
   &.#{$pre}-grid .#{$pre}-icon {
@@ -263,8 +248,6 @@ $btn-active: #ddd;
 [bindery-view-mode='interactive'] .#{$pre}-flip,
 [bindery-view-mode='outline'] .#{$pre}-outline,
 [bindery-view-mode='print'] .#{$pre}-print {
-  // color: white;
-  // background: $btn-border;
   color: $accent;
 }
 
