@@ -11,8 +11,8 @@ class FullBleedPage extends OutOfFlow {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';
     super(options);
-    this.name = 'Full Bleed Page';
     OptionType.validate(options, {
+      name: 'FullBleedPage',
       selector: OptionType.string,
       continue: OptionType.enum('next', 'same', 'left', 'right'),
       rotate: OptionType.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise'),

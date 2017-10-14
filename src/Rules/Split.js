@@ -7,8 +7,8 @@ class Split extends Rule {
     options.fromPrevious = options.fromPrevious || 'split-from-previous';
     super(options);
 
-    this.name = 'Split';
     OptionType.validate(options, {
+      name: 'Split',
       selector: OptionType.string,
       toNext: OptionType.string,
       fromPrevious: OptionType.string,

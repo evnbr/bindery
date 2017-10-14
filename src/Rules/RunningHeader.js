@@ -11,8 +11,8 @@ import c from '../utils/prefixClass';
 class RunningHeader extends Rule {
   constructor(options = {}) {
     super(options);
-    this.name = 'Running Header';
     OptionType.validate(options, {
+      name: 'RunningHeader',
       render: OptionType.func,
     });
   }

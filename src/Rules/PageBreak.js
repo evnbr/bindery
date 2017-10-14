@@ -7,8 +7,8 @@ class PageBreak extends Rule {
     options.continue = options.continue || 'any';
     super(options);
 
-    this.name = 'Page Break';
     OptionType.validate(options, {
+      name: 'PageBreak',
       selector: OptionType.string,
       continue: OptionType.enum('any', 'left', 'right'),
       position: OptionType.enum('before', 'after', 'both', 'avoid'),

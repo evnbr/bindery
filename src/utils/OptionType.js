@@ -8,7 +8,7 @@ const validate = (opts, validOpts) => {
       const val = opts[k];
       const checker = validOpts[k];
       if (!checker(val)) {
-        console.error(`Bindery: For property '${validOpts.name}.${k}', '${JSON.stringify(val)}' is not a valid value of type ${checker.name}`);
+        console.error(`Bindery: For property '${validOpts.name}.${k}', ${JSON.stringify(val)} is not a valid value of type ${checker.name}`);
       }
     }
   });
@@ -19,7 +19,10 @@ const isObj = val => typeof val === 'object';
 
 const OptionType = {
   enum(...enumCases) {
-    return str => enumCases.includes(str);
+    const enumCheck = function enumCheck(str) { return enumCases.includes(str); };
+    Object.defineProperty(enumCheck, 'name', { writable: true });
+    enumCheck.name = `enum ( '${enumCases.join('\' | \'')}' )`;
+    return enumCheck;
   },
   any() {
     return true;

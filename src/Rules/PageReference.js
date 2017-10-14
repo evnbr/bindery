@@ -9,8 +9,8 @@ import c from '../utils/prefixClass';
 class PageReference extends Replace {
   constructor(options) {
     super(options);
-    this.name = 'Page Reference';
     OptionType.validate(options, {
+      name: 'PageReference',
       selector: OptionType.string,
       replace: OptionType.func,
       createTest: OptionType.func,
