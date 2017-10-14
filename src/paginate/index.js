@@ -20,7 +20,8 @@ const MAXIMUM_PAGE_LIMIT = 9999;
 
 const paginate = ({ content, rules, success, progress, error, isDebugging }) => {
   // SETUP
-  const start = window.performance.now();
+  const startLayoutTime = window.performance.now();
+  let layoutWaitingTime = 0;
   const scheduler = new Scheduler(isDebugging);
   const cloneBreadcrumb = breadcrumbCloner(rules);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
@@ -407,7 +408,10 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       } else if (child.nodeType === Node.ELEMENT_NODE
         && child.tagName !== 'SCRIPT') {
         if (child.tagName === 'IMG' && !child.naturalWidth) {
+          const waitForImageStart = performance.now();
           waitForImage(child, () => {
+            const waitForImageTime = performance.now() - waitForImageStart;
+            layoutWaitingTime += waitForImageTime;
             addElementNode(child, addNext);
           });
         } else {
@@ -445,8 +449,10 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     applyEachPageRules();
 
     if (!isDebugging) {
-      const end = window.performance.now();
-      console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
+      const endLayoutTime = window.performance.now();
+      const totalTime = endLayoutTime - startLayoutTime;
+      const layoutTime = totalTime - layoutWaitingTime;
+      console.log(`📖 Book ready in ${(totalTime / 1000).toFixed(2)}s (Layout: ${(layoutTime / 1000).toFixed(2)}s, Waiting for images: ${(layoutWaitingTime / 1000).toFixed(2)}s)`);
     }
 
     success(book);

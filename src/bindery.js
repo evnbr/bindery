@@ -12,7 +12,7 @@ require('./main.scss');
 
 class Bindery {
   constructor(opts = {}) {
-    console.log(`Bindery ${'[AIV]{version}[/AIV]'}`);
+    console.log(`📖 Bindery v${'[AIV]{version}[/AIV]'}`);
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
