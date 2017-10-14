@@ -152,6 +152,7 @@ class Controls {
     const pause = btn('❙❙', {
       onclick: () => {
         window.binderyDebug.pause();
+        spinner.classList.add(c('paused'));
         pause.style.display = 'none';
         playSlow.style.display = '';
         step.style.display = '';
@@ -161,6 +162,7 @@ class Controls {
       style: { display: 'none' },
       onclick: () => {
         window.binderyDebug.resume();
+        spinner.classList.remove(c('paused'));
         playSlow.style.display = 'none';
         pause.style.display = '';
         step.style.display = 'none';
@@ -168,6 +170,7 @@ class Controls {
     });
     const debugDone = btn('Finish', {
       onclick: () => {
+        spinner.classList.remove(c('paused'));
         window.binderyDebug.finish();
       },
     });
@@ -193,8 +196,9 @@ class Controls {
         startPaginating();
       },
     });
+    const spinner = h(c('.spinner'));
     const header = title(
-      h(c('.spinner')),
+      spinner,
       headerContent,
       h(c('.refresh-btns'),
         refreshPaginationBtn,
