@@ -10,8 +10,8 @@ import { OptionType } from '../utils';
 class Footnote extends Replace {
   constructor(options) {
     super(options);
-    this.name = 'Footnote';
     OptionType.validate(options, {
+      name: 'Footnote',
       selector: OptionType.string,
       replace: OptionType.func,
       render: OptionType.func,

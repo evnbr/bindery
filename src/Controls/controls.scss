@@ -73,18 +73,6 @@ $btn-active: #ddd;
   }
 }
 
-.#{$pre}-title span {
-  transition: all 0.2s;
-}
-.#{$pre}-title:hover {
-  .#{$pre}-refresh-btns {
-    opacity: 1;
-  }
-  span {
-    opacity: 0;
-  }
-}
-
 .#{$pre}-print-options {
   opacity: 1;
   display: none;
@@ -111,7 +99,6 @@ $btn-active: #ddd;
   opacity: 0;
   pointer-events: none;
   transition: all 0.2s;
-  transform: scale(0.4);
   margin-right: 16px;
   .#{$pre}-in-progress & {
     // display: inline-block;
@@ -120,6 +107,9 @@ $btn-active: #ddd;
   }
   .#{$pre}-debug & {
     animation: spin 2s linear infinite;
+  }
+  &.#{$pre}-paused {
+    animation: none;
   }
 }
 @keyframes spin {
@@ -132,7 +122,7 @@ $btn-active: #ddd;
   -webkit-appearance: none;
   color: black;
   padding: $btn-pad;
-  // background: white;
+  background: #ddd;
   // border: 1px solid $btn-border;
   border: 0;
   cursor: pointer;
@@ -140,10 +130,6 @@ $btn-active: #ddd;
   border-radius: 2px;
   margin-right: 8px;
   text-decoration: none;
-  &:focus {
-    outline: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,.2);
-  }
 
   &:hover {
     background: $btn-hover;
@@ -182,7 +168,7 @@ $btn-active: #ddd;
   margin-left: auto;
   transition: all 0.8s;
   .#{$pre}-in-progress & {
-    opacity: 0.5;
+    background: gray;
     pointer-events: none;
   }
   .#{$pre}-debug & {
@@ -192,8 +178,6 @@ $btn-active: #ddd;
 
 .#{$pre}-viewswitcher {
   .#{$pre}-in-progress & {
-    // opacity: 0;
-    // transform: scale(0.95);
     pointer-events: none;
   }
   opacity: 1;
@@ -202,11 +186,6 @@ $btn-active: #ddd;
   transition-delay: 0.2s;
   user-select: none;
 
-  // margin: 20px;
-  // position: absolute;
-  // padding: 10px;
-  // top: 0;
-  // left: 0;
   overflow: hidden;
   display: flex;
   flex-direction: row;
@@ -231,6 +210,10 @@ $btn-active: #ddd;
     width: 32px;
     background: currentColor;
     margin: 0 auto;
+
+    .#{$pre}-in-progress & {
+      color: gray !important;
+    }
   }
 
   &.#{$pre}-grid .#{$pre}-icon {
@@ -245,12 +228,6 @@ $btn-active: #ddd;
       -webkit-mask-image: url('./_assets/icon-flip-filled.svg');
     }
   }
-  &.#{$pre}-outline .#{$pre}-icon {
-    -webkit-mask: url('./_assets/icon-outline.svg') no-repeat 50% 50%;
-    [bindery-view-mode='outline'] & {
-      -webkit-mask-image: url('./_assets/icon-outline-filled.svg');
-    }
-  }
   &.#{$pre}-print .#{$pre}-icon {
     -webkit-mask: url('./_assets/icon-sheet.svg') no-repeat 50% 50%;
     [bindery-view-mode='print'] & {
@@ -261,10 +238,7 @@ $btn-active: #ddd;
 
 [bindery-view-mode='grid'] .#{$pre}-grid,
 [bindery-view-mode='interactive'] .#{$pre}-flip,
-[bindery-view-mode='outline'] .#{$pre}-outline,
 [bindery-view-mode='print'] .#{$pre}-print {
-  // color: white;
-  // background: $btn-border;
   color: $accent;
 }
 

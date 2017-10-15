@@ -26,6 +26,10 @@
 						selector: '.navbox-list a[href]',
 						replace: (element) => {
 							let href = element.getAttribute('href');
+							if (!href) {
+								href = 'unknown';
+								console.log(element);
+							}
 							const span = document.createElement('span');
 							span.innerHTML = `${element.innerHTML}: `;
 							span.innerHTML += `<a href='${href}'>${href.replace('https://', '')}</a>`;
@@ -33,9 +37,13 @@
 						},
 					}),
 					Bindery.Footnote({
-						selector: 'a[title]:not(.internal)',
-						render: (elmt, number) => {
-							let href = elmt.getAttribute('href');
+						selector: 'p a[title]:not(.internal)',
+						render: (element, number) => {
+							let href = element.getAttribute('href');
+							if (!href) {
+								href = 'unknown';
+								console.log(element);
+							}
 							let note = `<sup>${number}</sup> `; // ${elmt.title}
 							note += ` <a href='${href}'>${href.replace('https://', '')}</a>`;
 							return note;

@@ -6,7 +6,6 @@ const title = function (...arg) {
   return h(c('.title'), ...arg);
 };
 
-// Structure
 const heading = function (...arg) {
   return h(c('.heading'), ...arg);
 };
@@ -14,19 +13,6 @@ const heading = function (...arg) {
 const row = function (...arg) {
   return h(c('.row'), ...arg);
 };
-
-// const expandRow = function (...arg) {
-//   return h(
-//     `.${c('row')}.${c('expand-row')}`,
-//     { onclick() {
-//       this.classList.toggle('selected');
-//     } },
-//     ...arg);
-// };
-// const expandArea = function (...arg) {
-//   return h(c('.expand-area'), ...arg);
-// };
-
 
 // Button
 const btn = function (...arg) {
@@ -41,10 +27,6 @@ const btnMain = function (...arg) {
   return h(`button.${c('btn')}.${c('btn-main')}`, ...arg);
 };
 
-// Menu
-// const select = function (...arg) {
-//   return h(`select.${c('select')}`, ...arg);
-// };
 const select = function (...arg) {
   const selectVal = h(c('.select-val'), 'Value');
   const selectEl = h(`select.${c('select')}`, ...arg);
@@ -86,8 +68,6 @@ const viewMode = function (id, action, text) {
 export {
   title,
   row,
-  // expandRow,
-  // expandArea,
   heading,
   btn,
   btnLight,

@@ -1,6 +1,6 @@
 const waitForImage = (image, done) => {
   const fileName = image.src.substring(image.src.lastIndexOf('/') + 1);
-  console.log(`Bindery: Waiting for image '${fileName}' size to load`);
+  // console.log(`Bindery: Waiting for image '${fileName}' size to load`);
 
   const pollForSize = setInterval(() => {
     if (image.naturalWidth) {

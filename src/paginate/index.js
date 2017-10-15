@@ -1,4 +1,5 @@
 import h from 'hyperscript';
+// import specificity from 'specificity'; TODO
 
 // Utils
 import elToStr from '../utils/elementToString';
@@ -20,7 +21,8 @@ const MAXIMUM_PAGE_LIMIT = 9999;
 
 const paginate = ({ content, rules, success, progress, error, isDebugging }) => {
   // SETUP
-  const start = window.performance.now();
+  const startLayoutTime = window.performance.now();
+  let layoutWaitingTime = 0;
   const scheduler = new Scheduler(isDebugging);
   const cloneBreadcrumb = breadcrumbCloner(rules);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
@@ -72,6 +74,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     if (book.pageInProgress && book.pageInProgress.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
       if (!book.pageInProgress.suppressErrors) {
+        error('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
@@ -118,50 +121,73 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const pageRules = rules.filter(r => r.eachPage);
   const selectorsNotToSplit = rules.filter(rule => rule.avoidSplit).map(rule => rule.selector);
 
+  const conflictingNames = ['FullBleedPage', 'FullBleedSpread', 'PageBreak'];
+  const dedupeRules = (inputRules) => {
+    const conflictRules = inputRules.filter(rule =>
+      conflictingNames.includes(rule.constructor.name));
+    const uniqueRules = inputRules.filter(rule => !conflictRules.includes(rule));
+
+    const firstSpreadRule = conflictRules.find(rule => rule.constructor.name === 'FullBleedSpread');
+    const firstPageRule = conflictRules.find(rule => rule.constructor.name === 'FullBleedPage');
+
+    // Only apply one
+    if (firstSpreadRule) uniqueRules.push(firstSpreadRule);
+    else if (firstPageRule) uniqueRules.push(firstPageRule);
+    else { // multiple pagebreaks are ok
+      uniqueRules.push(...conflictRules);
+    }
+
+    return uniqueRules;
+  };
+
   const applyBeforeAddRules = (element) => {
     let addedElement = element;
-    beforeAddRules.forEach((rule) => {
-      if (addedElement.matches(rule.selector)) {
-        addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
-      }
+
+    const matchingRules = beforeAddRules.filter(rule => addedElement.matches(rule.selector));
+    // const uniqueRules = dedupeRules(matchingRules);
+
+    matchingRules.forEach((rule) => {
+      addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
     });
     return addedElement;
   };
 
-  // TODO:
-  // While this does catch overflows, it introduces a few new bugs.
-  // It is pretty aggressive to move the entire node to the next page.
-  // - 1. there is no guarentee it will fit on the new page
-  // - 2. if it has childNodes, those side effects will not be undone,
-  // which means footnotes will get left on previous page.
-  // - 3. if it is a large paragraph, it will leave a large gap. the
-  // ideal approach would be to only need to invalidate
-  // the last line of text.
   const applyAfterAddRules = (originalElement) => {
     let addedElement = originalElement;
-    afterAddRules.forEach((rule) => {
-      if (addedElement.matches(rule.selector)) {
-        addedElement = rule.afterAdd(
-          addedElement,
-          book,
-          continueOnNewPage,
-          makeNewPage,
-          function overflowCallback(problemElement) {
-            problemElement.parentNode.removeChild(problemElement);
-            continueOnNewPage();
-            currentFlowElement().appendChild(problemElement);
-            return rule.afterAdd(
-              problemElement,
-              book,
-              continueOnNewPage,
-              makeNewPage,
-              () => {
-                console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
-              }
-            );
-          }
-        );
-      }
+
+    const matchingRules = afterAddRules.filter(rule => addedElement.matches(rule.selector));
+    const uniqueRules = dedupeRules(matchingRules);
+
+    uniqueRules.forEach((rule) => {
+      addedElement = rule.afterAdd(
+        addedElement,
+        book,
+        continueOnNewPage,
+        makeNewPage,
+        function overflowCallback(problemElement) {
+          // TODO:
+          // While this does catch overflows, it introduces a few new bugs.
+          // It is pretty aggressive to move the entire node to the next page.
+          // - 1. there is no guarentee it will fit on the new page
+          // - 2. if it has childNodes, those side effects will not be undone,
+          // which means footnotes will get left on previous page.
+          // - 3. if it is a large paragraph, it will leave a large gap. the
+          // ideal approach would be to only need to invalidate
+          // the last line of text.
+          problemElement.parentNode.removeChild(problemElement);
+          continueOnNewPage();
+          currentFlowElement().appendChild(problemElement);
+          return rule.afterAdd(
+            problemElement,
+            book,
+            continueOnNewPage,
+            makeNewPage,
+            () => {
+              console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
+            }
+          );
+        }
+      );
     });
     return addedElement;
   };
@@ -195,6 +221,15 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
     return true;
   };
+
+  // Walk up the tree to see if we are within
+  // an overflow-ignoring node
+  const shouldIgnoreOverflow = (node) => {
+    if (node.hasAttribute('data-ignore-overflow')) return true;
+    if (node.parentElement) return shouldIgnoreOverflow(node.parentElement);
+    return false;
+  };
+
 
   const moveElementToNextPage = (nodeToMove) => {
     // So this node won't get cloned. TODO: this is unclear
@@ -334,8 +369,10 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const addTextChild = (parent, child, next) => {
     const forceAddTextNode = () => {
       currentFlowElement().appendChild(child);
-      book.pageInProgress.suppressErrors = true;
-      continueOnNewPage();
+      if (!shouldIgnoreOverflow(currentFlowElement())) {
+        book.pageInProgress.suppressErrors = true;
+        continueOnNewPage();
+      }
       scheduler.throttle(next);
     };
 
@@ -348,11 +385,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
           forceAddTextNode();
         }
       };
-
       addTextNodeIncremental(child, next, failure);
     } else {
       const failure = () => {
-        moveElementToNextPage(parent);
+        if (!shouldIgnoreOverflow(currentFlowElement())) {
+          moveElementToNextPage(parent);
+        }
         scheduler.throttle(() => addTextNode(child, next, forceAddTextNode));
       };
       addTextNode(child, next, failure);
@@ -381,7 +419,11 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     // Overflows when empty
     if (book.pageInProgress.hasOverflowed()) {
-      moveElementToNextPage(element);
+      if (shouldIgnoreOverflow(currentFlowElement())) {
+        //
+      } else {
+        moveElementToNextPage(element);
+      }
     }
 
     let index = 0;
@@ -407,7 +449,10 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       } else if (child.nodeType === Node.ELEMENT_NODE
         && child.tagName !== 'SCRIPT') {
         if (child.tagName === 'IMG' && !child.naturalWidth) {
+          const waitForImageStart = performance.now();
           waitForImage(child, () => {
+            const waitForImageTime = performance.now() - waitForImageStart;
+            layoutWaitingTime += waitForImageTime;
             addElementNode(child, addNext);
           });
         } else {
@@ -445,8 +490,10 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     applyEachPageRules();
 
     if (!isDebugging) {
-      const end = window.performance.now();
-      console.log(`Bindery: Pages created in ${(end - start) / 1000}s`);
+      const endLayoutTime = window.performance.now();
+      const totalTime = endLayoutTime - startLayoutTime;
+      const layoutTime = totalTime - layoutWaitingTime;
+      console.log(`📖 Book ready in ${(totalTime / 1000).toFixed(2)}s (Layout: ${(layoutTime / 1000).toFixed(2)}s, Waiting for images: ${(layoutWaitingTime / 1000).toFixed(2)}s)`);
     }
 
     success(book);

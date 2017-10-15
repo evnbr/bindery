@@ -21,7 +21,7 @@ class Controls {
 
     const print = () => {
       viewer.setPrint();
-      window.print();
+      setTimeout(window.print, 10);
     };
 
     const printBtn = btnMain({ onclick: print }, 'Print');
@@ -152,6 +152,7 @@ class Controls {
     const pause = btn('❙❙', {
       onclick: () => {
         window.binderyDebug.pause();
+        spinner.classList.add(c('paused'));
         pause.style.display = 'none';
         playSlow.style.display = '';
         step.style.display = '';
@@ -161,6 +162,7 @@ class Controls {
       style: { display: 'none' },
       onclick: () => {
         window.binderyDebug.resume();
+        spinner.classList.remove(c('paused'));
         playSlow.style.display = 'none';
         pause.style.display = '';
         step.style.display = 'none';
@@ -168,17 +170,17 @@ class Controls {
     });
     const debugDone = btn('Finish', {
       onclick: () => {
+        spinner.classList.remove(c('paused'));
         window.binderyDebug.finish();
       },
     });
 
-    const debugControls = h('div',
+    const debugControls = h(c('.debug-controls'),
       pause,
       playSlow,
       step,
       debugDone,
     );
-    debugControls.classList.add(c('debug-controls'));
 
     const refreshPaginationBtn = h('a', { onclick: () => {
       this.binder.debug = false;
@@ -194,14 +196,14 @@ class Controls {
         startPaginating();
       },
     });
+    const spinner = h(c('.spinner'));
     const header = title(
-      h(c('.spinner')),
+      spinner,
       headerContent,
       h(c('.refresh-btns'),
         refreshPaginationBtn,
         refreshPaginationBtnDebug
       ),
-      debugControls,
     );
 
     this.setInProgress = () => {
@@ -235,6 +237,7 @@ class Controls {
       viewSwitcher,
       options,
       header,
+      debugControls,
       printBtn,
     );
   }

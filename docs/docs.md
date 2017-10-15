@@ -108,7 +108,6 @@ Bindery.makeBook({
 });
 ```
 
-
 ### PageBreak
 <!-- - `Bindery.PageBreak({})` -->
 Adds or avoids page breaks for the selected element.
@@ -121,6 +120,7 @@ Adds or avoids page breaks for the selected element.
   - `'avoid'` prevents the element from breaking in the middle, by pushing it to the next page.
 - `continue:` will insert an extra break when appropriate so that the flow will resume
 on a specific page. `Optional`
+  - `'next'` `default`
   - `'left'`
   - `'right'`
 

@@ -6,17 +6,17 @@ import Viewer from './Viewer';
 import c from './utils/prefixClass';
 
 import Rules from './Rules/';
-import { OptionType } from './utils';
+import { OptionType, urlQuery } from './utils';
 
 require('./main.scss');
 
 class Bindery {
   constructor(opts = {}) {
-    console.log(`Bindery ${'[AIV]{version}[/AIV]'}`);
+    console.log(`📖 Bindery v${'[AIV]{version}[/AIV]'}`);
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
-    this.debug = opts.debug || false;
+    this.debug = opts.debug || urlQuery('debug') || false;
 
     OptionType.validate(opts, {
       name: 'makeBook',
@@ -162,7 +162,7 @@ class Bindery {
       },
       error: (error) => {
         this.layoutComplete = true;
-        this.viewer.displayError('Layout couldn\'t complete', error);
+        this.viewer.displayError('Layout failed', error);
       },
       isDebugging: this.debug,
     });

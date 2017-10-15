@@ -6,6 +6,9 @@ class OutOfFlow extends Rule {
     this.name = 'Out of Flow';
   }
   beforeAdd(elmt) {
+    // Avoid breaking inside this element. Once it's completely added,
+    // it will moved onto the background layer.
+
     elmt.setAttribute('data-ignore-overflow', true);
     return elmt;
   }
