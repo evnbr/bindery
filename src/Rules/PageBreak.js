@@ -4,25 +4,25 @@ import { OptionType } from '../utils';
 class PageBreak extends Rule {
   constructor(options) {
     options.position = options.position || 'before';
-    options.continue = options.continue || 'any';
+    options.continue = options.continue || 'next';
     super(options);
 
     OptionType.validate(options, {
       name: 'PageBreak',
       selector: OptionType.string,
-      continue: OptionType.enum('any', 'left', 'right'),
+      continue: OptionType.enum('next', 'left', 'right'),
       position: OptionType.enum('before', 'after', 'both', 'avoid'),
     });
   }
   get avoidSplit() {
     return this.position === 'avoid';
   }
-  beforeAdd(elmt, book, requestNewPage) {
+  beforeAdd(elmt, book, continueOnNewPage) {
     if (this.position === 'before' || this.position === 'both') {
       if (!book.pageInProgress.isEmpty) {
-        requestNewPage();
+        continueOnNewPage();
       }
-      if (this.continue !== 'any') {
+      if (this.continue !== 'next') {
         book.pageInProgress.setPreference(this.continue);
       }
     }
@@ -31,7 +31,7 @@ class PageBreak extends Rule {
   afterAdd(elmt, book, continueOnNewPage) {
     if (this.position === 'after' || this.position === 'both') {
       const newPage = continueOnNewPage();
-      if (this.continue !== 'any') {
+      if (this.continue !== 'next') {
         newPage.setPreference(this.continue);
       }
     }
