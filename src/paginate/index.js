@@ -368,8 +368,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const addTextChild = (parent, child, next) => {
     const forceAddTextNode = () => {
       currentFlowElement().appendChild(child);
-      book.pageInProgress.suppressErrors = true;
       if (!shouldIgnoreOverflow(currentFlowElement())) {
+        book.pageInProgress.suppressErrors = true;
         continueOnNewPage();
       }
       scheduler.throttle(next);
