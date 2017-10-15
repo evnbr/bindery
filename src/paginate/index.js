@@ -142,22 +142,13 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     let addedElement = element;
 
     const matchingRules = beforeAddRules.filter(rule => addedElement.matches(rule.selector));
+    // const uniqueRules = dedupeRules(matchingRules);
 
     matchingRules.forEach((rule) => {
       addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
     });
     return addedElement;
   };
-
-  // TODO:
-  // While this does catch overflows, it introduces a few new bugs.
-  // It is pretty aggressive to move the entire node to the next page.
-  // - 1. there is no guarentee it will fit on the new page
-  // - 2. if it has childNodes, those side effects will not be undone,
-  // which means footnotes will get left on previous page.
-  // - 3. if it is a large paragraph, it will leave a large gap. the
-  // ideal approach would be to only need to invalidate
-  // the last line of text.
 
   const applyAfterAddRules = (originalElement) => {
     let addedElement = originalElement;
@@ -172,6 +163,15 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         continueOnNewPage,
         makeNewPage,
         function overflowCallback(problemElement) {
+          // TODO:
+          // While this does catch overflows, it introduces a few new bugs.
+          // It is pretty aggressive to move the entire node to the next page.
+          // - 1. there is no guarentee it will fit on the new page
+          // - 2. if it has childNodes, those side effects will not be undone,
+          // which means footnotes will get left on previous page.
+          // - 3. if it is a large paragraph, it will leave a large gap. the
+          // ideal approach would be to only need to invalidate
+          // the last line of text.
           problemElement.parentNode.removeChild(problemElement);
           continueOnNewPage();
           currentFlowElement().appendChild(problemElement);
@@ -219,6 +219,15 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
     return true;
   };
+
+  // Walk up the tree to see if we are within
+  // an overflow-ignoring node
+  const shouldIgnoreOverflow = (node) => {
+    if (node.hasAttribute('data-ignore-overflow')) return true;
+    if (node.parentElement) return shouldIgnoreOverflow(node.parentElement);
+    return false;
+  };
+
 
   const moveElementToNextPage = (nodeToMove) => {
     // So this node won't get cloned. TODO: this is unclear
@@ -359,7 +368,9 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     const forceAddTextNode = () => {
       currentFlowElement().appendChild(child);
       book.pageInProgress.suppressErrors = true;
-      continueOnNewPage();
+      if (!shouldIgnoreOverflow(currentFlowElement())) {
+        continueOnNewPage();
+      }
       scheduler.throttle(next);
     };
 
@@ -375,7 +386,9 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       addTextNodeIncremental(child, next, failure);
     } else {
       const failure = () => {
-        moveElementToNextPage(parent);
+        if (!shouldIgnoreOverflow(currentFlowElement())) {
+          moveElementToNextPage(parent);
+        }
         scheduler.throttle(() => addTextNode(child, next, forceAddTextNode));
       };
       addTextNode(child, next, failure);
@@ -404,7 +417,11 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     // Overflows when empty
     if (book.pageInProgress.hasOverflowed()) {
-      moveElementToNextPage(element);
+      if (shouldIgnoreOverflow(currentFlowElement())) {
+        //
+      } else {
+        moveElementToNextPage(element);
+      }
     }
 
     let index = 0;
