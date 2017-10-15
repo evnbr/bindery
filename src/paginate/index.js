@@ -128,12 +128,13 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     const firstSpreadRule = conflictRules.find(rule => rule.constructor.name === 'FullBleedSpread');
     const firstPageRule = conflictRules.find(rule => rule.constructor.name === 'FullBleedPage');
-    const firstBreakRule = conflictRules.find(rule => rule.constructor.name === 'PageBreak');
 
     // Only apply one
     if (firstSpreadRule) uniqueRules.push(firstSpreadRule);
     else if (firstPageRule) uniqueRules.push(firstPageRule);
-    else if (firstBreakRule) uniqueRules.push(firstBreakRule);
+    else { // multiple pagebreaks are ok
+      uniqueRules.push(...conflictRules);
+    }
 
     return uniqueRules;
   };
