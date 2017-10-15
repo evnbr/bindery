@@ -1,4 +1,5 @@
 import h from 'hyperscript';
+// import specificity from 'specificity'; TODO
 
 // Utils
 import elToStr from '../utils/elementToString';

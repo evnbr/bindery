@@ -228,12 +228,6 @@ $btn-active: #ddd;
       -webkit-mask-image: url('./_assets/icon-flip-filled.svg');
     }
   }
-  &.#{$pre}-outline .#{$pre}-icon {
-    -webkit-mask: url('./_assets/icon-outline.svg') no-repeat 50% 50%;
-    [bindery-view-mode='outline'] & {
-      -webkit-mask-image: url('./_assets/icon-outline-filled.svg');
-    }
-  }
   &.#{$pre}-print .#{$pre}-icon {
     -webkit-mask: url('./_assets/icon-sheet.svg') no-repeat 50% 50%;
     [bindery-view-mode='print'] & {
@@ -244,7 +238,6 @@ $btn-active: #ddd;
 
 [bindery-view-mode='grid'] .#{$pre}-grid,
 [bindery-view-mode='interactive'] .#{$pre}-flip,
-[bindery-view-mode='outline'] .#{$pre}-outline,
 [bindery-view-mode='print'] .#{$pre}-print {
   color: $accent;
 }

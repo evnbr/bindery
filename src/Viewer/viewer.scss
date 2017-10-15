@@ -30,46 +30,8 @@
     }
   }
 
-
   .#{$pre}-zoom-wrap * {
     transition: box-shadow 0.2s;
-  }
-
-  .#{$pre}-show-guides {
-    .bindery-zoom-wrap * {
-      box-shadow: inset 0 0 0 1px rgba(0, 92, 255, 0.2);
-    }
-    .#{$pre}-page::after {
-      box-shadow: 0 0 0 1px magenta;
-    }
-    .#{$pre}-flowbox,
-    .#{$pre}-footer,
-    .#{$pre}-running-header {
-      box-shadow: 0 0 0 1px cyan;
-    }
-    .#{$pre}-content {
-      box-shadow: inset 0 0 0 1px blue;
-    }
-    .#{$pre}-background {
-      box-shadow: 0 0 0 1px yellow;
-    }
-    .#{$pre}-out-of-flow {
-      display: block;
-      outline: 1px solid cyan;
-      &::after {
-        font: 10px / 1.4 $system;
-        content: attr(data-bindery);
-        position: absolute;
-        background: transparentize(cyan, 0.5);
-        padding: 4px;
-      }
-    }
-    .#{$pre}-right .#{$pre}-out-of-flow::after {
-      left: 100%;
-    }
-    .#{$pre}-left .#{$pre}-out-of-flow::after {
-      right: 100%;
-    }
   }
 
   .#{$pre}-is-overflowing {

@@ -1,7 +1,7 @@
 {
   "name": "bindery",
-  "version": "2.0.0-alpha.9.1",
-  "description": "",
+  "version": "2.0.0-alpha.9.2",
+  "description": "Book layout in the browser",
   "main": "dist/bindery.min.js",
   "repository": {
     "type": "git",
@@ -40,7 +40,12 @@
     "docs": "cd docs && jekyll serve",
     "lint": "eslint src/ webpack.*.js --cache"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "book", "pagination", "print"
+  ],
+  "author": {
+    "name": "Evan Brooks",
+    "url": "evanbrooks.info"
+  },
   "license": "MIT"
 }
