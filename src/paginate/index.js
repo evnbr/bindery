@@ -120,12 +120,31 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const pageRules = rules.filter(r => r.eachPage);
   const selectorsNotToSplit = rules.filter(rule => rule.avoidSplit).map(rule => rule.selector);
 
+  const conflictingNames = ['FullBleedPage', 'FullBleedSpread', 'PageBreak'];
+  const dedupeRules = (inputRules) => {
+    const conflictRules = inputRules.filter(rule =>
+      conflictingNames.includes(rule.constructor.name));
+    const uniqueRules = inputRules.filter(rule => !conflictRules.includes(rule));
+
+    const firstSpreadRule = conflictRules.find(rule => rule.constructor.name === 'FullBleedSpread');
+    const firstPageRule = conflictRules.find(rule => rule.constructor.name === 'FullBleedPage');
+    const firstBreakRule = conflictRules.find(rule => rule.constructor.name === 'PageBreak');
+
+    // Only apply one
+    if (firstSpreadRule) uniqueRules.push(firstSpreadRule);
+    else if (firstPageRule) uniqueRules.push(firstPageRule);
+    else if (firstBreakRule) uniqueRules.push(firstBreakRule);
+
+    return uniqueRules;
+  };
+
   const applyBeforeAddRules = (element) => {
     let addedElement = element;
-    beforeAddRules.forEach((rule) => {
-      if (addedElement.matches(rule.selector)) {
-        addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
-      }
+
+    const matchingRules = beforeAddRules.filter(rule => addedElement.matches(rule.selector));
+
+    matchingRules.forEach((rule) => {
+      addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
     });
     return addedElement;
   };
@@ -139,31 +158,34 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   // - 3. if it is a large paragraph, it will leave a large gap. the
   // ideal approach would be to only need to invalidate
   // the last line of text.
+
   const applyAfterAddRules = (originalElement) => {
     let addedElement = originalElement;
-    afterAddRules.forEach((rule) => {
-      if (addedElement.matches(rule.selector)) {
-        addedElement = rule.afterAdd(
-          addedElement,
-          book,
-          continueOnNewPage,
-          makeNewPage,
-          function overflowCallback(problemElement) {
-            problemElement.parentNode.removeChild(problemElement);
-            continueOnNewPage();
-            currentFlowElement().appendChild(problemElement);
-            return rule.afterAdd(
-              problemElement,
-              book,
-              continueOnNewPage,
-              makeNewPage,
-              () => {
-                console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
-              }
-            );
-          }
-        );
-      }
+
+    const matchingRules = afterAddRules.filter(rule => addedElement.matches(rule.selector));
+    const uniqueRules = dedupeRules(matchingRules);
+
+    uniqueRules.forEach((rule) => {
+      addedElement = rule.afterAdd(
+        addedElement,
+        book,
+        continueOnNewPage,
+        makeNewPage,
+        function overflowCallback(problemElement) {
+          problemElement.parentNode.removeChild(problemElement);
+          continueOnNewPage();
+          currentFlowElement().appendChild(problemElement);
+          return rule.afterAdd(
+            problemElement,
+            book,
+            continueOnNewPage,
+            makeNewPage,
+            () => {
+              console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
+            }
+          );
+        }
+      );
     });
     return addedElement;
   };
@@ -350,7 +372,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
           forceAddTextNode();
         }
       };
-
       addTextNodeIncremental(child, next, failure);
     } else {
       const failure = () => {
