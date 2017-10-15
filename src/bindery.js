@@ -6,7 +6,7 @@ import Viewer from './Viewer';
 import c from './utils/prefixClass';
 
 import Rules from './Rules/';
-import { OptionType, queryVariable } from './utils';
+import { OptionType, urlQuery } from './utils';
 
 require('./main.scss');
 
@@ -16,7 +16,7 @@ class Bindery {
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
-    this.debug = opts.debug || queryVariable('debug') || false;
+    this.debug = opts.debug || urlQuery('debug') || false;
 
     OptionType.validate(opts, {
       name: 'makeBook',
