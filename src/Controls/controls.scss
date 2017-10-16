@@ -229,6 +229,7 @@ $btn-active: #ddd;
     }
   }
   &.#{$pre}-print .#{$pre}-icon {
+    background: svg-inline('_assets/icon-sheet.svg');
     -webkit-mask: url('./_assets/icon-sheet.svg') no-repeat 50% 50%;
     [bindery-view-mode='print'] & {
       -webkit-mask-image: url('./_assets/icon-sheet-filled.svg');
