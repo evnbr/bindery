@@ -70,10 +70,10 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
-  const continueOnNewPage = () => {
+  const continueOnNewPage = (ignoreOverflow = false) => {
     if (book.pageInProgress && book.pageInProgress.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
-      if (!book.pageInProgress.suppressErrors) {
+      if (!book.pageInProgress.suppressErrors && !ignoreOverflow) {
         error('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
@@ -206,6 +206,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     });
   };
 
+  // TODO: Merge isSplittable and shouldIgnoreOverflow
+
   // Walk up the tree to see if we can safely
   // insert a split into this node.
   const isSplittable = (node) => {
@@ -264,7 +266,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     if (book.pageInProgress.isEmpty) {
       // Fail to move to next page, instead continue here
-      nodeToMove.setAttribute('data-ignore-overflow', true);
+      // nodeToMove.setAttribute('data-ignore-overflow', true);
     } else {
       if (book.pageInProgress.hasOverflowed()) {
         book.pageInProgress.suppressErrors = true;
@@ -376,7 +378,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       scheduler.throttle(next);
     };
 
-    if (isSplittable(parent)) {
+    if (isSplittable(parent) && !shouldIgnoreOverflow(parent)) {
       const failure = () => {
         if (breadcrumb.length > 1) {
           moveElementToNextPage(parent);
@@ -401,7 +403,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   // one by one recursively until thet overflow the page
   const addElementNode = (elementToAdd, doneCallback) => {
     if (book.pageInProgress.hasOverflowed()) {
-      if (currentFlowElement().hasAttribute('data-ignore-overflow')) {
+      if (shouldIgnoreOverflow(currentFlowElement())) {
         // Do nothing. We just have to add nodes despite the page overflowing.
       } else {
         book.pageInProgress.suppressErrors = true;

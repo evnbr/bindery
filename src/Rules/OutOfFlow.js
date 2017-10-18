@@ -17,7 +17,7 @@ class OutOfFlow extends Rule {
 
     // Catches cases when we didn't need to create a new page. but unclear
     if (this.continue !== 'same' || book.pageInProgress.hasOutOfFlowContent) {
-      continueOnNewPage();
+      continueOnNewPage(true);
       if (this.continue === 'left' || this.continue === 'right') {
         book.pageInProgress.setPreference(this.continue);
       }
