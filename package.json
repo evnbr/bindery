@@ -1,6 +1,6 @@
 {
   "name": "bindery",
-  "version": "2.0.0-alpha.9.2",
+  "version": "2.0.0-alpha.9.3",
   "description": "Book layout in the browser",
   "main": "dist/bindery.min.js",
   "repository": {

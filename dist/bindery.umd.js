@@ -1,4 +1,4 @@
-// [AIV]  Build version: 2.0.0-alpha.9.2 - Sunday, October 15th, 2017, 4:29:43 PM  
+// [AIV]  Build version: 2.0.0-alpha.9.3 - Tuesday, October 17th, 2017, 11:39:36 PM  
  (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -762,7 +762,7 @@ var OutOfFlow = function (_Rule) {
 
       // Catches cases when we didn't need to create a new page. but unclear
       if (this.continue !== 'same' || book.pageInProgress.hasOutOfFlowContent) {
-        continueOnNewPage();
+        continueOnNewPage(true);
         if (this.continue === 'left' || this.continue === 'right') {
           book.pageInProgress.setPreference(this.continue);
         }
@@ -844,7 +844,7 @@ var Bindery = function () {
 
     _classCallCheck(this, Bindery);
 
-    console.log('\uD83D\uDCD6 Bindery v' + '2.0.0-alpha.9.2');
+    console.log('\uD83D\uDCD6 Bindery v' + '2.0.0-alpha.9.3');
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
@@ -1437,9 +1437,11 @@ var paginate = function paginate(_ref) {
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   var continueOnNewPage = function continueOnNewPage() {
+    var ignoreOverflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
     if (book.pageInProgress && book.pageInProgress.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
-      if (!book.pageInProgress.suppressErrors) {
+      if (!book.pageInProgress.suppressErrors && !ignoreOverflow) {
         error('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
@@ -1580,6 +1582,8 @@ var paginate = function paginate(_ref) {
     });
   };
 
+  // TODO: Merge isSplittable and shouldIgnoreOverflow
+
   // Walk up the tree to see if we can safely
   // insert a split into this node.
   var isSplittable = function isSplittable(node) {
@@ -1638,7 +1642,7 @@ var paginate = function paginate(_ref) {
 
     if (book.pageInProgress.isEmpty) {
       // Fail to move to next page, instead continue here
-      nodeToMove.setAttribute('data-ignore-overflow', true);
+      // nodeToMove.setAttribute('data-ignore-overflow', true);
     } else {
       if (book.pageInProgress.hasOverflowed()) {
         book.pageInProgress.suppressErrors = true;
@@ -1750,7 +1754,7 @@ var paginate = function paginate(_ref) {
       scheduler.throttle(next);
     };
 
-    if (isSplittable(parent)) {
+    if (isSplittable(parent) && !shouldIgnoreOverflow(parent)) {
       var failure = function failure() {
         if (breadcrumb.length > 1) {
           moveElementToNextPage(parent);
@@ -1779,7 +1783,7 @@ var paginate = function paginate(_ref) {
   // one by one recursively until thet overflow the page
   var addElementNode = function addElementNode(elementToAdd, doneCallback) {
     if (book.pageInProgress.hasOverflowed()) {
-      if (currentFlowElement().hasAttribute('data-ignore-overflow')) {
+      if (shouldIgnoreOverflow(currentFlowElement())) {
         // Do nothing. We just have to add nodes despite the page overflowing.
       } else {
         book.pageInProgress.suppressErrors = true;
@@ -3514,7 +3518,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function (title, text) {
-  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.9.2'));
+  return (0, _hyperscript2.default)((0, _prefixClass2.default)('.error'), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-title'), title), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-text'), text), (0, _hyperscript2.default)((0, _prefixClass2.default)('.error-footer'), 'Bindery ' + '2.0.0-alpha.9.3'));
 };
 
 var _hyperscript = __webpack_require__(1);
@@ -4583,7 +4587,7 @@ var PageBreak = function (_Rule) {
     key: 'afterAdd',
     value: function afterAdd(elmt, book, continueOnNewPage) {
       if (this.position === 'after' || this.position === 'both') {
-        var newPage = continueOnNewPage();
+        var newPage = continueOnNewPage(true);
         if (this.continue !== 'next') {
           newPage.setPreference(this.continue);
         }
