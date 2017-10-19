@@ -10,6 +10,11 @@ import { last } from '../utils';
 import Book from '../Book';
 import Page from '../Page';
 
+// Rules to check against
+import FullBleedPage from '../Rules/FullBleedPage';
+import FullBleedSpread from '../Rules/FullBleedSpread';
+import PageBreak from '../Rules/PageBreak';
+
 // paginate
 import Scheduler from './Scheduler';
 import orderPages from './orderPages';
@@ -121,14 +126,16 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   const pageRules = rules.filter(r => r.eachPage);
   const selectorsNotToSplit = rules.filter(rule => rule.avoidSplit).map(rule => rule.selector);
 
-  const conflictingNames = ['FullBleedPage', 'FullBleedSpread', 'PageBreak'];
   const dedupeRules = (inputRules) => {
-    const conflictRules = inputRules.filter(rule =>
-      conflictingNames.includes(rule.constructor.name));
+    const conflictRules = inputRules.filter(rule => (
+        rule instanceof FullBleedSpread
+        || rule instanceof FullBleedPage
+        || rule instanceof PageBreak
+    ));
     const uniqueRules = inputRules.filter(rule => !conflictRules.includes(rule));
 
-    const firstSpreadRule = conflictRules.find(rule => rule.constructor.name === 'FullBleedSpread');
-    const firstPageRule = conflictRules.find(rule => rule.constructor.name === 'FullBleedPage');
+    const firstSpreadRule = conflictRules.find(rule => rule instanceof FullBleedSpread);
+    const firstPageRule = conflictRules.find(rule => rule instanceof FullBleedPage);
 
     // Only apply one
     if (firstSpreadRule) uniqueRules.push(firstSpreadRule);
@@ -265,7 +272,9 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
 
     if (book.pageInProgress.isEmpty) {
-      // Fail to move to next page, instead continue here
+      // If the page is empty when this node is removed,
+      // then it won't help to move it to the next page.
+      // Instead continue here until the node is done.
       // nodeToMove.setAttribute('data-ignore-overflow', true);
     } else {
       if (book.pageInProgress.hasOverflowed()) {
@@ -475,7 +484,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();
-    scheduler.throttle(() => {
+    requestAnimationFrame(() => {
       addElementNode(content, finishPagination);
     });
   };
