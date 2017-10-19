@@ -30,17 +30,13 @@
     }
   }
 
-  .#{$pre}-zoom-wrap * {
-    transition: box-shadow 0.2s;
-  }
-
   .#{$pre}-is-overflowing {
     border-bottom: 1px solid magenta;
   }
 
- .#{$pre}-print-page {
-   margin: 0 auto;
- }
+   .#{$pre}-print-page {
+     margin: 0 auto;
+   }
 
    .#{$pre}-error {
      font: 16px / 1.4 $system;
@@ -79,8 +75,6 @@
    .#{$pre}-placeholder-pulse {
      animation: pulse 1s infinite;
    }
-
-
 }
 
 @keyframes fadeUp {

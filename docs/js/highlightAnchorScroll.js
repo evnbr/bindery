@@ -1,10 +1,13 @@
 (function highlightAnchorScroll() {
   const scrollPct = el => (el.scrollTop + el.offsetHeight) / el.scrollHeight;
+  
+  // via https://gist.github.com/gre/1650294
   // eslint-disable-next-line no-confusing-arrow
   const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + ((4 - (2 * t)) * t);
 
   const anchors = Array.from(document.querySelectorAll('h2, h3, h4, h5'));
   const nav = document.querySelector('.docs-nav');
+  
   let currentAnchor;
   let throttleScroll;
 
@@ -41,25 +44,16 @@
         history.replaceState(undefined, undefined, `#${inview.id}`);
       }
     }
-    // if (nav) {
-    //   const scroller = document.scrollingElement;
-    //   const pct = scroller.scrollTop / scroller.scrollHeight;
-    //   const navScrollMax = nav.scrollHeight - nav.offsetHeight;
-    //   nav.scrollTop = navScrollMax * pct;
-    //   console.log(pct);
-    // }
     if (scrollPos > 10) {
       document.body.classList.add('docs-scrolled');
     } else {
       document.body.classList.remove('docs-scrolled');
     }
   };
-  // updateAnchor();
 
   [...document.querySelectorAll('a')]
     .filter(a => a.getAttribute('href')[0] === '#')
     .forEach((a) => {
-      // a.addEventListener('click', updateAnchor);
       a.addEventListener('click', (e) => {
         e.preventDefault();
         scrollToAnchor(a.getAttribute('href'));
