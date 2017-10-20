@@ -30,7 +30,7 @@ class PageBreak extends Rule {
   }
   afterAdd(elmt, book, continueOnNewPage) {
     if (this.position === 'after' || this.position === 'both') {
-      const newPage = continueOnNewPage();
+      const newPage = continueOnNewPage(true);
       if (this.continue !== 'next') {
         newPage.setPreference(this.continue);
       }

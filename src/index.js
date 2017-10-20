@@ -1,6 +1,6 @@
-const Bindery = require('./bindery').default;
-const Rules = require('./Rules').default;
+import Bindery from './bindery';
+import Rules from './Rules';
 
 const BinderyWithRules = Object.assign(Bindery, Rules);
 
-module.exports = BinderyWithRules;
+export default BinderyWithRules;

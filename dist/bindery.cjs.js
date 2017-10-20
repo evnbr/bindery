@@ -1,9 +1,5 @@
 /* 📖 Bindery v2.0.0-alpha.9.4 */
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.Bindery = factory());
-}(this, (function () { 'use strict';
+'use strict';
 
 var BINDERY_VERSION = 'v2.0.0-alpha.9.4'
 
@@ -24,1388 +20,9 @@ function ___$insertStyle(css) {
   return css;
 }
 
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-/*!
- * Cross-Browser Split 1.1.1
- * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
- * Available under the MIT License
- * ECMAScript compliant, uniform cross-browser split method
- */
-
-/**
- * Splits a string into an array of strings using a regex or string separator. Matches of the
- * separator are not included in the result array. However, if `separator` is a regex that contains
- * capturing groups, backreferences are spliced into the result each time `separator` is matched.
- * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
- * cross-browser.
- * @param {String} str String to split.
- * @param {RegExp|String} separator Regex or string to use for separating the string.
- * @param {Number} [limit] Maximum number of items to include in the result array.
- * @returns {Array} Array of substrings.
- * @example
- *
- * // Basic use
- * split('a b c d', ' ');
- * // -> ['a', 'b', 'c', 'd']
- *
- * // With limit
- * split('a b c d', ' ', 2);
- * // -> ['a', 'b']
- *
- * // Backreferences in result array
- * split('..word1 word2..', /([a-z]+)(\d+)/i);
- * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
- */
-var browserSplit = (function split(undef) {
-
-  var nativeSplit = String.prototype.split,
-    compliantExecNpcg = /()??/.exec("")[1] === undef,
-    // NPCG: nonparticipating capturing group
-    self;
-
-  self = function(str, separator, limit) {
-    // If `separator` is not a regex, use `nativeSplit`
-    if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
-      return nativeSplit.call(str, separator, limit);
-    }
-    var output = [],
-      flags = (separator.ignoreCase ? "i" : "") + (separator.multiline ? "m" : "") + (separator.extended ? "x" : "") + // Proposed for ES6
-      (separator.sticky ? "y" : ""),
-      // Firefox 3+
-      lastLastIndex = 0,
-      // Make `global` and avoid `lastIndex` issues by working with a copy
-      separator = new RegExp(separator.source, flags + "g"),
-      separator2, match, lastIndex, lastLength;
-    str += ""; // Type-convert
-    if (!compliantExecNpcg) {
-      // Doesn't need flags gy, but they don't hurt
-      separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
-    }
-    /* Values for `limit`, per the spec:
-     * If undefined: 4294967295 // Math.pow(2, 32) - 1
-     * If 0, Infinity, or NaN: 0
-     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
-     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
-     * If other: Type-convert, then use the above rules
-     */
-    limit = limit === undef ? -1 >>> 0 : // Math.pow(2, 32) - 1
-    limit >>> 0; // ToUint32(limit)
-    while (match = separator.exec(str)) {
-      // `separator.lastIndex` is not reliable cross-browser
-      lastIndex = match.index + match[0].length;
-      if (lastIndex > lastLastIndex) {
-        output.push(str.slice(lastLastIndex, match.index));
-        // Fix browsers whose `exec` methods don't consistently return `undefined` for
-        // nonparticipating capturing groups
-        if (!compliantExecNpcg && match.length > 1) {
-          match[0].replace(separator2, function() {
-            for (var i = 1; i < arguments.length - 2; i++) {
-              if (arguments[i] === undef) {
-                match[i] = undef;
-              }
-            }
-          });
-        }
-        if (match.length > 1 && match.index < str.length) {
-          Array.prototype.push.apply(output, match.slice(1));
-        }
-        lastLength = match[0].length;
-        lastLastIndex = lastIndex;
-        if (output.length >= limit) {
-          break;
-        }
-      }
-      if (separator.lastIndex === match.index) {
-        separator.lastIndex++; // Avoid an infinite loop
-      }
-    }
-    if (lastLastIndex === str.length) {
-      if (lastLength || !separator.test("")) {
-        output.push("");
-      }
-    } else {
-      output.push(str.slice(lastLastIndex));
-    }
-    return output.length > limit ? output.slice(0, limit) : output;
-  };
-
-  return self;
-})();
-
-var indexOf = [].indexOf;
-
-var indexof = function(arr, obj){
-  if (indexOf) return arr.indexOf(obj);
-  for (var i = 0; i < arr.length; ++i) {
-    if (arr[i] === obj) return i;
-  }
-  return -1;
-};
-
-// contains, add, remove, toggle
-
-
-var classList = ClassList;
-
-function ClassList(elem) {
-    var cl = elem.classList;
-
-    if (cl) {
-        return cl
-    }
-
-    var classList = {
-        add: add
-        , remove: remove
-        , contains: contains
-        , toggle: toggle
-        , toString: $toString
-        , length: 0
-        , item: item
-    };
-
-    return classList
-
-    function add(token) {
-        var list = getTokens();
-        if (indexof(list, token) > -1) {
-            return
-        }
-        list.push(token);
-        setTokens(list);
-    }
-
-    function remove(token) {
-        var list = getTokens()
-            , index = indexof(list, token);
-
-        if (index === -1) {
-            return
-        }
-
-        list.splice(index, 1);
-        setTokens(list);
-    }
-
-    function contains(token) {
-        return indexof(getTokens(), token) > -1
-    }
-
-    function toggle(token) {
-        if (contains(token)) {
-            remove(token);
-            return false
-        } else {
-            add(token);
-            return true
-        }
-    }
-
-    function $toString() {
-        return elem.className
-    }
-
-    function item(index) {
-        var tokens = getTokens();
-        return tokens[index] || null
-    }
-
-    function getTokens() {
-        var className = elem.className;
-
-        return filter(className.split(" "), isTruthy)
-    }
-
-    function setTokens(list) {
-        var length = list.length;
-
-        elem.className = list.join(" ");
-        classList.length = length;
-
-        for (var i = 0; i < list.length; i++) {
-            classList[i] = list[i];
-        }
-
-        delete list[length];
-    }
-}
-
-function filter (arr, fn) {
-    var ret = [];
-    for (var i = 0; i < arr.length; i++) {
-        if (fn(arr[i])) ret.push(arr[i]);
-    }
-    return ret
-}
-
-function isTruthy(value) {
-    return !!value
-}
-
-/**
- * Utils for HTML attributes
- * @module html-attributes
- */
-
-// property to attribute names
-var PROPS_TO_ATTRS = {
-  'className': 'class',
-  'htmlFor': 'for',
-};
-
-// map of attributes to the elements they affect
-// see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
-var HTML_ATTRIBUTES = {
-  'accept': new Set([
-    'form',
-    'input',
-  ]),
-
-  'accept-charset': new Set([
-    'form',
-  ]),
-
-  'accesskey': 'GLOBAL',
-
-  'action': new Set([
-    'form',
-  ]),
-
-  'align': new Set([
-    'applet',
-    'caption',
-    'col',
-    'colgroup',
-    'hr',
-    'iframe',
-    'img',
-    'table',
-    'tbody',
-    'td',
-    'tfoot',
-    'th',
-    'thead',
-    'tr',
-  ]),
-
-  'alt': new Set([
-    'applet',
-    'area',
-    'img',
-    'input',
-  ]),
-
-  'async': new Set([
-    'script',
-  ]),
-
-  'autocomplete': new Set([
-    'form',
-    'input',
-  ]),
-
-  'autofocus': new Set([
-    'button',
-    'input',
-    'keygen',
-    'select',
-    'textarea',
-  ]),
-
-  'autoplay': new Set([
-    'audio',
-    'video',
-  ]),
-
-  'autosave': new Set([
-    'input',
-  ]),
-
-  'bgcolor': new Set([
-    'body',
-    'col',
-    'colgroup',
-    'marquee',
-    'table',
-    'tbody',
-    'tfoot',
-    'td',
-    'th',
-    'tr',
-  ]),
-
-  'border': new Set([
-    'img',
-    'object',
-    'table',
-  ]),
-
-  'buffered': new Set([
-    'audio',
-    'video',
-  ]),
-
-  'challenge': new Set([
-    'keygen',
-  ]),
-
-  'charset': new Set([
-    'meta',
-    'script',
-  ]),
-
-  'checked': new Set([
-    'command',
-    'input',
-  ]),
-
-  'cite': new Set([
-    'blockquote',
-    'del',
-    'ins',
-    'q',
-  ]),
-
-  'class': 'GLOBAL',
-
-  'code': new Set([
-    'applet',
-  ]),
-
-  'codebase': new Set([
-    'applet',
-  ]),
-
-  'color': new Set([
-    'basefont',
-    'font',
-    'hr',
-  ]),
-
-  'cols': new Set([
-    'textarea',
-  ]),
-
-  'colspan': new Set([
-    'td',
-    'th',
-  ]),
-
-  'content': new Set([
-    'meta',
-  ]),
-
-  'contenteditable': 'GLOBAL',
-
-  'contextmenu': 'GLOBAL',
-
-  'controls': new Set([
-    'audio',
-    'video',
-  ]),
-
-  'coords': new Set([
-    'area',
-  ]),
-
-  'data': new Set([
-    'object',
-  ]),
-
-  'datetime': new Set([
-    'del',
-    'ins',
-    'time',
-  ]),
-
-  'default': new Set([
-    'track',
-  ]),
-
-  'defer': new Set([
-    'script',
-  ]),
-
-  'dir': 'GLOBAL',
-
-  'dirname': new Set([
-    'input',
-    'textarea',
-  ]),
-
-  'disabled': new Set([
-    'button',
-    'command',
-    'fieldset',
-    'input',
-    'keygen',
-    'optgroup',
-    'option',
-    'select',
-    'textarea',
-  ]),
-
-  'download': new Set([
-    'a',
-    'area',
-  ]),
-
-  'draggable': 'GLOBAL',
-
-  'dropzone': 'GLOBAL',
-
-  'enctype': new Set([
-    'form',
-  ]),
-
-  'for': new Set([
-    'label',
-    'output',
-  ]),
-
-  'form': new Set([
-    'button',
-    'fieldset',
-    'input',
-    'keygen',
-    'label',
-    'meter',
-    'object',
-    'output',
-    'progress',
-    'select',
-    'textarea',
-  ]),
-
-  'formaction': new Set([
-    'input',
-    'button',
-  ]),
-
-  'headers': new Set([
-    'td',
-    'th',
-  ]),
-
-  'height': new Set([
-    'canvas',
-    'embed',
-    'iframe',
-    'img',
-    'input',
-    'object',
-    'video',
-  ]),
-
-  'hidden': 'GLOBAL',
-
-  'high': new Set([
-    'meter',
-  ]),
-
-  'href': new Set([
-    'a',
-    'area',
-    'base',
-    'link',
-  ]),
-
-  'hreflang': new Set([
-    'a',
-    'area',
-    'link',
-  ]),
-
-  'http-equiv': new Set([
-    'meta',
-  ]),
-
-  'icon': new Set([
-    'command',
-  ]),
-
-  'id': 'GLOBAL',
-
-  'ismap': new Set([
-    'img',
-  ]),
-
-  'itemprop': 'GLOBAL',
-
-  'keytype': new Set([
-    'keygen',
-  ]),
-
-  'kind': new Set([
-    'track',
-  ]),
-
-  'label': new Set([
-    'track',
-  ]),
-
-  'lang': 'GLOBAL',
-
-  'language': new Set([
-    'script',
-  ]),
-
-  'list': new Set([
-    'input',
-  ]),
-
-  'loop': new Set([
-    'audio',
-    'bgsound',
-    'marquee',
-    'video',
-  ]),
-
-  'low': new Set([
-    'meter',
-  ]),
-
-  'manifest': new Set([
-    'html',
-  ]),
-
-  'max': new Set([
-    'input',
-    'meter',
-    'progress',
-  ]),
-
-  'maxlength': new Set([
-    'input',
-    'textarea',
-  ]),
-
-  'media': new Set([
-    'a',
-    'area',
-    'link',
-    'source',
-    'style',
-  ]),
-
-  'method': new Set([
-    'form',
-  ]),
-
-  'min': new Set([
-    'input',
-    'meter',
-  ]),
-
-  'multiple': new Set([
-    'input',
-    'select',
-  ]),
-
-  'muted': new Set([
-    'video',
-  ]),
-
-  'name': new Set([
-    'button',
-    'form',
-    'fieldset',
-    'iframe',
-    'input',
-    'keygen',
-    'object',
-    'output',
-    'select',
-    'textarea',
-    'map',
-    'meta',
-    'param',
-  ]),
-
-  'novalidate': new Set([
-    'form',
-  ]),
-
-  'open': new Set([
-    'details',
-  ]),
-
-  'optimum': new Set([
-    'meter',
-  ]),
-
-  'pattern': new Set([
-    'input',
-  ]),
-
-  'ping': new Set([
-    'a',
-    'area',
-  ]),
-
-  'placeholder': new Set([
-    'input',
-    'textarea',
-  ]),
-
-  'poster': new Set([
-    'video',
-  ]),
-
-  'preload': new Set([
-    'audio',
-    'video',
-  ]),
-
-  'radiogroup': new Set([
-    'command',
-  ]),
-
-  'readonly': new Set([
-    'input',
-    'textarea',
-  ]),
-
-  'rel': new Set([
-    'a',
-    'area',
-    'link',
-  ]),
-
-  'required': new Set([
-    'input',
-    'select',
-    'textarea',
-  ]),
-
-  'reversed': new Set([
-    'ol',
-  ]),
-
-  'rows': new Set([
-    'textarea',
-  ]),
-
-  'rowspan': new Set([
-    'td',
-    'th',
-  ]),
-
-  'sandbox': new Set([
-    'iframe',
-  ]),
-
-  'scope': new Set([
-    'th',
-  ]),
-
-  'scoped': new Set([
-    'style',
-  ]),
-
-  'seamless': new Set([
-    'iframe',
-  ]),
-
-  'selected': new Set([
-    'option',
-  ]),
-
-  'shape': new Set([
-    'a',
-    'area',
-  ]),
-
-  'size': new Set([
-    'input',
-    'select',
-  ]),
-
-  'sizes': new Set([
-    'img',
-    'link',
-    'source',
-  ]),
-
-  'span': new Set([
-    'col',
-    'colgroup',
-  ]),
-
-  'spellcheck': 'GLOBAL',
-
-  'src': new Set([
-    'audio',
-    'embed',
-    'iframe',
-    'img',
-    'input',
-    'script',
-    'source',
-    'track',
-    'video',
-  ]),
-
-  'srcdoc': new Set([
-    'iframe',
-  ]),
-
-  'srclang': new Set([
-    'track',
-  ]),
-
-  'srcset': new Set([
-    'img',
-  ]),
-
-  'start': new Set([
-    'ol',
-  ]),
-
-  'step': new Set([
-    'input',
-  ]),
-
-  'style': 'GLOBAL',
-
-  'summary': new Set([
-    'table',
-  ]),
-
-  'tabindex': 'GLOBAL',
-
-  'target': new Set([
-    'a',
-    'area',
-    'base',
-    'form',
-  ]),
-
-  'title': 'GLOBAL',
-
-  'type': new Set([
-    'button',
-    'input',
-    'command',
-    'embed',
-    'object',
-    'script',
-    'source',
-    'style',
-    'menu',
-  ]),
-
-  'usemap': new Set([
-    'img',
-    'input',
-    'object',
-  ]),
-
-  'value': new Set([
-    'button',
-    'option',
-    'input',
-    'li',
-    'meter',
-    'progress',
-    'param',
-  ]),
-
-  'width': new Set([
-    'canvas',
-    'embed',
-    'iframe',
-    'img',
-    'input',
-    'object',
-    'video',
-  ]),
-
-  'wrap': new Set([
-    'textarea',
-  ]),
-};
-
-function isStandardAttribute(attrName, tagName) {
-  tagName = tagName.toLowerCase();
-  var attr = HTML_ATTRIBUTES[attrName.toLowerCase()];
-  return !!attr && (
-    attr === 'GLOBAL' ||
-    attr.has(tagName)
-  );
-}
-
-function propToAttr(prop) {
-  return PROPS_TO_ATTRS[prop] || prop;
-}
-
-var htmlAttributes = {
-  isStandardAttribute: isStandardAttribute,
-  propToAttr: propToAttr,
-};
-
-function Document() {}
-
-Document.prototype.createTextNode = function(v) {
-    var n = new Text();
-    n.textContent = v;
-    n.nodeName = '#text';
-    n.nodeType = 3;
-    return n;
-};
-
-Document.prototype.createElement = function(nodeName) {
-    var el = new Element();
-    el.nodeName = el.tagName = nodeName;
-    return el;
-};
-
-Document.prototype.createComment = function(data) {
-    var el = new Comment();
-    el.data = data;
-    return el;
-};
-
-
-function Node$1 () {}
-
-Text.prototype = new Node$1();
-
-Element.prototype = new Node$1();
-
-Comment.prototype = new Node$1();
-
-
-function Style (el) {
-  this.el = el;
-  this.styles = [];
-}
-
-Style.prototype.setProperty = function (n,v) {
-    this.el._setProperty(this.styles, {name: n, value:v});
-};
-
-Style.prototype.getProperty = function(n) {
-    return this.el._getProperty(this.styles, n);
-};
-
-Style.prototype.__defineGetter__('cssText', function () {
-    var stylified = '';
-    this.styles.forEach(function(s){
-      stylified+=s.name+':'+s.value+';';
-    });
-    return stylified;
-});
-
-Style.prototype.__defineSetter__('cssText', function (v) {
-    this.styles.length = 0;
-
-    // parse cssText and set style attributes
-    v.split(';').forEach(function(part){
-      var splitPoint = part.indexOf(':');
-      if (splitPoint){
-        var key = part.slice(0, splitPoint).trim();
-        var value = part.slice(splitPoint+1).trim();
-        this.setProperty(key, value);
-      }
-    }, this);
-});
-
-function Attribute(name, value){
-  if (name) {
-    this.name = name;
-    this.value = value ? value : '';
-  }
-}
-
-
-function Element() {
-    var self = this;
-
-    this.style = new Style(this);
-    this.classList = classList(this);
-    this.childNodes = [];
-    this.attributes = [];
-    this.dataset = {};
-    this.className = '';
-
-    this._setProperty = function(arr, obj, key, val) {
-      var p = self._getProperty(arr, key);
-      if (p) {
-        p.value = String(val);
-        return;
-      }
-      arr.push('function' === typeof obj ? new obj(key.toLowerCase(),String(val)) : obj);
-    };
-
-    this._getProperty = function (arr, key) {
-      if (!key) return;
-      key = key.toLowerCase();
-      for (var i=0;i<arr.length;i++) {
-        if (key == arr[i].name) return arr[i];
-      }
-    };
-}
-
-Element.prototype.nodeType = 1;
-
-Element.prototype.appendChild = function (child) {
-    child.parentElement = this;
-    this.childNodes.push(child);
-    return child;
-};
-
-Element.prototype.setAttribute = function (n, v) {
-  if (n == 'style'){
-    this.style.cssText = v;
-  } else {
-    this._setProperty(this.attributes, Attribute, n, v);
-  }
-};
-
-Element.prototype.getAttribute = function (n) {
-  if (n == 'style'){
-    return this.style.cssText
-  } else {
-    var result = this._getProperty(this.attributes, n);
-    return typeof result !== 'undefined' ? result.value : null;
-  }
-};
-
-Element.prototype.removeAttribute = function (n) {
-  if (n === 'class') {
-    delete this.className;
-  } else {
-    for (var i = 0, len = this.attributes.length; i < len; i++) {
-      if (this.attributes[i].name === n) {
-        this.attributes.splice(i, 1);
-        break;
-      }
-    }
-  }
-};
-
-Element.prototype.replaceChild = function(newChild, oldChild) {
-    var self = this;
-    var replaced = false;
-    this.childNodes.forEach(function(child, index){
-        if (child === oldChild) {
-            self.childNodes[index] = newChild;
-            newChild.parentElement = this;
-            replaced = true;
-        }
-    });
-    if (replaced) return oldChild;
-};
-
-Element.prototype.removeChild = function(rChild) {
-    var self = this;
-    var removed = true;
-    this.childNodes.forEach(function(child, index){
-        if (child === rChild) {
-          // use splice to keep a clean childNode array
-          self.childNodes.splice(index, 1);
-          rChild.parentElement = null;
-          removed = true;
-        }
-    });
-    if (removed) return rChild;
-};
-
-Element.prototype.insertBefore = function (newChild, existingChild) {
-  var childNodes = this.childNodes;
-
-  if (existingChild === null) {
-    childNodes.push(newChild);
-  } else {
-    for (var i = 0, len = childNodes.length; i < len; i++) {
-      var child = childNodes[i];
-      if (child === existingChild) {
-        i === 0 ? childNodes.unshift(newChild) : childNodes.splice(i, 0, newChild);
-        break;
-      }
-    }
-  }
-  newChild.parentElement = this;
-
-  return newChild;
-};
-
-Element.prototype.addEventListener = function(type, listener, useCapture, wantsUntrusted) {
-  // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget.addEventListener
-  // There is an implementation there but probably not worth it.
-};
-
-Element.prototype.removeEventListener = function(type, listener, useCapture) {
-  // https://developer.mozilla.org/en/docs/Web/API/EventTarget.removeEventListener
-  // There is an implementation there but probably not worth it.
-};
-
-Element.prototype.insertAdjacentHTML = function(position, text) {
-  // https://developer.mozilla.org/en-US/docs/Web/API/Element.insertAdjacentHTML
-  // Not too much work to implement similar to innerHTML below.
-};
-
-Element.prototype.__defineGetter__('innerHTML', function () {
-    // regurgitate set innerHTML
-    var s = this.childNodes.html || '';
-    this.childNodes.forEach(function (e) {
-      s += (e.outerHTML || e.textContent);
-    });
-    return s
-});
-
-Element.prototype.__defineSetter__('innerHTML', function (v) {
-    //only handle this simple case that doesn't need parsing
-    //this case is useful... parsing is hard and will need added deps!
-    this.childNodes.length = 0;
-
-    // hack to preserve set innerHTML - no parsing just regurgitation
-    this.childNodes.html = v;
-});
-
-
-Element.prototype.__defineGetter__('outerHTML', function () {
-  var a = [],  self = this;
-  var VOID_ELEMENTS = {
-    AREA: true,
-    BASE: true,
-    BR: true,
-    COL: true,
-    EMBED: true,
-    HR: true,
-    IMG: true,
-    INPUT: true,
-    KEYGEN: true,
-    LINK: true,
-    META: true,
-    PARAM: true,
-    SOURCE: true,
-    TRACK: true,
-    WBR: true
-  };
-
-  function _stringify(arr) {
-    var attr = [], value;
-    arr.forEach(function(a){
-      value = ('style' != a.name) ? a.value : self.style.cssText;
-      attr.push(a.name+'='+'\"'+escapeAttribute(value)+'\"');
-    });
-    return attr.length ? ' '+attr.join(" ") : '';
-  }
-
-  function _dataify(data) {
-    var attr = [], value;
-    Object.keys(data).forEach(function(name){
-      attr.push('data-'+name+'='+'\"'+escapeAttribute(data[name])+'\"');
-    });
-    return attr.length ? ' '+attr.join(" ") : '';
-  }
-
-  function _propertify() {
-    var props = [];
-    for (var key in self) {
-      var attrName = htmlAttributes.propToAttr(key);
-      if (
-        self.hasOwnProperty(key) &&
-        ['string', 'boolean', 'number'].indexOf(typeof self[key]) !== -1 &&
-        htmlAttributes.isStandardAttribute(attrName, self.nodeName) &&
-        _shouldOutputProp(key, attrName)
-      ) {
-        props.push({name: attrName, value: self[key]});
-      }
-    }
-    return props ? _stringify(props) : '';
-  }
-
-  function _shouldOutputProp(prop, attr) {
-    if (self.getAttribute(attr)) {
-      // let explicitly-set attributes override props
-      return false;
-    } else {
-      if (prop === 'className' && !self[prop]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  var attrs = this.style.cssText ? this.attributes.concat([{name: 'style'}]) : this.attributes;
-
-  a.push('<'+this.nodeName + _propertify() + _stringify(attrs) + _dataify(this.dataset) +'>');
-
-  if (!VOID_ELEMENTS[this.nodeName.toUpperCase()]){
-    a.push(this.innerHTML);
-    a.push('</'+this.nodeName+'>');
-  }
-
-  return a.join('')
-});
-
-Element.prototype.__defineGetter__('textContent', function () {
-  var s = '';
-  this.childNodes.forEach(function (e) {
-    s += e.textContent;
-  });
-  return s
-});
-
-Element.prototype.__defineSetter__('textContent', function (v) {
-  var textNode = new Text();
-  textNode.textContent = v;
-  this.childNodes = [textNode];
-  return v
-});
-
-Element.prototype.addEventListener = function(t, l) {};
-
-function escapeHTML(s) {
-  return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-}
-
-function escapeAttribute(s) {
-  return escapeHTML(s).replace(/"/g, '&quot;')
-}
-
-Element.prototype.nodeValue = null;
-
-function Text(){}
-
-Text.prototype.nodeType = 3;
-
-Text.prototype.nodeName = '#text';
-
-Text.prototype.__defineGetter__('textContent', function() {
-  return escapeHTML(this.value || '');
-});
-
-Text.prototype.__defineSetter__('textContent', function(v) {
-  this.value = v;
-});
-
-Text.prototype.__defineGetter__('nodeValue', function() {
-  return escapeHTML(this.value || '');
-});
-
-Text.prototype.__defineSetter__('nodeValue', function(v) {
-  this.value = v;
-});
-
-Text.prototype.__defineGetter__('length', function() {
-  return (this.value || '').length;
-});
-
-Text.prototype.replaceData = function(offset, length, str) {
-  this.value = this.value.slice(0, offset) + str + this.value.slice(offset + length);
-};
-
-function Comment(){}
-
-Comment.prototype.nodeType = 8;
-
-Comment.prototype.nodeName = '#comment';
-
-Comment.prototype.__defineGetter__('data', function() {
-  return this.value
-});
-
-Comment.prototype.__defineSetter__('data', function(v) {
-  this.value = v;
-});
-
-Comment.prototype.__defineGetter__('outerHTML', function() {
-  return '<!--' + escapeHTML(this.value || '') + '-->'
-});
-
-Comment.prototype.__defineGetter__('nodeValue', function() {
-  return escapeHTML(this.value || '');
-});
-
-Comment.prototype.__defineSetter__('nodeValue', function(v) {
-  this.value = v;
-});
-
-function defineParentNode (obj) {
-  obj.__defineGetter__('parentNode', function () { return this.parentElement });
-}
-
-defineParentNode(Element.prototype);
-defineParentNode(Comment.prototype);
-defineParentNode(Text.prototype);
-defineParentNode(Node$1.prototype);
-
-var htmlElement = {
-  Document: Document,
-  Node: Node$1,
-  Element: Element,
-  Comment: Comment,
-  Text: Text,
-  document: new Document(),
-};
-
-var hyperscript = createCommonjsModule(function (module) {
-var w = typeof window === 'undefined' ? htmlElement : window;
-var document = w.document;
-var Text = w.Text;
-
-function context () {
-
-  var cleanupFuncs = [];
-
-  function h() {
-    var args = [].slice.call(arguments), e = null;
-    function item (l) {
-      var r;
-      function parseClass (string) {
-        // Our minimal parser doesn’t understand escaping CSS special
-        // characters like `#`. Don’t use them. More reading:
-        // https://mathiasbynens.be/notes/css-escapes .
-
-        var m = browserSplit(string, /([\.#]?[^\s#.]+)/);
-        if(/^\.|#/.test(m[1]))
-          e = document.createElement('div');
-        forEach(m, function (v) {
-          var s = v.substring(1,v.length);
-          if(!v) return
-          if(!e)
-            e = document.createElement(v);
-          else if (v[0] === '.')
-            classList(e).add(s);
-          else if (v[0] === '#')
-            e.setAttribute('id', s);
-        });
-      }
-
-      if(l == null)
-        ;
-      else if('string' === typeof l) {
-        if(!e)
-          parseClass(l);
-        else
-          e.appendChild(r = document.createTextNode(l));
-      }
-      else if('number' === typeof l
-        || 'boolean' === typeof l
-        || l instanceof Date
-        || l instanceof RegExp ) {
-          e.appendChild(r = document.createTextNode(l.toString()));
-      }
-      //there might be a better way to handle this...
-      else if (isArray(l))
-        forEach(l, item);
-      else if(isNode(l))
-        e.appendChild(r = l);
-      else if(l instanceof Text)
-        e.appendChild(r = l);
-      else if ('object' === typeof l) {
-        for (var k in l) {
-          if('function' === typeof l[k]) {
-            if(/^on\w+/.test(k)) {
-              (function (k, l) { // capture k, l in the closure
-                if (e.addEventListener){
-                  e.addEventListener(k.substring(2), l[k], false);
-                  cleanupFuncs.push(function(){
-                    e.removeEventListener(k.substring(2), l[k], false);
-                  });
-                }else{
-                  e.attachEvent(k, l[k]);
-                  cleanupFuncs.push(function(){
-                    e.detachEvent(k, l[k]);
-                  });
-                }
-              })(k, l);
-            } else {
-              // observable
-              e[k] = l[k]();
-              cleanupFuncs.push(l[k](function (v) {
-                e[k] = v;
-              }));
-            }
-          }
-          else if(k === 'style') {
-            if('string' === typeof l[k]) {
-              e.style.cssText = l[k];
-            }else{
-              for (var s in l[k]) (function(s, v) {
-                if('function' === typeof v) {
-                  // observable
-                  e.style.setProperty(s, v());
-                  cleanupFuncs.push(v(function (val) {
-                    e.style.setProperty(s, val);
-                  }));
-                } else
-                  var match = l[k][s].match(/(.*)\W+!important\W*$/);
-                  if (match) {
-                    e.style.setProperty(s, match[1], 'important');
-                  } else {
-                    e.style.setProperty(s, l[k][s]);
-                  }
-              })(s, l[k][s]);
-            }
-          } else if(k === 'attrs') {
-            for (var v in l[k]) {
-              e.setAttribute(v, l[k][v]);
-            }
-          }
-          else if (k.substr(0, 5) === "data-") {
-            e.setAttribute(k, l[k]);
-          } else {
-            e[k] = l[k];
-          }
-        }
-      } else if ('function' === typeof l) {
-        //assume it's an observable!
-        var v = l();
-        e.appendChild(r = isNode(v) ? v : document.createTextNode(v));
-
-        cleanupFuncs.push(l(function (v) {
-          if(isNode(v) && r.parentElement)
-            r.parentElement.replaceChild(v, r), r = v;
-          else
-            r.textContent = v;
-        }));
-      }
-
-      return r
-    }
-    while(args.length)
-      item(args.shift());
-
-    return e
-  }
-
-  h.cleanup = function () {
-    for (var i = 0; i < cleanupFuncs.length; i++){
-      cleanupFuncs[i]();
-    }
-    cleanupFuncs.length = 0;
-  };
-
-  return h
-}
-
-var h = module.exports = context();
-h.context = context;
-
-function isNode (el) {
-  return el && el.nodeName && el.nodeType
-}
-
-function forEach (arr, fn) {
-  if (arr.forEach) return arr.forEach(fn)
-  for (var i = 0; i < arr.length; i++) fn(arr[i], i);
-}
-
-function isArray (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]'
-}
-});
+var h = _interopDefault(require('hyperscript'));
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -1771,11 +388,11 @@ var Page = function () {
   function Page() {
     classCallCheck(this, Page);
 
-    this.flowContent = hyperscript(c('.content'));
-    this.flowBox = hyperscript(c('.flowbox'), this.flowContent);
-    this.footer = hyperscript(c('.footer'));
-    this.background = hyperscript(c('.background'));
-    this.element = hyperscript(c('.page') + c('.page-size'), this.background, this.flowBox, this.footer);
+    this.flowContent = h(c('.content'));
+    this.flowBox = h(c('.flowbox'), this.flowContent);
+    this.footer = h(c('.footer'));
+    this.background = h(c('.background'));
+    this.element = h(c('.page') + c('.page-size'), this.background, this.flowBox, this.footer);
   }
 
   createClass(Page, [{
@@ -1851,7 +468,7 @@ var Page = function () {
 
       var testPage = new Page();
       var measureArea = document.querySelector(c('.measure-area'));
-      if (!measureArea) measureArea = document.body.appendChild(hyperscript(c('.measure-area')));
+      if (!measureArea) measureArea = document.body.appendChild(h(c('.measure-area')));
 
       measureArea.innerHTML = '';
       measureArea.appendChild(testPage.element);
@@ -1954,7 +571,7 @@ var FullBleedPage = function (_OutOfFlow) {
         book.pages.push(newPage);
       }
       if (this.rotate !== 'none') {
-        var rotateContainer = hyperscript(c('.rotate-container'));
+        var rotateContainer = h(c('.rotate-container'));
         rotateContainer.classList.add(c('page-size-rotated'));
         rotateContainer.classList.add(c('rotate-' + this.rotate));
         rotateContainer.appendChild(newPage.background);
@@ -2010,7 +627,7 @@ var FullBleedSpread = function (_OutOfFlow) {
 
       if (this.rotate !== 'none') {
         [leftPage, rightPage].forEach(function (page) {
-          var rotateContainer = hyperscript(c('.rotate-container'));
+          var rotateContainer = h(c('.rotate-container'));
           rotateContainer.classList.add(c('spread-size-rotated'));
           rotateContainer.classList.add(c('rotate-spread-' + _this2.rotate));
           rotateContainer.appendChild(page.background);
@@ -2414,7 +1031,7 @@ var paginate = function paginate(_ref) {
   var layoutWaitingTime = 0;
   var scheduler = new Scheduler(isDebugging);
   var cloneBreadcrumb = breadcrumbCloner(rules);
-  var measureArea = document.body.appendChild(hyperscript(c('.measure-area')));
+  var measureArea = document.body.appendChild(h(c('.measure-area')));
 
   var breadcrumb = []; // Keep track of position in original tree
   var book = new Book();
@@ -3045,7 +1662,7 @@ var title = function title() {
     arg[_key] = arguments[_key];
   }
 
-  return hyperscript.apply(undefined, [c('.title')].concat(arg));
+  return h.apply(undefined, [c('.title')].concat(arg));
 };
 
 var row = function row() {
@@ -3053,7 +1670,7 @@ var row = function row() {
     arg[_key3] = arguments[_key3];
   }
 
-  return hyperscript.apply(undefined, [c('.row')].concat(arg));
+  return h.apply(undefined, [c('.row')].concat(arg));
 };
 
 // Button
@@ -3062,7 +1679,7 @@ var btn = function btn() {
     arg[_key4] = arguments[_key4];
   }
 
-  return hyperscript.apply(undefined, ['button.' + c('btn')].concat(arg));
+  return h.apply(undefined, ['button.' + c('btn')].concat(arg));
 };
 
 var btnMain = function btnMain() {
@@ -3070,23 +1687,23 @@ var btnMain = function btnMain() {
     arg[_key6] = arguments[_key6];
   }
 
-  return hyperscript.apply(undefined, ['button.' + c('btn') + '.' + c('btn-main')].concat(arg));
+  return h.apply(undefined, ['button.' + c('btn') + '.' + c('btn-main')].concat(arg));
 };
 
 var select = function select() {
-  var selectVal = hyperscript(c('.select-val'), 'Value');
+  var selectVal = h(c('.select-val'), 'Value');
 
   for (var _len7 = arguments.length, arg = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
     arg[_key7] = arguments[_key7];
   }
 
-  var selectEl = hyperscript.apply(undefined, ['select.' + c('select')].concat(arg));
+  var selectEl = h.apply(undefined, ['select.' + c('select')].concat(arg));
   var updateVal = function updateVal() {
     selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
   };
   selectEl.addEventListener('change', updateVal);
   updateVal();
-  return hyperscript(c('.select-wrap'), selectVal, selectEl);
+  return h(c('.select-wrap'), selectVal, selectEl);
 };
 
 var option = function option() {
@@ -3094,13 +1711,13 @@ var option = function option() {
     arg[_key8] = arguments[_key8];
   }
 
-  return hyperscript.apply(undefined, ['option'].concat(arg));
+  return h.apply(undefined, ['option'].concat(arg));
 };
 
 // View Swithcer
 var viewMode = function viewMode(id, action, text) {
   var sel = '.' + c('viewmode') + '.' + c(id);
-  return hyperscript(sel, { onclick: action }, hyperscript(c('.icon'))
+  return h(sel, { onclick: action }, h(c('.icon'))
   // text
   );
 };
@@ -3199,7 +1816,7 @@ var Controls = function Controls(opts) {
   var marks = row(marksSelect);
   var sheetSize = row(sheetSizeSelect);
 
-  var validCheck = hyperscript('div', { style: {
+  var validCheck = h('div', { style: {
       display: 'none',
       color: '#e2b200'
     } }, 'Too Small');
@@ -3212,9 +1829,9 @@ var Controls = function Controls(opts) {
   // viewMode('outline', viewer.setOutline, 'Outline'),
   viewMode('flip', viewer.setFlip, 'Flip'), viewMode('print', viewer.setPrint, 'Sheet')];
 
-  var viewSwitcher = hyperscript.apply(undefined, [c('.viewswitcher')].concat(viewModes));
+  var viewSwitcher = h.apply(undefined, [c('.viewswitcher')].concat(viewModes));
 
-  var headerContent = hyperscript('span', 'Loading');
+  var headerContent = h('span', 'Loading');
 
   var playSlow = void 0;
   var step = btn('→', {
@@ -3249,14 +1866,14 @@ var Controls = function Controls(opts) {
     }
   });
 
-  var debugControls = hyperscript(c('.debug-controls'), pause, playSlow, step, debugDone);
+  var debugControls = h(c('.debug-controls'), pause, playSlow, step, debugDone);
 
-  var refreshPaginationBtn = hyperscript('a', { onclick: function onclick() {
+  var refreshPaginationBtn = h('a', { onclick: function onclick() {
       _this.binder.debug = false;
       startPaginating();
     } }, 'Refresh');
   refreshPaginationBtn.classList.add(c('refresh'));
-  var refreshPaginationBtnDebug = hyperscript('a', '🐞', {
+  var refreshPaginationBtnDebug = h('a', '🐞', {
     onclick: function onclick() {
       playSlow.style.display = 'none';
       step.style.display = 'none';
@@ -3265,8 +1882,8 @@ var Controls = function Controls(opts) {
       startPaginating();
     }
   });
-  var spinner = hyperscript(c('.spinner'));
-  var header = title(spinner, headerContent, hyperscript(c('.refresh-btns'), refreshPaginationBtn, refreshPaginationBtnDebug));
+  var spinner = h(c('.spinner'));
+  var header = title(spinner, headerContent, h(c('.refresh-btns'), refreshPaginationBtn, refreshPaginationBtnDebug));
 
   this.setInProgress = function () {
     headerContent.textContent = 'Paginating';
@@ -3290,11 +1907,11 @@ var Controls = function Controls(opts) {
   var options = row(arrangement, sheetSize, marks);
   options.classList.add(c('print-options'));
 
-  this.element = hyperscript(c('.controls'), viewSwitcher, options, header, debugControls, printBtn);
+  this.element = h(c('.controls'), viewSwitcher, options, header, debugControls, printBtn);
 };
 
 var errorView = function (title, text) {
-  return hyperscript(c('.error'), hyperscript(c('.error-title'), title), hyperscript(c('.error-text'), text), hyperscript(c('.error-footer'), 'Bindery ' + '[AIV]{version}[/AIV]'));
+  return h(c('.error'), h(c('.error-title'), title), h(c('.error-text'), text), h(c('.error-footer'), 'Bindery ' + '[AIV]{version}[/AIV]'));
 };
 
 var orderPagesBooklet = function orderPagesBooklet(pages) {
@@ -3336,14 +1953,14 @@ var twoPageSpread = function twoPageSpread() {
     arg[_key] = arguments[_key];
   }
 
-  return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
+  return h.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
 };
 var onePageSpread = function onePageSpread() {
   for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
     arg[_key2] = arguments[_key2];
   }
 
-  return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.page-size')].concat(arg));
+  return h.apply(undefined, [c('.spread-wrapper') + c('.page-size')].concat(arg));
 };
 
 var renderGridLayout = function renderGridLayout(pages, isTwoUp) {
@@ -3364,22 +1981,22 @@ var renderGridLayout = function renderGridLayout(pages, isTwoUp) {
 };
 
 var bleedMarks = function bleedMarks() {
-  return [hyperscript(c('.bleed-top')), hyperscript(c('.bleed-bottom')), hyperscript(c('.bleed-left')), hyperscript(c('.bleed-right'))];
+  return [h(c('.bleed-top')), h(c('.bleed-bottom')), h(c('.bleed-left')), h(c('.bleed-right'))];
 };
 var cropMarks = function cropMarks() {
-  return [hyperscript(c('.crop-top')), hyperscript(c('.crop-bottom')), hyperscript(c('.crop-left')), hyperscript(c('.crop-right'))];
+  return [h(c('.crop-top')), h(c('.crop-bottom')), h(c('.crop-left')), h(c('.crop-right'))];
 };
 var printMarksSingle = function printMarksSingle() {
-  return hyperscript.apply(undefined, [c('.print-mark-wrap')].concat(toConsumableArray(cropMarks()), toConsumableArray(bleedMarks())));
+  return h.apply(undefined, [c('.print-mark-wrap')].concat(toConsumableArray(cropMarks()), toConsumableArray(bleedMarks())));
 };
 var printMarksSpread = function printMarksSpread() {
-  return hyperscript.apply(undefined, [c('.print-mark-wrap'), hyperscript(c('.crop-fold'))].concat(toConsumableArray(cropMarks()), toConsumableArray(bleedMarks())));
+  return h.apply(undefined, [c('.print-mark-wrap'), h(c('.crop-fold'))].concat(toConsumableArray(cropMarks()), toConsumableArray(bleedMarks())));
 };
 
 var bookletMeta = function bookletMeta(i, len) {
   var isFront = i % 4 === 0;
   var sheetIndex = parseInt((i + 1) / 4, 10) + 1;
-  return hyperscript(c('.print-meta'), 'Sheet ' + sheetIndex + ' of ' + len / 4 + ': ' + (isFront ? 'Outside' : 'Inside'));
+  return h(c('.print-meta'), 'Sheet ' + sheetIndex + ' of ' + len / 4 + ': ' + (isFront ? 'Outside' : 'Inside'));
 };
 
 var twoPageSpread$1 = function twoPageSpread() {
@@ -3387,14 +2004,14 @@ var twoPageSpread$1 = function twoPageSpread() {
     arg[_key] = arguments[_key];
   }
 
-  return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
+  return h.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
 };
 var onePageSpread$1 = function onePageSpread() {
   for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
     arg[_key2] = arguments[_key2];
   }
 
-  return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.page-size')].concat(arg));
+  return h.apply(undefined, [c('.spread-wrapper') + c('.page-size')].concat(arg));
 };
 
 var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBooklet) {
@@ -3404,7 +2021,7 @@ var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBoo
   var spread = isTwoUp ? twoPageSpread$1 : onePageSpread$1;
 
   var printSheet = function printSheet() {
-    return hyperscript(c('.print-page'), spread.apply(undefined, arguments));
+    return h(c('.print-page'), spread.apply(undefined, arguments));
   };
 
   if (isTwoUp) {
@@ -3429,8 +2046,8 @@ var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBoo
 
 var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
   var flipLayout = document.createDocumentFragment();
-  var sizer = hyperscript(c('.spread-size') + c('.flip-sizer'));
-  var flapHolder = hyperscript(c('.spread-size') + c('.flap-holder'));
+  var sizer = h(c('.spread-size') + c('.flip-sizer'));
+  var flapHolder = h(c('.spread-size') + c('.flap-holder'));
   sizer.appendChild(flapHolder);
   flipLayout.appendChild(sizer);
   var flaps = [];
@@ -3462,7 +2079,7 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
   var _loop = function _loop(i) {
     leafIndex += 1;
     var li = leafIndex;
-    var flap = hyperscript(c('.page3d') + c('.page-size'), {
+    var flap = h(c('.page3d') + c('.page-size'), {
       onclick: function onclick() {
         var newLeaf = li - 1;
         setLeaf(newLeaf);
@@ -3479,7 +2096,7 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
       leftPage.classList.add(c('page3d-back'));
       flap.appendChild(leftPage);
     } else {
-      leftPage = hyperscript(c('.page') + c('.page3d-back'));
+      leftPage = h(c('.page') + c('.page3d-back'));
       flap.appendChild(leftPage);
     }
     // TODO: Dynamically add/remove pages.
@@ -3517,8 +2134,8 @@ var Viewer = function () {
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
-    this.zoomBox = hyperscript(c('.zoom-wrap'));
-    this.element = hyperscript(c('.root'), this.zoomBox);
+    this.zoomBox = h(c('.zoom-wrap'));
+    this.element = h(c('.root'), this.zoomBox);
 
     this.doubleSided = true;
     this.printArrange = ARRANGE_ONE;
@@ -3757,7 +2374,7 @@ var Viewer = function () {
           arg[_key] = arguments[_key];
         }
 
-        return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
+        return h.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
       };
 
       this.book.pages.forEach(function (page, i) {
@@ -4057,7 +2674,7 @@ var Footnote = function (_Replace) {
     value: function afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
       var number = book.pageInProgress.footer.children.length + 1;
 
-      var footnote = hyperscript('.footnote');
+      var footnote = h('.footnote');
       var contents = this.render(element, number);
       if (contents instanceof HTMLElement) footnote.appendChild(contents);else footnote.innerHTML = contents;
 
@@ -4188,7 +2805,7 @@ var RunningHeader = function (_Rule) {
     key: 'eachPage',
     value: function eachPage(page) {
       if (!page.runningHeader) {
-        var el = hyperscript(c('.running-header'));
+        var el = h(c('.running-header'));
         page.element.appendChild(el);
         page.runningHeader = el;
       }
@@ -4328,7 +2945,7 @@ var Bindery = function () {
         }
         return '';
       }).then(function (fetchedContent) {
-        var wrapper = hyperscript('div');
+        var wrapper = h('div');
         wrapper.innerHTML = fetchedContent;
         _this.source = wrapper.querySelector(selector);
         if (!(_this.source instanceof HTMLElement)) {
@@ -4472,7 +3089,4 @@ var Bindery = function () {
 
 var BinderyWithRules = Object.assign(Bindery, Rules);
 
-return BinderyWithRules;
-
-})));
-//# sourceMappingURL=bindery.umd.js.map
+module.exports = BinderyWithRules;

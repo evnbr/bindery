@@ -30,6 +30,6 @@ gallery:
     url: /bindery/book
   - title: johncaserta.com
     desc: Site and book for John Caserta's projects, writing, and teaching
-    url: //new.johncaserta.com/bindery.html
+    url: http://johncaserta.com/bindery
   - title: Add yours?
     url: https://github.com/evnbr/bindery
