@@ -6,9 +6,22 @@ import uglify from 'rollup-plugin-uglify';
 import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
 import cssnano from 'cssnano';
-import inlinesvg from 'postcss-inline-svg';
+import inlinesvg from 'postcss-svg';
 
 import pkg from './package.json';
+
+const sassPlugin = () => sass({
+  insert: true,
+  processor: css => postcss([
+    inlinesvg({ func: 'url', dirs: './src' }),
+    cssnano(),
+  ])
+    .process(css)
+    .then((result) => {
+      console.log(result.css);
+      return result.css;
+    }),
+});
 
 export default [
   // browser-friendly UMD build
@@ -22,15 +35,7 @@ export default [
     plugins: [
       resolve(),
       commonjs(),
-      sass({
-        insert: true,
-        processor: css => postcss([cssnano(), inlinesvg()])
-          .process(css)
-          .then((result) => {
-            console.log(result.css);
-            return result.css;
-          }),
-      }),
+      sassPlugin(),
       babel({
         exclude: ['node_modules/**'],
       }),
@@ -48,7 +53,7 @@ export default [
     plugins: [
       resolve(),
       commonjs(),
-      sass({ insert: true }),
+      sassPlugin(),
       uglify(),
       babel({
         exclude: ['node_modules/**'],
@@ -71,7 +76,7 @@ export default [
     ],
     plugins: [
       resolve(),
-      sass({ insert: true }),
+      sassPlugin(),
       babel({
         exclude: ['node_modules/**'],
       }),
