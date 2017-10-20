@@ -10,27 +10,35 @@ import inlinesvg from 'postcss-svg';
 
 import pkg from './package.json';
 
+const baseConfig = {
+  entry: 'src/index.js',
+  moduleName: 'Bindery',
+  intro: `var BINDERY_VERSION = 'v${pkg.version}'`,
+  banner: `/* 📖 Bindery v${pkg.version} */`,
+};
+
 const sassPlugin = () => sass({
   insert: true,
   processor: css => postcss([
-    inlinesvg({ func: 'url', dirs: './src' }),
+    inlinesvg({
+      func: 'url',
+      dirs: './src',
+      svgo: { plugins: [
+        { cleanupAttrs: true },
+        { removeTitle: true },
+      ] },
+    }),
     cssnano(),
   ])
     .process(css)
-    .then((result) => {
-      console.log(result.css);
-      return result.css;
-    }),
+    .then(result => result.css),
 });
 
 export default [
   // browser-friendly UMD build
-  {
-    entry: 'src/index.js',
+  Object.assign({}, baseConfig, {
     dest: pkg.browser,
     format: 'umd',
-    moduleName: 'Bindery',
-    banner: `/* 📖 Bindery v${pkg.version} */`,
     sourceMap: true,
     plugins: [
       resolve(),
@@ -40,15 +48,12 @@ export default [
         exclude: ['node_modules/**'],
       }),
     ],
-  },
+  }),
 
-  // minified browser-friendly UMD build
-  {
-    entry: 'src/index.js',
+  // minified browser-friendly build
+  Object.assign({}, baseConfig, {
     dest: 'dist/bindery.min.js',
     format: 'iife',
-    moduleName: 'Bindery',
-    banner: `/* 📖 Bindery v${pkg.version} */`,
     sourceMap: true,
     plugins: [
       resolve(),
@@ -59,16 +64,10 @@ export default [
         exclude: ['node_modules/**'],
       }),
     ],
-  },
+  }),
 
   // CommonJS (for Node) and ES module (for bundlers) build.
-  // (We could have three entries in the configuration array
-  // instead of two, but it's quicker to generate multiple
-  // builds from a single configuration where possible, using
-  // the `targets` option which can specify `dest` and `format`)
-  {
-    entry: 'src/index.js',
-    banner: `/* 📖 Bindery v${pkg.version} */`,
+  Object.assign({}, baseConfig, {
     external: ['hyperscript'],
     targets: [
       { dest: pkg.main, format: 'cjs' },
@@ -81,5 +80,5 @@ export default [
         exclude: ['node_modules/**'],
       }),
     ],
-  },
+  }),
 ];
