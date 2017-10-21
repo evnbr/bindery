@@ -10,13 +10,9 @@ import { last } from '../utils';
 import Book from '../Book';
 import Page from '../Page';
 
-// Rules to check against
-import FullBleedPage from '../Rules/FullBleedPage';
-import FullBleedSpread from '../Rules/FullBleedSpread';
-import PageBreak from '../Rules/PageBreak';
-
 // paginate
 import Scheduler from './Scheduler';
+import RuleSet from './RuleSet';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
 import breadcrumbCloner from './breadcrumbCloner';
@@ -24,11 +20,23 @@ import waitForImage from './waitForImage';
 
 const MAXIMUM_PAGE_LIMIT = 9999;
 
+
+// Walk up the tree to see if we are within
+// an overflow-ignoring node
+const shouldIgnoreOverflow = (node) => {
+  if (node.hasAttribute('data-ignore-overflow')) return true;
+  if (node.parentElement) return shouldIgnoreOverflow(node.parentElement);
+  return false;
+};
+
+
 const paginate = ({ content, rules, success, progress, error, isDebugging }) => {
   // SETUP
   const startLayoutTime = window.performance.now();
   let layoutWaitingTime = 0;
+
   const scheduler = new Scheduler(isDebugging);
+  const ruleSet = new RuleSet(rules);
   const cloneBreadcrumb = breadcrumbCloner(rules);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
 
@@ -44,23 +52,11 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       : book.pageInProgress.flowContent;
   };
 
-  const applyNewPageRules = (pg) => {
-    rules.forEach((rule) => {
-      if (rule.afterPageCreated) rule.afterPageCreated(pg, book);
-    });
-  };
-
-  const applyLayoutStartRules = () => {
-    rules.forEach((rule) => {
-      if (rule.layoutStart) rule.layoutStart();
-    });
-  };
-
   const makeNewPage = () => {
     const newPage = new Page();
     measureArea.appendChild(newPage.element);
 
-    applyNewPageRules(newPage);
+    ruleSet.startPage(newPage, book);
     return newPage;
   };
 
@@ -69,7 +65,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     book.pages = orderPages(book.pages, makeNewPage);
     annotatePages(book.pages);
     if (book.pageInProgress) {
-      applyPageRules(book.pageInProgress);
+      ruleSet.finishPage(book.pageInProgress, book);
     }
   };
 
@@ -121,104 +117,12 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     return newPage;
   };
 
-  const beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
-  const afterAddRules = rules.filter(r => r.selector && r.afterAdd);
-  const pageRules = rules.filter(r => r.eachPage);
-  const selectorsNotToSplit = rules.filter(rule => rule.avoidSplit).map(rule => rule.selector);
-
-  const dedupeRules = (inputRules) => {
-    const conflictRules = inputRules.filter(rule => (
-        rule instanceof FullBleedSpread
-        || rule instanceof FullBleedPage
-        || rule instanceof PageBreak
-    ));
-    const uniqueRules = inputRules.filter(rule => !conflictRules.includes(rule));
-
-    const firstSpreadRule = conflictRules.find(rule => rule instanceof FullBleedSpread);
-    const firstPageRule = conflictRules.find(rule => rule instanceof FullBleedPage);
-
-    // Only apply one
-    if (firstSpreadRule) uniqueRules.push(firstSpreadRule);
-    else if (firstPageRule) uniqueRules.push(firstPageRule);
-    else { // multiple pagebreaks are ok
-      uniqueRules.push(...conflictRules);
-    }
-
-    return uniqueRules;
-  };
-
-  const applyBeforeAddRules = (element) => {
-    let addedElement = element;
-
-    const matchingRules = beforeAddRules.filter(rule => addedElement.matches(rule.selector));
-    // const uniqueRules = dedupeRules(matchingRules);
-
-    matchingRules.forEach((rule) => {
-      addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
-    });
-    return addedElement;
-  };
-
-  const applyAfterAddRules = (originalElement) => {
-    let addedElement = originalElement;
-
-    const matchingRules = afterAddRules.filter(rule => addedElement.matches(rule.selector));
-    const uniqueRules = dedupeRules(matchingRules);
-
-    uniqueRules.forEach((rule) => {
-      addedElement = rule.afterAdd(
-        addedElement,
-        book,
-        continueOnNewPage,
-        makeNewPage,
-        function overflowCallback(problemElement) {
-          // TODO:
-          // While this does catch overflows, it introduces a few new bugs.
-          // It is pretty aggressive to move the entire node to the next page.
-          // - 1. there is no guarentee it will fit on the new page
-          // - 2. if it has childNodes, those side effects will not be undone,
-          // which means footnotes will get left on previous page.
-          // - 3. if it is a large paragraph, it will leave a large gap. the
-          // ideal approach would be to only need to invalidate
-          // the last line of text.
-          problemElement.parentNode.removeChild(problemElement);
-          continueOnNewPage();
-          currentFlowElement().appendChild(problemElement);
-          return rule.afterAdd(
-            problemElement,
-            book,
-            continueOnNewPage,
-            makeNewPage,
-            () => {
-              console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
-            }
-          );
-        }
-      );
-    });
-    return addedElement;
-  };
-
-  const applyEachPageRules = () => {
-    pageRules.forEach((rule) => {
-      book.pages.forEach((page) => {
-        rule.eachPage(page, book);
-      });
-    });
-  };
-
-  const applyPageRules = (page) => {
-    pageRules.forEach((rule) => {
-      rule.eachPage(page, book);
-    });
-  };
-
   // TODO: Merge isSplittable and shouldIgnoreOverflow
 
   // Walk up the tree to see if we can safely
   // insert a split into this node.
   const isSplittable = (node) => {
-    if (selectorsNotToSplit.some(sel => node.matches(sel))) {
+    if (ruleSet.selectorsNotToSplit.some(sel => node.matches(sel))) {
       if (node.hasAttribute('data-bindery-did-move')
         || node.classList.contains(c('continuation'))) {
         return true; // don't split it again.
@@ -230,15 +134,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
     return true;
   };
-
-  // Walk up the tree to see if we are within
-  // an overflow-ignoring node
-  const shouldIgnoreOverflow = (node) => {
-    if (node.hasAttribute('data-ignore-overflow')) return true;
-    if (node.parentElement) return shouldIgnoreOverflow(node.parentElement);
-    return false;
-  };
-
 
   const moveElementToNextPage = (nodeToMove) => {
     // So this node won't get cloned. TODO: this is unclear
@@ -324,18 +219,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     let pos = 0;
 
-    // Must be in viewport for caretRangeFromPoint
-    // measureArea.appendChild(book.pageInProgress.element);
-    //
-    // const flowBoxPos = book.pageInProgress.flowBox.getBoundingClientRect();
-    // const endX = flowBoxPos.left + flowBoxPos.width - 1;
-    // const endY = flowBoxPos.top + flowBoxPos.height - 30; // TODO: Real line height
-    // const range = document.caretRangeFromPoint(endX, endY);
-    // if (range && range.startContainer === textNode) {
-    //   console.log(`Predicted ${range.startOffset}: ${originalText.substr(0, range.startOffset)}`);
-    //   pos = range.startOffset;
-    // }
-
     const splitTextStep = () => {
       textNode.nodeValue = originalText.substr(0, pos);
 
@@ -419,7 +302,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         continueOnNewPage();
       }
     }
-    const element = applyBeforeAddRules(elementToAdd);
+    const element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
 
     currentFlowElement().appendChild(element);
 
@@ -443,7 +326,13 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
         // We're now done with this element and its children,
         // so we pop up a level
         const addedChild = breadcrumb.pop();
-        applyAfterAddRules(addedChild);
+        ruleSet.afterAddElement(
+          addedChild,
+          book,
+          continueOnNewPage,
+          makeNewPage,
+          currentFlowElement
+        );
 
         // if (book.pageInProgress.hasOverflowed()) {
           // console.log('Bindery: Added element despite overflowing');
@@ -480,7 +369,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   };
 
   const startPagination = () => {
-    applyLayoutStartRules();
+    ruleSet.setup();
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();
@@ -498,7 +387,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     annotatePages(book.pages);
 
     book.setCompleted();
-    applyEachPageRules();
+    ruleSet.finishEveryPage(book);
 
     if (!isDebugging) {
       const endLayoutTime = window.performance.now();

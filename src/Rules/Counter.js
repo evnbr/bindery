@@ -15,7 +15,7 @@ class Counter extends Rule {
       replace: OptionType.func,
     });
   }
-  layoutStart() {
+  setup() {
     this.counterValue = 0;
   }
   beforeAdd(el) {
