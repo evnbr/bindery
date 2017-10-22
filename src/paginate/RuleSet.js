@@ -3,12 +3,15 @@ import FullBleedSpread from '../Rules/FullBleedSpread';
 import PageBreak from '../Rules/PageBreak';
 import elToStr from '../utils/elementToString';
 
+
+const isFullPageRule = rule => (
+    rule instanceof FullBleedSpread
+    || rule instanceof FullBleedPage
+    || rule instanceof PageBreak
+);
+
 const dedupe = (inputRules) => {
-  const conflictRules = inputRules.filter(rule => (
-      rule instanceof FullBleedSpread
-      || rule instanceof FullBleedPage
-      || rule instanceof PageBreak
-  ));
+  const conflictRules = inputRules.filter(isFullPageRule);
   const uniqueRules = inputRules.filter(rule => !conflictRules.includes(rule));
 
   const firstSpreadRule = conflictRules.find(rule => rule instanceof FullBleedSpread);
@@ -17,9 +20,7 @@ const dedupe = (inputRules) => {
   // Only apply one fullpage or fullspread
   if (firstSpreadRule) uniqueRules.push(firstSpreadRule);
   else if (firstPageRule) uniqueRules.push(firstPageRule);
-  else { // multiple pagebreaks are ok
-    uniqueRules.push(...conflictRules);
-  }
+  else uniqueRules.push(...conflictRules); // multiple pagebreaks are ok
 
   return uniqueRules;
 };

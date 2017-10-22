@@ -1,10 +1,10 @@
-## [Bindery.js](http://evanbrooks.info/bindery/)
+## [Bindery.js](https://evanbrooks.info/bindery/)
 
-[Intro](http://evanbrooks.info/bindery/) ·
-[Guide](http://evanbrooks.info/bindery/guide) ·
-[Docs](http://evanbrooks.info/bindery/docs) ·
-[Demos](http://evanbrooks.info/bindery/demos) ·
-[About](http://evanbrooks.info/bindery/about)
+[Intro](https://evanbrooks.info/bindery/) ·
+[Guide](https://evanbrooks.info/bindery/guide) ·
+[Docs](https://evanbrooks.info/bindery/docs) ·
+[Demos](https://evanbrooks.info/bindery/demos) ·
+[About](https://evanbrooks.info/bindery/about)
 
 *Bindery.js* is a library for designing printable books with HTML and CSS.
 
@@ -50,19 +50,16 @@ If you're designing a website, think about books as an extension of the responsi
 </script>
 ```
 
-For more, see the [Guide](http://evanbrooks.info/bindery/guide) and [Docs](http://evanbrooks.info/bindery/docs).
+For more, see the [Guide](https://evanbrooks.info/bindery/guide) and [Docs](https://evanbrooks.info/bindery/docs).
 
 ### Developing
 
-ES6 / babel, bundled with webpack. The only runtime dependency
+ES6 / babel, bundled with rollup. The only runtime dependency
 is [Hyperscript](https://github.com/hyperhype/hyperscript), for templating the UI, which is included in the bundle by default.
 
 When contributing, keep the following in mind: The goal of bindery.js is to provide an approachable jumping-off point for HTML-to-Print exploration. Because of this, it is intended to work out of the box as a script tag (without needing to run a dev server, set up a development environment, use preprocessors, or really know javascript at all).
 
-- `npm run-script dist` - Updates all builds
-- `npm run-script build` - Updates build in /dist/ and /docs/js/
-- `npm run-script minify` - Updates minified production build
-- `npm run-script lint` - ESLint using the [Airbnb style guide](https://github.com/airbnb/javascript)
+- `npm run-script build` - Updates all builds
 - `npm run-script test` - Runs Jest
 
 Note that the pagination code in Bindery is inherently fairly slow. Each step of pagination involves

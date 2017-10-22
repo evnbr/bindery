@@ -9,9 +9,7 @@
     padding: 10px;
     z-index: 99;
     position: relative;
-    // padding-right: $sidebarWidth;
     padding-top: 80px;
-    animation: fadeUp 0.3s;
     min-height: 90vh;
   }
 
@@ -75,11 +73,6 @@
    .#{$pre}-placeholder-pulse {
      animation: pulse 1s infinite;
    }
-}
-
-@keyframes fadeUp {
-  0%   { opacity: 0; }
-  100% { opacity: 1; }
 }
 
 @keyframes pulse {
@@ -177,7 +170,6 @@ body.#{$pre}-viewing {
   padding: 0 20px;
   box-sizing: content-box;
 }
-
 
 .#{$pre}-page3d {
   margin: auto;

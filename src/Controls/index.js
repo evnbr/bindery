@@ -26,14 +26,6 @@ class Controls {
 
     const printBtn = btnMain({ onclick: print }, 'Print');
 
-    const doneBtn = btn({ onclick: () => {
-      if (this.binder.autorun) {
-        window.history.back();
-      } else {
-        this.binder.cancel();
-      }
-    } }, 'Done');
-
     const sheetSizes = supportsCustomPageSize ? [
       option({ value: 'size_page', selected: true }, 'Auto'),
       option({ value: 'size_page_bleed' }, 'Auto + Bleed'),
@@ -62,12 +54,9 @@ class Controls {
       const newVal = e.target.value;
       viewer.setSheetSize(newVal);
       if (newVal === 'size_page' || newVal === 'size_page_bleed') {
-        // marksSelect.value = 'marks_none';
-        marksSelect.disabled = true;
         marksSelect.classList.add(c('hidden-select'));
       } else {
         marksSelect.classList.remove(c('hidden-select'));
-        marksSelect.disabled = false;
       }
 
       this.binder.pageSetup.updateStylesheet();
@@ -83,8 +72,6 @@ class Controls {
       option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
       option({ value: 'arrange_two' }, '1 Spread / Sheet'),
       option({ value: 'arrange_booklet' }, 'Booklet Sheets'),
-      // option({ disabled: true }, 'Grid'),
-      // option({ disabled: true }, 'Signatures'),
     );
     const arrangement = row(arrangeSelect);
 
@@ -122,11 +109,6 @@ class Controls {
     }
     const marks = row(marksSelect);
     const sheetSize = row(sheetSizeSelect);
-
-    const validCheck = h('div', { style: {
-      display: 'none',
-      color: '#e2b200',
-    } }, 'Too Small');
 
     const startPaginating = () => {
       this.binder.makeBook(() => {
@@ -208,7 +190,6 @@ class Controls {
 
     this.setInProgress = () => {
       headerContent.textContent = 'Paginating';
-      validCheck.style.display = 'none';
     };
 
     this.updateProgress = (count) => {
@@ -217,11 +198,9 @@ class Controls {
 
     this.setDone = () => {
       headerContent.textContent = `${viewer.book.pages.length} Pages`;
-      validCheck.style.display = 'none';
     };
 
     this.setInvalid = () => {
-      validCheck.style.display = '';
     };
 
     printBtn.classList.add(c('btn-print'));

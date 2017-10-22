@@ -13,18 +13,15 @@ $btn-active: #ddd;
   font: 14px / 1.4 $system;
   display: none;
   flex-direction: row;
-  // flex-wrap: wrap;
   align-items: start;
 
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  // width: $sidebarWidth;
   z-index: 999;
   margin: auto;
   color: $text;
-  // background: $background;
   padding: 10px;
   overflow: visible;
   -webkit-font-smoothing: antialiased;
@@ -64,9 +61,6 @@ $btn-active: #ddd;
   overflow: hidden;
   margin-right: auto;
   opacity: 0;
-  // [bindery-view-mode='print'] & {
-  //   opacity: 0;
-  // }
   .#{$pre}-in-progress & {
     opacity: 1;
     display: flex;
@@ -92,9 +86,6 @@ $btn-active: #ddd;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  // position: absolute;
-  // right: 0;
-  // top: 8px;
   vertical-align: middle;
   opacity: 0;
   pointer-events: none;
@@ -181,9 +172,6 @@ $btn-active: #ddd;
     pointer-events: none;
   }
   opacity: 1;
-  transform: scale(1);
-  transition: all 0.8s;
-  transition-delay: 0.2s;
   user-select: none;
 
   overflow: hidden;
@@ -204,36 +192,34 @@ $btn-active: #ddd;
   &:active {
     background: $btn-active;
   }
+}
 
-  .#{$pre}-icon {
-    height: 36px;
-    width: 32px;
-    background: currentColor;
-    margin: 0 auto;
+.#{$pre}-icon {
+  height: 36px;
+  width: 32px;
+  background: currentColor;
+  margin: 0 auto;
 
-    .#{$pre}-in-progress & {
-      color: gray !important;
-    }
+  .#{$pre}-in-progress & {
+    color: gray !important;
   }
-
-  &.#{$pre}-grid .#{$pre}-icon {
-    -webkit-mask: url('./_assets/icon-grid.svg') no-repeat 50% 50%;
-    [bindery-view-mode='grid'] & {
-      -webkit-mask-image: url('./_assets/icon-grid-filled.svg');
-    }
+}
+.#{$pre}-grid .#{$pre}-icon {
+  -webkit-mask: url('./_assets/icon-grid.svg') no-repeat 50% 50%;
+  [bindery-view-mode='grid'] & {
+    -webkit-mask-image: url('./_assets/icon-grid-filled.svg');
   }
-  &.#{$pre}-flip .#{$pre}-icon {
-    -webkit-mask: url('./_assets/icon-flip.svg') no-repeat 50% 50%;
-    [bindery-view-mode='interactive'] & {
-      -webkit-mask-image: url('./_assets/icon-flip-filled.svg');
-    }
+}
+.#{$pre}-flip .#{$pre}-icon {
+  -webkit-mask: url('./_assets/icon-flip.svg') no-repeat 50% 50%;
+  [bindery-view-mode='interactive'] & {
+    -webkit-mask-image: url('./_assets/icon-flip-filled.svg');
   }
-  &.#{$pre}-print .#{$pre}-icon {
-    background: svg-inline('_assets/icon-sheet.svg');
-    -webkit-mask: url('./_assets/icon-sheet.svg') no-repeat 50% 50%;
-    [bindery-view-mode='print'] & {
-      -webkit-mask-image: url('./_assets/icon-sheet-filled.svg');
-    }
+}
+.#{$pre}-print .#{$pre}-icon {
+  -webkit-mask: url('./_assets/icon-sheet.svg') no-repeat 50% 50%;
+  [bindery-view-mode='print'] & {
+    -webkit-mask-image: url('./_assets/icon-sheet-filled.svg');
   }
 }
 
@@ -270,7 +256,6 @@ $btn-active: #ddd;
     color: transparent;
   }
 }
-
 
 .#{$pre}-select {
   position: absolute;
@@ -311,10 +296,6 @@ $btn-active: #ddd;
       color: black;
     }
   }
-}
-
-.#{$pre}-controls .#{$pre}-options-toggle {
-  display: none;
 }
 
 @media screen and (max-width: 720px) {

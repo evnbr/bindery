@@ -56,7 +56,7 @@ const inputNumberUnits = function (val) {
 };
 
 // View Swithcer
-const viewMode = function (id, action, text) {
+const viewMode = function (id, action) {
   const sel = `.${c('viewmode')}.${c(id)}`;
   return h(sel,
     { onclick: action },
