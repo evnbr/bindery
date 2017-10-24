@@ -15,7 +15,7 @@ file as your content, and you're ready to go.
 
 <div>
   <a href="https://raw.githubusercontent.com/evnbr/bindery/master/dist/bindery.min.js" class="btn" download>
-    ↓ Download bindery.min.js · 88k
+    ↓ Download bindery.min.js · 73k
   </a>
 </div>
 

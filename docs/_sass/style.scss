@@ -578,8 +578,6 @@ p code, li code {
 }
 
 .highlight pre, pre.highlight {
-  // background-color: #f5f5ff;
-  // padding: 1rem;
   padding-left: 1.5rem;
   padding-bottom: 0.1em;
   box-shadow: inset 0.5px 0 0 0 black;
@@ -637,11 +635,12 @@ html.book {
 }
 
 sup {
-  font: 0.6rem/1.3 $system;
+  font: 0.6rem/1.3 $mono;
 }
 
 .footnote {
-  font: 0.7rem/1.3 $system;
+  font: 0.6rem/1.3 $mono;
+  letter-spacing: -0.015em;
 }
 
 
