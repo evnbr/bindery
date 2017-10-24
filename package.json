@@ -1,6 +1,6 @@
 {
   "name": "bindery",
-  "version": "2.0.0-alpha.9.4",
+  "version": "2.0.0-alpha.10",
   "description": "Book layout in the browser",
   "main": "dist/bindery.cjs.js",
   "module": "dist/bindery.esm.js",
@@ -47,7 +47,7 @@
   ],
   "author": {
     "name": "Evan Brooks",
-    "url": "evanbrooks.info"
+    "url": "https://evanbrooks.info"
   },
   "license": "MIT"
 }

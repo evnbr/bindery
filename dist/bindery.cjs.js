@@ -1,7 +1,7 @@
-/* 📖 Bindery v2.0.0-alpha.9.4 */
+/* 📖 Bindery v2.0.0-alpha.10 */
 'use strict';
 
-var BINDERY_VERSION = 'v2.0.0-alpha.9.4'
+var BINDERY_VERSION = 'v2.0.0-alpha.10'
 
 function ___$insertStyle(css) {
   if (!css) {
@@ -482,6 +482,132 @@ var Page = function () {
   return Page;
 }();
 
+// Even when there is no debugDelay,
+// the throttler will occassionally use rAF
+// to prevent the call stack from getting too big.
+//
+// There might be a better way to do this.
+var MAX_CALLS = 1000;
+
+var Scheduler = function () {
+  function Scheduler(debuggable) {
+    classCallCheck(this, Scheduler);
+
+    this.numberOfCalls = 0;
+    this.resumeLimit = Infinity;
+    this.callsSinceResume = 0;
+    this.queuedFunc = null;
+    this.isPaused = false;
+    this.useDelay = debuggable;
+    this.delayTime = 100;
+
+    if (debuggable) {
+      // Only expose these
+      window.binderyDebug = {
+        pause: this.pause.bind(this),
+        resume: this.resume.bind(this),
+        resumeFor: this.resumeFor.bind(this),
+        step: this.step.bind(this),
+        finish: this.finish.bind(this)
+      };
+      console.log('Bindery: Debug layout with the following: \nbinderyDebug.pause() \nbinderyDebug.resume()\n binderyDebug.resumeFor(n) // pauses after n steps, \nbinderyDebug.step()');
+    }
+  }
+
+  createClass(Scheduler, [{
+    key: 'throttle',
+    value: function throttle(func) {
+      this.callsSinceResume += 1;
+
+      if (this.callsSinceResume > this.resumeLimit) {
+        this.endResume();
+      }
+
+      if (this.isPaused) {
+        this.queuedFunc = func;
+      } else if (this.useDelay) {
+        setTimeout(func, this.delayTime);
+      } else if (this.numberOfCalls < MAX_CALLS) {
+        this.numberOfCalls += 1;
+        func();
+      } else {
+        this.numberOfCalls = 0;
+        if (document.hidden) {
+          // Tab in background
+          setTimeout(func, 1);
+        } else {
+          requestAnimationFrame(func);
+        }
+      }
+    }
+  }, {
+    key: 'pause',
+    value: function pause() {
+      if (this.isPaused) return 'Already paused';
+      this.isPaused = true;
+      return 'Paused';
+    }
+  }, {
+    key: 'resumeDelay',
+    value: function resumeDelay() {
+      this.useDelay = true;
+      this.resume();
+    }
+  }, {
+    key: 'finish',
+    value: function finish() {
+      this.useDelay = false;
+      this.resume();
+    }
+  }, {
+    key: 'resume',
+    value: function resume() {
+      if (this.isPaused) {
+        this.isPaused = false;
+        if (this.queuedFunc) {
+          this.queuedFunc();
+          this.queuedFunc = null;
+        } else {
+          return 'Layout complete';
+        }
+        return 'Resuming';
+      }
+      return 'Already running';
+    }
+  }, {
+    key: 'step',
+    value: function step() {
+      if (!this.isPaused) {
+        return this.pause();
+      }
+      if (this.queuedFunc) {
+        var queued = this.queuedFunc;
+        var n = queued.name;
+        this.queuedFunc = null;
+        queued();
+        return n;
+      }
+      return 'Layout complete';
+    }
+  }, {
+    key: 'resumeFor',
+    value: function resumeFor(n) {
+      this.callsSinceResume = 0;
+      this.resumeLimit = n;
+      return this.resume();
+    }
+  }, {
+    key: 'endResume',
+    value: function endResume() {
+      console.log('Paused after ' + this.resumeLimit);
+      this.resumeLimit = Infinity;
+      this.callsSinceResume = 0;
+      this.pause();
+    }
+  }]);
+  return Scheduler;
+}();
+
 var Rule = function Rule(options) {
   var _this = this;
 
@@ -704,130 +830,128 @@ var PageBreak = function (_Rule) {
   return PageBreak;
 }(Rule);
 
-// Even when there is no debugDelay,
-// the throttler will occassionally use rAF
-// to prevent the call stack from getting too big.
-//
-// There might be a better way to do this.
-var MAX_CALLS = 1000;
+var isFullPageRule = function isFullPageRule(rule) {
+  return rule instanceof FullBleedSpread || rule instanceof FullBleedPage || rule instanceof PageBreak;
+};
 
-var Scheduler = function () {
-  function Scheduler(debuggable) {
-    classCallCheck(this, Scheduler);
+var dedupe = function dedupe(inputRules) {
+  var conflictRules = inputRules.filter(isFullPageRule);
+  var uniqueRules = inputRules.filter(function (rule) {
+    return !conflictRules.includes(rule);
+  });
 
-    this.numberOfCalls = 0;
-    this.resumeLimit = Infinity;
-    this.callsSinceResume = 0;
-    this.queuedFunc = null;
-    this.isPaused = false;
-    this.useDelay = debuggable;
-    this.delayTime = 100;
+  var firstSpreadRule = conflictRules.find(function (rule) {
+    return rule instanceof FullBleedSpread;
+  });
+  var firstPageRule = conflictRules.find(function (rule) {
+    return rule instanceof FullBleedPage;
+  });
 
-    if (debuggable) {
-      // Only expose these
-      window.binderyDebug = {
-        pause: this.pause.bind(this),
-        resume: this.resume.bind(this),
-        resumeFor: this.resumeFor.bind(this),
-        step: this.step.bind(this),
-        finish: this.finish.bind(this)
-      };
-      console.log('Bindery: Debug layout with the following: \nbinderyDebug.pause() \nbinderyDebug.resume()\n binderyDebug.resumeFor(n) // pauses after n steps, \nbinderyDebug.step()');
-    }
+  // Only apply one fullpage or fullspread
+  if (firstSpreadRule) uniqueRules.push(firstSpreadRule);else if (firstPageRule) uniqueRules.push(firstPageRule);else uniqueRules.push.apply(uniqueRules, toConsumableArray(conflictRules)); // multiple pagebreaks are ok
+
+  return uniqueRules;
+};
+
+var RuleSet = function () {
+  function RuleSet(rules) {
+    classCallCheck(this, RuleSet);
+
+    this.rules = rules;
+    this.pageRules = rules.filter(function (r) {
+      return r.eachPage;
+    });
+    this.beforeAddRules = rules.filter(function (r) {
+      return r.selector && r.beforeAdd;
+    });
+    this.afterAddRules = rules.filter(function (r) {
+      return r.selector && r.afterAdd;
+    });
+    this.selectorsNotToSplit = rules.filter(function (rule) {
+      return rule.avoidSplit;
+    }).map(function (rule) {
+      return rule.selector;
+    });
   }
 
-  createClass(Scheduler, [{
-    key: 'throttle',
-    value: function throttle(func) {
-      this.callsSinceResume += 1;
+  createClass(RuleSet, [{
+    key: 'setup',
+    value: function setup() {
+      this.rules.forEach(function (rule) {
+        if (rule.setup) rule.setup();
+      });
+    }
+  }, {
+    key: 'startPage',
+    value: function startPage(pg, book) {
+      this.rules.forEach(function (rule) {
+        if (rule.afterPageCreated) rule.afterPageCreated(pg, book);
+      });
+    }
+  }, {
+    key: 'finishEveryPage',
+    value: function finishEveryPage(book) {
+      this.pageRules.forEach(function (rule) {
+        book.pages.forEach(function (page) {
+          rule.eachPage(page, book);
+        });
+      });
+    }
+  }, {
+    key: 'finishPage',
+    value: function finishPage(page, book) {
+      this.pageRules.forEach(function (rule) {
+        rule.eachPage(page, book);
+      });
+    }
+  }, {
+    key: 'beforeAddElement',
+    value: function beforeAddElement(element, book, continueOnNewPage, makeNewPage) {
+      var addedElement = element;
 
-      if (this.callsSinceResume > this.resumeLimit) {
-        this.endResume();
-      }
+      var matchingRules = this.beforeAddRules.filter(function (rule) {
+        return addedElement.matches(rule.selector);
+      });
+      // const uniqueRules = dedupeRules(matchingRules);
 
-      if (this.isPaused) {
-        this.queuedFunc = func;
-      } else if (this.useDelay) {
-        setTimeout(func, this.delayTime);
-      } else if (this.numberOfCalls < MAX_CALLS) {
-        this.numberOfCalls += 1;
-        func();
-      } else {
-        this.numberOfCalls = 0;
-        if (document.hidden) {
-          // Tab in background
-          setTimeout(func, 1);
-        } else {
-          requestAnimationFrame(func);
-        }
-      }
+      matchingRules.forEach(function (rule) {
+        addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
+      });
+      return addedElement;
     }
   }, {
-    key: 'pause',
-    value: function pause() {
-      if (this.isPaused) return 'Already paused';
-      this.isPaused = true;
-      return 'Paused';
-    }
-  }, {
-    key: 'resumeDelay',
-    value: function resumeDelay() {
-      this.useDelay = true;
-      this.resume();
-    }
-  }, {
-    key: 'finish',
-    value: function finish() {
-      this.useDelay = false;
-      this.resume();
-    }
-  }, {
-    key: 'resume',
-    value: function resume() {
-      if (this.isPaused) {
-        this.isPaused = false;
-        if (this.queuedFunc) {
-          this.queuedFunc();
-          this.queuedFunc = null;
-        } else {
-          return 'Layout complete';
-        }
-        return 'Resuming';
-      }
-      return 'Already running';
-    }
-  }, {
-    key: 'step',
-    value: function step() {
-      if (!this.isPaused) {
-        return this.pause();
-      }
-      if (this.queuedFunc) {
-        var queued = this.queuedFunc;
-        var n = queued.name;
-        this.queuedFunc = null;
-        queued();
-        return n;
-      }
-      return 'Layout complete';
-    }
-  }, {
-    key: 'resumeFor',
-    value: function resumeFor(n) {
-      this.callsSinceResume = 0;
-      this.resumeLimit = n;
-      return this.resume();
-    }
-  }, {
-    key: 'endResume',
-    value: function endResume() {
-      console.log('Paused after ' + this.resumeLimit);
-      this.resumeLimit = Infinity;
-      this.callsSinceResume = 0;
-      this.pause();
+    key: 'afterAddElement',
+    value: function afterAddElement(originalElement, book, continueOnNewPage, makeNewPage, currentFlowElement) {
+      var addedElement = originalElement;
+
+      var matchingRules = this.afterAddRules.filter(function (rule) {
+        return addedElement.matches(rule.selector);
+      });
+      var uniqueRules = dedupe(matchingRules);
+
+      uniqueRules.forEach(function (rule) {
+        addedElement = rule.afterAdd(addedElement, book, continueOnNewPage, makeNewPage, function overflowCallback(problemElement) {
+          // TODO:
+          // While this does catch overflows, it introduces a few new bugs.
+          // It is pretty aggressive to move the entire node to the next page.
+          // - 1. there is no guarentee it will fit on the new page
+          // - 2. if it has childNodes, those side effects will not be undone,
+          // which means footnotes will get left on previous page.
+          // - 3. if it is a large paragraph, it will leave a large gap. the
+          // ideal approach would be to only need to invalidate
+          // the last line of text.
+          problemElement.parentNode.removeChild(problemElement);
+          continueOnNewPage();
+          currentFlowElement().appendChild(problemElement);
+          return rule.afterAdd(problemElement, book, continueOnNewPage, makeNewPage, function () {
+            console.log('Couldn\'t apply ' + rule.name + ' to ' + elementToString(problemElement) + '. Caused overflows twice.');
+          });
+        });
+      });
+      return addedElement;
     }
   }]);
-  return Scheduler;
+  return RuleSet;
 }();
 
 var indexOfNextInFlowPage = function indexOfNextInFlowPage(pages, startIndex) {
@@ -1014,9 +1138,16 @@ var waitForImage = function waitForImage(image, done) {
 
 // Utils
 // Bindery
-// Rules to check against
 // paginate
 var MAXIMUM_PAGE_LIMIT = 9999;
+
+// Walk up the tree to see if we are within
+// an overflow-ignoring node
+var shouldIgnoreOverflow = function shouldIgnoreOverflow(node) {
+  if (node.hasAttribute('data-ignore-overflow')) return true;
+  if (node.parentElement) return shouldIgnoreOverflow(node.parentElement);
+  return false;
+};
 
 var paginate = function paginate(_ref) {
   var content = _ref.content,
@@ -1029,8 +1160,10 @@ var paginate = function paginate(_ref) {
   // SETUP
   var startLayoutTime = window.performance.now();
   var layoutWaitingTime = 0;
+
   var scheduler = new Scheduler(isDebugging);
-  var cloneBreadcrumb = breadcrumbCloner(rules);
+  var ruleSet = new RuleSet(rules);
+  var continueBreadcrumb = breadcrumbCloner(rules);
   var measureArea = document.body.appendChild(h(c('.measure-area')));
 
   var breadcrumb = []; // Keep track of position in original tree
@@ -1043,47 +1176,37 @@ var paginate = function paginate(_ref) {
     return breadcrumb[0] ? last(breadcrumb) : book.pageInProgress.flowContent;
   };
 
-  var applyNewPageRules = function applyNewPageRules(pg) {
-    rules.forEach(function (rule) {
-      if (rule.afterPageCreated) rule.afterPageCreated(pg, book);
-    });
-  };
-
-  var applyLayoutStartRules = function applyLayoutStartRules() {
-    rules.forEach(function (rule) {
-      if (rule.layoutStart) rule.layoutStart();
-    });
+  var canSplit = function canSplit() {
+    return !shouldIgnoreOverflow(currentFlowElement());
   };
 
   var makeNewPage = function makeNewPage() {
     var newPage = new Page();
     measureArea.appendChild(newPage.element);
 
-    applyNewPageRules(newPage);
+    ruleSet.startPage(newPage, book);
     return newPage;
   };
 
-  var finishPage = function finishPage() {
+  var finishPage = function finishPage(page, ignoreOverflow) {
+    if (page && page.hasOverflowed()) {
+      console.warn('Bindery: Page overflowing', book.pageInProgress.element);
+      if (!page.suppressErrors && !ignoreOverflow) {
+        error('Moved to new page when last one is still overflowing');
+        throw Error('Bindery: Moved to new page when last one is still overflowing');
+      }
+    }
+
     // finished with this page, can display
     book.pages = orderPages(book.pages, makeNewPage);
     annotatePages(book.pages);
-    if (book.pageInProgress) {
-      applyPageRules(book.pageInProgress);
-    }
+    if (page) ruleSet.finishPage(page, book);
   };
 
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   var continueOnNewPage = function continueOnNewPage() {
     var ignoreOverflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-    if (book.pageInProgress && book.pageInProgress.hasOverflowed()) {
-      console.warn('Bindery: Page overflowing', book.pageInProgress.element);
-      if (!book.pageInProgress.suppressErrors && !ignoreOverflow) {
-        error('Moved to new page when last one is still overflowing');
-        throw Error('Bindery: Moved to new page when last one is still overflowing');
-      }
-    }
 
     if (book.pages.length === 500) {
       console.warn('Bindery: More than 500 pages, performance may be slow.');
@@ -1094,9 +1217,9 @@ var paginate = function paginate(_ref) {
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
-    finishPage();
+    finishPage(book.pageInProgress, ignoreOverflow);
 
-    breadcrumb = cloneBreadcrumb(breadcrumb);
+    breadcrumb = continueBreadcrumb(breadcrumb);
     var newPage = makeNewPage();
 
     book.pageInProgress = newPage;
@@ -1112,111 +1235,14 @@ var paginate = function paginate(_ref) {
     if (newPage.hasOverflowed()) {
       var suspect = currentFlowElement();
       if (suspect) {
-        console.error('Bindery: NextPage already overflowing, probably due to a style set on ' + elementToString(suspect) + '. It may not fit on the page.');
+        console.warn('Bindery: Content overflows, probably due to a style set on ' + elementToString(suspect) + '.');
         suspect.parentNode.removeChild(suspect);
       } else {
-        console.error('Bindery: NextPage already overflowing.');
+        console.warn('Bindery: Content overflows.');
       }
     }
 
     return newPage;
-  };
-
-  var beforeAddRules = rules.filter(function (r) {
-    return r.selector && r.beforeAdd;
-  });
-  var afterAddRules = rules.filter(function (r) {
-    return r.selector && r.afterAdd;
-  });
-  var pageRules = rules.filter(function (r) {
-    return r.eachPage;
-  });
-  var selectorsNotToSplit = rules.filter(function (rule) {
-    return rule.avoidSplit;
-  }).map(function (rule) {
-    return rule.selector;
-  });
-
-  var dedupeRules = function dedupeRules(inputRules) {
-    var conflictRules = inputRules.filter(function (rule) {
-      return rule instanceof FullBleedSpread || rule instanceof FullBleedPage || rule instanceof PageBreak;
-    });
-    var uniqueRules = inputRules.filter(function (rule) {
-      return !conflictRules.includes(rule);
-    });
-
-    var firstSpreadRule = conflictRules.find(function (rule) {
-      return rule instanceof FullBleedSpread;
-    });
-    var firstPageRule = conflictRules.find(function (rule) {
-      return rule instanceof FullBleedPage;
-    });
-
-    // Only apply one
-    if (firstSpreadRule) uniqueRules.push(firstSpreadRule);else if (firstPageRule) uniqueRules.push(firstPageRule);else {
-      // multiple pagebreaks are ok
-      uniqueRules.push.apply(uniqueRules, toConsumableArray(conflictRules));
-    }
-
-    return uniqueRules;
-  };
-
-  var applyBeforeAddRules = function applyBeforeAddRules(element) {
-    var addedElement = element;
-
-    var matchingRules = beforeAddRules.filter(function (rule) {
-      return addedElement.matches(rule.selector);
-    });
-    // const uniqueRules = dedupeRules(matchingRules);
-
-    matchingRules.forEach(function (rule) {
-      addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
-    });
-    return addedElement;
-  };
-
-  var applyAfterAddRules = function applyAfterAddRules(originalElement) {
-    var addedElement = originalElement;
-
-    var matchingRules = afterAddRules.filter(function (rule) {
-      return addedElement.matches(rule.selector);
-    });
-    var uniqueRules = dedupeRules(matchingRules);
-
-    uniqueRules.forEach(function (rule) {
-      addedElement = rule.afterAdd(addedElement, book, continueOnNewPage, makeNewPage, function overflowCallback(problemElement) {
-        // TODO:
-        // While this does catch overflows, it introduces a few new bugs.
-        // It is pretty aggressive to move the entire node to the next page.
-        // - 1. there is no guarentee it will fit on the new page
-        // - 2. if it has childNodes, those side effects will not be undone,
-        // which means footnotes will get left on previous page.
-        // - 3. if it is a large paragraph, it will leave a large gap. the
-        // ideal approach would be to only need to invalidate
-        // the last line of text.
-        problemElement.parentNode.removeChild(problemElement);
-        continueOnNewPage();
-        currentFlowElement().appendChild(problemElement);
-        return rule.afterAdd(problemElement, book, continueOnNewPage, makeNewPage, function () {
-          console.log('Couldn\'t apply ' + rule.name + ' to ' + elementToString(problemElement) + '. Caused overflows twice.');
-        });
-      });
-    });
-    return addedElement;
-  };
-
-  var applyEachPageRules = function applyEachPageRules() {
-    pageRules.forEach(function (rule) {
-      book.pages.forEach(function (page) {
-        rule.eachPage(page, book);
-      });
-    });
-  };
-
-  var applyPageRules = function applyPageRules(page) {
-    pageRules.forEach(function (rule) {
-      rule.eachPage(page, book);
-    });
   };
 
   // TODO: Merge isSplittable and shouldIgnoreOverflow
@@ -1224,7 +1250,7 @@ var paginate = function paginate(_ref) {
   // Walk up the tree to see if we can safely
   // insert a split into this node.
   var isSplittable = function isSplittable(node) {
-    if (selectorsNotToSplit.some(function (sel) {
+    if (ruleSet.selectorsNotToSplit.some(function (sel) {
       return node.matches(sel);
     })) {
       if (node.hasAttribute('data-bindery-did-move') || node.classList.contains(c('continuation'))) {
@@ -1236,14 +1262,6 @@ var paginate = function paginate(_ref) {
       return isSplittable(node.parentElement);
     }
     return true;
-  };
-
-  // Walk up the tree to see if we are within
-  // an overflow-ignoring node
-  var shouldIgnoreOverflow = function shouldIgnoreOverflow(node) {
-    if (node.hasAttribute('data-ignore-overflow')) return true;
-    if (node.parentElement) return shouldIgnoreOverflow(node.parentElement);
-    return false;
   };
 
   var moveElementToNextPage = function moveElementToNextPage(nodeToMove) {
@@ -1319,28 +1337,12 @@ var paginate = function paginate(_ref) {
     var originalText = textNode.nodeValue;
     currentFlowElement().appendChild(textNode);
 
-    if (!book.pageInProgress.hasOverflowed()) {
-      scheduler.throttle(doneCallback);
-      return;
-    }
-    if (currentFlowElement().hasAttribute('data-ignore-overflow')) {
+    if (!book.pageInProgress.hasOverflowed() || !canSplit()) {
       scheduler.throttle(doneCallback);
       return;
     }
 
     var pos = 0;
-
-    // Must be in viewport for caretRangeFromPoint
-    // measureArea.appendChild(book.pageInProgress.element);
-    //
-    // const flowBoxPos = book.pageInProgress.flowBox.getBoundingClientRect();
-    // const endX = flowBoxPos.left + flowBoxPos.width - 1;
-    // const endY = flowBoxPos.top + flowBoxPos.height - 30; // TODO: Real line height
-    // const range = document.caretRangeFromPoint(endX, endY);
-    // if (range && range.startContainer === textNode) {
-    //   console.log(`Predicted ${range.startOffset}: ${originalText.substr(0, range.startOffset)}`);
-    //   pos = range.startOffset;
-    // }
 
     var splitTextStep = function splitTextStep() {
       textNode.nodeValue = originalText.substr(0, pos);
@@ -1386,7 +1388,7 @@ var paginate = function paginate(_ref) {
   var addTextChild = function addTextChild(parent, child, next) {
     var forceAddTextNode = function forceAddTextNode() {
       currentFlowElement().appendChild(child);
-      if (!shouldIgnoreOverflow(currentFlowElement())) {
+      if (canSplit()) {
         book.pageInProgress.suppressErrors = true;
         continueOnNewPage();
       }
@@ -1407,7 +1409,7 @@ var paginate = function paginate(_ref) {
       addTextNodeIncremental(child, next, failure);
     } else {
       var _failure = function _failure() {
-        if (!shouldIgnoreOverflow(currentFlowElement())) {
+        if (canSplit()) {
           moveElementToNextPage(parent);
         }
         scheduler.throttle(function () {
@@ -1421,18 +1423,12 @@ var paginate = function paginate(_ref) {
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
   var addElementNode = function addElementNode(elementToAdd, doneCallback) {
-    if (book.pageInProgress.hasOverflowed()) {
-      if (shouldIgnoreOverflow(currentFlowElement())) {
-        // Do nothing. We just have to add nodes despite the page overflowing.
-      } else {
-        book.pageInProgress.suppressErrors = true;
-        continueOnNewPage();
-      }
+    if (book.pageInProgress.hasOverflowed() && canSplit()) {
+      book.pageInProgress.suppressErrors = true;
+      continueOnNewPage();
     }
-    var element = applyBeforeAddRules(elementToAdd);
-
+    var element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
     currentFlowElement().appendChild(element);
-
     breadcrumb.push(element);
 
     var childNodes = [].concat(toConsumableArray(element.childNodes));
@@ -1440,9 +1436,7 @@ var paginate = function paginate(_ref) {
 
     // Overflows when empty
     if (book.pageInProgress.hasOverflowed()) {
-      if (shouldIgnoreOverflow(currentFlowElement())) {
-        //
-      } else {
+      if (canSplit()) {
         moveElementToNextPage(element);
       }
     }
@@ -1453,7 +1447,7 @@ var paginate = function paginate(_ref) {
         // We're now done with this element and its children,
         // so we pop up a level
         var addedChild = breadcrumb.pop();
-        applyAfterAddRules(addedChild);
+        ruleSet.afterAddElement(addedChild, book, continueOnNewPage, makeNewPage, currentFlowElement);
 
         // if (book.pageInProgress.hasOverflowed()) {
         // console.log('Bindery: Added element despite overflowing');
@@ -1477,7 +1471,7 @@ var paginate = function paginate(_ref) {
           });
         } else {
           scheduler.throttle(function () {
-            addElementNode(child, addNext);
+            return addElementNode(child, addNext);
           });
         }
       } else {
@@ -1489,7 +1483,7 @@ var paginate = function paginate(_ref) {
   };
 
   var startPagination = function startPagination() {
-    applyLayoutStartRules();
+    ruleSet.setup();
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();
@@ -1507,7 +1501,7 @@ var paginate = function paginate(_ref) {
     annotatePages(book.pages);
 
     book.setCompleted();
-    applyEachPageRules();
+    ruleSet.finishEveryPage(book);
 
     if (!isDebugging) {
       var endLayoutTime = window.performance.now();
@@ -1715,7 +1709,7 @@ var option = function option() {
 };
 
 // View Swithcer
-var viewMode = function viewMode(id, action, text) {
+var viewMode = function viewMode(id, action) {
   var sel = '.' + c('viewmode') + '.' + c(id);
   return h(sel, { onclick: action }, h(c('.icon'))
   // text
@@ -1740,14 +1734,6 @@ var Controls = function Controls(opts) {
 
   var printBtn = btnMain({ onclick: print }, 'Print');
 
-  var doneBtn = btn({ onclick: function onclick() {
-      if (_this.binder.autorun) {
-        window.history.back();
-      } else {
-        _this.binder.cancel();
-      }
-    } }, 'Done');
-
   var sheetSizes = supportsCustomPageSize$1 ? [option({ value: 'size_page', selected: true }, 'Auto'), option({ value: 'size_page_bleed' }, 'Auto + Bleed'), option({ value: 'size_page_marks' }, 'Auto + Marks'), option({ value: 'size_letter_p' }, 'Letter Portrait'), option({ value: 'size_letter_l' }, 'Letter Landscape'), option({ value: 'size_a4_p' }, 'A4 Portrait'), option({ value: 'size_a4_l' }, 'A4 Landscape')] : [option({ value: 'size_letter_p', selected: true }, 'Default Page Size *'), option({ disabled: true }, 'Only Chrome supports custom page sizes. Set in your browser\'s print dialog instead.')];
 
   var updateSheetSizeNames = function updateSheetSizeNames() {
@@ -1765,12 +1751,9 @@ var Controls = function Controls(opts) {
     var newVal = e.target.value;
     viewer.setSheetSize(newVal);
     if (newVal === 'size_page' || newVal === 'size_page_bleed') {
-      // marksSelect.value = 'marks_none';
-      marksSelect.disabled = true;
       marksSelect.classList.add(c('hidden-select'));
     } else {
       marksSelect.classList.remove(c('hidden-select'));
-      marksSelect.disabled = false;
     }
 
     _this.binder.pageSetup.updateStylesheet();
@@ -1781,10 +1764,7 @@ var Controls = function Controls(opts) {
   var arrangeSelect = select({ onchange: function onchange(e) {
       viewer.setPrintArrange(e.target.value);
       updateSheetSizeNames();
-    } }, option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'), option({ value: 'arrange_two' }, '1 Spread / Sheet'), option({ value: 'arrange_booklet' }, 'Booklet Sheets')
-  // option({ disabled: true }, 'Grid'),
-  // option({ disabled: true }, 'Signatures'),
-  );
+    } }, option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'), option({ value: 'arrange_two' }, '1 Spread / Sheet'), option({ value: 'arrange_booklet' }, 'Booklet Sheets'));
   var arrangement = row(arrangeSelect);
 
   var updateMarks = function updateMarks(e) {
@@ -1815,11 +1795,6 @@ var Controls = function Controls(opts) {
   }
   var marks = row(marksSelect);
   var sheetSize = row(sheetSizeSelect);
-
-  var validCheck = h('div', { style: {
-      display: 'none',
-      color: '#e2b200'
-    } }, 'Too Small');
 
   var startPaginating = function startPaginating() {
     _this.binder.makeBook(function () {});
@@ -1887,7 +1862,6 @@ var Controls = function Controls(opts) {
 
   this.setInProgress = function () {
     headerContent.textContent = 'Paginating';
-    validCheck.style.display = 'none';
   };
 
   this.updateProgress = function (count) {
@@ -1896,12 +1870,9 @@ var Controls = function Controls(opts) {
 
   this.setDone = function () {
     headerContent.textContent = viewer.book.pages.length + ' Pages';
-    validCheck.style.display = 'none';
   };
 
-  this.setInvalid = function () {
-    validCheck.style.display = '';
-  };
+  this.setInvalid = function () {};
 
   printBtn.classList.add(c('btn-print'));
   var options = row(arrangement, sheetSize, marks);
@@ -2564,8 +2535,8 @@ var Counter = function (_Rule) {
   }
 
   createClass(Counter, [{
-    key: 'layoutStart',
-    value: function layoutStart() {
+    key: 'setup',
+    value: function setup() {
       this.counterValue = 0;
     }
   }, {
@@ -2854,7 +2825,7 @@ var Rules = {
   }
 };
 
-___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:200px;height:300px;position:relative;display:flex;flex-direction:column;flex-wrap:nowrap;margin:auto}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:12pt;background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:12pt;height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:12pt;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;padding:10px;position:relative;padding-top:80px;animation:a .3s;min-height:90vh}.📖-measure-area,.📖-root{background:#f4f4f4;z-index:2}.📖-measure-area{position:fixed;padding:50px 20px;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:b 1s infinite}}@keyframes a{0%{opacity:0}to{opacity:1}}@keyframes b{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all .2s}.📖-spread-wrapper{position:relative;display:flex;width:800px;margin:0 auto 50px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box}.📖-page3d{margin:auto;width:400px;height:600px;transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}@media screen{.📖-viewing .📖-controls{display:flex!important}}.📖-controls{font:14px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;display:none;flex-direction:row;align-items:start;position:fixed;top:0;left:0;right:0;z-index:3;margin:auto;color:#000;padding:10px;overflow:visible;-webkit-font-smoothing:antialiased}.📖-controls *{font:inherit;color:inherit;margin:0;padding:0;box-sizing:border-box}.📖-controls a{color:blue;text-decoration:none}.📖-row{position:relative;display:flex;flex-wrap:wrap;align-items:start;cursor:default;user-select:none;margin-left:8px;margin-bottom:8px}.📖-title{position:relative;display:flex;padding:8px 16px;transition:opacity .2s;display:none;white-space:nowrap;overflow:hidden;margin-right:auto;opacity:0}.📖-in-progress .📖-title{opacity:1;display:flex}.📖-print-options{opacity:1;display:none}[bindery-view-mode=print] .📖-print-options{display:flex}.📖-in-progress .📖-print-options{opacity:0;display:none}.📖-spinner{border:1px solid transparent;border-left-color:#000;width:20px;height:20px;border-radius:50%;vertical-align:middle;opacity:0;pointer-events:none;transition:all .2s;margin-right:16px}.📖-in-progress .📖-spinner{opacity:1;animation:c .6s linear infinite}.📖-debug .📖-spinner{animation:c 2s linear infinite}.📖-spinner.📖-paused{animation:none}@keyframes c{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.📖-controls .📖-btn{-webkit-appearance:none;color:#000;padding:8px 16px;background:#ddd;border:0;cursor:pointer;display:inline-block;border-radius:2px;margin-right:8px;text-decoration:none}.📖-controls .📖-btn:hover{background:#eee}.📖-controls .📖-btn:active{background:#ddd}.📖-controls .📖-btn:last-child{margin-right:0}.📖-controls .📖-btn-light{background:none;border:none}.📖-controls .📖-btn-main{background:blue;border-color:blue;color:#fff}.📖-controls .📖-btn-main:hover{background:blue;opacity:.7}.📖-controls .📖-btn-main:active{background:#000;opacity:1}.📖-btn-print{margin-left:auto;transition:all .8s}.📖-in-progress .📖-btn-print{background:gray;pointer-events:none}.📖-debug .📖-btn-print{display:none}.📖-viewswitcher{opacity:1;transform:scale(1);transition:all .8s;transition-delay:.2s;user-select:none;overflow:hidden;display:flex;flex-direction:row;border-radius:2px}.📖-in-progress .📖-viewswitcher{pointer-events:none}.📖-viewmode{color:#444;cursor:pointer;padding:0 8px;border-radius:2px}.📖-viewmode:hover{background:#eee}.📖-viewmode:active{background:#ddd}.📖-viewmode .📖-icon{height:36px;width:32px;background:currentColor;margin:0 auto}.📖-in-progress .📖-viewmode .📖-icon{color:gray!important}.📖-viewmode.📖-grid .📖-icon{-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.5 8.5h11v15h-11zm11 0h11v15h-11z' stroke='%23000' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=grid] .📖-viewmode.📖-grid .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 8h11v16H5zm12 0h11v16H17z' fill-rule='evenodd'/%3E%3C/svg%3E\")}.📖-viewmode.📖-flip .📖-icon{-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M5.5 8.5h11v15h-11z'/%3E%3Cpath d='M27.5 23.5v-15' stroke-linecap='square'/%3E%3Cpath d='M16.5 8.5v15h.41l7.59-2.847V5.722l-7.324 2.746L17 8.5h-.5z'/%3E%3Cpath d='M27.5 23.5h-11m8-15h3' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=interactive] .📖-viewmode.📖-flip .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M26 8h2v16h-8.152L26 21.693V8zM5 8h11v16H5V8zm12 0l8-3v16l-8 3V8z' fill-rule='evenodd'/%3E%3C/svg%3E\")}.📖-viewmode.📖-print .📖-icon{background:svg-inline(\"_assets/icon-sheet.svg\");-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath stroke='%23000' d='M9.5 5.5h13v6h-13zm13 17H26a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 13v8A1.5 1.5 0 0 0 6 22.5h3.5v-5h13v5z'/%3E%3Ccircle fill='%23000' cx='25' cy='14' r='1'/%3E%3Cpath stroke='%23000' d='M9.5 17.5h13v8h-13z'/%3E%3C/g%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=print] .📖-viewmode.📖-print .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill-rule='evenodd'%3E%3Cpath d='M9 5h14v5H9zm15 18v-5H8v5H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2zm1-8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3Cpath d='M9 19h14v8H9z'/%3E%3C/g%3E%3C/svg%3E\")}[bindery-view-mode=grid] .📖-grid,[bindery-view-mode=interactive] .📖-flip,[bindery-view-mode=print] .📖-print{color:blue}.📖-select-wrap{padding:8px 16px;padding-right:28px;background:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 14l5 5 5-5' stroke='%23000' fill='none'/%3E%3C/svg%3E\") no-repeat 50% 50%;background-color:#f4f4f4;background-position:100%;border-radius:2px;transition:all .2s;white-space:nowrap;width:100%}.📖-select-wrap:active,.📖-select-wrap:hover{background-color:#eee}.📖-select-wrap.📖-hidden-select{max-width:0;padding-left:0;padding-right:0;border-left-width:0;border-right-width:0;color:transparent}.📖-select{position:absolute;top:0;left:0;opacity:0;-webkit-appearance:none;-moz-appearance:none;padding:8px 16px;color:#000;border:transparent;width:100%}.📖-debug-controls{display:none}.📖-debug .📖-in-progress .📖-debug-controls{display:block}.📖-refresh-btns{opacity:0;position:absolute;top:0;left:0;padding:8px 0;transition:all .2s}.📖-in-progress .📖-refresh-btns{display:none}.📖-refresh-btns a{margin-left:1em;cursor:pointer}.📖-refresh-btns a:hover{color:#000}.📖-controls .📖-options-toggle{display:none}@media screen and (max-width:720px){[bindery-view-mode=print].📖-root{padding-top:120px}.📖-controls,.📖-print-options{background:#f4f4f4}.📖-print-options{top:56px;left:0;right:0;position:fixed;margin:0 8px 0 0}.📖-print-options.📖-options-hidden{display:none}}@media screen and (max-width:500px){[bindery-view-mode=print].📖-root{padding-top:190px}.📖-print-options{flex-direction:column;align-items:stretch}.📖-hidden-select{max-width:none;max-height:0}}");
+___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 2px 4px -1px rgba(0,0,0,.2);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:200px;height:300px;position:relative;display:flex;flex-direction:column;flex-wrap:nowrap;margin:auto}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:12pt;background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:12pt;height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:12pt;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;padding:10px;position:relative;padding-top:80px;min-height:90vh}.📖-measure-area,.📖-root{background:#f4f4f4;z-index:2}.📖-measure-area{position:fixed;padding:50px 20px;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all .2s}.📖-spread-wrapper{position:relative;display:flex;width:800px;margin:0 auto 50px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box}.📖-page3d{margin:auto;width:400px;height:600px;transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}@media screen{.📖-viewing .📖-controls{display:flex!important}}.📖-controls{font:14px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;display:none;flex-direction:row;align-items:start;position:fixed;top:0;left:0;right:0;z-index:3;margin:auto;color:#000;padding:10px;overflow:visible;-webkit-font-smoothing:antialiased}.📖-controls *{font:inherit;color:inherit;margin:0;padding:0;box-sizing:border-box}.📖-controls a{color:blue;text-decoration:none}.📖-row{position:relative;display:flex;flex-wrap:wrap;align-items:start;cursor:default;user-select:none;margin-left:8px;margin-bottom:8px}.📖-title{position:relative;display:flex;padding:8px 16px;transition:opacity .2s;display:none;white-space:nowrap;overflow:hidden;margin-right:auto;opacity:0}.📖-in-progress .📖-title{opacity:1;display:flex}.📖-print-options{opacity:1;display:none}[bindery-view-mode=print] .📖-print-options{display:flex}.📖-in-progress .📖-print-options{opacity:0;display:none}.📖-spinner{border:1px solid transparent;border-left-color:#000;width:20px;height:20px;border-radius:50%;vertical-align:middle;opacity:0;pointer-events:none;transition:all .2s;margin-right:16px}.📖-in-progress .📖-spinner{opacity:1;animation:b .6s linear infinite}.📖-debug .📖-spinner{animation:b 2s linear infinite}.📖-spinner.📖-paused{animation:none}@keyframes b{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.📖-controls .📖-btn{-webkit-appearance:none;color:#000;padding:8px 16px;background:#ddd;border:0;cursor:pointer;display:inline-block;border-radius:2px;margin-right:8px;text-decoration:none}.📖-controls .📖-btn:hover{background:#eee}.📖-controls .📖-btn:active{background:#ddd}.📖-controls .📖-btn:last-child{margin-right:0}.📖-controls .📖-btn-light{background:none;border:none}.📖-controls .📖-btn-main{background:blue;border-color:blue;color:#fff}.📖-controls .📖-btn-main:hover{background:blue;opacity:.7}.📖-controls .📖-btn-main:active{background:#000;opacity:1}.📖-btn-print{margin-left:auto;transition:all .8s}.📖-in-progress .📖-btn-print{background:gray;pointer-events:none}.📖-debug .📖-btn-print{display:none}.📖-viewswitcher{opacity:1;user-select:none;overflow:hidden;display:flex;flex-direction:row;border-radius:2px}.📖-in-progress .📖-viewswitcher{pointer-events:none}.📖-viewmode{color:#444;cursor:pointer;padding:0 8px;border-radius:2px}.📖-viewmode:hover{background:#eee}.📖-viewmode:active{background:#ddd}.📖-icon{height:36px;width:32px;background:currentColor;margin:0 auto}.📖-in-progress .📖-icon{color:gray!important}.📖-grid .📖-icon{-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.5 8.5h11v15h-11zm11 0h11v15h-11z' stroke='%23000' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=grid] .📖-grid .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 8h11v16H5zm12 0h11v16H17z' fill-rule='evenodd'/%3E%3C/svg%3E\")}.📖-flip .📖-icon{-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M5.5 8.5h11v15h-11z'/%3E%3Cpath d='M27.5 23.5v-15' stroke-linecap='square'/%3E%3Cpath d='M16.5 8.5v15h.41l7.59-2.847V5.722l-7.324 2.746L17 8.5h-.5z'/%3E%3Cpath d='M27.5 23.5h-11m8-15h3' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=interactive] .📖-flip .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M26 8h2v16h-8.152L26 21.693V8zM5 8h11v16H5V8zm12 0l8-3v16l-8 3V8z' fill-rule='evenodd'/%3E%3C/svg%3E\")}.📖-print .📖-icon{-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath stroke='%23000' d='M9.5 5.5h13v6h-13zm13 17H26a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 13v8A1.5 1.5 0 0 0 6 22.5h3.5v-5h13v5z'/%3E%3Ccircle fill='%23000' cx='25' cy='14' r='1'/%3E%3Cpath stroke='%23000' d='M9.5 17.5h13v8h-13z'/%3E%3C/g%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=print] .📖-print .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill-rule='evenodd'%3E%3Cpath d='M9 5h14v5H9zm15 18v-5H8v5H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2zm1-8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3Cpath d='M9 19h14v8H9z'/%3E%3C/g%3E%3C/svg%3E\")}[bindery-view-mode=grid] .📖-grid,[bindery-view-mode=interactive] .📖-flip,[bindery-view-mode=print] .📖-print{color:blue}.📖-select-wrap{padding:8px 16px;padding-right:28px;background:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 14l5 5 5-5' stroke='%23000' fill='none'/%3E%3C/svg%3E\") no-repeat 50% 50%;background-color:#f4f4f4;background-position:100%;border-radius:2px;transition:all .2s;white-space:nowrap;width:100%}.📖-select-wrap:active,.📖-select-wrap:hover{background-color:#eee}.📖-select-wrap.📖-hidden-select{max-width:0;padding-left:0;padding-right:0;border-left-width:0;border-right-width:0;color:transparent}.📖-select{position:absolute;top:0;left:0;opacity:0;-webkit-appearance:none;-moz-appearance:none;padding:8px 16px;color:#000;border:transparent;width:100%}.📖-debug-controls{display:none}.📖-debug .📖-in-progress .📖-debug-controls{display:block}.📖-refresh-btns{opacity:0;position:absolute;top:0;left:0;padding:8px 0;transition:all .2s}.📖-in-progress .📖-refresh-btns{display:none}.📖-refresh-btns a{margin-left:1em;cursor:pointer}.📖-refresh-btns a:hover{color:#000}@media screen and (max-width:720px){[bindery-view-mode=print].📖-root{padding-top:120px}.📖-controls,.📖-print-options{background:#f4f4f4}.📖-print-options{top:56px;left:0;right:0;position:fixed;margin:0 8px 0 0}.📖-print-options.📖-options-hidden{display:none}}@media screen and (max-width:500px){[bindery-view-mode=print].📖-root{padding-top:190px}.📖-print-options{flex-direction:column;align-items:stretch}.📖-hidden-select{max-width:none;max-height:0}}");
 
 var Bindery = function () {
   function Bindery() {
