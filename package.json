@@ -40,6 +40,9 @@
     "docs": "cd docs && jekyll serve",
     "lint": "eslint src/ webpack.*.js --cache"
   },
+  "jest": {
+    "collectCoverageFrom": ["**/src/**.{js,jsx}", "!**/node_modules/**", "!**/vendor/**"]
+  },
   "keywords": [
     "book",
     "pagination",
