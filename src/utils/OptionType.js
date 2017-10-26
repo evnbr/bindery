@@ -16,6 +16,10 @@ const validate = (opts, validOpts) => {
 };
 
 const isObj = val => typeof val === 'object';
+const isFunc = val => typeof val === 'function';
+const isBool = val => typeof val === 'boolean';
+const isStr = val => typeof val === 'string';
+const isArr = val => Array.isArray(val);
 
 const OptionType = {
   enum(...enumCases) {
@@ -27,22 +31,12 @@ const OptionType = {
   any() {
     return true;
   },
-  string(val) {
-    return typeof val === 'string';
-  },
-  length(val) {
-    return isValidLength(val);
-  },
-  bool(val) {
-    return typeof val === 'boolean';
-  },
-  func(val) {
-    return typeof val === 'function';
-  },
+  string: isStr,
+  length: isValidLength,
+  bool: isBool,
+  func: isFunc,
   obj: isObj,
-  array(val) {
-    return Array.isArray(val);
-  },
+  array: isArr,
   shape(validShape) {
     return userShape => isObj(userShape) && validate(userShape, validShape);
   },

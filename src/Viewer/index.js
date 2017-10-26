@@ -307,9 +307,9 @@ class Viewer {
 
     let pages = this.book.pages.slice();
     if (this.printArrange === ARRANGE_SPREAD) {
-      pages = padPages(pages);
+      pages = padPages(pages, () => new Page());
     } else if (isBooklet) {
-      pages = orderPagesBooklet(pages);
+      pages = orderPagesBooklet(pages, () => new Page());
     }
 
     const fragment = printLayout(pages, this.isTwoUp, orient, isBooklet);
@@ -322,7 +322,7 @@ class Viewer {
 
     let pages = this.book.pages.slice();
 
-    if (this.doubleSided) pages = padPages(pages);
+    if (this.doubleSided) pages = padPages(pages, () => new Page());
 
     const fragment = gridLayout(pages, this.doubleSided);
     this.zoomBox.appendChild(fragment);
@@ -335,7 +335,7 @@ class Viewer {
     this.element.classList.remove(c('show-bleed'));
     this.element.classList.remove(c('show-guides'));
 
-    const pages = padPages(this.book.pages.slice());
+    const pages = padPages(this.book.pages.slice(), () => new Page());
 
     const fragment = flipLayout(pages, this.doubleSided);
     this.zoomBox.appendChild(fragment);
