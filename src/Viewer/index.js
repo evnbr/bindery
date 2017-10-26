@@ -7,7 +7,7 @@ import Page from '../Page';
 import errorView from './error';
 import orderPagesBooklet from './orderPagesBooklet';
 import padPages from './padPages';
-import { gridLayout, printLayout, flipLayout } from '../Layouts';
+import { gridLayout, printLayout, flipLayout } from './Layouts';
 
 const MODE_FLIP = 'interactive';
 const MODE_PREVIEW = 'grid';

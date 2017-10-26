@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import { c } from '../utils';
+import { c } from '../../utils';
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 
 const twoPageSpread = function (...arg) {
