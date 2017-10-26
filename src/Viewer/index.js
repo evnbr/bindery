@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import c from '../utils/prefixClass';
+import { c } from '../utils';
 
 import Controls from '../Controls';
 import Page from '../Page';

@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import c from '../utils/prefixClass';
+import { c } from '../utils';
 
 export default function (title, text) {
   return h(c('.error'),

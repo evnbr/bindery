@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import c from '../utils/prefixClass';
+import { c } from '../utils';
 
 const twoPageSpread = function (...arg) {
   return h(c('.spread-wrapper') + c('.spread-size'), ...arg);

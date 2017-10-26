@@ -1,4 +1,4 @@
-import c from '../utils/prefixClass';
+import { c } from '../utils';
 
 // @param rules: array of Bindery.Rules
 // @return: A new function that clones the given
@@ -20,15 +20,15 @@ const breadcrumbCloner = (rules) => {
   const markAsContinues = (node) => {
     node.classList.add(c('continues'));
     rules
-      .filter(rule => rule.customContinuesClass)
-      .forEach(rule => node.classList.add(rule.customContinuesClass));
+      .filter(rule => rule.customToNextClass)
+      .forEach(rule => node.classList.add(rule.customToNextClass));
   };
 
   const markAsContinuation = (node) => {
     node.classList.add(c('continuation'));
     rules
-      .filter(rule => rule.customContinuationClass)
-      .forEach(rule => node.classList.add(rule.customContinuationClass));
+      .filter(rule => rule.customFromPrevClass)
+      .forEach(rule => node.classList.add(rule.customFromPrevClass));
   };
 
   return (origBreadcrumb) => {

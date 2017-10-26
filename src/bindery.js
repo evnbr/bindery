@@ -1,12 +1,13 @@
+/* global BINDERY_VERSION */
+
 import h from 'hyperscript';
 
 import paginate from './paginate';
 import PageSetup from './PageSetup';
 import Viewer from './Viewer';
-import c from './utils/prefixClass';
 
 import Rules from './Rules/';
-import { OptionType, urlQuery } from './utils';
+import { OptionType, urlQuery, c } from './utils';
 
 import './main.scss';
 
