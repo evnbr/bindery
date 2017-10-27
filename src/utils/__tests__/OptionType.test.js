@@ -43,3 +43,19 @@ test('Handles enums', () => {
   expect(enumChecker('up')).toBe(false);
   expect(enumChecker('down')).toBe(false);
 });
+
+test('Handles shapes', () => {
+  const shapeChecker = OptionType.shape({
+    height: OptionType.length,
+    name: OptionType.string,
+  });
+  expect(shapeChecker({
+    height: '12px',
+    name: 'example',
+  })).toBe(true);
+
+  expect(shapeChecker({
+    width: '12px',
+    title: 'example',
+  })).toBe(false);
+});

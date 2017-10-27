@@ -1,18 +1,21 @@
 import { isValidLength } from './convertUnits';
 
 const validate = (opts, validOpts) => {
+  let isValid = true;
   Object.keys(opts).forEach((k) => {
     if (!validOpts[k]) {
       console.error(`Bindery: '${validOpts.name}' doesn't have property '${k}'`);
+      isValid = false;
     } else {
       const val = opts[k];
       const checker = validOpts[k];
       if (!checker(val)) {
         console.error(`Bindery: For property '${validOpts.name}.${k}', ${JSON.stringify(val)} is not a valid value of type ${checker.name}`);
+        isValid = false;
       }
     }
   });
-  return true;
+  return isValid;
 };
 
 const isObj = val => typeof val === 'object';
