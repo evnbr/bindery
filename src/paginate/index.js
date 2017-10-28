@@ -15,7 +15,7 @@ import Scheduler from './Scheduler';
 import RuleSet from './RuleSet';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
-import breadcrumbCloner from './breadcrumbCloner';
+import breadcrumbClone from './breadcrumbClone';
 import waitForImage from './waitForImage';
 
 const MAXIMUM_PAGE_LIMIT = 9999;
@@ -37,7 +37,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
   const scheduler = new Scheduler(isDebugging);
   const ruleSet = new RuleSet(rules);
-  const continueBreadcrumb = breadcrumbCloner(rules);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
 
   let breadcrumb = []; // Keep track of position in original tree
@@ -91,7 +90,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     finishPage(book.pageInProgress, ignoreOverflow);
 
-    breadcrumb = continueBreadcrumb(breadcrumb);
+    breadcrumb = breadcrumbClone(breadcrumb, rules);
     const newPage = makeNewPage();
 
     book.pageInProgress = newPage;
