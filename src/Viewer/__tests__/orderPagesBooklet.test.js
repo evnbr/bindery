@@ -36,3 +36,22 @@ test('Orders 8', () => {
     pages[4],
   ]);
 });
+
+test('Adds pages to end when not divisible by 4', () => {
+  const pages = [
+    makePage(),
+    makePage(),
+    makePage(),
+    makePage(),
+    makePage(),
+  ];
+
+  const ordered = orderPagesBooklet(pages, makePage);
+
+  expect(ordered.length).toBe(8);
+  expect(ordered[1]).toBe(pages[0]);
+  expect(ordered[2]).toBe(pages[1]);
+  expect(ordered[5]).toBe(pages[2]);
+  expect(ordered[6]).toBe(pages[3]);
+  expect(ordered[7]).toBe(pages[4]);
+});
