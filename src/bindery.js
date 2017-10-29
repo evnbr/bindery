@@ -3,6 +3,7 @@
 import h from 'hyperscript';
 
 import paginate from './paginate';
+import scheduler from './paginate/Scheduler';
 import PageSetup from './PageSetup';
 import Viewer from './Viewer';
 
@@ -17,7 +18,7 @@ class Bindery {
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
-    this.debug = opts.debug || urlQuery('debug') || false;
+    scheduler.isDebugging = opts.debug || urlQuery('debug') || false;
 
     OptionType.validate(opts, {
       name: 'makeBook',
@@ -165,7 +166,6 @@ class Bindery {
         this.layoutComplete = true;
         this.viewer.displayError('Layout failed', error);
       },
-      isDebugging: this.debug,
     });
   }
 
@@ -194,7 +194,7 @@ class Bindery {
 
     document.body.classList.add(c('viewing'));
     this.viewer.element.classList.add(c('in-progress'));
-    if (this.debug) document.body.classList.add(c('debug'));
+    if (scheduler.isDebugging) document.body.classList.add(c('debug'));
 
     this.pageSetup.updateStylesheet();
 
@@ -223,7 +223,6 @@ class Bindery {
         this.viewer.element.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
       },
-      isDebugging: this.debug,
     });
   }
 }

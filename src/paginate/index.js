@@ -11,31 +11,110 @@ import Book from '../Book';
 import Page from '../Page';
 
 // paginate
-import Scheduler from './Scheduler';
+import scheduler from './Scheduler';
 import RuleSet from './RuleSet';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
 import breadcrumbClone from './breadcrumbClone';
 import waitForImage from './waitForImage';
 
-const MAXIMUM_PAGE_LIMIT = 9999;
+const MAXIMUM_PAGE_LIMIT = 1500;
 
-
+// TODO: Combine isSplittable and shouldIgnoreOverflow
 // Walk up the tree to see if we are within
 // an overflow-ignoring node
-const shouldIgnoreOverflow = (node) => {
-  if (node.hasAttribute('data-ignore-overflow')) return true;
-  if (node.parentElement) return shouldIgnoreOverflow(node.parentElement);
+const shouldIgnoreOverflow = (element) => {
+  if (element.hasAttribute('data-ignore-overflow')) return true;
+  if (element.parentElement) return shouldIgnoreOverflow(element.parentElement);
   return false;
 };
 
+// Walk up the tree to see if we can safely
+// insert a split into this node.
+const isSplittable = (element, selectorsNotToSplit) => {
+  if (selectorsNotToSplit.some(sel => element.matches(sel))) {
+    if (element.hasAttribute('data-bindery-did-move')
+      || element.classList.contains(c('continuation'))) {
+      return true; // ignore rules and split it anyways.
+    }
+    return false;
+  }
+  if (element.parentElement) {
+    return isSplittable(element.parentElement, selectorsNotToSplit);
+  }
+  return true;
+};
 
-const paginate = ({ content, rules, success, progress, error, isDebugging }) => {
+const addTextNode = (textNode, parent, page, success, failure) => {
+  parent.appendChild(textNode);
+
+  if (page.hasOverflowed()) {
+    parent.removeChild(textNode);
+    failure();
+  } else {
+    scheduler.throttle(success);
+  }
+};
+
+// Adds an text node by incrementally adding words
+// until it just barely doesnt overflow
+const addTextNodeIncremental = (textNode, parent, page, success, failure, moveToNextPage) => {
+  const originalText = textNode.nodeValue;
+  parent.appendChild(textNode);
+
+  if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
+    scheduler.throttle(success);
+    return;
+  }
+
+  let pos = 0;
+
+  const splitTextStep = () => {
+    textNode.nodeValue = originalText.substr(0, pos);
+
+    if (page.hasOverflowed()) {
+      // Back out to word boundary
+      if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
+      while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
+
+      if (pos < 1) {
+        textNode.nodeValue = originalText;
+        textNode.parentNode.removeChild(textNode);
+        failure();
+        return;
+      }
+
+      // console.log(`Text breaks at ${pos}: ${originalText.substr(0, pos)}`);
+
+      const fittingText = originalText.substr(0, pos);
+      const overflowingText = originalText.substr(pos);
+      textNode.nodeValue = fittingText;
+
+      // Start on new page
+      const remainingTextNode = document.createTextNode(overflowingText);
+      moveToNextPage(remainingTextNode);
+      return;
+    }
+    if (pos > originalText.length - 1) {
+      scheduler.throttle(success);
+      return;
+    }
+
+    pos += 1;
+    while (originalText.charAt(pos) !== ' ' && pos < originalText.length) pos += 1;
+
+    scheduler.throttle(splitTextStep);
+  };
+
+  splitTextStep();
+};
+
+const paginate = ({ content, rules, success, progress, error }) => {
   // SETUP
   const startLayoutTime = window.performance.now();
   let layoutWaitingTime = 0;
 
-  const scheduler = new Scheduler(isDebugging);
+  // const scheduler = new Scheduler(isDebugging);
   const ruleSet = new RuleSet(rules);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
 
@@ -45,13 +124,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   let updatePaginationProgress;
   let finishPagination;
 
-  const currentFlowElement = function () {
-    return breadcrumb[0]
-      ? last(breadcrumb)
-      : book.pageInProgress.flowContent;
-  };
-
-  const canSplit = () => !shouldIgnoreOverflow(currentFlowElement());
+  const currentFlowElement = () => last(breadcrumb);
+  const canSplit = () => !shouldIgnoreOverflow(last(breadcrumb));
 
   const makeNewPage = () => {
     const newPage = new Page();
@@ -79,11 +153,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
   const continueOnNewPage = (ignoreOverflow = false) => {
-    if (book.pages.length === 500) {
-      console.warn('Bindery: More than 500 pages, performance may be slow.');
-    } else if (book.pages.length === 1000) {
-      console.warn('Bindery: More than 1000 pages, performance may be slow.');
-    } else if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
+    if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
       error('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
@@ -104,7 +174,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
 
     // make sure the cloned page is valid.
     if (newPage.hasOverflowed()) {
-      const suspect = currentFlowElement();
+      const suspect = last(breadcrumb);
       if (suspect) {
         console.warn(`Bindery: Content overflows, probably due to a style set on ${elToStr(suspect)}.`);
         suspect.parentNode.removeChild(suspect);
@@ -114,24 +184,6 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
 
     return newPage;
-  };
-
-  // TODO: Merge isSplittable and shouldIgnoreOverflow
-
-  // Walk up the tree to see if we can safely
-  // insert a split into this node.
-  const isSplittable = (node) => {
-    if (ruleSet.selectorsNotToSplit.some(sel => node.matches(sel))) {
-      if (node.hasAttribute('data-bindery-did-move')
-        || node.classList.contains(c('continuation'))) {
-        return true; // don't split it again.
-      }
-      return false;
-    }
-    if (node.parentElement) {
-      return isSplittable(node.parentElement);
-    }
-    return true;
   };
 
   const moveElementToNextPage = (nodeToMove) => {
@@ -145,8 +197,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     // find the nearest splittable parent
     let willMove = nodeToMove;
     const pathToRestore = [];
-    while (breadcrumb.length > 1 && !isSplittable(currentFlowElement())) {
-      // console.log('Not OK to split:', currentFlowElement());
+    while (breadcrumb.length > 1 && !isSplittable(last(breadcrumb), ruleSet.selectorsNotToSplit)) {
+      // console.log('Not OK to split:', last(breadcrumb));
       willMove = breadcrumb.pop();
       pathToRestore.unshift(willMove);
     }
@@ -158,7 +210,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     const parent = willMove.parentNode;
     parent.removeChild(willMove);
 
-    if (breadcrumb.length > 1 && currentFlowElement().textContent.trim() === '') {
+    if (breadcrumb.length > 1 && last(breadcrumb).textContent.trim() === '') {
       parent.appendChild(willMove);
       willMove = breadcrumb.pop();
       pathToRestore.unshift(willMove);
@@ -178,7 +230,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     }
 
     // append node as first in new page
-    currentFlowElement().appendChild(willMove);
+    last(breadcrumb).appendChild(willMove);
 
     // restore subpath
     pathToRestore.forEach((restore) => {
@@ -190,74 +242,9 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     breadcrumb.push(nodeToMove);
   };
 
-  const addTextNode = (textNode, doneCallback, failure) => {
-    currentFlowElement().appendChild(textNode);
-
-    if (book.pageInProgress.hasOverflowed()) {
-      textNode.parentNode.removeChild(textNode);
-      failure();
-    } else {
-      scheduler.throttle(doneCallback);
-    }
-  };
-
-  // Adds an text node by incrementally adding words
-  // until it just barely doesnt overflow
-  const addTextNodeIncremental = (textNode, doneCallback, failure) => {
-    const originalText = textNode.nodeValue;
-    currentFlowElement().appendChild(textNode);
-
-    if (!book.pageInProgress.hasOverflowed() || !canSplit()) {
-      scheduler.throttle(doneCallback);
-      return;
-    }
-
-    let pos = 0;
-
-    const splitTextStep = () => {
-      textNode.nodeValue = originalText.substr(0, pos);
-
-      if (book.pageInProgress.hasOverflowed()) {
-        // Back out to word boundary
-        if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
-        while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
-
-        if (pos < 1) {
-          textNode.nodeValue = originalText;
-          textNode.parentNode.removeChild(textNode);
-          failure();
-          return;
-        }
-
-        // console.log(`Text breaks at ${pos}: ${originalText.substr(0, pos)}`);
-
-        const fittingText = originalText.substr(0, pos);
-        const overflowingText = originalText.substr(pos);
-        textNode.nodeValue = fittingText;
-
-        // Start on new page
-        continueOnNewPage();
-        const remainingTextNode = document.createTextNode(overflowingText);
-        addTextNodeIncremental(remainingTextNode, doneCallback, failure);
-        return;
-      }
-      if (pos > originalText.length - 1) {
-        scheduler.throttle(doneCallback);
-        return;
-      }
-
-      pos += 1;
-      while (originalText.charAt(pos) !== ' ' && pos < originalText.length) pos += 1;
-
-      scheduler.throttle(splitTextStep);
-    };
-
-    splitTextStep();
-  };
-
   const addTextChild = (parent, child, next) => {
     const forceAddTextNode = () => {
-      currentFlowElement().appendChild(child);
+      last(breadcrumb).appendChild(child);
       if (canSplit()) {
         book.pageInProgress.suppressErrors = true;
         continueOnNewPage();
@@ -265,24 +252,46 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       scheduler.throttle(next);
     };
 
-    if (isSplittable(parent) && !shouldIgnoreOverflow(parent)) {
-      const failure = () => {
+    if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
+      let failure;
+      let continueText;
+      const addText = (text) => {
+        addTextNodeIncremental(
+          text, last(breadcrumb), book.pageInProgress, next, failure, continueText
+        );
+      };
+      continueText = (remainingTextNode) => {
+        continueOnNewPage();
+        addText(remainingTextNode);
+      };
+      failure = () => {
         if (breadcrumb.length > 1) {
           moveElementToNextPage(parent);
-          scheduler.throttle(() => addTextNodeIncremental(child, next, forceAddTextNode));
+          scheduler.throttle(() =>
+            addTextNodeIncremental(
+              child,
+              last(breadcrumb),
+              book.pageInProgress,
+              next,
+              forceAddTextNode,
+              continueText
+            )
+          );
         } else {
           forceAddTextNode();
         }
       };
-      addTextNodeIncremental(child, next, failure);
+      addText(child);
     } else {
       const failure = () => {
         if (canSplit()) {
           moveElementToNextPage(parent);
         }
-        scheduler.throttle(() => addTextNode(child, next, forceAddTextNode));
+        scheduler.throttle(() =>
+          addTextNode(child, last(breadcrumb), book.pageInProgress, next, forceAddTextNode)
+        );
       };
-      addTextNode(child, next, failure);
+      addTextNode(child, last(breadcrumb), book.pageInProgress, next, failure);
     }
   };
 
@@ -294,7 +303,8 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
       continueOnNewPage();
     }
     const element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
-    currentFlowElement().appendChild(element);
+    if (!breadcrumb[0]) book.pageInProgress.flowContent.appendChild(element);
+    else last(breadcrumb).appendChild(element);
     breadcrumb.push(element);
 
     const childNodes = [...element.childNodes];
@@ -373,7 +383,7 @@ const paginate = ({ content, rules, success, progress, error, isDebugging }) => 
     book.setCompleted();
     ruleSet.finishEveryPage(book);
 
-    if (!isDebugging) {
+    if (!scheduler.isDebugging) {
       const endLayoutTime = window.performance.now();
       const totalTime = endLayoutTime - startLayoutTime;
       const layoutTime = totalTime - layoutWaitingTime;

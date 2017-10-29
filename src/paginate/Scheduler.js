@@ -6,17 +6,23 @@
 const MAX_CALLS = 1000;
 
 class Scheduler {
-  constructor(debuggable) {
+  constructor() {
     this.numberOfCalls = 0;
     this.resumeLimit = Infinity;
     this.callsSinceResume = 0;
     this.queuedFunc = null;
     this.isPaused = false;
-    this.useDelay = debuggable;
+    this.useDelay = false;
     this.delayTime = 100;
+  }
 
-    if (debuggable) {
-      // Only expose these
+  get isDebugging() {
+    return this.useDelay;
+  }
+
+  set isDebugging(newValue) {
+    this.useDelay = newValue;
+    if (newValue) {
       window.binderyDebug = {
         pause: this.pause.bind(this),
         resume: this.resume.bind(this),
@@ -27,6 +33,7 @@ class Scheduler {
       console.log('Bindery: Debug layout with the following: \nbinderyDebug.pause() \nbinderyDebug.resume()\n binderyDebug.resumeFor(n) // pauses after n steps, \nbinderyDebug.step()');
     }
   }
+
   throttle(func) {
     this.callsSinceResume += 1;
 
@@ -102,4 +109,4 @@ class Scheduler {
   }
 }
 
-export default Scheduler;
+export default new Scheduler();
