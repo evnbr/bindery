@@ -281,6 +281,8 @@ class Viewer {
   renderGrid() {
     this.zoomBox.innerHTML = '';
 
+    this.element.classList.remove(c('show-bleed'));
+
     let pages = this.book.pages.slice();
 
     if (this.doubleSided) pages = padPages(pages, () => new Page());

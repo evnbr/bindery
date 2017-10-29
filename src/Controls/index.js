@@ -1,5 +1,4 @@
 import h from 'hyperscript';
-// import { convertStrToPx } from '../utils/convertUnits';
 import c from '../utils/prefixClass';
 
 import {
