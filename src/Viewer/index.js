@@ -12,7 +12,6 @@ import { gridLayout, printLayout, flipLayout } from './Layouts';
 const MODE_FLIP = 'interactive';
 const MODE_PREVIEW = 'grid';
 const MODE_SHEET = 'print';
-const MODE_OUTLINE = 'outline';
 
 const ARRANGE_ONE = 'arrange_one';
 const ARRANGE_SPREAD = 'arrange_two';
@@ -39,7 +38,6 @@ class Viewer {
     this.listenForResize();
 
     this.setGrid = this.setGrid.bind(this);
-    this.setOutline = this.setOutline.bind(this);
     this.setPrint = this.setPrint.bind(this);
     this.setFlip = this.setFlip.bind(this);
 
@@ -150,9 +148,6 @@ class Viewer {
       this.element.parentNode.removeChild(this.element);
     }
   }
-  toggleGuides() {
-    this.element.classList.toggle(c('show-guides'));
-  }
   toggleBleed() {
     this.element.classList.add(c('show-bleed'));
   }
@@ -174,10 +169,6 @@ class Viewer {
     case 'sheet':
       this.mode = MODE_SHEET;
       break;
-    case 'outline':
-    case 'outlines':
-      this.mode = MODE_OUTLINE;
-      break;
     default:
       console.error(`Bindery: Unknown view mode "${newMode}"`);
       break;
@@ -185,23 +176,8 @@ class Viewer {
   }
   setGrid() {
     if (this.mode === MODE_PREVIEW) return;
-    if (this.mode === MODE_OUTLINE) {
-      this.mode = MODE_PREVIEW;
-      this.updateGuides();
-    } else {
-      this.mode = MODE_PREVIEW;
-      this.render();
-    }
-  }
-  setOutline() {
-    if (this.mode === MODE_OUTLINE) return;
-    if (this.mode === MODE_PREVIEW) {
-      this.mode = MODE_OUTLINE;
-      this.updateGuides();
-    } else {
-      this.mode = MODE_OUTLINE;
-      this.render();
-    }
+    this.mode = MODE_PREVIEW;
+    this.render();
   }
   setPrint() {
     if (this.mode === MODE_SHEET) return;
@@ -228,8 +204,6 @@ class Viewer {
     const scrollPct = body.scrollTop / scrollMax;
 
     if (this.mode === MODE_PREVIEW) {
-      this.renderGrid();
-    } else if (this.mode === MODE_OUTLINE) {
       this.renderGrid();
     } else if (this.mode === MODE_FLIP) {
       this.renderInteractive();
@@ -285,20 +259,8 @@ class Viewer {
     }
   }
 
-  updateGuides() {
-    this.element.setAttribute('bindery-view-mode', this.mode);
-    if (this.mode === MODE_OUTLINE) {
-      this.element.classList.add(c('show-bleed'));
-      this.element.classList.add(c('show-guides'));
-    } else {
-      this.element.classList.remove(c('show-bleed'));
-      this.element.classList.remove(c('show-guides'));
-    }
-  }
-
   renderPrint() {
     this.element.classList.add(c('show-bleed'));
-    this.element.classList.remove(c('show-guides'));
 
     this.zoomBox.innerHTML = '';
 
@@ -317,7 +279,6 @@ class Viewer {
   }
 
   renderGrid() {
-    this.updateGuides();
     this.zoomBox.innerHTML = '';
 
     let pages = this.book.pages.slice();
@@ -333,7 +294,6 @@ class Viewer {
     this.flaps = [];
 
     this.element.classList.remove(c('show-bleed'));
-    this.element.classList.remove(c('show-guides'));
 
     const pages = padPages(this.book.pages.slice(), () => new Page());
 
