@@ -3,7 +3,7 @@
 import h from 'hyperscript';
 
 import paginate from './paginate';
-import scheduler from './paginate/Scheduler';
+import scheduler from './Scheduler';
 import PageSetup from './PageSetup';
 import Viewer from './Viewer';
 
