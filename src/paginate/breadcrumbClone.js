@@ -23,8 +23,8 @@ const breadcrumbClone = (origBreadcrumb, rules) => {
     .filter(rule => rule.customToNextClass)
     .map(rule => rule.customToNextClass);
   const fromPrevClasses = rules
-    .filter(rule => rule.customFromPrevClass)
-    .map(rule => rule.customFromPrevClass);
+    .filter(rule => rule.customFromPreviousClass)
+    .map(rule => rule.customFromPreviousClass);
 
   const markAsToNext = (node) => {
     node.classList.add(c('continues'));
