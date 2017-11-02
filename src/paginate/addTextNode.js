@@ -2,14 +2,14 @@ import scheduler from '../Scheduler';
 import shouldIgnoreOverflow from './shouldIgnoreOverflow';
 
 // Try adding a text node in one go
-const addTextNode = (textNode, parent, page, success, failure) => {
+const addTextNode = (textNode, parent, page, success) => {
   parent.appendChild(textNode);
 
   if (page.hasOverflowed()) {
     parent.removeChild(textNode);
-    failure();
+    scheduler.throttle(() => success(false));
   } else {
-    scheduler.throttle(success);
+    scheduler.throttle(() => success(true));
   }
 };
 
@@ -17,13 +17,28 @@ const addTextNode = (textNode, parent, page, success, failure) => {
 // until it just barely doesnt overflow.
 // Binary search would probably be better but its not currenty
 // the bottleneck.
-const addTextNodeIncremental = (textNode, parent, page, success, failure, continueOnNewPage) => {
+const addTextNodeIncremental = (textNode, parent, page) => {
+  let callbackArgs = null;
+  let doneCallback = null;
+
+  const success = function (...args) {
+    callbackArgs = args;
+    if (doneCallback !== null) doneCallback(callbackArgs);
+  };
+
+  const synchronousThenable = {
+    then: (func) => {
+      doneCallback = func;
+      if (callbackArgs !== null) doneCallback(callbackArgs);
+    },
+  };
+
   const originalText = textNode.nodeValue;
   parent.appendChild(textNode);
 
   if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
-    scheduler.throttle(success);
-    return;
+    scheduler.throttle(() => success(true));
+    return synchronousThenable;
   }
 
   let pos = 0;
@@ -39,7 +54,7 @@ const addTextNodeIncremental = (textNode, parent, page, success, failure, contin
       if (pos < 1) {
         textNode.nodeValue = originalText;
         textNode.parentNode.removeChild(textNode);
-        failure();
+        scheduler.throttle(() => success(false));
         return;
       }
 
@@ -51,7 +66,7 @@ const addTextNodeIncremental = (textNode, parent, page, success, failure, contin
 
       // Start on new page
       const remainingTextNode = document.createTextNode(overflowingText);
-      continueOnNewPage(remainingTextNode);
+      scheduler.throttle(() => success(true, remainingTextNode));
       return;
     }
     if (pos > originalText.length - 1) {
@@ -66,6 +81,7 @@ const addTextNodeIncremental = (textNode, parent, page, success, failure, contin
   };
 
   splitTextStep();
+  return synchronousThenable;
 };
 
 export { addTextNode, addTextNodeIncremental };

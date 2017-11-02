@@ -1,10 +1,5 @@
 import h from 'hyperscript';
 
-// Utils
-import elToStr from '../utils/elementToString';
-import c from '../utils/prefixClass';
-import { last } from '../utils';
-
 // Bindery
 import Book from '../Book';
 import Page from '../Page';
@@ -18,6 +13,10 @@ import orderPages from './orderPages';
 import annotatePages from './annotatePages';
 import breadcrumbClone from './breadcrumbClone';
 import waitForImage from './waitForImage';
+
+// Utils
+import elToStr from '../utils/elementToString';
+import { c, last } from '../utils';
 
 const MAXIMUM_PAGE_LIMIT = 1500;
 
@@ -52,7 +51,6 @@ const paginate = ({ content, rules, success, progress, error }) => {
   let updatePaginationProgress;
   let finishPagination;
 
-  const currentFlowElement = () => last(breadcrumb);
   const canSplit = () => !shouldIgnoreOverflow(last(breadcrumb));
 
   const makeNewPage = () => {
@@ -164,84 +162,101 @@ const paginate = ({ content, rules, success, progress, error }) => {
     breadcrumb.push(nodeToMove);
   };
 
-  const addTextChild = (parent, child, next) => {
-    const addTextWithoutChecks = () => {
-      last(breadcrumb).appendChild(child);
-      if (canSplit()) {
-        book.pageInProgress.suppressErrors = true;
-        continueOnNewPage();
-      }
-      scheduler.throttle(next);
-    };
+  const addTextWithoutChecks = (child, parent, next) => {
+    parent.appendChild(child);
+    if (canSplit()) {
+      book.pageInProgress.suppressErrors = true;
+      continueOnNewPage();
+    }
+    scheduler.throttle(next);
+  };
 
-    if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
-      let failure;
-      let continueText;
-      const addText = (text) => {
-        addTextNodeIncremental(
-          text, last(breadcrumb), book.pageInProgress, next, failure, continueText
-        );
-      };
-      continueText = (remainingTextNode) => {
+  const addSplittableText = (text, completed, failure) => {
+    addTextNodeIncremental(
+      text,
+      last(breadcrumb),
+      book.pageInProgress,
+    ).then((complete, remainder) => {
+      if (complete && !remainder) completed();
+      else if (complete && remainder) {
         continueOnNewPage();
-        addText(remainingTextNode);
-      };
-      failure = () => {
+        addSplittableText(remainder, completed, failure);
+      } else failure();
+    });
+  };
+
+  const addTextChild = (parent, child, next) => {
+    if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
+      addSplittableText(child, next, () => {
         if (breadcrumb.length > 1) {
           moveElementToNextPage(parent);
-          scheduler.throttle(() =>
-            addTextNodeIncremental(
-              child,
-              last(breadcrumb),
-              book.pageInProgress,
-              next,
-              addTextWithoutChecks,
-              continueText
-            )
-          );
+          addSplittableText(child, next, () => addTextWithoutChecks(child, last(breadcrumb), next));
         } else {
-          addTextWithoutChecks();
+          addTextWithoutChecks(child, last(breadcrumb), next);
         }
-      };
-      addText(child);
+      });
     } else {
-      const failure = () => {
-        if (canSplit()) {
-          moveElementToNextPage(parent);
+      addTextNode(child, last(breadcrumb), book.pageInProgress, (complete) => {
+        if (complete) next();
+        else {
+          if (canSplit()) moveElementToNextPage(parent);
+          addTextNode(child, last(breadcrumb), book.pageInProgress, (retryComplete) => {
+            if (retryComplete) next();
+            else addTextWithoutChecks(child, last(breadcrumb), next);
+          });
         }
-        scheduler.throttle(() =>
-          addTextNode(child, last(breadcrumb), book.pageInProgress, next, addTextWithoutChecks)
-        );
-      };
-      addTextNode(child, last(breadcrumb), book.pageInProgress, next, failure);
+      });
+    }
+  };
+
+  let addElementNode;
+  const addChild = (child, parent, next) => {
+    if (child.nodeType === Node.TEXT_NODE) {
+      addTextChild(parent, child, next);
+    } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'SCRIPT') {
+      if (child.tagName === 'IMG' && !child.naturalWidth) {
+        const imgStart = performance.now();
+        waitForImage(child, () => {
+          layoutWaitingTime += (performance.now() - imgStart);
+          addElementNode(child, next);
+        });
+      } else {
+        scheduler.throttle(() => addElementNode(child, next));
+      }
+    } else {
+      next(); // Skip comments and unknown nodes
     }
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
-  const addElementNode = (elementToAdd, doneCallback) => {
+  addElementNode = (elementToAdd, doneCallback) => {
     if (book.pageInProgress.hasOverflowed() && canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
     }
     const element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
+
     if (!breadcrumb[0]) book.pageInProgress.flowContent.appendChild(element);
     else last(breadcrumb).appendChild(element);
+
     breadcrumb.push(element);
 
     const childNodes = [...element.childNodes];
     element.innerHTML = '';
 
     // Overflows when empty
-    if (book.pageInProgress.hasOverflowed()) {
-      if (canSplit()) {
-        moveElementToNextPage(element);
-      }
+    if (book.pageInProgress.hasOverflowed() && canSplit()) {
+      moveElementToNextPage(element);
     }
 
     let index = 0;
     const addNext = () => {
-      if (!(index < childNodes.length)) {
+      if (index < childNodes.length) {
+        const child = childNodes[index];
+        index += 1;
+        addChild(child, element, addNext);
+      } else {
         // We're now done with this element and its children,
         // so we pop up a level
         const addedChild = breadcrumb.pop();
@@ -250,36 +265,12 @@ const paginate = ({ content, rules, success, progress, error }) => {
           book,
           continueOnNewPage,
           makeNewPage,
-          currentFlowElement
+          () => last(breadcrumb)
         );
-
-        // if (book.pageInProgress.hasOverflowed()) {
-          // console.log('Bindery: Added element despite overflowing');
-        // }
-
         doneCallback();
-        return;
-      }
-      const child = childNodes[index];
-      index += 1;
-
-      if (child.nodeType === Node.TEXT_NODE) {
-        addTextChild(element, child, addNext);
-      } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'SCRIPT') {
-        if (child.tagName === 'IMG' && !child.naturalWidth) {
-          const waitForImageStart = performance.now();
-          waitForImage(child, () => {
-            const waitForImageTime = performance.now() - waitForImageStart;
-            layoutWaitingTime += waitForImageTime;
-            addElementNode(child, addNext);
-          });
-        } else {
-          scheduler.throttle(() => addElementNode(child, addNext));
-        }
-      } else {
-        addNext(); // Skip comments and unknown nodes
       }
     };
+
     // kick it off
     addNext();
   };
