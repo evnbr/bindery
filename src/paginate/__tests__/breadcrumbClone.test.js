@@ -21,7 +21,7 @@ test('Split elements get classes from custom rule', () => {
   const span = document.createElement('span');
   const crumb = [div, span];
   const newCrumb = breadcrumbClone(crumb, [
-    { customFromPrevClass: 'fromPrev', customToNextClass: 'toNext' },
+    { customFromPreviousClass: 'fromPrev', customToNextClass: 'toNext' },
   ]);
 
   expect(div.classList.contains('toNext')).toBe(true);
