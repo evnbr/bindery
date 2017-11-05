@@ -13,32 +13,68 @@ const addTextNode = (textNode, parent, page, success) => {
   }
 };
 
+
+class Thenable {
+  constructor() {
+    this.callbackArgs = [];
+    this.successCallback = null;
+    this.errorCallback = null;
+    this.isRejected = false;
+    this.isResolved = false;
+
+    this.resolve = this.resolve.bind(this);
+    this.reject = this.reject.bind(this);
+  }
+
+  then(func) {
+    this.successCallback = func;
+    if (this.isResolved) {
+      if (this.callbackArgs.length > 0) {
+        this.successCallback(...this.callbackArgs);
+      } else {
+        this.successCallback();
+      }
+    }
+    return this;
+  }
+
+  catch(func) {
+    this.errorCallback = func;
+    if (this.isRejected) this.errorCallback();
+    return this;
+  }
+
+  resolve(...args) {
+    this.isResolved = true;
+    if (args.length > 0) this.callbackArgs = args;
+    if (this.successCallback !== null) {
+      if (this.callbackArgs.length > 0) {
+        this.successCallback(...this.callbackArgs);
+      } else {
+        this.successCallback();
+      }
+    }
+  }
+
+  reject() {
+    this.isRejected = true;
+    if (this.errorCallback !== null) this.errorCallback();
+  }
+}
+
 // Try adding a text node by incrementally adding words
 // until it just barely doesnt overflow.
 // Binary search would probably be better but its not currenty
 // the bottleneck.
 const addTextNodeIncremental = (textNode, parent, page) => {
-  let callbackArgs = null;
-  let doneCallback = null;
-
-  const success = function (...args) {
-    callbackArgs = args;
-    if (doneCallback !== null) doneCallback(callbackArgs);
-  };
-
-  const synchronousThenable = {
-    then: (func) => {
-      doneCallback = func;
-      if (callbackArgs !== null) doneCallback(callbackArgs);
-    },
-  };
+  const then = new Thenable();
 
   const originalText = textNode.nodeValue;
   parent.appendChild(textNode);
 
   if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
-    scheduler.throttle(() => success(true));
-    return synchronousThenable;
+    scheduler.throttle(then.resolve);
+    return then;
   }
 
   let pos = 0;
@@ -54,7 +90,7 @@ const addTextNodeIncremental = (textNode, parent, page) => {
       if (pos < 1) {
         textNode.nodeValue = originalText;
         textNode.parentNode.removeChild(textNode);
-        scheduler.throttle(() => success(false));
+        scheduler.throttle(then.reject);
         return;
       }
 
@@ -66,11 +102,11 @@ const addTextNodeIncremental = (textNode, parent, page) => {
 
       // Start on new page
       const remainingTextNode = document.createTextNode(overflowingText);
-      scheduler.throttle(() => success(true, remainingTextNode));
+      scheduler.throttle(() => then.resolve(remainingTextNode));
       return;
     }
     if (pos > originalText.length - 1) {
-      scheduler.throttle(success);
+      scheduler.throttle(then.resolve);
       return;
     }
 
@@ -81,7 +117,7 @@ const addTextNodeIncremental = (textNode, parent, page) => {
   };
 
   splitTextStep();
-  return synchronousThenable;
+  return then;
 };
 
 export { addTextNode, addTextNodeIncremental };

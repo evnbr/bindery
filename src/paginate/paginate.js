@@ -175,14 +175,15 @@ const paginate = ({ content, rules, success, progress, error }) => {
     addTextNodeIncremental(
       text,
       last(breadcrumb),
-      book.pageInProgress,
-    ).then((complete, remainder) => {
-      if (complete && !remainder) completed();
-      else if (complete && remainder) {
+      book.pageInProgress
+    ).then((remainder) => {
+      if (remainder) {
         continueOnNewPage();
         addSplittableText(remainder, completed, failure);
-      } else failure();
-    });
+      } else {
+        completed();
+      }
+    }).catch(failure);
   };
 
   const addTextChild = (parent, child, next) => {

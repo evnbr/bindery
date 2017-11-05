@@ -3,7 +3,7 @@
 // to prevent the call stack from getting too big.
 //
 // There might be a better way to do this.
-const MAX_CALLS = 1000;
+const MAX_CALLS = 800;
 
 class Scheduler {
   constructor() {
@@ -53,7 +53,7 @@ class Scheduler {
       if (document.hidden) {  // Tab in background
         setTimeout(func, 1);
       } else {
-        requestAnimationFrame(func);
+        requestAnimationFrame(() => func());
       }
     }
   }
