@@ -17,6 +17,7 @@ import waitForImage from './waitForImage';
 // Utils
 import elToStr from '../utils/elementToString';
 import { c, last } from '../utils';
+import Thenable from './Thenable';
 
 const MAXIMUM_PAGE_LIMIT = 1500;
 
@@ -36,7 +37,8 @@ const isSplittable = (element, selectorsNotToSplit) => {
   return true;
 };
 
-const paginate = ({ content, rules, success, progress, error }) => {
+const paginate = ({ content, rules, progress }) => {
+  const paginationThen = new Thenable();
   // SETUP
   const startLayoutTime = window.performance.now();
   let layoutWaitingTime = 0;
@@ -65,7 +67,7 @@ const paginate = ({ content, rules, success, progress, error }) => {
     if (page && page.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
       if (!page.suppressErrors && !ignoreOverflow) {
-        error('Moved to new page when last one is still overflowing');
+        paginationThen.reject('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
@@ -80,7 +82,7 @@ const paginate = ({ content, rules, success, progress, error }) => {
   // we were in when we overflowed the last page
   const continueOnNewPage = (ignoreOverflow = false) => {
     if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      error('Maximum page count exceeded');
+      paginationThen.reject('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
@@ -171,42 +173,43 @@ const paginate = ({ content, rules, success, progress, error }) => {
     scheduler.throttle(next);
   };
 
-  const addSplittableText = (text, completed, failure) => {
-    addTextNodeIncremental(
-      text,
-      last(breadcrumb),
-      book.pageInProgress
-    ).then((remainder) => {
+  const addSplittableText = (text) => {
+    const then = new Thenable();
+    addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress)
+    .then((remainder) => {
       if (remainder) {
         continueOnNewPage();
-        addSplittableText(remainder, completed, failure);
+        addSplittableText(remainder).then(then.resolve).catch(then.reject);
       } else {
-        completed();
+        then.resolve();
       }
-    }).catch(failure);
+    }).catch(then.reject);
+    return then;
   };
 
   const addTextChild = (parent, child, next) => {
     if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
-      addSplittableText(child, next, () => {
-        if (breadcrumb.length > 1) {
-          moveElementToNextPage(parent);
-          addSplittableText(child, next, () => addTextWithoutChecks(child, last(breadcrumb), next));
-        } else {
-          addTextWithoutChecks(child, last(breadcrumb), next);
-        }
-      });
+      addSplittableText(child)
+        .then(next)
+        .catch(() => {
+          if (breadcrumb.length > 1) {
+            moveElementToNextPage(parent);
+            addSplittableText(child)
+              .then(next)
+              .catch(() => addTextWithoutChecks(child, last(breadcrumb), next));
+          } else {
+            addTextWithoutChecks(child, last(breadcrumb), next);
+          }
+        });
     } else {
-      addTextNode(child, last(breadcrumb), book.pageInProgress, (complete) => {
-        if (complete) next();
-        else {
+      addTextNode(child, last(breadcrumb), book.pageInProgress)
+        .then(next)
+        .catch(() => {
           if (canSplit()) moveElementToNextPage(parent);
-          addTextNode(child, last(breadcrumb), book.pageInProgress, (retryComplete) => {
-            if (retryComplete) next();
-            else addTextWithoutChecks(child, last(breadcrumb), next);
-          });
-        }
-      });
+          addTextNode(child, last(breadcrumb), book.pageInProgress)
+            .then(next)
+            .catch(() => addTextWithoutChecks(child, last(breadcrumb), next));
+        });
     }
   };
 
@@ -304,9 +307,10 @@ const paginate = ({ content, rules, success, progress, error }) => {
       console.log(`📖 Book ready in ${(totalTime / 1000).toFixed(2)}s (Layout: ${(layoutTime / 1000).toFixed(2)}s, Waiting for images: ${(layoutWaitingTime / 1000).toFixed(2)}s)`);
     }
 
-    success(book);
+    paginationThen.resolve(book);
   };
   startPagination();
+  return paginationThen;
 };
 
 export default paginate;

@@ -1,66 +1,22 @@
 import scheduler from '../Scheduler';
 import shouldIgnoreOverflow from './shouldIgnoreOverflow';
+import Thenable from './Thenable';
 
 // Try adding a text node in one go
-const addTextNode = (textNode, parent, page, success) => {
+const addTextNode = (textNode, parent, page) => {
+  const then = new Thenable();
+
   parent.appendChild(textNode);
 
   if (page.hasOverflowed()) {
     parent.removeChild(textNode);
-    scheduler.throttle(() => success(false));
+    scheduler.throttle(then.reject);
   } else {
-    scheduler.throttle(() => success(true));
+    scheduler.throttle(then.resolve);
   }
+
+  return then;
 };
-
-
-class Thenable {
-  constructor() {
-    this.callbackArgs = [];
-    this.successCallback = null;
-    this.errorCallback = null;
-    this.isRejected = false;
-    this.isResolved = false;
-
-    this.resolve = this.resolve.bind(this);
-    this.reject = this.reject.bind(this);
-  }
-
-  then(func) {
-    this.successCallback = func;
-    if (this.isResolved) {
-      if (this.callbackArgs.length > 0) {
-        this.successCallback(...this.callbackArgs);
-      } else {
-        this.successCallback();
-      }
-    }
-    return this;
-  }
-
-  catch(func) {
-    this.errorCallback = func;
-    if (this.isRejected) this.errorCallback();
-    return this;
-  }
-
-  resolve(...args) {
-    this.isResolved = true;
-    if (args.length > 0) this.callbackArgs = args;
-    if (this.successCallback !== null) {
-      if (this.callbackArgs.length > 0) {
-        this.successCallback(...this.callbackArgs);
-      } else {
-        this.successCallback();
-      }
-    }
-  }
-
-  reject() {
-    this.isRejected = true;
-    if (this.errorCallback !== null) this.errorCallback();
-  }
-}
 
 // Try adding a text node by incrementally adding words
 // until it just barely doesnt overflow.

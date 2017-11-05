@@ -203,26 +203,24 @@ class Bindery {
     paginate({
       content,
       rules: this.rules,
-      success: (book) => {
-        this.viewer.book = book;
-        this.viewer.render();
-
-        this.layoutComplete = true;
-        this.controls.setDone();
-        if (doneBinding) doneBinding();
-        this.viewer.element.classList.remove(c('in-progress'));
-        document.body.classList.remove(c('debug'));
-      },
       progress: (book) => {
         this.viewer.book = book;
         this.controls.updateProgress(book.pages.length);
         this.viewer.renderProgress();
       },
-      error: (error) => {
-        this.layoutComplete = true;
-        this.viewer.element.classList.remove(c('in-progress'));
-        this.viewer.displayError('Layout couldn\'t complete', error);
-      },
+    }).then((book) => {
+      this.viewer.book = book;
+      this.viewer.render();
+
+      this.layoutComplete = true;
+      this.controls.setDone();
+      if (doneBinding) doneBinding();
+      this.viewer.element.classList.remove(c('in-progress'));
+      document.body.classList.remove(c('debug'));
+    }).catch((error) => {
+      this.layoutComplete = true;
+      this.viewer.element.classList.remove(c('in-progress'));
+      this.viewer.displayError('Layout couldn\'t complete', error);
     });
   }
 }
