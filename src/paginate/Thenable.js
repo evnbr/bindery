@@ -8,8 +8,10 @@ class Thenable {
   constructor() {
     this.successArgs = [];
     this.errorArgs = [];
+
     this.successCallback = null;
     this.errorCallback = null;
+    this.progressCallback = null;
 
     this.isRejected = false;
     this.isResolved = false;
@@ -27,6 +29,11 @@ class Thenable {
         this.successCallback();
       }
     }
+    return this;
+  }
+
+  progress(func) {
+    this.progressCallback = func;
     return this;
   }
 
@@ -65,6 +72,12 @@ class Thenable {
       } else {
         this.errorCallback();
       }
+    }
+  }
+
+  updateProgress(...args) {
+    if (this.progressCallback !== null) {
+      this.progressCallback(...args);
     }
   }
 }

@@ -37,20 +37,17 @@ const isSplittable = (element, selectorsNotToSplit) => {
   return true;
 };
 
-const paginate = ({ content, rules, progress }) => {
-  const paginationThen = new Thenable();
+const paginate = (content, rules) => {
+  const bookComplete = new Thenable();
   // SETUP
   const startLayoutTime = window.performance.now();
   let layoutWaitingTime = 0;
-
-  // const scheduler = new Scheduler(isDebugging);
   const ruleSet = new RuleSet(rules);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
 
   let breadcrumb = []; // Keep track of position in original tree
   const book = new Book();
 
-  let updatePaginationProgress;
   let finishPagination;
 
   const canSplit = () => !shouldIgnoreOverflow(last(breadcrumb));
@@ -67,7 +64,7 @@ const paginate = ({ content, rules, progress }) => {
     if (page && page.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
       if (!page.suppressErrors && !ignoreOverflow) {
-        paginationThen.reject('Moved to new page when last one is still overflowing');
+        bookComplete.reject('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
@@ -82,7 +79,7 @@ const paginate = ({ content, rules, progress }) => {
   // we were in when we overflowed the last page
   const continueOnNewPage = (ignoreOverflow = false) => {
     if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      paginationThen.reject('Maximum page count exceeded');
+      bookComplete.reject('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
@@ -92,7 +89,7 @@ const paginate = ({ content, rules, progress }) => {
     const newPage = makeNewPage();
 
     book.pageInProgress = newPage;
-    updatePaginationProgress(); // finished with this page, can display
+    bookComplete.updateProgress(book);
 
     book.pages.push(newPage);
 
@@ -288,9 +285,6 @@ const paginate = ({ content, rules, progress }) => {
       addElementNode(content, finishPagination);
     });
   };
-  updatePaginationProgress = () => {
-    progress(book);
-  };
   finishPagination = () => {
     document.body.removeChild(measureArea);
 
@@ -307,10 +301,10 @@ const paginate = ({ content, rules, progress }) => {
       console.log(`📖 Book ready in ${(totalTime / 1000).toFixed(2)}s (Layout: ${(layoutTime / 1000).toFixed(2)}s, Waiting for images: ${(layoutWaitingTime / 1000).toFixed(2)}s)`);
     }
 
-    paginationThen.resolve(book);
+    bookComplete.resolve(book);
   };
   startPagination();
-  return paginationThen;
+  return bookComplete;
 };
 
 export default paginate;
