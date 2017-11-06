@@ -14,6 +14,8 @@ class Scheduler {
     this.isPaused = false;
     this.useDelay = false;
     this.delayTime = 100;
+
+    this.lastWaitedTime = 0;
   }
 
   get isDebugging() {
@@ -41,11 +43,13 @@ class Scheduler {
       this.endResume();
     }
 
+    const handlerTime = performance.now() - this.lastWaitedTime;
+
     if (this.isPaused) {
       this.queuedFunc = func;
     } else if (this.useDelay) {
       setTimeout(func, this.delayTime);
-    } else if (this.numberOfCalls < MAX_CALLS) {
+    } else if (this.numberOfCalls < MAX_CALLS && handlerTime < 100) {
       this.numberOfCalls += 1;
       func();
     } else {
@@ -53,7 +57,10 @@ class Scheduler {
       if (document.hidden) {  // Tab in background
         setTimeout(func, 1);
       } else {
-        requestAnimationFrame(() => func());
+        requestAnimationFrame((t) => {
+          this.lastWaitedTime = t;
+          func();
+        });
       }
     }
   }
