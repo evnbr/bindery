@@ -35,7 +35,7 @@ class Thenable {
       return this;
     } else if (!this.chainedSuccessCallback) {
       this.chainedSuccessCallback = func;
-      console.log('attached chained then');
+      // console.log('attached chained then');
       return this;
     }
     throw Error('need real chained then');
@@ -47,13 +47,17 @@ class Thenable {
   }
 
   catch(func) {
+    if (this.chainedThenable) {
+      return this.chainedThenable.catch(func);
+    }
+
     if (!this.errorCallback) {
       this.errorCallback = func;
       if (this.isRejected) this.reject();
       return this;
     } else if (!this.chainedErrorCallback) {
       this.chainedErrorCallback = func;
-      console.log('attached chained error');
+      // console.log('attached chained error');
       return this;
     }
     throw Error('need real chained catch');
@@ -63,7 +67,7 @@ class Thenable {
     this.isResolved = true;
     if (args.length > 0) this.successArgs = args;
     if (this.successCallback !== null) {
-      console.log('applying then');
+      // console.log('applying then');
       let result;
       if (this.successArgs.length > 0) {
         result = this.successCallback(...this.successArgs);
@@ -75,7 +79,7 @@ class Thenable {
         else this.chainedSuccessCallback();
       }
     } else {
-      console.log('waiting for then');
+      // console.log('waiting for then');
     }
   }
 
@@ -83,7 +87,7 @@ class Thenable {
     this.isRejected = true;
     if (args.length > 0) this.errorArgs = args;
     if (this.errorCallback !== null) {
-      console.log('applying catch');
+      // console.log('applying catch');
       let result;
       if (this.errorArgs.length > 0) {
         result = this.errorCallback(...this.errorArgs);
@@ -91,33 +95,33 @@ class Thenable {
         result = this.errorCallback();
       }
       if (result && result.then) {
-        console.log('isChain');
+        // console.log('isChain');
         this.chainedThenable = result;
       }
       if (this.successCallback) {
         if (result && result.then) {
-          console.log('forwarded unused then');
+          // console.log('forwarded unused then');
           result.then(this.successCallback);
         }
       }
       if (this.chainedSuccessCallback) {
         if (result && result.then) {
-          console.log('forwarded chained then');
+          // console.log('forwarded chained then');
           result.then(this.chainedSuccessCallback);
         } else this.chainedSuccessCallback();
       }
       if (this.chainedErrorCallback) {
-        console.log('has chained error');
+        // console.log('has chained error');
         if (result && result.then) {
-          console.log('forwarded chained error');
+          // console.log('forwarded chained error');
           result.catch(this.chainedErrorCallback);
         } else {
-          console.log('called chained error');
+          // console.log('called chained error');
           this.chainedErrorCallback();
         }
       }
     } else {
-      console.log('waiting for catch');
+      // console.log('waiting for catch');
     }
   }
 
