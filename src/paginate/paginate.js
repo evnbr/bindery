@@ -161,59 +161,60 @@ const paginate = (content, rules) => {
     breadcrumb.push(nodeToMove);
   };
 
-  const addTextWithoutChecks = (child, parent, next) => {
+  const addTextWithoutChecks = (child, parent) => {
+    const then = new Thenable();
     parent.appendChild(child);
     if (canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
     }
-    scheduler.throttle(next);
+    then.resolve();
+    return then;
   };
 
   const addSplittableText = (text) => {
     const then = new Thenable();
     addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress)
-    .then((remainder) => {
-      if (remainder) {
-        continueOnNewPage();
-        addSplittableText(remainder).then(then.resolve).catch(then.reject);
-      } else {
-        then.resolve();
-      }
-    }).catch(then.reject);
+      .then((remainder) => {
+        if (remainder) {
+          continueOnNewPage();
+          addSplittableText(remainder).then(then.resolve).catch(then.reject);
+        } else {
+          then.resolve();
+        }
+      }).catch(then.reject);
     return then;
   };
 
-  const addTextChild = (parent, child, next) => {
+  const addTextChild = (child, parent) => {
+    const then = new Thenable();
     if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
       addSplittableText(child)
-        .then(next)
         .catch(() => {
           if (breadcrumb.length > 1) {
             moveElementToNextPage(parent);
-            addSplittableText(child)
-              .then(next)
-              .catch(() => addTextWithoutChecks(child, last(breadcrumb), next));
-          } else {
-            addTextWithoutChecks(child, last(breadcrumb), next);
+            return addSplittableText(child);
           }
-        });
+          return addTextWithoutChecks(child, last(breadcrumb));
+        })
+        .catch(() => addTextWithoutChecks(child, last(breadcrumb)))
+        .then(then.resolve);
     } else {
       addTextNode(child, last(breadcrumb), book.pageInProgress)
-        .then(next)
         .catch(() => {
           if (canSplit()) moveElementToNextPage(parent);
-          addTextNode(child, last(breadcrumb), book.pageInProgress)
-            .then(next)
-            .catch(() => addTextWithoutChecks(child, last(breadcrumb), next));
-        });
+          return addTextNode(child, last(breadcrumb), book.pageInProgress);
+        })
+        .catch(() => addTextWithoutChecks(child, last(breadcrumb)))
+        .then(then.resolve);
     }
+    return then;
   };
 
   let addElementNode;
   const addChild = (child, parent, next) => {
     if (child.nodeType === Node.TEXT_NODE) {
-      addTextChild(parent, child, next);
+      addTextChild(child, parent).then(next);
     } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'SCRIPT') {
       if (child.tagName === 'IMG' && !child.naturalWidth) {
         const imgStart = performance.now();
