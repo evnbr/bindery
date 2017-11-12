@@ -203,7 +203,7 @@ class Bindery {
     paginate(content, this.rules)
       .progress((book) => {
         this.viewer.book = book;
-        this.controls.updateProgress(book.pages.length);
+        this.controls.updateProgress(book.pages.length, book.estimatedProgress);
         this.viewer.renderProgress();
       }).then((book) => {
         this.viewer.book = book;

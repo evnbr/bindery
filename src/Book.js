@@ -3,6 +3,7 @@ class Book {
     this.pages = [];
     this.queued = [];
     this.isComplete = false;
+    this.estimatedProgress = 0;
   }
   get pageCount() {
     return this.pages.length;
@@ -28,6 +29,7 @@ class Book {
 
   setCompleted() {
     this.isComplete = true;
+    this.estimatedProgress = 1;
     this.queued.forEach((func) => {
       func();
     });

@@ -191,8 +191,8 @@ class Controls {
       headerContent.textContent = 'Paginating';
     };
 
-    this.updateProgress = (count) => {
-      headerContent.textContent = `${count} Pages`;
+    this.updateProgress = (count, pct) => {
+      headerContent.textContent = `${count} Pages, ${Math.floor(pct * 100)} %`;
     };
 
     this.setDone = () => {

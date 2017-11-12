@@ -1,9 +1,10 @@
-// Even when there is no debugDelay,
+// When there is no debugDelay,
 // the throttler will occassionally use rAF
-// to prevent the call stack from getting too big.
-//
-// There might be a better way to do this.
+// to prevent stack overflow
+// and browser lockup
+
 const MAX_CALLS = 800;
+const MAX_TIME = 100; // ms
 
 class Scheduler {
   constructor() {
@@ -49,7 +50,7 @@ class Scheduler {
       this.queuedFunc = func;
     } else if (this.useDelay) {
       setTimeout(func, this.delayTime);
-    } else if (this.numberOfCalls < MAX_CALLS && handlerTime < 100) {
+    } else if (this.numberOfCalls < MAX_CALLS && handlerTime < MAX_TIME) {
       this.numberOfCalls += 1;
       func();
     } else {
