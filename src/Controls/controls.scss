@@ -157,9 +157,10 @@ $btn-active: #ddd;
 
 .#{$pre}-btn-print {
   margin-left: auto;
-  transition: all 0.8s;
+  transition: all 0.5s;
   .#{$pre}-in-progress & {
-    background: gray;
+    // background: gray;
+    opacity: 0;
     pointer-events: none;
   }
   .#{$pre}-debug & {
@@ -170,8 +171,10 @@ $btn-active: #ddd;
 .#{$pre}-viewswitcher {
   .#{$pre}-in-progress & {
     pointer-events: none;
+    opacity: 0;
   }
   opacity: 1;
+  transition: all 0.5s;
   user-select: none;
 
   overflow: hidden;
@@ -306,7 +309,6 @@ $btn-active: #ddd;
   height: 2px;
   width: 0%;
   transition: all 0.2s;
-  transition-delay: opacity 0.2s;
   opacity: 0;
   .#{$pre}-in-progress & {
     opacity: 1;

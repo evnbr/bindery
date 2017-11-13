@@ -49,6 +49,8 @@ class Controls {
     };
     updateSheetSizeNames();
 
+    let marksSelect;
+    let spinner;
     const updateSheetSize = (e) => {
       const newVal = e.target.value;
       viewer.setSheetSize(newVal);
@@ -96,7 +98,7 @@ class Controls {
       }
     };
 
-    const marksSelect = select(
+    marksSelect = select(
       { onchange: updateMarks },
       option({ value: 'marks_none' }, 'No Marks'),
       option({ value: 'marks_crop', selected: true }, 'Crop Marks'),
@@ -177,7 +179,7 @@ class Controls {
         startPaginating();
       },
     });
-    const spinner = h(c('.spinner'));
+    spinner = h(c('.spinner'));
     const progressBar = h(c('.progress-bar'));
     const header = title(
       // spinner,
