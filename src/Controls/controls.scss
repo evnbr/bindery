@@ -298,6 +298,22 @@ $btn-active: #ddd;
   }
 }
 
+.#{$pre}-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: $accent;
+  height: 2px;
+  width: 0%;
+  transition: all 0.2s;
+  transition-delay: opacity 0.2s;
+  opacity: 0;
+  .#{$pre}-in-progress & {
+    opacity: 1;
+  }
+}
+
+
 @media screen and (max-width: 720px) {
 
   [bindery-view-mode='print'].#{$pre}-root {

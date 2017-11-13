@@ -178,9 +178,10 @@ class Controls {
       },
     });
     const spinner = h(c('.spinner'));
+    const progressBar = h(c('.progress-bar'));
     const header = title(
-      spinner,
-      headerContent,
+      // spinner,
+      // headerContent,
       h(c('.refresh-btns'),
         refreshPaginationBtn,
         refreshPaginationBtnDebug
@@ -191,11 +192,18 @@ class Controls {
       headerContent.textContent = 'Paginating';
     };
 
+    let lastUpdate = 0;
     this.updateProgress = (count, pct) => {
-      headerContent.textContent = `${count} Pages, ${Math.floor(pct * 100)} %`;
+      const t = performance.now();
+      if (t - lastUpdate > 100) {
+        lastUpdate = t;
+        progressBar.style.width = `${Math.floor(pct * 100)}%`;
+        headerContent.textContent = `${count} Pages`;
+      }
     };
 
     this.setDone = () => {
+      progressBar.style.width = '100%';
       headerContent.textContent = `${viewer.book.pages.length} Pages`;
     };
 
@@ -212,6 +220,7 @@ class Controls {
 
 
     this.element = h(c('.controls'),
+      progressBar,
       viewSwitcher,
       options,
       header,
