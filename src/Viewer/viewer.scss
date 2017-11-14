@@ -9,7 +9,7 @@
     padding: 10px;
     z-index: 99;
     position: relative;
-    padding-top: 80px;
+    padding-top: 60px;
     min-height: 90vh;
   }
 
@@ -146,7 +146,7 @@ body.#{$pre}-viewing {
   position: relative;
   display: flex;
   width: 800px;
-  margin: 0 auto 50px;
+  margin: 0 auto 32px;
 }
 
 .#{$pre}-print-page .#{$pre}-spread-wrapper {

@@ -46,14 +46,14 @@ const option = function (...arg) {
 };
 
 // View Swithcer
-const viewMode = function (id, action) {
-  const sel = `.${c('viewmode')}.${c(id)}`;
-  return h(sel,
-    { onclick: action },
-    h(c('.icon')),
-    // text
-  );
-};
+// const viewMode = function (id, action) {
+//   const sel = `.${c('viewmode')}.${c(id)}`;
+//   return h(sel,
+//     { onclick: action },
+//     h(c('.icon')),
+//     // text
+//   );
+// };
 
 export {
   title,
@@ -64,5 +64,5 @@ export {
   btnMain,
   select,
   option,
-  viewMode,
+  // viewMode,
 };

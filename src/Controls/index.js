@@ -8,7 +8,7 @@ import {
   btn,
   btnMain,
   row,
-  viewMode,
+  // viewMode,
 } from './components';
 
 const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
@@ -116,21 +116,24 @@ class Controls {
       });
     };
 
-    const viewModes = [
-      viewMode('grid', viewer.setGrid, 'Grid'),
-      // viewMode('outline', viewer.setOutline, 'Outline'),
-      viewMode('flip', viewer.setFlip, 'Flip'),
-      viewMode('print', viewer.setPrint, 'Sheet'),
-    ];
+    // const viewModes = [
+    //   viewMode('grid', viewer.setGrid, 'Grid'),
+    //   // viewMode('outline', viewer.setOutline, 'Outline'),
+    //   viewMode('flip', viewer.setFlip, 'Flip'),
+    //   viewMode('print', viewer.setPrint, 'Sheet'),
+    // ];
 
-    const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
+    // const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
 
     const headerContent = h('span', 'Loading');
 
     let playSlow;
     const step = btn('→', {
       style: { display: 'none' },
-      onclick: () => window.binderyDebug.step(),
+      onclick: () => {
+        window.binderyDebug.step();
+        document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
+      },
     });
     const pause = btn('❙❙', {
       onclick: () => {
@@ -220,13 +223,28 @@ class Controls {
     );
     options.classList.add(c('print-options'));
 
+    const updateView = (e) => {
+      const val = e.target.value;
+      if (val === 'view_grid') viewer.setGrid();
+      else if (val === 'view_flip') viewer.setFlip();
+      else if (val === 'view_print') viewer.setPrint();
+    };
+    const viewSelect = select(
+      { onchange: updateView },
+      option({ value: 'view_grid' }, 'Preview'),
+      option({ value: 'view_flip' }, 'Flipbook'),
+      option({ value: 'view_print' }, 'Print Preview'),
+    );
+    const viewRow = row(viewSelect);
+    viewRow.classList.add(c('view-row'));
 
     this.element = h(c('.controls'),
       progressBar,
-      viewSwitcher,
+      // viewSwitcher,
       options,
       header,
       debugControls,
+      viewRow,
       printBtn,
     );
   }

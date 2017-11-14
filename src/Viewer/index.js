@@ -203,18 +203,15 @@ class Viewer {
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
 
-    if (this.mode === MODE_PREVIEW) {
-      this.renderGrid();
-    } else if (this.mode === MODE_FLIP) {
-      this.renderInteractive();
-    } else if (this.mode === MODE_SHEET) {
-      this.renderPrint();
-    } else {
-      this.renderGrid();
-    }
+    window.requestAnimationFrame(() => {
+      if (this.mode === MODE_PREVIEW) this.renderGrid();
+      else if (this.mode === MODE_FLIP) this.renderInteractive();
+      else if (this.mode === MODE_SHEET) this.renderPrint();
+      else this.renderGrid();
 
-    body.scrollTop = scrollMax * scrollPct;
-    this.updateZoom();
+      body.scrollTop = scrollMax * scrollPct;
+      this.updateZoom();
+    });
   }
 
   renderProgress() {
