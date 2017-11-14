@@ -18,8 +18,17 @@ class Controls {
     this.binder = opts.binder;
     const viewer = opts.viewer;
 
+    let viewSelect;
+    let marksSelect;
+    let spinner;
+
     const print = () => {
       viewer.setPrint();
+
+      const sel = viewSelect.querySelector('select');
+      sel.value = 'view_print';
+      sel.dispatchEvent(new Event('change'));
+
       setTimeout(window.print, 10);
     };
 
@@ -49,8 +58,6 @@ class Controls {
     };
     updateSheetSizeNames();
 
-    let marksSelect;
-    let spinner;
     const updateSheetSize = (e) => {
       const newVal = e.target.value;
       viewer.setSheetSize(newVal);
@@ -229,7 +236,7 @@ class Controls {
       else if (val === 'view_flip') viewer.setFlip();
       else if (val === 'view_print') viewer.setPrint();
     };
-    const viewSelect = select(
+    viewSelect = select(
       { onchange: updateView },
       option({ value: 'view_grid' }, 'Preview'),
       option({ value: 'view_flip' }, 'Flipbook'),
@@ -241,10 +248,10 @@ class Controls {
     this.element = h(c('.controls'),
       progressBar,
       // viewSwitcher,
-      options,
       header,
       debugControls,
       viewRow,
+      options,
       printBtn,
     );
   }

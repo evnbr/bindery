@@ -70,6 +70,7 @@ $btn-active: #eee;
 .#{$pre}-print-options {
   opacity: 1;
   display: none;
+  margin-right: 12px;
   [bindery-view-mode='print'] & {
     display: flex;
   }
@@ -180,73 +181,9 @@ $btn-active: #eee;
   }
 }
 
-// .#{$pre}-viewswitcher {
-//   .#{$pre}-in-progress & {
-//     pointer-events: none;
-//     opacity: 0;
-//   }
-//   opacity: 1;
-//   transition: all 0.5s;
-//   user-select: none;
-//
-//   overflow: hidden;
-//   display: flex;
-//   flex-direction: row;
-//   border-radius: 2px;
-// }
-
-// .#{$pre}-viewmode {
-//   color: $btn-border;
-//   cursor: pointer;
-//   padding: 0 8px;
-//   border-radius: 2px;
-//
-//   &:hover {
-//     background: $btn-hover;
-//   }
-//   &:active {
-//     background: $btn-active;
-//   }
-// }
-
-// .#{$pre}-icon {
-//   height: 36px;
-//   width: 32px;
-//   background: currentColor;
-//   margin: 0 auto;
-//
-//   .#{$pre}-in-progress & {
-//     color: gray !important;
-//   }
-// }
-// .#{$pre}-grid .#{$pre}-icon {
-//   -webkit-mask: url('./_assets/icon-grid.svg') no-repeat 50% 50%;
-//   [bindery-view-mode='grid'] & {
-//     -webkit-mask-image: url('./_assets/icon-grid-filled.svg');
-//   }
-// }
-// .#{$pre}-flip .#{$pre}-icon {
-//   -webkit-mask: url('./_assets/icon-flip.svg') no-repeat 50% 50%;
-//   [bindery-view-mode='interactive'] & {
-//     -webkit-mask-image: url('./_assets/icon-flip-filled.svg');
-//   }
-// }
-// .#{$pre}-print .#{$pre}-icon {
-//   -webkit-mask: url('./_assets/icon-sheet.svg') no-repeat 50% 50%;
-//   [bindery-view-mode='print'] & {
-//     -webkit-mask-image: url('./_assets/icon-sheet-filled.svg');
-//   }
-// }
-
-// [bindery-view-mode='grid'] .#{$pre}-grid,
-// [bindery-view-mode='interactive'] .#{$pre}-flip,
-// [bindery-view-mode='print'] .#{$pre}-print {
-//   color: $accent;
-// }
-
 .#{$pre}-select-wrap {
   padding: $btn-pad;
-  padding-right: 28px;
+  padding-right: 32px;
   background: url('./_assets/icon-carat.svg') no-repeat 50% 50%;
   background-color: $background; //white;
   background-position: right;
