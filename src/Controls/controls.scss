@@ -48,7 +48,7 @@ $btn-active: #eee;
   cursor: default;
   user-select: none;
   margin-left: 8px;
-  margin-bottom: 8px;
+  // margin-bottom: 8px;
 }
 
 .#{$pre}-title {
@@ -71,8 +71,16 @@ $btn-active: #eee;
   opacity: 1;
   display: none;
   margin-right: 12px;
+  border-radius: 2px;
+  background: #e4e4e4;
   [bindery-view-mode='print'] & {
     display: flex;
+  }
+  .#{$pre}-row {
+    margin: 0;
+  }
+  .#{$pre}-select-wrap {
+    background-color: transparent;
   }
   .#{$pre}-in-progress & {
     opacity: 0;
@@ -272,18 +280,20 @@ $btn-active: #eee;
     padding-top: 120px;
   }
   .#{$pre}-controls {
-    background: $background;
+    height: 98px;
+  }
+
+  .#{$pre}-view-row {
+    margin-left: auto;
   }
 
   .#{$pre}-print-options {
-    background: $background;
-    top: 56px;
-    left: 0;
-    right: 0;
+    top: 54px;
+    right: 10px;
     position: fixed;
-    margin: 0 8px 0 0;
-    &.#{$pre}-options-hidden {
-      display: none;
+    margin: 0;
+    .#{$pre}-row {
+      margin: 0;
     }
   }
 
@@ -294,15 +304,18 @@ $btn-active: #eee;
     padding-top: 190px;
   }
 
-  .#{$pre}-controls {
-    // font-size: 12px;
+  [bindery-view-mode='print'].#{$pre}-root {
+    .#{$pre}-controls {
+      background: $background;
+      height: 170px;
+    }
   }
   .#{$pre}-print-options {
     flex-direction: column;
     align-items: stretch;
+    left: 10px;
   }
   &.#{$pre}-hidden-select {
-    max-width: none;
-    max-height: 0;
+    display: none;
   }
 }
