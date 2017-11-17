@@ -5,7 +5,7 @@
 // it waits until they are).
 
 class Thenable {
-  constructor() {
+  constructor(func) {
     this.successArgs = [];
     this.errorArgs = [];
 
@@ -22,6 +22,8 @@ class Thenable {
 
     this.resolve = this.resolve.bind(this);
     this.reject = this.reject.bind(this);
+
+    if (func) func(this.resolve, this.reject);
   }
 
   then(func) {

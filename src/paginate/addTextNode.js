@@ -3,34 +3,28 @@ import shouldIgnoreOverflow from './shouldIgnoreOverflow';
 import Thenable from './Thenable';
 
 // Try adding a text node in one go
-const addTextNode = (textNode, parent, page) => {
-  const then = new Thenable();
-
+const addTextNode = (textNode, parent, page) => new Thenable((resolve, reject) => {
   parent.appendChild(textNode);
 
   if (page.hasOverflowed()) {
     parent.removeChild(textNode);
-    scheduler.throttle(then.reject);
+    scheduler.throttle(reject);
   } else {
-    scheduler.throttle(then.resolve);
+    scheduler.throttle(resolve);
   }
-
-  return then;
-};
+});
 
 // Try adding a text node by incrementally adding words
 // until it just barely doesnt overflow.
 // Binary search would probably be better but its not currenty
 // the bottleneck.
-const addTextNodeIncremental = (textNode, parent, page) => {
-  const then = new Thenable();
-
+const addTextNodeIncremental = (textNode, parent, page) => new Thenable((resolve, reject) => {
   const originalText = textNode.nodeValue;
   parent.appendChild(textNode);
 
   if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
-    scheduler.throttle(then.resolve);
-    return then;
+    scheduler.throttle(resolve);
+    return;
   }
 
   let pos = 0;
@@ -46,7 +40,7 @@ const addTextNodeIncremental = (textNode, parent, page) => {
       if (pos < 1) {
         textNode.nodeValue = originalText;
         textNode.parentNode.removeChild(textNode);
-        scheduler.throttle(then.reject);
+        scheduler.throttle(reject);
         return;
       }
 
@@ -58,11 +52,11 @@ const addTextNodeIncremental = (textNode, parent, page) => {
 
       // Start on new page
       const remainingTextNode = document.createTextNode(overflowingText);
-      scheduler.throttle(() => then.resolve(remainingTextNode));
+      scheduler.throttle(() => resolve(remainingTextNode));
       return;
     }
     if (pos > originalText.length - 1) {
-      scheduler.throttle(then.resolve);
+      scheduler.throttle(resolve);
       return;
     }
 
@@ -73,7 +67,6 @@ const addTextNodeIncremental = (textNode, parent, page) => {
   };
 
   splitTextStep();
-  return then;
-};
+});
 
 export { addTextNode, addTextNodeIncremental };

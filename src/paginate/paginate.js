@@ -113,12 +113,17 @@ const paginate = (content, rules) => {
     return newPage;
   };
 
+  // Shifts this element to the next page. If any of its
+  // ancestors cannot be split across page, it will
+  // step up the tree to find the first ancestor
+  // that can be split, and move all of that descendants
+  // to the next page.
   const moveElementToNextPage = (nodeToMove) => {
     // So this node won't get cloned. TODO: this is unclear
     breadcrumb.pop();
 
     if (breadcrumb.length < 1) {
-      throw Error('Bindery: Attempting to move the top-level element is not allowed');
+      throw Error('Bindery: Attempting to move the top-level element');
     }
 
     // find the nearest splittable parent
@@ -163,30 +168,26 @@ const paginate = (content, rules) => {
     breadcrumb.push(nodeToMove);
   };
 
-  const addTextWithoutChecks = (child, parent) => {
-    const then = new Thenable();
+  const addTextWithoutChecks = (child, parent) => new Thenable((resolve) => {
     parent.appendChild(child);
     if (canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
     }
-    then.resolve();
-    return then;
-  };
+    resolve();
+  });
 
-  const addSplittableText = (text) => {
-    const then = new Thenable();
+  const addSplittableText = text => new Thenable((resolve, reject) => {
     addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress)
       .then((remainder) => {
         if (remainder) {
           continueOnNewPage();
-          addSplittableText(remainder).then(then.resolve).catch(then.reject);
+          addSplittableText(remainder).then(resolve).catch(reject);
         } else {
-          then.resolve();
+          resolve();
         }
-      }).catch(then.reject);
-    return then;
-  };
+      }).catch(reject);
+  });
 
   const addTextChild = (child, parent) => {
     if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
@@ -208,27 +209,30 @@ const paginate = (content, rules) => {
   };
 
   let addElementNode;
-  const addChild = (child, parent, next) => {
+  const addChild = (child, parent) => {
     if (child.nodeType === Node.TEXT_NODE) {
-      addTextChild(child, parent).then(next);
+      return addTextChild(child, parent);
     } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'SCRIPT') {
-      if (child.tagName === 'IMG' && !child.naturalWidth) {
-        const imgStart = performance.now();
-        waitForImage(child, () => {
-          layoutWaitingTime += (performance.now() - imgStart);
-          addElementNode(child, next);
-        });
-      } else {
-        scheduler.throttle(() => addElementNode(child, next));
-      }
+      return new Thenable((resolve) => {
+        if (child.tagName === 'IMG' && !child.naturalWidth) {
+          const imgStart = performance.now();
+          waitForImage(child, () => {
+            layoutWaitingTime += (performance.now() - imgStart);
+            addElementNode(child).then(resolve);
+          });
+        } else {
+          scheduler.throttle(() => addElementNode(child).then(resolve));
+        }
+      });
     } else {
-      next(); // Skip comments and unknown nodes
+      // Skip comments and unknown nodes
+      return new Thenable(resolve => resolve());
     }
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
-  addElementNode = (elementToAdd, doneCallback) => {
+  addElementNode = elementToAdd => new Thenable((resolve) => {
     if (book.pageInProgress.hasOverflowed() && canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
@@ -261,7 +265,7 @@ const paginate = (content, rules) => {
       );
       elementsProcessed += 1;
       book.estimatedProgress = elementsProcessed / elementCount;
-      doneCallback();
+      resolve();
     };
 
     let index = 0;
@@ -269,7 +273,7 @@ const paginate = (content, rules) => {
       if (index < childNodes.length) {
         const child = childNodes[index];
         index += 1;
-        addChild(child, element, addNext);
+        addChild(child, element).then(addNext);
       } else {
         doneAdding();
       }
@@ -277,7 +281,7 @@ const paginate = (content, rules) => {
 
     // kick it off
     addNext();
-  };
+  });
 
   const startPagination = () => {
     ruleSet.setup();
@@ -285,7 +289,7 @@ const paginate = (content, rules) => {
     content.style.padding = 0;
     elementCount = content.querySelectorAll('*').length;
     continueOnNewPage();
-    addElementNode(content, finishPagination);
+    addElementNode(content).then(finishPagination);
   };
   finishPagination = () => {
     document.body.removeChild(measureArea);
