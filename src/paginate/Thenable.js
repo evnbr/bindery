@@ -37,6 +37,7 @@ class Thenable {
       return this;
     } else if (!this.chainedSuccessCallback) {
       this.chainedSuccessCallback = func;
+      if (this.isResolved) this.resolveChained();
       // console.log('attached chained then');
       return this;
     }
@@ -59,6 +60,7 @@ class Thenable {
       return this;
     } else if (!this.chainedErrorCallback) {
       this.chainedErrorCallback = func;
+      if (this.isRejected) this.rejectChained();
       // console.log('attached chained error');
       return this;
     }
@@ -76,13 +78,16 @@ class Thenable {
       } else {
         result = this.successCallback();
       }
-      if (this.chainedSuccessCallback) {
-        if (result && result.then) result.then(this.chainedSuccessCallback);
-        else this.chainedSuccessCallback();
-      }
+      if (result && result.then) this.chainedThenable = result;
+      if (this.chainedSuccessCallback) this.resolveChained();
     } else {
       // console.log('waiting for then');
     }
+  }
+
+  resolveChained() {
+    if (this.chainedThenable) this.chainedThenable.then(this.chainedSuccessCallback);
+    else this.chainedSuccessCallback();
   }
 
   reject(...args) {
@@ -97,7 +102,6 @@ class Thenable {
         result = this.errorCallback();
       }
       if (result && result.then) {
-        // console.log('isChain');
         this.chainedThenable = result;
       }
       if (this.successCallback) {
@@ -112,19 +116,15 @@ class Thenable {
           result.then(this.chainedSuccessCallback);
         } else this.chainedSuccessCallback();
       }
-      if (this.chainedErrorCallback) {
-        // console.log('has chained error');
-        if (result && result.then) {
-          // console.log('forwarded chained error');
-          result.catch(this.chainedErrorCallback);
-        } else {
-          // console.log('called chained error');
-          this.chainedErrorCallback();
-        }
-      }
+      if (this.chainedErrorCallback) this.rejectChained();
     } else {
       // console.log('waiting for catch');
     }
+  }
+
+  rejectChained() {
+    if (this.chainedThenable) this.chainedThenable.catch(this.chainedErrorCallback);
+    else this.chainedErrorCallback();
   }
 
   updateProgress(...args) {
