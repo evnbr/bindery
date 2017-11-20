@@ -10,7 +10,7 @@
 
 At its simplest, Bindery flows content over multiple pages. From there, the designer can create elements that depend on that flow, like running headers, footnotes, tables of contents, and indexes. Bindery also provides print options like bleed, crop marks, and booklet ordering.
 
-If you're designing a website, think about books as an extension of the responsive web. If you're designing a book, express your layous programmatically, with no need for InDesign.
+If you're designing a website, think about books as an extension of the responsive web. If you're designing a book, express your layouts programmatically, with no need for InDesign.
 
 ### Getting Started
 
@@ -40,7 +40,7 @@ If you're designing a website, think about books as an extension of the responsi
       Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
       Bindery.Footnote({
         selector: 'p > a',
-        render: (element, number) -> {
+        render: (element, number) => {
           let href = element.getAttribute('href');
           return `<sup>${number}</sup> Link to ${href}`;
         },

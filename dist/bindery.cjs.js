@@ -157,38 +157,64 @@ var toConsumableArray = function (arr) {
   }
 };
 
-var elementToString = function elementToString(node) {
-  var tag = node.tagName.toLowerCase();
-  var id = node.id ? '#' + node.id : '';
+var Book = function () {
+  function Book() {
+    classCallCheck(this, Book);
 
-  var classes = '';
-  if (node.classList.length > 0) {
-    classes = '.' + [].concat(toConsumableArray(node.classList)).join('.');
+    this.pages = [];
+    this.queued = [];
+    this.isComplete = false;
+    this.estimatedProgress = 0;
   }
 
-  var text = '';
-  if (id.length < 1 && classes.length < 2) {
-    text = '("' + node.textContent.substr(0, 30).replace(/\s+/g, ' ') + '...")';
-  }
-  return tag + id + classes + text;
-};
+  createClass(Book, [{
+    key: "pagesForSelector",
 
-// const p = 'bindery-';
-var p = '📖-';
 
-var prefix = function prefix(str) {
-  return '' + p + str;
-};
-var prefixClass = function prefixClass(str) {
-  return '.' + prefix(str);
-};
+    // arguments: selector : String
+    // return: pages : [ Int ]
+    // if no matches: []
+    value: function pagesForSelector(sel) {
+      return this.pagesForTest(function (page) {
+        return page.element.querySelector(sel);
+      });
+    }
+    // arguments: testFunc : (element) => bool
+    // return: pages : [ Int ]
+    // if no matches: []
 
-var c = function c(str) {
-  if (str[0] === '.') {
-    return prefixClass(str.substr(1));
-  }
-  return prefix(str);
-};
+  }, {
+    key: "pagesForTest",
+    value: function pagesForTest(testFunc) {
+      return this.pages.filter(function (pg) {
+        return testFunc(pg.element);
+      }).map(function (pg) {
+        return pg.number;
+      });
+    }
+  }, {
+    key: "onComplete",
+    value: function onComplete(func) {
+      if (!this.isComplete) this.queued.push(func);else func();
+    }
+  }, {
+    key: "setCompleted",
+    value: function setCompleted() {
+      this.isComplete = true;
+      this.estimatedProgress = 1;
+      this.queued.forEach(function (func) {
+        func();
+      });
+      this.queued = [];
+    }
+  }, {
+    key: "pageCount",
+    get: function get$$1() {
+      return this.pages.length;
+    }
+  }]);
+  return Book;
+}();
 
 var last = function last(arr) {
   return arr[arr.length - 1];
@@ -226,10 +252,8 @@ var makeRanges = function makeRanges(arr) {
   return str;
 };
 
-// Convert units, via pixels, while making assumptions
-
-// Inch assumptions
 var cssNumberRegEx = /^([+-]?[0-9]+(.?[0-9]+)?)(px|in|cm|mm|pt|pc)$/;
+
 var isValidLength = function isValidLength(str) {
   return cssNumberRegEx.test(str);
 };
@@ -254,22 +278,37 @@ var parseVal = function parseVal(str) {
 };
 
 var validate = function validate(opts, validOpts) {
+  var isValid = true;
   Object.keys(opts).forEach(function (k) {
     if (!validOpts[k]) {
       console.error('Bindery: \'' + validOpts.name + '\' doesn\'t have property \'' + k + '\'');
+      isValid = false;
     } else {
       var val = opts[k];
       var checker = validOpts[k];
       if (!checker(val)) {
         console.error('Bindery: For property \'' + validOpts.name + '.' + k + '\', ' + JSON.stringify(val) + ' is not a valid value of type ' + checker.name);
+        isValid = false;
       }
     }
   });
-  return true;
+  return isValid;
 };
 
 var isObj = function isObj(val) {
   return (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
+};
+var isFunc = function isFunc(val) {
+  return typeof val === 'function';
+};
+var isBool = function isBool(val) {
+  return typeof val === 'boolean';
+};
+var isStr = function isStr(val) {
+  return typeof val === 'string';
+};
+var isArr = function isArr(val) {
+  return Array.isArray(val);
 };
 
 var OptionType = {
@@ -288,23 +327,13 @@ var OptionType = {
   any: function any() {
     return true;
   },
-  string: function string(val) {
-    return typeof val === 'string';
-  },
-  length: function length(val) {
-    return isValidLength(val);
-  },
-  bool: function bool(val) {
-    return typeof val === 'boolean';
-  },
-  func: function func(val) {
-    return typeof val === 'function';
-  },
 
+  string: isStr,
+  length: isValidLength,
+  bool: isBool,
+  func: isFunc,
   obj: isObj,
-  array: function array(val) {
-    return Array.isArray(val);
-  },
+  array: isArr,
   shape: function shape(validShape) {
     return function (userShape) {
       return isObj(userShape) && validate(userShape, validShape);
@@ -327,62 +356,22 @@ var urlQuery = (function (variable) {
   return false;
 });
 
-var Book = function () {
-  function Book() {
-    classCallCheck(this, Book);
+// const p = 'bindery-';
+var p = '📖-';
 
-    this.pages = [];
-    this.queued = [];
-    this.isComplete = false;
+var prefix = function prefix(str) {
+  return '' + p + str;
+};
+var prefixClass = function prefixClass(str) {
+  return '.' + prefix(str);
+};
+
+var c = function c(str) {
+  if (str[0] === '.') {
+    return prefixClass(str.substr(1));
   }
-
-  createClass(Book, [{
-    key: "pagesForSelector",
-
-
-    // arguments: selector : String
-    // return: pages : [ Int ]
-    // if no matches: []
-    value: function pagesForSelector(sel) {
-      return this.pagesForTest(function (page) {
-        return page.element.querySelector(sel);
-      });
-    }
-    // arguments: testFunc : (element) => bool
-    // return: pages : [ Int ]
-    // if no matches: []
-
-  }, {
-    key: "pagesForTest",
-    value: function pagesForTest(testFunc) {
-      return this.pages.filter(function (pg) {
-        return testFunc(pg.element);
-      }).map(function (pg) {
-        return pg.number;
-      });
-    }
-  }, {
-    key: "onComplete",
-    value: function onComplete(func) {
-      if (!this.isComplete) this.queued.push(func);else func();
-    }
-  }, {
-    key: "setCompleted",
-    value: function setCompleted() {
-      this.isComplete = true;
-      this.queued.forEach(function (func) {
-        func();
-      });
-      this.queued = [];
-    }
-  }, {
-    key: "pageCount",
-    get: function get$$1() {
-      return this.pages.length;
-    }
-  }]);
-  return Book;
-}();
+  return prefix(str);
+};
 
 var Page = function () {
   function Page() {
@@ -482,15 +471,16 @@ var Page = function () {
   return Page;
 }();
 
-// Even when there is no debugDelay,
+// When there is no debugDelay,
 // the throttler will occassionally use rAF
-// to prevent the call stack from getting too big.
-//
-// There might be a better way to do this.
-var MAX_CALLS = 1000;
+// to prevent stack overflow
+// and browser lockup
+
+var MAX_CALLS = 800;
+var MAX_TIME = 50; // ms
 
 var Scheduler = function () {
-  function Scheduler(debuggable) {
+  function Scheduler() {
     classCallCheck(this, Scheduler);
 
     this.numberOfCalls = 0;
@@ -498,36 +488,30 @@ var Scheduler = function () {
     this.callsSinceResume = 0;
     this.queuedFunc = null;
     this.isPaused = false;
-    this.useDelay = debuggable;
+    this.useDelay = false;
     this.delayTime = 100;
 
-    if (debuggable) {
-      // Only expose these
-      window.binderyDebug = {
-        pause: this.pause.bind(this),
-        resume: this.resume.bind(this),
-        resumeFor: this.resumeFor.bind(this),
-        step: this.step.bind(this),
-        finish: this.finish.bind(this)
-      };
-      console.log('Bindery: Debug layout with the following: \nbinderyDebug.pause() \nbinderyDebug.resume()\n binderyDebug.resumeFor(n) // pauses after n steps, \nbinderyDebug.step()');
-    }
+    this.lastWaitedTime = 0;
   }
 
   createClass(Scheduler, [{
     key: 'throttle',
     value: function throttle(func) {
+      var _this = this;
+
       this.callsSinceResume += 1;
 
       if (this.callsSinceResume > this.resumeLimit) {
         this.endResume();
       }
 
+      var handlerTime = performance.now() - this.lastWaitedTime;
+
       if (this.isPaused) {
         this.queuedFunc = func;
       } else if (this.useDelay) {
         setTimeout(func, this.delayTime);
-      } else if (this.numberOfCalls < MAX_CALLS) {
+      } else if (this.numberOfCalls < MAX_CALLS && handlerTime < MAX_TIME) {
         this.numberOfCalls += 1;
         func();
       } else {
@@ -536,7 +520,10 @@ var Scheduler = function () {
           // Tab in background
           setTimeout(func, 1);
         } else {
-          requestAnimationFrame(func);
+          requestAnimationFrame(function (t) {
+            _this.lastWaitedTime = t;
+            func();
+          });
         }
       }
     }
@@ -604,9 +591,268 @@ var Scheduler = function () {
       this.callsSinceResume = 0;
       this.pause();
     }
+  }, {
+    key: 'isDebugging',
+    get: function get$$1() {
+      return this.useDelay;
+    },
+    set: function set$$1(newValue) {
+      this.useDelay = newValue;
+      if (newValue) {
+        window.binderyDebug = {
+          pause: this.pause.bind(this),
+          resume: this.resume.bind(this),
+          resumeFor: this.resumeFor.bind(this),
+          step: this.step.bind(this),
+          finish: this.finish.bind(this)
+        };
+        console.log('Bindery: Debug layout with the following: \nbinderyDebug.pause() \nbinderyDebug.resume()\n binderyDebug.resumeFor(n) // pauses after n steps, \nbinderyDebug.step()');
+      }
+    }
   }]);
   return Scheduler;
 }();
+
+var scheduler = new Scheduler();
+
+// TODO: Combine isSplittable and shouldIgnoreOverflow
+// Walk up the tree to see if we are within
+// an overflow-ignoring node
+var shouldIgnoreOverflow = function shouldIgnoreOverflow(element) {
+  if (element.hasAttribute('data-ignore-overflow')) return true;
+  if (element.parentElement) return shouldIgnoreOverflow(element.parentElement);
+  return false;
+};
+
+// promise-inspired thenable.
+// really just to make callbacks cleaner,
+// not guarenteed to be asynchronous.
+// (if then and catch aren't registered yet,
+// it waits until they are).
+
+var Thenable = function () {
+  function Thenable(func) {
+    classCallCheck(this, Thenable);
+
+    this.successArgs = [];
+    this.errorArgs = [];
+
+    this.successCallback = null;
+    this.errorCallback = null;
+    this.progressCallback = null;
+
+    this.chainedThenable = null;
+    this.chainedSuccessCallback = null;
+    this.chainedErrorCallback = null;
+
+    this.isRejected = false;
+    this.isResolved = false;
+
+    this.resolve = this.resolve.bind(this);
+    this.reject = this.reject.bind(this);
+
+    if (func) func(this.resolve, this.reject);
+  }
+
+  createClass(Thenable, [{
+    key: 'then',
+    value: function then(func) {
+      if (this.chainedThenable) {
+        return this.chainedThenable.then(func);
+      }
+
+      if (!this.successCallback) {
+        this.successCallback = func;
+        if (this.isResolved) this.resolve();
+        return this;
+      } else if (!this.chainedSuccessCallback) {
+        this.chainedSuccessCallback = func;
+        if (this.isResolved) this.resolveChained();
+        // console.log('attached chained then');
+        return this;
+      }
+      throw Error('need real chained then');
+    }
+  }, {
+    key: 'progress',
+    value: function progress(func) {
+      this.progressCallback = func;
+      return this;
+    }
+  }, {
+    key: 'catch',
+    value: function _catch(func) {
+      if (this.chainedThenable) {
+        return this.chainedThenable.catch(func);
+      }
+
+      if (!this.errorCallback) {
+        this.errorCallback = func;
+        if (this.isRejected) this.reject();
+        return this;
+      } else if (!this.chainedErrorCallback) {
+        this.chainedErrorCallback = func;
+        if (this.isRejected) this.rejectChained();
+        // console.log('attached chained error');
+        return this;
+      }
+      throw Error('need real chained catch');
+    }
+  }, {
+    key: 'resolve',
+    value: function resolve() {
+      this.isResolved = true;
+
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      if (args.length > 0) this.successArgs = args;
+      if (this.successCallback !== null) {
+        // console.log('applying then');
+        var result = void 0;
+        if (this.successArgs.length > 0) {
+          result = this.successCallback.apply(this, toConsumableArray(this.successArgs));
+        } else {
+          result = this.successCallback();
+        }
+        if (result && result.then) this.chainedThenable = result;
+        if (this.chainedSuccessCallback) this.resolveChained();
+      } else {
+        // console.log('waiting for then');
+      }
+    }
+  }, {
+    key: 'resolveChained',
+    value: function resolveChained() {
+      if (this.chainedThenable) this.chainedThenable.then(this.chainedSuccessCallback);else this.chainedSuccessCallback();
+    }
+  }, {
+    key: 'reject',
+    value: function reject() {
+      this.isRejected = true;
+
+      for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      if (args.length > 0) this.errorArgs = args;
+      if (this.errorCallback !== null) {
+        // console.log('applying catch');
+        var result = void 0;
+        if (this.errorArgs.length > 0) {
+          result = this.errorCallback.apply(this, toConsumableArray(this.errorArgs));
+        } else {
+          result = this.errorCallback();
+        }
+        if (result && result.then) {
+          this.chainedThenable = result;
+        }
+        if (this.successCallback) {
+          if (result && result.then) {
+            // console.log('forwarded unused then');
+            result.then(this.successCallback);
+          }
+        }
+        if (this.chainedSuccessCallback) {
+          if (result && result.then) {
+            // console.log('forwarded chained then');
+            result.then(this.chainedSuccessCallback);
+          } else this.chainedSuccessCallback();
+        }
+        if (this.chainedErrorCallback) this.rejectChained();
+      } else {
+        // console.log('waiting for catch');
+      }
+    }
+  }, {
+    key: 'rejectChained',
+    value: function rejectChained() {
+      if (this.chainedThenable) this.chainedThenable.catch(this.chainedErrorCallback);else this.chainedErrorCallback();
+    }
+  }, {
+    key: 'updateProgress',
+    value: function updateProgress() {
+      if (this.progressCallback !== null) {
+        this.progressCallback.apply(this, arguments);
+      }
+    }
+  }]);
+  return Thenable;
+}();
+
+// Try adding a text node in one go
+var addTextNode = function addTextNode(textNode, parent, page) {
+  return new Thenable(function (resolve, reject) {
+    parent.appendChild(textNode);
+
+    if (page.hasOverflowed()) {
+      parent.removeChild(textNode);
+      scheduler.throttle(reject);
+    } else {
+      scheduler.throttle(resolve);
+    }
+  });
+};
+
+// Try adding a text node by incrementally adding words
+// until it just barely doesnt overflow.
+// Binary search would probably be better but its not currenty
+// the bottleneck.
+var addTextNodeIncremental = function addTextNodeIncremental(textNode, parent, page) {
+  return new Thenable(function (resolve, reject) {
+    var originalText = textNode.nodeValue;
+    parent.appendChild(textNode);
+
+    if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
+      scheduler.throttle(resolve);
+      return;
+    }
+
+    var pos = 0;
+
+    var splitTextStep = function splitTextStep() {
+      textNode.nodeValue = originalText.substr(0, pos);
+
+      if (page.hasOverflowed()) {
+        // Back out to word boundary
+        if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
+        while (originalText.charAt(pos) !== ' ' && pos > 0) {
+          pos -= 1;
+        }if (pos < 1) {
+          textNode.nodeValue = originalText;
+          textNode.parentNode.removeChild(textNode);
+          scheduler.throttle(reject);
+          return;
+        }
+
+        // console.log(`Text breaks at ${pos}: ${originalText.substr(0, pos)}`);
+
+        var fittingText = originalText.substr(0, pos);
+        var overflowingText = originalText.substr(pos);
+        textNode.nodeValue = fittingText;
+
+        // Start on new page
+        var remainingTextNode = document.createTextNode(overflowingText);
+        scheduler.throttle(function () {
+          return resolve(remainingTextNode);
+        });
+        return;
+      }
+      if (pos > originalText.length - 1) {
+        scheduler.throttle(resolve);
+        return;
+      }
+
+      pos += 1;
+      while (originalText.charAt(pos) !== ' ' && pos < originalText.length) {
+        pos += 1;
+      }scheduler.throttle(splitTextStep);
+    };
+
+    splitTextStep();
+  });
+};
 
 var Rule = function Rule(options) {
   var _this = this;
@@ -829,6 +1075,22 @@ var PageBreak = function (_Rule) {
   }]);
   return PageBreak;
 }(Rule);
+
+var elementToString = function elementToString(node) {
+  var tag = node.tagName.toLowerCase();
+  var id = node.id ? '#' + node.id : '';
+
+  var classes = '';
+  if (node.classList.length > 0) {
+    classes = '.' + [].concat(toConsumableArray(node.classList)).join('.');
+  }
+
+  var text = '';
+  if (id.length < 1 && classes.length < 2) {
+    text = '("' + node.textContent.substr(0, 30).replace(/\s+/g, ' ') + '...")';
+  }
+  return tag + id + classes + text;
+};
 
 var isFullPageRule = function isFullPageRule(rule) {
   return rule instanceof FullBleedSpread || rule instanceof FullBleedPage || rule instanceof PageBreak;
@@ -1059,125 +1321,145 @@ var annotatePages = function annotatePages(pages) {
 // which lets you add classes to the original and cloned element
 // to customize styling.
 
-var breadcrumbCloner = function breadcrumbCloner(rules) {
-  // METHODS
-  var markAsContinues = function markAsContinues(node) {
-    node.classList.add(c('continues'));
-    rules.filter(function (rule) {
-      return rule.customContinuesClass;
-    }).forEach(function (rule) {
-      return node.classList.add(rule.customContinuesClass);
-    });
-  };
+var breadcrumbClone = function breadcrumbClone(origBreadcrumb, rules) {
+  var newBreadcrumb = [];
 
-  var markAsContinuation = function markAsContinuation(node) {
-    node.classList.add(c('continuation'));
-    rules.filter(function (rule) {
-      return rule.customContinuationClass;
-    }).forEach(function (rule) {
-      return node.classList.add(rule.customContinuationClass);
-    });
-  };
-
-  return function (origBreadcrumb) {
-    var newBreadcrumb = [];
-
-    for (var i = origBreadcrumb.length - 1; i >= 0; i -= 1) {
-      var original = origBreadcrumb[i];
-      var clone = original.cloneNode(false); // shallow
-      clone.innerHTML = '';
-
-      markAsContinues(original);
-      markAsContinuation(clone);
-
-      // Special case for ordered lists
-      if (clone.tagName === 'OL') {
-        // restart numbering
-        var prevStart = 1;
-        if (original.hasAttribute('start')) {
-          // the OL is also a continuation
-          prevStart = parseInt(original.getAttribute('start'), 10);
-        }
-        if (i < origBreadcrumb.length - 1 && origBreadcrumb[i + 1].tagName === 'LI') {
-          // the first list item is a continuation
-          prevStart -= 1;
-        }
-        var prevCount = original.children.length;
-        var newStart = prevStart + prevCount;
-        clone.setAttribute('start', newStart);
-      }
-
-      if (i < origBreadcrumb.length - 1) clone.appendChild(newBreadcrumb[i + 1]);
-      newBreadcrumb[i] = clone;
-    }
-
-    return newBreadcrumb;
-  };
-};
-
-var waitForImage = function waitForImage(image, done) {
-  var fileName = image.src.substring(image.src.lastIndexOf('/') + 1);
-  // console.log(`Bindery: Waiting for image '${fileName}' size to load`);
-
-  var pollForSize = setInterval(function () {
-    if (image.naturalWidth) {
-      clearInterval(pollForSize);
-      done();
-    }
-  }, 10);
-
-  image.addEventListener('error', function () {
-    clearInterval(pollForSize);
-    console.error('Bindery: Image \'' + fileName + '\' failed to load.');
-    done();
+  // TODO check if element actually matches
+  var toNextClasses = rules.filter(function (rule) {
+    return rule.customToNextClass;
+  }).map(function (rule) {
+    return rule.customToNextClass;
   });
-  image.src = image.src;
+  var fromPrevClasses = rules.filter(function (rule) {
+    return rule.customFromPreviousClass;
+  }).map(function (rule) {
+    return rule.customFromPreviousClass;
+  });
+
+  var markAsToNext = function markAsToNext(node) {
+    node.classList.add(c('continues'));
+    toNextClasses.forEach(function (cl) {
+      return node.classList.add(cl);
+    });
+  };
+
+  var markAsFromPrev = function markAsFromPrev(node) {
+    node.classList.add(c('continuation'));
+    fromPrevClasses.forEach(function (cl) {
+      return node.classList.add(cl);
+    });
+  };
+
+  for (var i = origBreadcrumb.length - 1; i >= 0; i -= 1) {
+    var original = origBreadcrumb[i];
+    var clone = original.cloneNode(false); // shallow
+    clone.innerHTML = '';
+
+    markAsToNext(original);
+    markAsFromPrev(clone);
+
+    // Special case for ordered lists
+    if (clone.tagName === 'OL') {
+      // restart numbering
+      var prevStart = 1;
+      if (original.hasAttribute('start')) {
+        // the OL is also a continuation
+        prevStart = parseInt(original.getAttribute('start'), 10);
+      }
+      if (i < origBreadcrumb.length - 1 && origBreadcrumb[i + 1].tagName === 'LI') {
+        // the first list item is a continuation
+        prevStart -= 1;
+      }
+      var prevCount = original.children.length;
+      var newStart = prevStart + prevCount;
+      clone.setAttribute('start', newStart);
+    }
+
+    if (i < origBreadcrumb.length - 1) clone.appendChild(newBreadcrumb[i + 1]);
+    newBreadcrumb[i] = clone;
+  }
+
+  return newBreadcrumb;
 };
 
-// import specificity from 'specificity'; TODO
+// Note: Doesn't ever reject, since missing images
+// shouldn't prevent layout from resolving
 
-// Utils
+var waitForImage = function waitForImage(image) {
+  return new Thenable(function (resolve) {
+    var pollForSize = setInterval(function () {
+      if (image.naturalWidth) {
+        clearInterval(pollForSize);
+        resolve();
+      }
+    }, 10);
+
+    image.addEventListener('error', function () {
+      clearInterval(pollForSize);
+      resolve();
+    });
+    image.src = image.src;
+  });
+};
+
 // Bindery
 // paginate
-var MAXIMUM_PAGE_LIMIT = 9999;
+// Utils
+var MAXIMUM_PAGE_LIMIT = 2000;
 
-// Walk up the tree to see if we are within
-// an overflow-ignoring node
-var shouldIgnoreOverflow = function shouldIgnoreOverflow(node) {
-  if (node.hasAttribute('data-ignore-overflow')) return true;
-  if (node.parentElement) return shouldIgnoreOverflow(node.parentElement);
-  return false;
+var isTextNode = function isTextNode(node) {
+  return node.nodeType === Node.TEXT_NODE;
+};
+var isElement = function isElement(node) {
+  return node.nodeType === Node.ELEMENT_NODE;
+};
+var isScript = function isScript(node) {
+  return node.tagName === 'SCRIPT';
+};
+var isImage = function isImage(node) {
+  return node.tagName === 'IMG';
+};
+var isUnloadedImage = function isUnloadedImage(node) {
+  return isImage(node) && !node.naturalWidth;
+};
+var isContent = function isContent(node) {
+  return isElement(node) && !isScript(node);
 };
 
-var paginate = function paginate(_ref) {
-  var content = _ref.content,
-      rules = _ref.rules,
-      success = _ref.success,
-      progress = _ref.progress,
-      error = _ref.error,
-      isDebugging = _ref.isDebugging;
+// Walk up the tree to see if we can safely
+// insert a split into this node.
+var isSplittable = function isSplittable(element, selectorsNotToSplit) {
+  if (selectorsNotToSplit.some(function (sel) {
+    return element.matches(sel);
+  })) {
+    if (element.hasAttribute('data-bindery-did-move') || element.classList.contains(c('continuation'))) {
+      return true; // ignore rules and split it anyways.
+    }
+    return false;
+  }
+  if (element.parentElement) {
+    return isSplittable(element.parentElement, selectorsNotToSplit);
+  }
+  return true;
+};
 
+var paginate$1 = function paginate(content, rules) {
+  var bookPromise = new Thenable();
   // SETUP
   var startLayoutTime = window.performance.now();
   var layoutWaitingTime = 0;
-
-  var scheduler = new Scheduler(isDebugging);
+  var elementCount = 0;
+  var elementsProcessed = 0;
   var ruleSet = new RuleSet(rules);
-  var continueBreadcrumb = breadcrumbCloner(rules);
   var measureArea = document.body.appendChild(h(c('.measure-area')));
 
   var breadcrumb = []; // Keep track of position in original tree
   var book = new Book();
 
-  var updatePaginationProgress = void 0;
   var finishPagination = void 0;
 
-  var currentFlowElement = function currentFlowElement() {
-    return breadcrumb[0] ? last(breadcrumb) : book.pageInProgress.flowContent;
-  };
-
   var canSplit = function canSplit() {
-    return !shouldIgnoreOverflow(currentFlowElement());
+    return !shouldIgnoreOverflow(last(breadcrumb));
   };
 
   var makeNewPage = function makeNewPage() {
@@ -1192,7 +1474,7 @@ var paginate = function paginate(_ref) {
     if (page && page.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
       if (!page.suppressErrors && !ignoreOverflow) {
-        error('Moved to new page when last one is still overflowing');
+        bookPromise.reject('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
@@ -1208,22 +1490,18 @@ var paginate = function paginate(_ref) {
   var continueOnNewPage = function continueOnNewPage() {
     var ignoreOverflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-    if (book.pages.length === 500) {
-      console.warn('Bindery: More than 500 pages, performance may be slow.');
-    } else if (book.pages.length === 1000) {
-      console.warn('Bindery: More than 1000 pages, performance may be slow.');
-    } else if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      error('Maximum page count exceeded');
+    if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
+      bookPromise.reject('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
     finishPage(book.pageInProgress, ignoreOverflow);
 
-    breadcrumb = continueBreadcrumb(breadcrumb);
+    breadcrumb = breadcrumbClone(breadcrumb, rules);
     var newPage = makeNewPage();
 
     book.pageInProgress = newPage;
-    updatePaginationProgress(); // finished with this page, can display
+    bookPromise.updateProgress(book);
 
     book.pages.push(newPage);
 
@@ -1233,7 +1511,7 @@ var paginate = function paginate(_ref) {
 
     // make sure the cloned page is valid.
     if (newPage.hasOverflowed()) {
-      var suspect = currentFlowElement();
+      var suspect = last(breadcrumb);
       if (suspect) {
         console.warn('Bindery: Content overflows, probably due to a style set on ' + elementToString(suspect) + '.');
         suspect.parentNode.removeChild(suspect);
@@ -1245,38 +1523,24 @@ var paginate = function paginate(_ref) {
     return newPage;
   };
 
-  // TODO: Merge isSplittable and shouldIgnoreOverflow
-
-  // Walk up the tree to see if we can safely
-  // insert a split into this node.
-  var isSplittable = function isSplittable(node) {
-    if (ruleSet.selectorsNotToSplit.some(function (sel) {
-      return node.matches(sel);
-    })) {
-      if (node.hasAttribute('data-bindery-did-move') || node.classList.contains(c('continuation'))) {
-        return true; // don't split it again.
-      }
-      return false;
-    }
-    if (node.parentElement) {
-      return isSplittable(node.parentElement);
-    }
-    return true;
-  };
-
+  // Shifts this element to the next page. If any of its
+  // ancestors cannot be split across page, it will
+  // step up the tree to find the first ancestor
+  // that can be split, and move all of that descendants
+  // to the next page.
   var moveElementToNextPage = function moveElementToNextPage(nodeToMove) {
     // So this node won't get cloned. TODO: this is unclear
     breadcrumb.pop();
 
     if (breadcrumb.length < 1) {
-      throw Error('Bindery: Attempting to move the top-level element is not allowed');
+      throw Error('Bindery: Attempting to move the top-level element');
     }
 
     // find the nearest splittable parent
     var willMove = nodeToMove;
     var pathToRestore = [];
-    while (breadcrumb.length > 1 && !isSplittable(currentFlowElement())) {
-      // console.log('Not OK to split:', currentFlowElement());
+    while (breadcrumb.length > 1 && !isSplittable(last(breadcrumb), ruleSet.selectorsNotToSplit)) {
+      // console.log('Not OK to split:', last(breadcrumb));
       willMove = breadcrumb.pop();
       pathToRestore.unshift(willMove);
     }
@@ -1288,19 +1552,17 @@ var paginate = function paginate(_ref) {
     var parent = willMove.parentNode;
     parent.removeChild(willMove);
 
-    if (breadcrumb.length > 1 && currentFlowElement().textContent.trim() === '') {
+    if (breadcrumb.length > 1 && last(breadcrumb).textContent.trim() === '') {
       parent.appendChild(willMove);
       willMove = breadcrumb.pop();
       pathToRestore.unshift(willMove);
       willMove.parentNode.removeChild(willMove);
     }
 
-    if (book.pageInProgress.isEmpty) {
-      // If the page is empty when this node is removed,
-      // then it won't help to move it to the next page.
-      // Instead continue here until the node is done.
-      // nodeToMove.setAttribute('data-ignore-overflow', true);
-    } else {
+    // If the page is empty when this node is removed,
+    // then it won't help to move it to the next page.
+    // Instead continue here until the node is done.
+    if (!book.pageInProgress.isEmpty) {
       if (book.pageInProgress.hasOverflowed()) {
         book.pageInProgress.suppressErrors = true;
       }
@@ -1308,192 +1570,139 @@ var paginate = function paginate(_ref) {
     }
 
     // append node as first in new page
-    currentFlowElement().appendChild(willMove);
+    last(breadcrumb).appendChild(willMove);
 
     // restore subpath
     pathToRestore.forEach(function (restore) {
       breadcrumb.push(restore);
     });
 
-    // TODO: Confusing. If we didn't pop this node above, we don't
-    // need to push it back again.
     breadcrumb.push(nodeToMove);
   };
 
-  var addTextNode = function addTextNode(textNode, doneCallback, failure) {
-    currentFlowElement().appendChild(textNode);
-
-    if (book.pageInProgress.hasOverflowed()) {
-      textNode.parentNode.removeChild(textNode);
-      failure();
-    } else {
-      scheduler.throttle(doneCallback);
-    }
-  };
-
-  // Adds an text node by incrementally adding words
-  // until it just barely doesnt overflow
-  var addTextNodeIncremental = function addTextNodeIncremental(textNode, doneCallback, failure) {
-    var originalText = textNode.nodeValue;
-    currentFlowElement().appendChild(textNode);
-
-    if (!book.pageInProgress.hasOverflowed() || !canSplit()) {
-      scheduler.throttle(doneCallback);
-      return;
-    }
-
-    var pos = 0;
-
-    var splitTextStep = function splitTextStep() {
-      textNode.nodeValue = originalText.substr(0, pos);
-
-      if (book.pageInProgress.hasOverflowed()) {
-        // Back out to word boundary
-        if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
-        while (originalText.charAt(pos) !== ' ' && pos > 0) {
-          pos -= 1;
-        }if (pos < 1) {
-          textNode.nodeValue = originalText;
-          textNode.parentNode.removeChild(textNode);
-          failure();
-          return;
-        }
-
-        // console.log(`Text breaks at ${pos}: ${originalText.substr(0, pos)}`);
-
-        var fittingText = originalText.substr(0, pos);
-        var overflowingText = originalText.substr(pos);
-        textNode.nodeValue = fittingText;
-
-        // Start on new page
-        continueOnNewPage();
-        var remainingTextNode = document.createTextNode(overflowingText);
-        addTextNodeIncremental(remainingTextNode, doneCallback, failure);
-        return;
-      }
-      if (pos > originalText.length - 1) {
-        scheduler.throttle(doneCallback);
-        return;
-      }
-
-      pos += 1;
-      while (originalText.charAt(pos) !== ' ' && pos < originalText.length) {
-        pos += 1;
-      }scheduler.throttle(splitTextStep);
-    };
-
-    splitTextStep();
-  };
-
-  var addTextChild = function addTextChild(parent, child, next) {
-    var forceAddTextNode = function forceAddTextNode() {
-      currentFlowElement().appendChild(child);
+  var addTextWithoutChecks = function addTextWithoutChecks(child, parent) {
+    return new Thenable(function (resolve) {
+      parent.appendChild(child);
       if (canSplit()) {
         book.pageInProgress.suppressErrors = true;
         continueOnNewPage();
       }
-      scheduler.throttle(next);
-    };
+      resolve();
+    });
+  };
 
-    if (isSplittable(parent) && !shouldIgnoreOverflow(parent)) {
-      var failure = function failure() {
-        if (breadcrumb.length > 1) {
-          moveElementToNextPage(parent);
-          scheduler.throttle(function () {
-            return addTextNodeIncremental(child, next, forceAddTextNode);
-          });
+  var addSplittableText = function addSplittableText(text) {
+    return new Thenable(function (resolve, reject) {
+      addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress).then(function (remainder) {
+        if (remainder) {
+          continueOnNewPage();
+          addSplittableText(remainder).then(resolve).catch(reject);
         } else {
-          forceAddTextNode();
+          resolve();
         }
-      };
-      addTextNodeIncremental(child, next, failure);
+      }).catch(reject);
+    });
+  };
+
+  var addTextChild = function addTextChild(child, parent) {
+    if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
+      return addSplittableText(child).catch(function () {
+        if (breadcrumb.length < 2) return addTextWithoutChecks(child, last(breadcrumb));
+        moveElementToNextPage(parent);
+        return addSplittableText(child);
+      }).catch(function () {
+        return addTextWithoutChecks(child, last(breadcrumb));
+      });
     } else {
-      var _failure = function _failure() {
-        if (canSplit()) {
-          moveElementToNextPage(parent);
-        }
-        scheduler.throttle(function () {
-          return addTextNode(child, next, forceAddTextNode);
-        });
-      };
-      addTextNode(child, next, _failure);
+      return addTextNode(child, last(breadcrumb), book.pageInProgress).catch(function () {
+        if (canSplit()) moveElementToNextPage(parent);
+        return addTextNode(child, last(breadcrumb), book.pageInProgress);
+      }).catch(function () {
+        return addTextWithoutChecks(child, last(breadcrumb));
+      });
     }
+  };
+
+  var addElementNode = void 0;
+
+  var addChild = function addChild(child, parent) {
+    if (isTextNode(child)) {
+      return addTextChild(child, parent);
+    } else if (isUnloadedImage(child)) {
+      var imgStart = performance.now();
+      return waitForImage(child).then(function () {
+        layoutWaitingTime += performance.now() - imgStart;
+        return addElementNode(child);
+      });
+    } else if (isContent(child)) {
+      return addElementNode(child);
+    }
+
+    // Skip comments and unknown node
+    return new Thenable(function (resolve) {
+      return resolve();
+    });
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
-  var addElementNode = function addElementNode(elementToAdd, doneCallback) {
-    if (book.pageInProgress.hasOverflowed() && canSplit()) {
-      book.pageInProgress.suppressErrors = true;
-      continueOnNewPage();
-    }
-    var element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
-    currentFlowElement().appendChild(element);
-    breadcrumb.push(element);
+  addElementNode = function addElementNode(elementToAdd) {
+    return new Thenable(function (resolve) {
+      if (book.pageInProgress.hasOverflowed() && canSplit()) {
+        book.pageInProgress.suppressErrors = true;
+        continueOnNewPage();
+      }
+      var element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
 
-    var childNodes = [].concat(toConsumableArray(element.childNodes));
-    element.innerHTML = '';
+      if (!breadcrumb[0]) book.pageInProgress.flowContent.appendChild(element);else last(breadcrumb).appendChild(element);
 
-    // Overflows when empty
-    if (book.pageInProgress.hasOverflowed()) {
-      if (canSplit()) {
+      breadcrumb.push(element);
+
+      var childNodes = [].concat(toConsumableArray(element.childNodes));
+      element.innerHTML = '';
+
+      // Overflows when empty
+      if (book.pageInProgress.hasOverflowed() && canSplit()) {
         moveElementToNextPage(element);
       }
-    }
 
-    var index = 0;
-    var addNext = function addNext() {
-      if (!(index < childNodes.length)) {
+      var doneAdding = function doneAdding() {
         // We're now done with this element and its children,
         // so we pop up a level
         var addedChild = breadcrumb.pop();
-        ruleSet.afterAddElement(addedChild, book, continueOnNewPage, makeNewPage, currentFlowElement);
+        ruleSet.afterAddElement(addedChild, book, continueOnNewPage, makeNewPage, function () {
+          return last(breadcrumb);
+        });
+        elementsProcessed += 1;
+        book.estimatedProgress = elementsProcessed / elementCount;
+        resolve();
+      };
 
-        // if (book.pageInProgress.hasOverflowed()) {
-        // console.log('Bindery: Added element despite overflowing');
-        // }
-
-        doneCallback();
-        return;
-      }
-      var child = childNodes[index];
-      index += 1;
-
-      if (child.nodeType === Node.TEXT_NODE) {
-        addTextChild(element, child, addNext);
-      } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'SCRIPT') {
-        if (child.tagName === 'IMG' && !child.naturalWidth) {
-          var waitForImageStart = performance.now();
-          waitForImage(child, function () {
-            var waitForImageTime = performance.now() - waitForImageStart;
-            layoutWaitingTime += waitForImageTime;
-            addElementNode(child, addNext);
-          });
+      var index = 0;
+      var addNext = function addNext() {
+        if (index < childNodes.length) {
+          var child = childNodes[index];
+          index += 1;
+          addChild(child, element).then(addNext);
         } else {
-          scheduler.throttle(function () {
-            return addElementNode(child, addNext);
-          });
+          doneAdding();
         }
-      } else {
-        addNext(); // Skip comments and unknown nodes
-      }
-    };
-    // kick it off
-    addNext();
+      };
+
+      // kick it off
+      addNext();
+    });
   };
 
   var startPagination = function startPagination() {
     ruleSet.setup();
     content.style.margin = 0;
     content.style.padding = 0;
+    elementCount = content.querySelectorAll('*').length;
     continueOnNewPage();
-    requestAnimationFrame(function () {
-      addElementNode(content, finishPagination);
-    });
+    addElementNode(content).then(finishPagination);
   };
-  updatePaginationProgress = function updatePaginationProgress() {
-    progress(book);
-  };
+
   finishPagination = function finishPagination() {
     document.body.removeChild(measureArea);
 
@@ -1503,16 +1712,21 @@ var paginate = function paginate(_ref) {
     book.setCompleted();
     ruleSet.finishEveryPage(book);
 
-    if (!isDebugging) {
+    if (!scheduler.isDebugging) {
       var endLayoutTime = window.performance.now();
       var totalTime = endLayoutTime - startLayoutTime;
       var layoutTime = totalTime - layoutWaitingTime;
-      console.log('\uD83D\uDCD6 Book ready in ' + (totalTime / 1000).toFixed(2) + 's (Layout: ' + (layoutTime / 1000).toFixed(2) + 's, Waiting for images: ' + (layoutWaitingTime / 1000).toFixed(2) + 's)');
+
+      var t = (totalTime / 1000).toFixed(2);
+      var l = (layoutTime / 1000).toFixed(2);
+      var w = (layoutWaitingTime / 1000).toFixed(2);
+      console.log('\uD83D\uDCD6 Book ready in ' + t + 's (Layout: ' + l + 's, Waiting for images: ' + w + 's)');
     }
 
-    success(book);
+    bookPromise.resolve(book);
   };
   startPagination();
+  return bookPromise;
 };
 
 var letter = { width: '8.5in', height: '11in' };
@@ -1673,7 +1887,7 @@ var btn = function btn() {
     arg[_key4] = arguments[_key4];
   }
 
-  return h.apply(undefined, ['button.' + c('btn')].concat(arg));
+  return h.apply(undefined, ['button' + c('.control') + c('.btn')].concat(arg));
 };
 
 var btnMain = function btnMain() {
@@ -1681,7 +1895,7 @@ var btnMain = function btnMain() {
     arg[_key6] = arguments[_key6];
   }
 
-  return h.apply(undefined, ['button.' + c('btn') + '.' + c('btn-main')].concat(arg));
+  return h.apply(undefined, ['button' + c('.control') + c('.btn') + c('.btn-main')].concat(arg));
 };
 
 var select = function select() {
@@ -1697,7 +1911,7 @@ var select = function select() {
   };
   selectEl.addEventListener('change', updateVal);
   updateVal();
-  return h(c('.select-wrap'), selectVal, selectEl);
+  return h('' + c('.select-wrap') + c('.control'), selectVal, selectEl);
 };
 
 var option = function option() {
@@ -1708,15 +1922,6 @@ var option = function option() {
   return h.apply(undefined, ['option'].concat(arg));
 };
 
-// View Swithcer
-var viewMode = function viewMode(id, action) {
-  var sel = '.' + c('viewmode') + '.' + c(id);
-  return h(sel, { onclick: action }, h(c('.icon'))
-  // text
-  );
-};
-
-// import { convertStrToPx } from '../utils/convertUnits';
 var supportsCustomPageSize$1 = !!window.chrome && !!window.chrome.webstore;
 
 var Controls = function Controls(opts) {
@@ -1727,8 +1932,17 @@ var Controls = function Controls(opts) {
   this.binder = opts.binder;
   var viewer = opts.viewer;
 
+  var viewSelect = void 0;
+  var marksSelect = void 0;
+  var spinner = void 0;
+
   var print = function print() {
     viewer.setPrint();
+
+    var sel = viewSelect.querySelector('select');
+    sel.value = 'view_print';
+    sel.dispatchEvent(new Event('change'));
+
     setTimeout(window.print, 10);
   };
 
@@ -1789,7 +2003,7 @@ var Controls = function Controls(opts) {
     }
   };
 
-  var marksSelect = select({ onchange: updateMarks }, option({ value: 'marks_none' }, 'No Marks'), option({ value: 'marks_crop', selected: true }, 'Crop Marks'), option({ value: 'marks_bleed' }, 'Bleed Marks'), option({ value: 'marks_both' }, 'Crop and Bleed'));
+  marksSelect = select({ onchange: updateMarks }, option({ value: 'marks_none' }, 'No Marks'), option({ value: 'marks_crop', selected: true }, 'Crop Marks'), option({ value: 'marks_bleed' }, 'Bleed Marks'), option({ value: 'marks_both' }, 'Crop and Bleed'));
   if (supportsCustomPageSize$1) {
     marksSelect.classList.add(c('hidden-select'));
   }
@@ -1800,19 +2014,14 @@ var Controls = function Controls(opts) {
     _this.binder.makeBook(function () {});
   };
 
-  var viewModes = [viewMode('grid', viewer.setGrid, 'Grid'),
-  // viewMode('outline', viewer.setOutline, 'Outline'),
-  viewMode('flip', viewer.setFlip, 'Flip'), viewMode('print', viewer.setPrint, 'Sheet')];
-
-  var viewSwitcher = h.apply(undefined, [c('.viewswitcher')].concat(viewModes));
-
   var headerContent = h('span', 'Loading');
 
   var playSlow = void 0;
   var step = btn('→', {
     style: { display: 'none' },
     onclick: function onclick() {
-      return window.binderyDebug.step();
+      window.binderyDebug.step();
+      document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
     }
   });
   var pause = btn('❙❙', {
@@ -1857,18 +2066,33 @@ var Controls = function Controls(opts) {
       startPaginating();
     }
   });
-  var spinner = h(c('.spinner'));
-  var header = title(spinner, headerContent, h(c('.refresh-btns'), refreshPaginationBtn, refreshPaginationBtnDebug));
+  spinner = h(c('.spinner'));
+  var progressBar = h(c('.progress-bar'));
+  var header = title(
+  // spinner,
+  headerContent
+  // h(c('.refresh-btns'),
+  //   refreshPaginationBtn,
+  //   refreshPaginationBtnDebug
+  // ),
+  );
 
   this.setInProgress = function () {
     headerContent.textContent = 'Paginating';
   };
 
-  this.updateProgress = function (count) {
-    headerContent.textContent = count + ' Pages';
+  var lastUpdate = 0;
+  this.updateProgress = function (count, pct) {
+    var t = performance.now();
+    if (t - lastUpdate > 100) {
+      lastUpdate = t;
+      progressBar.style.width = pct * 100 + '%';
+      headerContent.textContent = count + ' Pages';
+    }
   };
 
   this.setDone = function () {
+    progressBar.style.width = '100%';
     headerContent.textContent = viewer.book.pages.length + ' Pages';
   };
 
@@ -1878,16 +2102,26 @@ var Controls = function Controls(opts) {
   var options = row(arrangement, sheetSize, marks);
   options.classList.add(c('print-options'));
 
-  this.element = h(c('.controls'), viewSwitcher, options, header, debugControls, printBtn);
+  var updateView = function updateView(e) {
+    var val = e.target.value;
+    if (val === 'view_grid') viewer.setGrid();else if (val === 'view_flip') viewer.setFlip();else if (val === 'view_print') viewer.setPrint();
+  };
+  viewSelect = select({ onchange: updateView }, option({ value: 'view_grid' }, 'Preview'), option({ value: 'view_flip' }, 'Flipbook'), option({ value: 'view_print' }, 'Print Preview'));
+  var viewRow = row(viewSelect);
+  viewRow.classList.add(c('view-row'));
+
+  this.element = h(c('.controls'), progressBar, header, debugControls, viewRow, options, printBtn);
 };
+
+/* global BINDERY_VERSION */
 
 var errorView = function (title, text) {
-  return h(c('.error'), h(c('.error-title'), title), h(c('.error-text'), text), h(c('.error-footer'), 'Bindery ' + '[AIV]{version}[/AIV]'));
+  return h(c('.error'), h(c('.error-title'), title), h(c('.error-text'), text), h(c('.error-footer'), 'Bindery ' + BINDERY_VERSION));
 };
 
-var orderPagesBooklet = function orderPagesBooklet(pages) {
+var orderPagesBooklet = function orderPagesBooklet(pages, makePage) {
   while (pages.length % 4 !== 0) {
-    var spacerPage = new Page();
+    var spacerPage = makePage();
     spacerPage.element.style.visibility = 'hidden';
     pages.push(spacerPage);
   }
@@ -1904,13 +2138,13 @@ var orderPagesBooklet = function orderPagesBooklet(pages) {
   return bookletOrder;
 };
 
-var padPages = function padPages(pages) {
+var padPages = function padPages(pages, makePage) {
   if (pages.length % 2 !== 0) {
-    var pg = new Page();
+    var pg = makePage();
     pages.push(pg);
   }
-  var spacerPage = new Page();
-  var spacerPage2 = new Page();
+  var spacerPage = makePage();
+  var spacerPage2 = makePage();
   spacerPage.element.style.visibility = 'hidden';
   spacerPage2.element.style.visibility = 'hidden';
   pages.unshift(spacerPage);
@@ -1985,7 +2219,7 @@ var onePageSpread$1 = function onePageSpread() {
   return h.apply(undefined, [c('.spread-wrapper') + c('.page-size')].concat(arg));
 };
 
-var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, orient, isBooklet) {
+var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, isBooklet) {
   var printLayout = document.createDocumentFragment();
 
   var marks = isTwoUp ? printMarksSpread : printMarksSingle;
@@ -2091,7 +2325,6 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
 var MODE_FLIP = 'interactive';
 var MODE_PREVIEW = 'grid';
 var MODE_SHEET = 'print';
-var MODE_OUTLINE = 'outline';
 
 var ARRANGE_ONE = 'arrange_one';
 var ARRANGE_SPREAD = 'arrange_two';
@@ -2121,7 +2354,6 @@ var Viewer = function () {
     this.listenForResize();
 
     this.setGrid = this.setGrid.bind(this);
-    this.setOutline = this.setOutline.bind(this);
     this.setPrint = this.setPrint.bind(this);
     this.setFlip = this.setFlip.bind(this);
 
@@ -2224,11 +2456,6 @@ var Viewer = function () {
       }
     }
   }, {
-    key: 'toggleGuides',
-    value: function toggleGuides() {
-      this.element.classList.toggle(c('show-guides'));
-    }
-  }, {
     key: 'toggleBleed',
     value: function toggleBleed() {
       this.element.classList.add(c('show-bleed'));
@@ -2255,10 +2482,6 @@ var Viewer = function () {
         case 'sheet':
           this.mode = MODE_SHEET;
           break;
-        case 'outline':
-        case 'outlines':
-          this.mode = MODE_OUTLINE;
-          break;
         default:
           console.error('Bindery: Unknown view mode "' + newMode + '"');
           break;
@@ -2268,25 +2491,8 @@ var Viewer = function () {
     key: 'setGrid',
     value: function setGrid() {
       if (this.mode === MODE_PREVIEW) return;
-      if (this.mode === MODE_OUTLINE) {
-        this.mode = MODE_PREVIEW;
-        this.updateGuides();
-      } else {
-        this.mode = MODE_PREVIEW;
-        this.render();
-      }
-    }
-  }, {
-    key: 'setOutline',
-    value: function setOutline() {
-      if (this.mode === MODE_OUTLINE) return;
-      if (this.mode === MODE_PREVIEW) {
-        this.mode = MODE_OUTLINE;
-        this.updateGuides();
-      } else {
-        this.mode = MODE_OUTLINE;
-        this.render();
-      }
+      this.mode = MODE_PREVIEW;
+      this.render();
     }
   }, {
     key: 'setPrint',
@@ -2304,6 +2510,8 @@ var Viewer = function () {
   }, {
     key: 'render',
     value: function render() {
+      var _this4 = this;
+
       if (!this.book) return;
       var _document = document,
           body = _document.body;
@@ -2320,25 +2528,17 @@ var Viewer = function () {
       var scrollMax = body.scrollHeight - body.offsetHeight;
       var scrollPct = body.scrollTop / scrollMax;
 
-      if (this.mode === MODE_PREVIEW) {
-        this.renderGrid();
-      } else if (this.mode === MODE_OUTLINE) {
-        this.renderGrid();
-      } else if (this.mode === MODE_FLIP) {
-        this.renderInteractive();
-      } else if (this.mode === MODE_SHEET) {
-        this.renderPrint();
-      } else {
-        this.renderGrid();
-      }
+      window.requestAnimationFrame(function () {
+        if (_this4.mode === MODE_PREVIEW) _this4.renderGrid();else if (_this4.mode === MODE_FLIP) _this4.renderInteractive();else if (_this4.mode === MODE_SHEET) _this4.renderPrint();else _this4.renderGrid();
 
-      body.scrollTop = scrollMax * scrollPct;
-      this.updateZoom();
+        body.scrollTop = scrollMax * scrollPct;
+        _this4.updateZoom();
+      });
     }
   }, {
     key: 'renderProgress',
     value: function renderProgress() {
-      var _this4 = this;
+      var _this5 = this;
 
       var twoPageSpread = function twoPageSpread() {
         for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
@@ -2350,18 +2550,18 @@ var Viewer = function () {
 
       this.book.pages.forEach(function (page, i) {
         // If hasn't been added, or not in spread yet
-        if (!_this4.zoomBox.contains(page.element) || page.element.parentNode === _this4.zoomBox) {
-          if (_this4.lastSpreadInProgress && _this4.lastSpreadInProgress.children.length < 2) {
-            _this4.lastSpreadInProgress.appendChild(page.element);
+        if (!_this5.zoomBox.contains(page.element) || page.element.parentNode === _this5.zoomBox) {
+          if (_this5.lastSpreadInProgress && _this5.lastSpreadInProgress.children.length < 2) {
+            _this5.lastSpreadInProgress.appendChild(page.element);
           } else {
             if (i === 0) {
               var spacer = new Page();
               spacer.element.style.visibility = 'hidden';
-              _this4.lastSpreadInProgress = twoPageSpread(spacer.element, page.element);
+              _this5.lastSpreadInProgress = twoPageSpread(spacer.element, page.element);
             } else {
-              _this4.lastSpreadInProgress = twoPageSpread(page.element);
+              _this5.lastSpreadInProgress = twoPageSpread(page.element);
             }
-            _this4.zoomBox.appendChild(_this4.lastSpreadInProgress);
+            _this5.zoomBox.appendChild(_this5.lastSpreadInProgress);
           }
         }
       });
@@ -2386,47 +2586,40 @@ var Viewer = function () {
       }
     }
   }, {
-    key: 'updateGuides',
-    value: function updateGuides() {
-      this.element.setAttribute('bindery-view-mode', this.mode);
-      if (this.mode === MODE_OUTLINE) {
-        this.element.classList.add(c('show-bleed'));
-        this.element.classList.add(c('show-guides'));
-      } else {
-        this.element.classList.remove(c('show-bleed'));
-        this.element.classList.remove(c('show-guides'));
-      }
-    }
-  }, {
     key: 'renderPrint',
     value: function renderPrint() {
       this.element.classList.add(c('show-bleed'));
-      this.element.classList.remove(c('show-guides'));
 
       this.zoomBox.innerHTML = '';
 
       var isBooklet = this.printArrange === ARRANGE_BOOKLET;
-      var orient = this.orientation;
 
       var pages = this.book.pages.slice();
       if (this.printArrange === ARRANGE_SPREAD) {
-        pages = padPages(pages);
+        pages = padPages(pages, function () {
+          return new Page();
+        });
       } else if (isBooklet) {
-        pages = orderPagesBooklet(pages);
+        pages = orderPagesBooklet(pages, function () {
+          return new Page();
+        });
       }
 
-      var fragment = renderPrintLayout(pages, this.isTwoUp, orient, isBooklet);
+      var fragment = renderPrintLayout(pages, this.isTwoUp, isBooklet);
       this.zoomBox.appendChild(fragment);
     }
   }, {
     key: 'renderGrid',
     value: function renderGrid() {
-      this.updateGuides();
       this.zoomBox.innerHTML = '';
+
+      this.element.classList.remove(c('show-bleed'));
 
       var pages = this.book.pages.slice();
 
-      if (this.doubleSided) pages = padPages(pages);
+      if (this.doubleSided) pages = padPages(pages, function () {
+        return new Page();
+      });
 
       var fragment = renderGridLayout(pages, this.doubleSided);
       this.zoomBox.appendChild(fragment);
@@ -2438,9 +2631,10 @@ var Viewer = function () {
       this.flaps = [];
 
       this.element.classList.remove(c('show-bleed'));
-      this.element.classList.remove(c('show-guides'));
 
-      var pages = padPages(this.book.pages.slice());
+      var pages = padPages(this.book.pages.slice(), function () {
+        return new Page();
+      });
 
       var fragment = renderFlipLayout(pages, this.doubleSided);
       this.zoomBox.appendChild(fragment);
@@ -2501,12 +2695,12 @@ var Split = function (_Rule) {
   }
 
   createClass(Split, [{
-    key: 'customContinuesClass',
+    key: 'customToNextClass',
     get: function get$$1() {
       return this.toNext;
     }
   }, {
-    key: 'customContinuationClass',
+    key: 'customFromPreviousClass',
     get: function get$$1() {
       return this.fromPrevious;
     }
@@ -2825,7 +3019,9 @@ var Rules = {
   }
 };
 
-___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 2px 4px -1px rgba(0,0,0,.2);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:200px;height:300px;position:relative;display:flex;flex-direction:column;flex-wrap:nowrap;margin:auto}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:12pt;background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:12pt;height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:12pt;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;padding:10px;position:relative;padding-top:80px;min-height:90vh}.📖-measure-area,.📖-root{background:#f4f4f4;z-index:2}.📖-measure-area{position:fixed;padding:50px 20px;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all .2s}.📖-spread-wrapper{position:relative;display:flex;width:800px;margin:0 auto 50px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box}.📖-page3d{margin:auto;width:400px;height:600px;transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}@media screen{.📖-viewing .📖-controls{display:flex!important}}.📖-controls{font:14px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;display:none;flex-direction:row;align-items:start;position:fixed;top:0;left:0;right:0;z-index:3;margin:auto;color:#000;padding:10px;overflow:visible;-webkit-font-smoothing:antialiased}.📖-controls *{font:inherit;color:inherit;margin:0;padding:0;box-sizing:border-box}.📖-controls a{color:blue;text-decoration:none}.📖-row{position:relative;display:flex;flex-wrap:wrap;align-items:start;cursor:default;user-select:none;margin-left:8px;margin-bottom:8px}.📖-title{position:relative;display:flex;padding:8px 16px;transition:opacity .2s;display:none;white-space:nowrap;overflow:hidden;margin-right:auto;opacity:0}.📖-in-progress .📖-title{opacity:1;display:flex}.📖-print-options{opacity:1;display:none}[bindery-view-mode=print] .📖-print-options{display:flex}.📖-in-progress .📖-print-options{opacity:0;display:none}.📖-spinner{border:1px solid transparent;border-left-color:#000;width:20px;height:20px;border-radius:50%;vertical-align:middle;opacity:0;pointer-events:none;transition:all .2s;margin-right:16px}.📖-in-progress .📖-spinner{opacity:1;animation:b .6s linear infinite}.📖-debug .📖-spinner{animation:b 2s linear infinite}.📖-spinner.📖-paused{animation:none}@keyframes b{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.📖-controls .📖-btn{-webkit-appearance:none;color:#000;padding:8px 16px;background:#ddd;border:0;cursor:pointer;display:inline-block;border-radius:2px;margin-right:8px;text-decoration:none}.📖-controls .📖-btn:hover{background:#eee}.📖-controls .📖-btn:active{background:#ddd}.📖-controls .📖-btn:last-child{margin-right:0}.📖-controls .📖-btn-light{background:none;border:none}.📖-controls .📖-btn-main{background:blue;border-color:blue;color:#fff}.📖-controls .📖-btn-main:hover{background:blue;opacity:.7}.📖-controls .📖-btn-main:active{background:#000;opacity:1}.📖-btn-print{margin-left:auto;transition:all .8s}.📖-in-progress .📖-btn-print{background:gray;pointer-events:none}.📖-debug .📖-btn-print{display:none}.📖-viewswitcher{opacity:1;user-select:none;overflow:hidden;display:flex;flex-direction:row;border-radius:2px}.📖-in-progress .📖-viewswitcher{pointer-events:none}.📖-viewmode{color:#444;cursor:pointer;padding:0 8px;border-radius:2px}.📖-viewmode:hover{background:#eee}.📖-viewmode:active{background:#ddd}.📖-icon{height:36px;width:32px;background:currentColor;margin:0 auto}.📖-in-progress .📖-icon{color:gray!important}.📖-grid .📖-icon{-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.5 8.5h11v15h-11zm11 0h11v15h-11z' stroke='%23000' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=grid] .📖-grid .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 8h11v16H5zm12 0h11v16H17z' fill-rule='evenodd'/%3E%3C/svg%3E\")}.📖-flip .📖-icon{-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23000' fill='none' fill-rule='evenodd'%3E%3Cpath d='M5.5 8.5h11v15h-11z'/%3E%3Cpath d='M27.5 23.5v-15' stroke-linecap='square'/%3E%3Cpath d='M16.5 8.5v15h.41l7.59-2.847V5.722l-7.324 2.746L17 8.5h-.5z'/%3E%3Cpath d='M27.5 23.5h-11m8-15h3' stroke-linecap='square'/%3E%3C/g%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=interactive] .📖-flip .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M26 8h2v16h-8.152L26 21.693V8zM5 8h11v16H5V8zm12 0l8-3v16l-8 3V8z' fill-rule='evenodd'/%3E%3C/svg%3E\")}.📖-print .📖-icon{-webkit-mask:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath stroke='%23000' d='M9.5 5.5h13v6h-13zm13 17H26a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 13v8A1.5 1.5 0 0 0 6 22.5h3.5v-5h13v5z'/%3E%3Ccircle fill='%23000' cx='25' cy='14' r='1'/%3E%3Cpath stroke='%23000' d='M9.5 17.5h13v8h-13z'/%3E%3C/g%3E%3C/svg%3E\") no-repeat 50% 50%}[bindery-view-mode=print] .📖-print .📖-icon{-webkit-mask-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill-rule='evenodd'%3E%3Cpath d='M9 5h14v5H9zm15 18v-5H8v5H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2zm1-8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3Cpath d='M9 19h14v8H9z'/%3E%3C/g%3E%3C/svg%3E\")}[bindery-view-mode=grid] .📖-grid,[bindery-view-mode=interactive] .📖-flip,[bindery-view-mode=print] .📖-print{color:blue}.📖-select-wrap{padding:8px 16px;padding-right:28px;background:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 14l5 5 5-5' stroke='%23000' fill='none'/%3E%3C/svg%3E\") no-repeat 50% 50%;background-color:#f4f4f4;background-position:100%;border-radius:2px;transition:all .2s;white-space:nowrap;width:100%}.📖-select-wrap:active,.📖-select-wrap:hover{background-color:#eee}.📖-select-wrap.📖-hidden-select{max-width:0;padding-left:0;padding-right:0;border-left-width:0;border-right-width:0;color:transparent}.📖-select{position:absolute;top:0;left:0;opacity:0;-webkit-appearance:none;-moz-appearance:none;padding:8px 16px;color:#000;border:transparent;width:100%}.📖-debug-controls{display:none}.📖-debug .📖-in-progress .📖-debug-controls{display:block}.📖-refresh-btns{opacity:0;position:absolute;top:0;left:0;padding:8px 0;transition:all .2s}.📖-in-progress .📖-refresh-btns{display:none}.📖-refresh-btns a{margin-left:1em;cursor:pointer}.📖-refresh-btns a:hover{color:#000}@media screen and (max-width:720px){[bindery-view-mode=print].📖-root{padding-top:120px}.📖-controls,.📖-print-options{background:#f4f4f4}.📖-print-options{top:56px;left:0;right:0;position:fixed;margin:0 8px 0 0}.📖-print-options.📖-options-hidden{display:none}}@media screen and (max-width:500px){[bindery-view-mode=print].📖-root{padding-top:190px}.📖-print-options{flex-direction:column;align-items:stretch}.📖-hidden-select{max-width:none;max-height:0}}");
+___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid #ddd;box-shadow:0 2px 4px -1px rgba(0,0,0,.15);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:200px;height:300px;position:relative;display:flex;flex-direction:column;flex-wrap:nowrap;margin:auto}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;padding:10px;position:relative;padding-top:60px;min-height:90vh}.📖-measure-area,.📖-root{background:#f4f4f4;z-index:2}.📖-measure-area{position:fixed;padding:50px 20px;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all .2s}.📖-spread-wrapper{position:relative;display:flex;width:800px;margin:0 auto 32px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:100%!important}.📖-page3d{margin:auto;width:400px;height:600px;transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:12pt;background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:12pt;height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:12pt;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}@media screen{.📖-viewing .📖-controls{display:flex!important}}.📖-controls{font:14px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;display:none;flex-direction:row;align-items:start;position:fixed;top:0;left:0;right:0;z-index:3;margin:auto;color:#000;padding:10px;overflow:visible;-webkit-font-smoothing:antialiased}.📖-controls *{font:inherit;color:inherit;margin:0;padding:0;box-sizing:border-box}.📖-controls a{color:blue;text-decoration:none}.📖-row{flex-wrap:wrap;align-items:start;cursor:default;user-select:none}.📖-row,.📖-title{position:relative;display:flex}.📖-title{padding:8px 16px;transition:opacity .2s;white-space:nowrap;overflow:hidden;margin-right:auto}.📖-print-options{display:flex;opacity:0;max-width:0;border-radius:0;background:#e4e4e4;overflow:hidden;transition:all .4s;flex-wrap:nowrap;transition-delay:.2s}[bindery-view-mode=print] .📖-print-options{max-width:720px;margin-right:12px;opacity:1}.📖-in-progress .📖-print-options{opacity:0;display:none}.📖-controls .📖-print-options .📖-control{background-color:transparent}.📖-spinner{border:1px solid transparent;border-left-color:#000;width:20px;height:20px;border-radius:50%;vertical-align:middle;opacity:0;pointer-events:none;transition:all .2s;margin-right:16px}.📖-in-progress .📖-spinner{opacity:1;animation:b .6s linear infinite}.📖-debug .📖-spinner{animation:b 2s linear infinite}.📖-spinner.📖-paused{animation:none}@keyframes b{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.📖-controls .📖-btn{-webkit-appearance:none;cursor:pointer;display:inline-block;margin-right:8px;text-decoration:none}.📖-controls .📖-btn:hover{background:#ddd}.📖-controls .📖-btn:active{background:#eee}.📖-controls .📖-btn:last-child{margin-right:0}.📖-controls .📖-control{border-radius:0;color:#000;padding:8px 16px;background-color:#f4f4f4;border:0}.📖-controls .📖-btn-light{background:none;border:none}.📖-controls .📖-btn-main{background:blue;border-color:blue;color:#fff}.📖-controls .📖-btn-main:hover{background:blue;opacity:.7}.📖-controls .📖-btn-main:active{background:#000;opacity:1}.📖-view-row{margin-left:auto;margin-right:12px;transition:all .5s}.📖-in-progress .📖-view-row{opacity:0;pointer-events:none}.📖-debug .📖-view-row{display:none}.📖-btn-print{transition:all .5s}.📖-in-progress .📖-btn-print{opacity:0;pointer-events:none}.📖-debug .📖-btn-print{display:none}.📖-controls .📖-select-wrap{padding-right:32px;background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 14l5 5 5-5' stroke='%23000' fill='none'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:100%;transition:all .2s;white-space:nowrap;width:100%}.📖-controls .📖-select-wrap:active,.📖-controls .📖-select-wrap:hover{background-color:#ddd}.📖-controls .📖-select-wrap.📖-hidden-select{max-width:0;padding-left:0;padding-right:0;border-left-width:0;border-right-width:0;color:transparent}.📖-select{position:absolute;top:0;left:0;opacity:0;-webkit-appearance:none;-moz-appearance:none;padding:8px 16px;color:#000;border:transparent;width:100%}.📖-debug-controls{display:none}.📖-debug .📖-in-progress .📖-debug-controls{display:block}.📖-refresh-btns{opacity:0;position:absolute;top:0;left:0;padding:8px 0;transition:all .2s}.📖-in-progress .📖-refresh-btns{display:none}.📖-refresh-btns a{margin-left:1em;cursor:pointer}.📖-refresh-btns a:hover{color:#000}.📖-progress-bar{position:absolute;left:0;top:0;background:blue;width:0;transition:all .2s;opacity:0;height:0}.📖-in-progress .📖-progress-bar{opacity:1;height:2px}@media screen and (max-width:720px){.📖-print-options{max-width:unset;max-height:0}[bindery-view-mode=print] .📖-print-options{max-width:unset;max-height:240px;margin:0}.📖-root{transition:all .2s}[bindery-view-mode=print].📖-root{padding-top:120px}.📖-controls{height:98px}.📖-view-row{margin-left:auto}.📖-print-options{top:54px;right:10px;position:fixed;margin:0}.📖-print-options .📖-row{margin:0}}@media screen and (max-width:500px){[bindery-view-mode=print].📖-root{padding-top:190px}[bindery-view-mode=print].📖-root .📖-controls{background:#f4f4f4;height:170px}.📖-print-options{flex-direction:column;align-items:stretch;left:10px}.📖-hidden-select{display:none}}");
+
+/* global BINDERY_VERSION */
 
 var Bindery = function () {
   function Bindery() {
@@ -2836,7 +3032,7 @@ var Bindery = function () {
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
-    this.debug = opts.debug || urlQuery('debug') || false;
+    scheduler.isDebugging = opts.debug || urlQuery('debug') || false;
 
     OptionType.validate(opts, {
       name: 'makeBook',
@@ -2970,7 +3166,7 @@ var Bindery = function () {
 
       this.pageSetup.updateStylesheet();
 
-      paginate({
+      paginate$1({
         content: content,
         rules: this.rules,
         success: function success(book) {
@@ -2983,8 +3179,7 @@ var Bindery = function () {
         error: function error(_error) {
           _this3.layoutComplete = true;
           _this3.viewer.displayError('Layout failed', _error);
-        },
-        isDebugging: this.debug
+        }
       });
     }
   }, {
@@ -3014,36 +3209,29 @@ var Bindery = function () {
 
       document.body.classList.add(c('viewing'));
       this.viewer.element.classList.add(c('in-progress'));
-      if (this.debug) document.body.classList.add(c('debug'));
+      if (scheduler.isDebugging) document.body.classList.add(c('debug'));
 
       this.pageSetup.updateStylesheet();
 
       this.controls.setInProgress();
 
-      paginate({
-        content: content,
-        rules: this.rules,
-        success: function success(book) {
-          _this4.viewer.book = book;
-          _this4.viewer.render();
+      paginate$1(content, this.rules).progress(function (book) {
+        _this4.viewer.book = book;
+        _this4.controls.updateProgress(book.pages.length, book.estimatedProgress);
+        _this4.viewer.renderProgress();
+      }).then(function (book) {
+        _this4.viewer.book = book;
+        _this4.viewer.render();
 
-          _this4.layoutComplete = true;
-          _this4.controls.setDone();
-          if (doneBinding) doneBinding();
-          _this4.viewer.element.classList.remove(c('in-progress'));
-          document.body.classList.remove(c('debug'));
-        },
-        progress: function progress(book) {
-          _this4.viewer.book = book;
-          _this4.controls.updateProgress(book.pages.length);
-          _this4.viewer.renderProgress();
-        },
-        error: function error(_error2) {
-          _this4.layoutComplete = true;
-          _this4.viewer.element.classList.remove(c('in-progress'));
-          _this4.viewer.displayError('Layout couldn\'t complete', _error2);
-        },
-        isDebugging: this.debug
+        _this4.layoutComplete = true;
+        _this4.controls.setDone();
+        if (doneBinding) doneBinding();
+        _this4.viewer.element.classList.remove(c('in-progress'));
+        document.body.classList.remove(c('debug'));
+      }).catch(function (error) {
+        _this4.layoutComplete = true;
+        _this4.viewer.element.classList.remove(c('in-progress'));
+        _this4.viewer.displayError('Layout couldn\'t complete', error);
       });
     }
   }], [{
