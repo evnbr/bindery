@@ -169,6 +169,7 @@ body.#{$pre}-viewing {
   margin: auto;
   padding: 0 20px;
   box-sizing: content-box;
+  height: 100% !important;
 }
 
 .#{$pre}-page3d {

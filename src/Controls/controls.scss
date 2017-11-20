@@ -4,8 +4,7 @@
   }
 }
 
-$btn-border: #444;
-$btn-pad: 8px 20px;
+$btn-pad: 8px 16px;
 $btn-hover: #ddd;
 $btn-active: #eee;
 
@@ -47,8 +46,6 @@ $btn-active: #eee;
   align-items: start;
   cursor: default;
   user-select: none;
-  margin-left: 8px;
-  // margin-bottom: 8px;
 }
 
 .#{$pre}-title {
@@ -56,36 +53,34 @@ $btn-active: #eee;
   display: flex;
   padding: $btn-pad;
   transition: opacity 0.2s;
-  display: none;
+  display: flex;
   white-space: nowrap;
   overflow: hidden;
   margin-right: auto;
-  opacity: 0;
-  .#{$pre}-in-progress & {
-    opacity: 1;
-    display: flex;
-  }
 }
 
 .#{$pre}-print-options {
-  opacity: 1;
-  display: none;
-  margin-right: 12px;
-  border-radius: 2px;
+  display: flex;
+  opacity: 0;
+  max-width: 0;
+  border-radius: 0;
   background: #e4e4e4;
+  overflow: hidden;
+  transition: all 0.4s;
+  flex-wrap: nowrap;
+  transition-delay: 0.2s;
   [bindery-view-mode='print'] & {
-    display: flex;
-  }
-  .#{$pre}-row {
-    margin: 0;
-  }
-  .#{$pre}-select-wrap {
-    background-color: transparent;
+    max-width: 720px;
+    margin-right: 12px;
+    opacity: 1;
   }
   .#{$pre}-in-progress & {
     opacity: 0;
     display: none;
   }
+}
+.#{$pre}-controls .#{$pre}-print-options .#{$pre}-control {
+  background-color: transparent;
 }
 
 
@@ -120,14 +115,8 @@ $btn-active: #eee;
 
 .#{$pre}-controls .#{$pre}-btn {
   -webkit-appearance: none;
-  color: black;
-  padding: $btn-pad;
-  background: #ddd;
-  // border: 1px solid $btn-border;
-  border: 0;
   cursor: pointer;
   display: inline-block;
-  border-radius: 2px;
   margin-right: 8px;
   text-decoration: none;
 
@@ -141,6 +130,14 @@ $btn-active: #eee;
   &:last-child {
     margin-right: 0;
   }
+}
+
+.#{$pre}-controls .#{$pre}-control {
+  border-radius: 0;
+  color: black;
+  padding: $btn-pad;
+  background-color: $background;
+  border: 0;
 }
 
 .#{$pre}-controls .#{$pre}-btn-light {
@@ -189,13 +186,11 @@ $btn-active: #eee;
   }
 }
 
-.#{$pre}-select-wrap {
-  padding: $btn-pad;
+.#{$pre}-controls .#{$pre}-select-wrap {
   padding-right: 32px;
-  background: url('./_assets/icon-carat.svg') no-repeat 50% 50%;
-  background-color: $background; //white;
+  background-image: url('./_assets/icon-carat.svg');
+  background-repeat: no-repeat;
   background-position: right;
-  border-radius: 2px;
   transition: all 0.2s;
   white-space: nowrap;
   width: 100%;
@@ -227,7 +222,7 @@ $btn-active: #eee;
   -moz-appearance:none;
   padding: $btn-pad;
   color: black;
-  border: transparent; // 1px solid $btn-border;
+  border: transparent;
   width: 100%;
 }
 
@@ -275,6 +270,19 @@ $btn-active: #eee;
 
 
 @media screen and (max-width: 720px) {
+  .#{$pre}-print-options {
+    max-width: unset;
+    max-height: 0;
+    [bindery-view-mode='print'] & {
+      max-width: unset;
+      max-height: 240px;
+      margin: 0;
+    }
+  }
+
+  .#{$pre}-root {
+    transition: all 0.2s;
+  }
 
   [bindery-view-mode='print'].#{$pre}-root {
     padding-top: 120px;

@@ -26,7 +26,7 @@ buttons.classList.add('📖-view-source-header');
 buttons.classList.add('📖-controls');
 buttons.id = 'viewSourceHeader';
 buttons.innerHTML = `
-  <a class="📖-btn" href="https://github.com/evnbr/bindery/tree/master/docs/examples/${id}">View Source ↗</a>
+  <a class="📖-btn 📖-control" href="https://github.com/evnbr/bindery/tree/master/docs/examples/${id}">View Source ↗</a>
 `;
 
 document.head.appendChild(sheet);

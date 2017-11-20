@@ -123,15 +123,6 @@ class Controls {
       });
     };
 
-    // const viewModes = [
-    //   viewMode('grid', viewer.setGrid, 'Grid'),
-    //   // viewMode('outline', viewer.setOutline, 'Outline'),
-    //   viewMode('flip', viewer.setFlip, 'Flip'),
-    //   viewMode('print', viewer.setPrint, 'Sheet'),
-    // ];
-
-    // const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
-
     const headerContent = h('span', 'Loading');
 
     let playSlow;
@@ -193,11 +184,11 @@ class Controls {
     const progressBar = h(c('.progress-bar'));
     const header = title(
       // spinner,
-      // headerContent,
-      h(c('.refresh-btns'),
-        refreshPaginationBtn,
-        refreshPaginationBtnDebug
-      ),
+      headerContent,
+      // h(c('.refresh-btns'),
+      //   refreshPaginationBtn,
+      //   refreshPaginationBtnDebug
+      // ),
     );
 
     this.setInProgress = () => {
@@ -247,7 +238,6 @@ class Controls {
 
     this.element = h(c('.controls'),
       progressBar,
-      // viewSwitcher,
       header,
       debugControls,
       viewRow,
