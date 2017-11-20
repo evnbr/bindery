@@ -12,7 +12,7 @@ $keyword: purple;
 $sidebar-width: 12rem;
 $docs-options-inset: 6rem;
 
-$wide-enough-for-side-nav: 50rem;
+$wide-enough-for-side-nav: 65rem;
 $narrow: 40rem;
 
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
@@ -225,8 +225,21 @@ li {
 .docs-nav {
   // font: 0.7rem / 1.5 $system;
   z-index: 99;
-  position: relative;
-  display: inline-block;
+  position: fixed;
+  display: block;
+  border-left: 1px solid black;
+  width: 12rem;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  transform: translate3d(100%,0,0);
+  max-height: 100%;
+  overflow-y: scroll;
+  padding: 2rem 0 2rem 2rem;
+
+  transition: all 0.2s;
+  background: white;
+
   a {
     position: relative;
     &:hover {
@@ -243,7 +256,39 @@ li {
     left: -1em;
     top: 0.65rem;
     border-radius: 50%;
-    display: none;
+  }
+
+  .docs-nav-visible & {
+    transform: translate3d(0,0,0);
+  }
+}
+
+.docs-toc-btn {
+  position: fixed;
+  top: calc(50vh - 1.5rem);
+  right: -1.5rem;
+  background: white;
+  border: 1px solid black;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  z-index: 88;
+}
+
+.docs-toc-scrim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 77;
+  background: rgba(255,255,255,0.3);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s;
+  .docs-nav-visible & {
+    opacity: 1;
+    pointer-events: all;
   }
 }
 
@@ -308,9 +353,6 @@ li {
     padding-bottom: 0;
   }
 
-}
-
-.docs-nav {
 }
 
 .page-content {
@@ -407,10 +449,10 @@ blockquote {
  * Code formatting
  */
 pre, code {
-  line-height: 0.9rem;
+  line-height: 1.2rem;
   font-family: $mono;
   letter-spacing: -0.015em;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 
 p code, li code {
@@ -503,18 +545,21 @@ p code, li code {
     box-shadow: none;
     display: block;
     width: auto;
-    display: inline-block;
+    // display: inline-block;
     // margin-right: 0.5rem;
     a {
       width: auto;
-      &:after {
-        content: ',';
-      }
     }
   }
 }
 
 @media (min-width: $wide-enough-for-side-nav) {
+  .docs-toc-btn {
+    display: none;
+  }
+  .docs-toc-scrim {
+    display: none;
+  }
   .scroll-back {
     display: block;
   }
@@ -548,18 +593,11 @@ p code, li code {
   }
 
   .docs-nav {
-    position: fixed;
-    top: 0;
-    max-height: 100%;
-    overflow-y: scroll;
-    padding: 6rem 0 2rem;
     width: $sidebar-width;
+    padding: 6rem 0 2rem 1rem;
     right: 0;
-    padding-left: 1rem;
-    &::-webkit-scrollbar {
-      width: 0px;
-      background: transparent; /* make scrollbar transparent */
-    }
+    transform: none;
+    border: 0;
     .selected::before {
       display: block;
     }
