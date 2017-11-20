@@ -458,6 +458,11 @@ pre, code {
 p code, li code {
   font-size: 0.8rem;
 }
+@media (max-width: 512px) {
+  .btn, .post-content .btn {
+    display: block;
+  }
+}
 
 @media (max-width: $narrow) {
   html {
@@ -646,6 +651,12 @@ html.book {
 .book {
   .site-header {
     position: relative;
+  }
+  .toc {
+    font-size: 2rem;
+    li {
+      margin: 0;
+    }
   }
   pre.highlight {
     box-shadow: none;
