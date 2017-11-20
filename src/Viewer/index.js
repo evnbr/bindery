@@ -262,7 +262,6 @@ class Viewer {
     this.zoomBox.innerHTML = '';
 
     const isBooklet = this.printArrange === ARRANGE_BOOKLET;
-    const orient = this.orientation;
 
     let pages = this.book.pages.slice();
     if (this.printArrange === ARRANGE_SPREAD) {
@@ -271,7 +270,7 @@ class Viewer {
       pages = orderPagesBooklet(pages, () => new Page());
     }
 
-    const fragment = printLayout(pages, this.isTwoUp, orient, isBooklet);
+    const fragment = printLayout(pages, this.isTwoUp, isBooklet);
     this.zoomBox.appendChild(fragment);
   }
 

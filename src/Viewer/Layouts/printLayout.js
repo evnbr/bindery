@@ -10,7 +10,7 @@ const onePageSpread = function (...arg) {
 };
 
 
-const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
+const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
   const printLayout = document.createDocumentFragment();
 
   const marks = isTwoUp ? printMarksSpread : printMarksSingle;
