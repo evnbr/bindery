@@ -4,7 +4,7 @@
 // and browser lockup
 
 const MAX_CALLS = 800;
-const MAX_TIME = 100; // ms
+const MAX_TIME = 50; // ms
 
 class Scheduler {
   constructor() {

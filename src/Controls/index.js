@@ -209,7 +209,7 @@ class Controls {
       const t = performance.now();
       if (t - lastUpdate > 100) {
         lastUpdate = t;
-        progressBar.style.width = `${Math.floor(pct * 100)}%`;
+        progressBar.style.width = `${pct * 100}%`;
         headerContent.textContent = `${count} Pages`;
       }
     };
