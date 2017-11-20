@@ -1,20 +1,21 @@
-const waitForImage = (image, done) => {
-  const fileName = image.src.substring(image.src.lastIndexOf('/') + 1);
-  // console.log(`Bindery: Waiting for image '${fileName}' size to load`);
+import Thenable from './Thenable';
 
+// Note: Doesn't ever reject, since missing images
+// shouldn't prevent layout from resolving
+
+const waitForImage = image => new Thenable((resolve) => {
   const pollForSize = setInterval(() => {
     if (image.naturalWidth) {
       clearInterval(pollForSize);
-      done();
+      resolve();
     }
   }, 10);
 
   image.addEventListener('error', () => {
     clearInterval(pollForSize);
-    console.error(`Bindery: Image '${fileName}' failed to load.`);
-    done();
+    resolve();
   });
   image.src = image.src;
-};
+});
 
 export default waitForImage;

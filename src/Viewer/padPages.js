@@ -1,12 +1,10 @@
-import Page from '../Page';
-
-const padPages = (pages) => {
+const padPages = (pages, makePage) => {
   if (pages.length % 2 !== 0) {
-    const pg = new Page();
+    const pg = makePage();
     pages.push(pg);
   }
-  const spacerPage = new Page();
-  const spacerPage2 = new Page();
+  const spacerPage = makePage();
+  const spacerPage2 = makePage();
   spacerPage.element.style.visibility = 'hidden';
   spacerPage2.element.style.visibility = 'hidden';
   pages.unshift(spacerPage);

@@ -14,10 +14,10 @@ class Split extends Rule {
       fromPrevious: OptionType.string,
     });
   }
-  get customContinuesClass() {
+  get customToNextClass() {
     return this.toNext;
   }
-  get customContinuationClass() {
+  get customFromPreviousClass() {
     return this.fromPrevious;
   }
 }

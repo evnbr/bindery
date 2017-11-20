@@ -72,9 +72,26 @@ layout: default
       </div>
   </nav>
 
+  <a id="docs-toc" class="docs-toc-btn" href=""></a>
+  <div class="docs-toc-scrim"></div>
 
   <div class="post-content docs-content">
     {{ content }}
   </div>
+
+  <script>
+    const btn = document.getElementById('docs-toc');
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.body.classList.toggle('docs-nav-visible');
+    });
+
+    const scrim = document.querySelector('.docs-toc-scrim');
+    scrim.addEventListener('click', (e) => {
+      console.log('e');
+      document.body.classList.remove('docs-nav-visible');
+    });
+  </script>
+
 
 </article>

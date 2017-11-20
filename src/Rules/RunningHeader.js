@@ -1,7 +1,6 @@
 import h from 'hyperscript';
 import Rule from './Rule';
-import { OptionType } from '../utils';
-import c from '../utils/prefixClass';
+import { OptionType, c } from '../utils';
 
 // Options:
 // selector: String

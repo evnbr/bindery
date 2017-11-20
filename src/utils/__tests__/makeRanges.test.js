@@ -1,4 +1,4 @@
-import makeRanges from './makeRanges';
+import makeRanges from '../makeRanges';
 
 test('Doesn\'t create ranges for spaced pages', () => {
   expect(makeRanges([1, 3, 5, 7])).toEqual('1, 3, 5, 7');

@@ -1,6 +1,5 @@
 import Replace from './Replace';
-import { OptionType, makeRanges } from '../utils';
-import c from '../utils/prefixClass';
+import { OptionType, makeRanges, c } from '../utils';
 
 // Options:
 // selector: String

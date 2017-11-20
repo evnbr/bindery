@@ -1,18 +1,17 @@
 $pre: "📖";
 
-$accent: blue;//#0000d0; //navy;
-$invalid: #bf5656;
+$accent: blue; //#00984b;
 $text: black;
 $background: #f4f4f4;
 $hover: rgba(0,0,0,0.04);
 
-$sidebarWidth: 280px;
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
 
 
 @import './Page/page.scss';
 @import './Rules/fullBleed.scss';
-@import './Layouts/printMarks.scss';
 
 @import './Viewer/viewer.scss';
+@import './Viewer/Layouts/printMarks.scss';
+
 @import './Controls/controls.scss';

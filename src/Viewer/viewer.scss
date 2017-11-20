@@ -9,9 +9,7 @@
     padding: 10px;
     z-index: 99;
     position: relative;
-    // padding-right: $sidebarWidth;
-    padding-top: 80px;
-    animation: fadeUp 0.3s;
+    padding-top: 60px;
     min-height: 90vh;
   }
 
@@ -75,11 +73,6 @@
    .#{$pre}-placeholder-pulse {
      animation: pulse 1s infinite;
    }
-}
-
-@keyframes fadeUp {
-  0%   { opacity: 0; }
-  100% { opacity: 1; }
 }
 
 @keyframes pulse {
@@ -153,7 +146,7 @@ body.#{$pre}-viewing {
   position: relative;
   display: flex;
   width: 800px;
-  margin: 0 auto 50px;
+  margin: 0 auto 32px;
 }
 
 .#{$pre}-print-page .#{$pre}-spread-wrapper {
@@ -176,8 +169,8 @@ body.#{$pre}-viewing {
   margin: auto;
   padding: 0 20px;
   box-sizing: content-box;
+  height: 100% !important;
 }
-
 
 .#{$pre}-page3d {
   margin: auto;

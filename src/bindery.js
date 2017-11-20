@@ -1,22 +1,24 @@
+/* global BINDERY_VERSION */
+
 import h from 'hyperscript';
 
 import paginate from './paginate';
+import scheduler from './Scheduler';
 import PageSetup from './PageSetup';
 import Viewer from './Viewer';
-import c from './utils/prefixClass';
 
 import Rules from './Rules/';
-import { OptionType, urlQuery } from './utils';
+import { OptionType, urlQuery, c } from './utils';
 
-require('./main.scss');
+import './main.scss';
 
 class Bindery {
   constructor(opts = {}) {
-    console.log(`📖 Bindery v${'[AIV]{version}[/AIV]'}`);
+    console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
-    this.debug = opts.debug || urlQuery('debug') || false;
+    scheduler.isDebugging = opts.debug || urlQuery('debug') || false;
 
     OptionType.validate(opts, {
       name: 'makeBook',
@@ -164,7 +166,6 @@ class Bindery {
         this.layoutComplete = true;
         this.viewer.displayError('Layout failed', error);
       },
-      isDebugging: this.debug,
     });
   }
 
@@ -193,16 +194,18 @@ class Bindery {
 
     document.body.classList.add(c('viewing'));
     this.viewer.element.classList.add(c('in-progress'));
-    if (this.debug) document.body.classList.add(c('debug'));
+    if (scheduler.isDebugging) document.body.classList.add(c('debug'));
 
     this.pageSetup.updateStylesheet();
 
     this.controls.setInProgress();
 
-    paginate({
-      content,
-      rules: this.rules,
-      success: (book) => {
+    paginate(content, this.rules)
+      .progress((book) => {
+        this.viewer.book = book;
+        this.controls.updateProgress(book.pages.length, book.estimatedProgress);
+        this.viewer.renderProgress();
+      }).then((book) => {
         this.viewer.book = book;
         this.viewer.render();
 
@@ -211,19 +214,11 @@ class Bindery {
         if (doneBinding) doneBinding();
         this.viewer.element.classList.remove(c('in-progress'));
         document.body.classList.remove(c('debug'));
-      },
-      progress: (book) => {
-        this.viewer.book = book;
-        this.controls.updateProgress(book.pages.length);
-        this.viewer.renderProgress();
-      },
-      error: (error) => {
+      }).catch((error) => {
         this.layoutComplete = true;
         this.viewer.element.classList.remove(c('in-progress'));
         this.viewer.displayError('Layout couldn\'t complete', error);
-      },
-      isDebugging: this.debug,
-    });
+      });
   }
 }
 

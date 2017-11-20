@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import c from '../utils/prefixClass';
+import { c } from '../../utils';
 
 const renderFlipLayout = (pages, doubleSided) => {
   const flipLayout = document.createDocumentFragment();

@@ -1,5 +1,5 @@
 import h from 'hyperscript';
-import c from '../utils/prefixClass';
+import { c } from '../../utils';
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 
 const twoPageSpread = function (...arg) {
@@ -10,7 +10,7 @@ const onePageSpread = function (...arg) {
 };
 
 
-const renderPrintLayout = (pages, isTwoUp, orient, isBooklet) => {
+const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
   const printLayout = document.createDocumentFragment();
 
   const marks = isTwoUp ? printMarksSpread : printMarksSingle;

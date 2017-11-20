@@ -1,5 +1,4 @@
 import h from 'hyperscript';
-// import { convertStrToPx } from '../utils/convertUnits';
 import c from '../utils/prefixClass';
 
 import {
@@ -9,7 +8,7 @@ import {
   btn,
   btnMain,
   row,
-  viewMode,
+  // viewMode,
 } from './components';
 
 const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
@@ -19,20 +18,21 @@ class Controls {
     this.binder = opts.binder;
     const viewer = opts.viewer;
 
+    let viewSelect;
+    let marksSelect;
+    let spinner;
+
     const print = () => {
       viewer.setPrint();
+
+      const sel = viewSelect.querySelector('select');
+      sel.value = 'view_print';
+      sel.dispatchEvent(new Event('change'));
+
       setTimeout(window.print, 10);
     };
 
     const printBtn = btnMain({ onclick: print }, 'Print');
-
-    const doneBtn = btn({ onclick: () => {
-      if (this.binder.autorun) {
-        window.history.back();
-      } else {
-        this.binder.cancel();
-      }
-    } }, 'Done');
 
     const sheetSizes = supportsCustomPageSize ? [
       option({ value: 'size_page', selected: true }, 'Auto'),
@@ -62,12 +62,9 @@ class Controls {
       const newVal = e.target.value;
       viewer.setSheetSize(newVal);
       if (newVal === 'size_page' || newVal === 'size_page_bleed') {
-        // marksSelect.value = 'marks_none';
-        marksSelect.disabled = true;
         marksSelect.classList.add(c('hidden-select'));
       } else {
         marksSelect.classList.remove(c('hidden-select'));
-        marksSelect.disabled = false;
       }
 
       this.binder.pageSetup.updateStylesheet();
@@ -83,8 +80,6 @@ class Controls {
       option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
       option({ value: 'arrange_two' }, '1 Spread / Sheet'),
       option({ value: 'arrange_booklet' }, 'Booklet Sheets'),
-      // option({ disabled: true }, 'Grid'),
-      // option({ disabled: true }, 'Signatures'),
     );
     const arrangement = row(arrangeSelect);
 
@@ -110,7 +105,7 @@ class Controls {
       }
     };
 
-    const marksSelect = select(
+    marksSelect = select(
       { onchange: updateMarks },
       option({ value: 'marks_none' }, 'No Marks'),
       option({ value: 'marks_crop', selected: true }, 'Crop Marks'),
@@ -123,31 +118,20 @@ class Controls {
     const marks = row(marksSelect);
     const sheetSize = row(sheetSizeSelect);
 
-    const validCheck = h('div', { style: {
-      display: 'none',
-      color: '#e2b200',
-    } }, 'Too Small');
-
     const startPaginating = () => {
       this.binder.makeBook(() => {
       });
     };
-
-    const viewModes = [
-      viewMode('grid', viewer.setGrid, 'Grid'),
-      // viewMode('outline', viewer.setOutline, 'Outline'),
-      viewMode('flip', viewer.setFlip, 'Flip'),
-      viewMode('print', viewer.setPrint, 'Sheet'),
-    ];
-
-    const viewSwitcher = h(c('.viewswitcher'), ...viewModes);
 
     const headerContent = h('span', 'Loading');
 
     let playSlow;
     const step = btn('→', {
       style: { display: 'none' },
-      onclick: () => window.binderyDebug.step(),
+      onclick: () => {
+        window.binderyDebug.step();
+        document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
+      },
     });
     const pause = btn('❙❙', {
       onclick: () => {
@@ -196,32 +180,37 @@ class Controls {
         startPaginating();
       },
     });
-    const spinner = h(c('.spinner'));
+    spinner = h(c('.spinner'));
+    const progressBar = h(c('.progress-bar'));
     const header = title(
-      spinner,
+      // spinner,
       headerContent,
-      h(c('.refresh-btns'),
-        refreshPaginationBtn,
-        refreshPaginationBtnDebug
-      ),
+      // h(c('.refresh-btns'),
+      //   refreshPaginationBtn,
+      //   refreshPaginationBtnDebug
+      // ),
     );
 
     this.setInProgress = () => {
       headerContent.textContent = 'Paginating';
-      validCheck.style.display = 'none';
     };
 
-    this.updateProgress = (count) => {
-      headerContent.textContent = `${count} Pages`;
+    let lastUpdate = 0;
+    this.updateProgress = (count, pct) => {
+      const t = performance.now();
+      if (t - lastUpdate > 100) {
+        lastUpdate = t;
+        progressBar.style.width = `${pct * 100}%`;
+        headerContent.textContent = `${count} Pages`;
+      }
     };
 
     this.setDone = () => {
+      progressBar.style.width = '100%';
       headerContent.textContent = `${viewer.book.pages.length} Pages`;
-      validCheck.style.display = 'none';
     };
 
     this.setInvalid = () => {
-      validCheck.style.display = '';
     };
 
     printBtn.classList.add(c('btn-print'));
@@ -232,12 +221,27 @@ class Controls {
     );
     options.classList.add(c('print-options'));
 
+    const updateView = (e) => {
+      const val = e.target.value;
+      if (val === 'view_grid') viewer.setGrid();
+      else if (val === 'view_flip') viewer.setFlip();
+      else if (val === 'view_print') viewer.setPrint();
+    };
+    viewSelect = select(
+      { onchange: updateView },
+      option({ value: 'view_grid' }, 'Preview'),
+      option({ value: 'view_flip' }, 'Flipbook'),
+      option({ value: 'view_print' }, 'Print Preview'),
+    );
+    const viewRow = row(viewSelect);
+    viewRow.classList.add(c('view-row'));
 
     this.element = h(c('.controls'),
-      viewSwitcher,
-      options,
+      progressBar,
       header,
       debugControls,
+      viewRow,
+      options,
       printBtn,
     );
   }

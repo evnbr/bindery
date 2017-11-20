@@ -1,6 +1,5 @@
 import h from 'hyperscript';
 import c from '../utils/prefixClass';
-import { cssNumberPattern } from '../utils/convertUnits';
 
 const title = function (...arg) {
   return h(c('.title'), ...arg);
@@ -16,15 +15,15 @@ const row = function (...arg) {
 
 // Button
 const btn = function (...arg) {
-  return h(`button.${c('btn')}`, ...arg);
+  return h(`button${c('.control')}${c('.btn')}`, ...arg);
 };
 
 const btnLight = function (...arg) {
-  return h(`button.${c('btn')}.${c('btn-light')}`, ...arg);
+  return h(`button${c('.control')}${c('.btn')}${c('.btn-light')}`, ...arg);
 };
 
 const btnMain = function (...arg) {
-  return h(`button.${c('btn')}.${c('btn-main')}`, ...arg);
+  return h(`button${c('.control')}${c('.btn')}${c('.btn-main')}`, ...arg);
 };
 
 const select = function (...arg) {
@@ -35,7 +34,7 @@ const select = function (...arg) {
   };
   selectEl.addEventListener('change', updateVal);
   updateVal();
-  return h(c('.select-wrap'),
+  return h(`${c('.select-wrap')}${c('.control')}`,
     selectVal,
     selectEl
   );
@@ -44,25 +43,6 @@ const select = function (...arg) {
 
 const option = function (...arg) {
   return h('option', ...arg);
-};
-
-// Input
-const inputNumberUnits = function (val) {
-  return h('input', {
-    type: 'text',
-    value: val,
-    pattern: cssNumberPattern,
-  });
-};
-
-// View Swithcer
-const viewMode = function (id, action, text) {
-  const sel = `.${c('viewmode')}.${c(id)}`;
-  return h(sel,
-    { onclick: action },
-    h(c('.icon')),
-    // text
-  );
 };
 
 export {
@@ -74,6 +54,5 @@ export {
   btnMain,
   select,
   option,
-  inputNumberUnits,
-  viewMode,
+  // viewMode,
 };

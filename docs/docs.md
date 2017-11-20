@@ -1,6 +1,6 @@
 ---
 layout: docs
-title:  Docs
+title:  Documentation
 shortTitle: Docs
 permalink: /docs/
 order: 2
@@ -19,7 +19,7 @@ Bindery.makeBook({
 });
 ```
 
-Note that the above is a shortcut for the following, which you may want to use if you're
+<!-- Note that the above is a shortcut for the following, which you may want to use if you're
 integrating Bindery with your own UI.
 
 ```js
@@ -29,7 +29,7 @@ let bindery = new Bindery({
 
 // Later, in your own event handler
 bindery.makeBook();
-```
+``` -->
 
 ### content
 
@@ -41,9 +41,10 @@ Bindery.makeBook({
   content: '#content',
 });
 
-// HTMLElement
+// Element
+const el = document.getElementByID('content');
 Bindery.makeBook({
-  content: document.getElementByID('content'),
+  content: el,
 });
 
 // Fetch from a URL

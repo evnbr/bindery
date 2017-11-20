@@ -1,21 +1,28 @@
 import { isValidLength } from './convertUnits';
 
 const validate = (opts, validOpts) => {
+  let isValid = true;
   Object.keys(opts).forEach((k) => {
     if (!validOpts[k]) {
       console.error(`Bindery: '${validOpts.name}' doesn't have property '${k}'`);
+      isValid = false;
     } else {
       const val = opts[k];
       const checker = validOpts[k];
       if (!checker(val)) {
         console.error(`Bindery: For property '${validOpts.name}.${k}', ${JSON.stringify(val)} is not a valid value of type ${checker.name}`);
+        isValid = false;
       }
     }
   });
-  return true;
+  return isValid;
 };
 
 const isObj = val => typeof val === 'object';
+const isFunc = val => typeof val === 'function';
+const isBool = val => typeof val === 'boolean';
+const isStr = val => typeof val === 'string';
+const isArr = val => Array.isArray(val);
 
 const OptionType = {
   enum(...enumCases) {
@@ -27,22 +34,12 @@ const OptionType = {
   any() {
     return true;
   },
-  string(val) {
-    return typeof val === 'string';
-  },
-  length(val) {
-    return isValidLength(val);
-  },
-  bool(val) {
-    return typeof val === 'boolean';
-  },
-  func(val) {
-    return typeof val === 'function';
-  },
+  string: isStr,
+  length: isValidLength,
+  bool: isBool,
+  func: isFunc,
   obj: isObj,
-  array(val) {
-    return Array.isArray(val);
-  },
+  array: isArr,
   shape(validShape) {
     return userShape => isObj(userShape) && validate(userShape, validShape);
   },

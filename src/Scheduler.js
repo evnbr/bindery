@@ -1,22 +1,31 @@
-// Even when there is no debugDelay,
+// When there is no debugDelay,
 // the throttler will occassionally use rAF
-// to prevent the call stack from getting too big.
-//
-// There might be a better way to do this.
-const MAX_CALLS = 1000;
+// to prevent stack overflow
+// and browser lockup
+
+const MAX_CALLS = 800;
+const MAX_TIME = 50; // ms
 
 class Scheduler {
-  constructor(debuggable) {
+  constructor() {
     this.numberOfCalls = 0;
     this.resumeLimit = Infinity;
     this.callsSinceResume = 0;
     this.queuedFunc = null;
     this.isPaused = false;
-    this.useDelay = debuggable;
+    this.useDelay = false;
     this.delayTime = 100;
 
-    if (debuggable) {
-      // Only expose these
+    this.lastWaitedTime = 0;
+  }
+
+  get isDebugging() {
+    return this.useDelay;
+  }
+
+  set isDebugging(newValue) {
+    this.useDelay = newValue;
+    if (newValue) {
       window.binderyDebug = {
         pause: this.pause.bind(this),
         resume: this.resume.bind(this),
@@ -27,6 +36,7 @@ class Scheduler {
       console.log('Bindery: Debug layout with the following: \nbinderyDebug.pause() \nbinderyDebug.resume()\n binderyDebug.resumeFor(n) // pauses after n steps, \nbinderyDebug.step()');
     }
   }
+
   throttle(func) {
     this.callsSinceResume += 1;
 
@@ -34,11 +44,13 @@ class Scheduler {
       this.endResume();
     }
 
+    const handlerTime = performance.now() - this.lastWaitedTime;
+
     if (this.isPaused) {
       this.queuedFunc = func;
     } else if (this.useDelay) {
       setTimeout(func, this.delayTime);
-    } else if (this.numberOfCalls < MAX_CALLS) {
+    } else if (this.numberOfCalls < MAX_CALLS && handlerTime < MAX_TIME) {
       this.numberOfCalls += 1;
       func();
     } else {
@@ -46,7 +58,10 @@ class Scheduler {
       if (document.hidden) {  // Tab in background
         setTimeout(func, 1);
       } else {
-        requestAnimationFrame(func);
+        requestAnimationFrame((t) => {
+          this.lastWaitedTime = t;
+          func();
+        });
       }
     }
   }
@@ -102,4 +117,4 @@ class Scheduler {
   }
 }
 
-export default Scheduler;
+export default new Scheduler();
