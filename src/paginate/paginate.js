@@ -1,7 +1,7 @@
 import h from 'hyperscript';
 
 // Bindery
-import Book from '../Book';
+import Book from './Book';
 import Page from '../Page';
 import scheduler from '../Scheduler';
 
@@ -20,6 +20,13 @@ import { c, last } from '../utils';
 import Thenable from './Thenable';
 
 const MAXIMUM_PAGE_LIMIT = 2000;
+
+const isTextNode = node => node.nodeType === Node.TEXT_NODE;
+const isElement = node => node.nodeType === Node.ELEMENT_NODE;
+const isScript = node => node.tagName === 'SCRIPT';
+const isImage = node => node.tagName === 'IMG';
+const isUnloadedImage = node => isImage(node) && !node.naturalWidth;
+const isContent = node => isElement(node) && !isScript(node);
 
 // Walk up the tree to see if we can safely
 // insert a split into this node.
@@ -209,25 +216,22 @@ const paginate = (content, rules) => {
   };
 
   let addElementNode;
+
   const addChild = (child, parent) => {
-    if (child.nodeType === Node.TEXT_NODE) {
+    if (isTextNode(child)) {
       return addTextChild(child, parent);
-    } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'SCRIPT') {
-      return new Thenable((resolve) => {
-        if (child.tagName === 'IMG' && !child.naturalWidth) {
-          const imgStart = performance.now();
-          waitForImage(child, () => {
-            layoutWaitingTime += (performance.now() - imgStart);
-            addElementNode(child).then(resolve);
-          });
-        } else {
-          scheduler.throttle(() => addElementNode(child).then(resolve));
-        }
+    } else if (isUnloadedImage(child)) {
+      const imgStart = performance.now();
+      return waitForImage(child).then(() => {
+        layoutWaitingTime += (performance.now() - imgStart);
+        return addElementNode(child);
       });
-    } else {
-      // Skip comments and unknown nodes
-      return new Thenable(resolve => resolve());
+    } else if (isContent(child)) {
+      return addElementNode(child);
     }
+
+    // Skip comments and unknown node
+    return new Thenable(resolve => resolve());
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
@@ -291,6 +295,7 @@ const paginate = (content, rules) => {
     continueOnNewPage();
     addElementNode(content).then(finishPagination);
   };
+
   finishPagination = () => {
     document.body.removeChild(measureArea);
 
