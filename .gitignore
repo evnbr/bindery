@@ -1,11 +1,11 @@
 
 node_modules/
+dist/
+coverage/
+
 *.sketch
 *.map
-
 *.log
 
 .eslintcache
-coverage
-
 stats.json
