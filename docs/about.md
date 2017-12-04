@@ -18,7 +18,7 @@ Computer printers predate computer screens. Here is where a short history would 
 Bindery.js 1.0 was developed in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
 a publication from participants in the graphic design course *HTML Output* at [RISD](http://risd.edu). It was based on the [much-maligned](https://alistapart.com/blog/post/css-regions-considered-harmful), [now abandoned](https://arstechnica.com/information-technology/2014/01/google-plans-to-dump-adobe-css-tech-to-make-blink-fast-not-rich/) CSS Regions spec, using [a polyfill](https://github.com/FremyCompany/css-regions-polyfill). [Catherine Leigh Schmidt](http://cath.land) and [Lukas WinklerPrins](http://ltwp.net) produced a Jekyll theme called [Baby Bindery](https://github.com/thedesignoffice/babybindery) for the [Design Office](http://thedesignoffice.org/) based on this initial version.
 
-Bindery.js 2.0 has been redeveloped since February 2017 by [Evan Brooks](http://evanbrooks.info). It has been rewritten from scratch to be smaller, faster, more flexible, and more robust.  With thanks to [John Caserta](http://johncaserta.com/) and [Teddy Bradford](#) for contributions and feedback.
+Bindery.js 2.0 has been developed since February 2017 by [Evan Brooks](https://evanbrooks.info). It has been rewritten from scratch to be smaller, faster, more flexible, and more robust.  With thanks to [John Caserta](http://johncaserta.com/) and [Teddy Bradford](https://teddybradford.com/) for contributions and feedback.
 
 Report bugs, make suggestions, or lend a hand
   <a href="https://github.com/evnbr/bindery">on Github</a>.
@@ -35,7 +35,7 @@ programmatically. It's not a graphical user interface (though you could build on
 
 ### Colophon
 Text is set in [Tiempos Headline](https://klim.co.nz/retail-fonts/tiempos-headline/) by [Kris Sowersby](https://klim.co.nz/), and
-code samples are set in [Input Mono Narrow](http://input.fontbureau.com/) by [David Jonathan Ross](https://djr.com/).
+code samples are set in [Input Mono](http://input.fontbureau.com/) by [David Jonathan Ross](https://djr.com/).
 
 This page was rendered at <span id='now'>[Time and Date]</span> with <span id='browser'>[Browser]</span> using the following user agent: <span id='userAgent'>[System]</span>.
 It is displayed at <span id='windowSize'>[Window Size]</span> pixels on a screen of <span id='screenSize'>[Screen Size]</span> pixels, with a device pixel ratio of <span id='devicePixelRatio'>[DPR]</span>.

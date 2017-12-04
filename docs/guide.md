@@ -30,15 +30,18 @@ file as your content, and you're ready to go.
 </script>
 ```
 
-Use your usual web CSS if you've got it—96 CSS pixels equals 1 CSS inch. That should be around 1 inch while printed, although some browsers might adjust the scale a little.
+You can also install it from [npm](https://www.npmjs.com/package/bindery) with `npm install bindery`.  
 
-Avoid using `@media print`, since bindery won't be able to consider those styles during pagination, and you won't be able to see them in the preview.
+### Styling a Book
 
-If you add book-specific styles, note that that CSS supports traditional print measurements
-like points (`pt`), pica (`pc`), inches (`in`), and millimeters (`mm`).
-You'll want to steer clear of viewport-specific units like `vh` or `vw`.
+Use your existing web CSS if you've got it—96 CSS pixels equals 1 CSS inch. That should be around 1 inch while printed, although some browsers might adjust the scale a little. CSS also supports points (`pt`), pica (`pc`), inches (`in`), and millimeters (`mm`).
 
-### Fetching Content
+When using media queries or viewport-specific units like `vh` or `vw`, note that
+these refer to the browser width, not width of a book page. Also, you probably want to avoid
+changing sizes or layout when using `@media print`. Bindery won't be able
+to use that information when flowing content across pages, and you won't be able to see them in the preview.
+
+### Preparing Content
 
 Your book content is probably pretty long, so you may want to keep it in a separate
 file. You can fetch it by passing in the URL, like this.
@@ -56,9 +59,7 @@ file. You can fetch it by passing in the URL, like this.
 ```
 
 Keep in mind, your browser won't fetch content from a different web server
-(since that wouldn't be secure). Make sure you're loading both your current file and your content file from a web server. (Tip: If the URL says `file://`, you aren't using a server).
-
-### Preparing Content
+(since that wouldn't be secure). Make sure you're loading both your current file and your content file from a web server. (Tip: If your browser says `file://` in the URL bar, you aren't using a server).
 
 You don't need to do anything special with your HTML content, as long
 as it all ends up in a single file. For example, you could use the Wikipedia
@@ -102,10 +103,7 @@ Bindery.makeBook({
 });
 ```
 
-### Rules and Options
-
-Rules have options that customize their behavior. Sometimes the options
-are simple, like `position: 'before'` in `PageBreak` above.
+### Rendering Book Elements
 
 For rules that create new elements on the page, you'll want to be more specific. (This part requires knowing a little bit of javascript). You do so
 by passing in your own function. You can use whatever tools you like as long as you return
@@ -115,19 +113,13 @@ an HTML element, or the text to display.
 ```js
 let linksAsFootnotes = Bindery.Footnote({
   selector: 'p > a',
-  render: (element, number) => {
-    return `${number}: Link to ${element.href}`;
-  }
+  render: (element, number) => `${number}: Link to ${element.href}`;
 });
 
 let runningHeaders = Bindery.RunningHeader({
-  render: (page) => {
-    if (page.isLeft) {
-      return `${page.number} · Jan Tschichold`;
-    } else {
-      return `The Form of the Book · ${page.number}`;
-    }
-  },
+  render: (page) => page.isLeft
+    ? `${page.number} · Jan Tschichold`
+    : `The Form of the Book · ${page.number}`;
 });
 
 Bindery.makeBook({
@@ -143,28 +135,15 @@ In the example above, we return a string. For complete control, we can create an
 element ourselves in javascript.
 
 ```js
-// String
-render: (element, number) => {
-  return number + ': Link to ' + element.href;
-}
-
-// document.createElement
-render: (element, number) => {
-  let myFootnoteEl = document.createElement('div');
-  myFootnoteEl.classList.add('my-footnote')
-  myFootnoteEl.textContent = number + ': Link to ' + element.href;
-  return myFootnoteEl;
-}
-
-// jQuery
-render: (element, number) =>  {
-  return  $('<div class="my-footnote">' + number + ': Link to ' + element.href + '</div>');
-}
-
-// hyperscript
-render: (element, number) => {
-  return h('.my-footnote', number + ': Link to ' + element.href);
-}
+let myCustomFootnote = Bindery.Footnote({
+  selector: 'p > a',
+  render: (element, number) => {
+    let myFootnote = document.createElement('div');
+    myFootnote.classList.add('my-footnote')
+    myFootnote.textContent = `${number}: Link to ${element.href}`;
+    return myFootnote;
+  }
+});
 ```
 
 

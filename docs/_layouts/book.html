@@ -11,15 +11,28 @@
           url: '/bindery/book-content/',
           selector: '.content',
         },
+        pageSetup: {
+          size: { width: '5in', height: '8in' },
+          margin: {
+            top: '0.3in',
+            bottom: '1in',
+            inner: '0.3in',
+            outer: '0.3in',
+          },
+        },
         rules: [
           Bindery.PageBreak({
-            selector: 'h1, h2',
+            selector: 'h2',
             position: 'before',
             continue: 'right',
           }),
           Bindery.PageBreak({
-            selector: '.toc-header',
+            selector: 'h1',
             position: 'before',
+            continue: 'right',
+          }),
+          Bindery.FullBleedPage({
+            selector: 'h1',
             continue: 'right',
           }),
           Bindery.PageBreak({
@@ -31,23 +44,9 @@
             selector: '.logo',
             continue: 'right',
           }),
-          // Bindery.PageBreak({
-          //   selector: '.logo',
-          //   position: 'after',
-          //   continue: 'right',
-          // }),
           Bindery.PageBreak({
             selector: '.highlight',
             position: 'avoid',
-          }),
-          Bindery.PageReference({
-            selector: '.toc a',
-            replace: (element, number) => {
-              let row = document.createElement('div');
-              row.innerHTML = `${element.textContent}`;
-              row.innerHTML += `<span style='float: right;'>${number}</span>`;
-              return row;
-            }
           }),
           Bindery.RunningHeader({
             render: (page) => {

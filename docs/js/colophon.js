@@ -1,6 +1,4 @@
-const system = () => {
-  return navigator.userAgent;
-};
+const system = () => navigator.userAgent;
 
 const browser = () => {
   const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
@@ -20,28 +18,31 @@ const browser = () => {
   return 'an unknown browser';
 };
 
+const updateColophon = (el) => {
+  if (el.querySelector('#colophon')) {
+    const now = el.querySelector('#now');
+    now.textContent = window.moment().format('h:mm:ss A on MMMM DD, YYYY');
 
-if (document.getElementById('colophon')) {
-  const now = document.getElementById('now');
-  now.textContent = window.moment().format('h:mm:ss A on MMMM DD, YYYY');
-
-  const winSize = document.getElementById('windowSize');
-  winSize.textContent = `${window.innerWidth} by ${window.innerHeight}`;
-
-  const scrSize = document.getElementById('screenSize');
-  scrSize.textContent = screen.width + ' by ' + screen.height;
-
-  const dpr = document.getElementById('devicePixelRatio');
-  dpr.textContent = window.devicePixelRatio;
-
-  const b = document.getElementById('browser');
-  b.textContent = browser();
-
-  const ua = document.getElementById('userAgent');
-  ua.textContent = system();
-
-  window.addEventListener('resize', () => {
+    const winSize = el.querySelector('#windowSize');
     winSize.textContent = `${window.innerWidth} by ${window.innerHeight}`;
-    now.textContent = window.moment().format('h:mm:ss A on MMMM Do YYYY');
-  });
-}
+
+    const scrSize = el.querySelector('#screenSize');
+    scrSize.textContent = `${screen.width} by ${screen.height}`;
+
+    const dpr = el.querySelector('#devicePixelRatio');
+    dpr.textContent = window.devicePixelRatio;
+
+    const b = el.querySelector('#browser');
+    b.textContent = browser();
+
+    const ua = el.querySelector('#userAgent');
+    ua.textContent = system();
+
+    window.addEventListener('resize', () => {
+      winSize.textContent = `${window.innerWidth} by ${window.innerHeight}`;
+      now.textContent = window.moment().format('h:mm:ss A on MMMM Do YYYY');
+    });
+  }
+};
+
+updateColophon(document.body);
