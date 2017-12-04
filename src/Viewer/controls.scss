@@ -9,7 +9,7 @@ $btn-hover: #ddd;
 $btn-active: #eee;
 
 .#{$pre}-controls {
-  font: 14px / 1.4 $system;
+  font: 16px / 1.4 $system;
   display: none;
   flex-direction: row;
   align-items: start;
@@ -188,7 +188,7 @@ $btn-active: #eee;
 
 .#{$pre}-controls .#{$pre}-select-wrap {
   padding-right: 32px;
-  background-image: url('./_assets/icon-carat.svg');
+  background-image: url('./Viewer/_assets/icon-carat.svg');
   background-repeat: no-repeat;
   background-position: right;
   transition: all 0.2s;

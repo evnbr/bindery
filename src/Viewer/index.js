@@ -1,7 +1,7 @@
 import h from 'hyperscript';
 import { c } from '../utils';
 
-import Controls from '../Controls';
+import Controls from './Controls';
 import Page from '../Page';
 
 import errorView from './error';
@@ -72,6 +72,11 @@ class Viewer {
         }, 20);
       }
     });
+  }
+
+  setInProgress() {
+    this.element.classList.add(c('in-progress'));
+    this.controls.setInProgress();
   }
 
   get isTwoUp() {
@@ -191,7 +196,6 @@ class Viewer {
   render() {
     if (!this.book) return;
     const { body } = document;
-
     if (!this.element.parentNode) {
       body.appendChild(this.element);
     }
@@ -203,6 +207,7 @@ class Viewer {
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
 
+    this.controls.setDone();
     window.requestAnimationFrame(() => {
       if (this.mode === MODE_PREVIEW) this.renderGrid();
       else if (this.mode === MODE_FLIP) this.renderInteractive();
@@ -215,6 +220,11 @@ class Viewer {
   }
 
   renderProgress() {
+    this.controls.updateProgress(
+      this.book.pages.length,
+      this.book.estimatedProgress
+    );
+
     const twoPageSpread = function (...arg) {
       return h(c('.spread-wrapper') + c('.spread-size'), ...arg);
     };

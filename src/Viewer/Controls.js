@@ -166,29 +166,10 @@ class Controls {
       debugDone,
     );
 
-    const refreshPaginationBtn = h('a', { onclick: () => {
-      this.binder.debug = false;
-      startPaginating();
-    } }, 'Refresh');
-    refreshPaginationBtn.classList.add(c('refresh'));
-    const refreshPaginationBtnDebug = h('a', '🐞', {
-      onclick: () => {
-        playSlow.style.display = 'none';
-        step.style.display = 'none';
-        pause.style.display = '';
-        this.binder.debug = true;
-        startPaginating();
-      },
-    });
     spinner = h(c('.spinner'));
     const progressBar = h(c('.progress-bar'));
     const header = title(
-      // spinner,
       headerContent,
-      // h(c('.refresh-btns'),
-      //   refreshPaginationBtn,
-      //   refreshPaginationBtnDebug
-      // ),
     );
 
     this.setInProgress = () => {
