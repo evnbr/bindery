@@ -6,9 +6,7 @@ test('Returns when image gets naturalWidth', (done) => {
     addEventListener: () => {},
   };
 
-  waitForImage(mockImage, () => {
-    done();
-  });
+  waitForImage(mockImage).then(done);
 
   setTimeout(() => {
     mockImage.naturalWidth = true;
@@ -24,9 +22,7 @@ test('Error listener also returns', (done) => {
     },
   };
 
-  waitForImage(mockImage, () => {
-    done();
-  });
+  waitForImage(mockImage).then(done);
 
   setTimeout(() => {
     errorListener();
