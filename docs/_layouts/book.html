@@ -9,14 +9,6 @@
 
       const paperSize = { width: '5in', height: '8in' };
 
-      const colophonUpdater = Bindery.createRule({
-        selector: '.colophon-wrap',
-        beforeAdd: (el) => {
-          updateColophon(el, { version: Bindery.version });
-          return el;
-        }
-      });
-
       Bindery.makeBook({
         content: {
           url: '/bindery/book-content/',
@@ -32,7 +24,13 @@
           },
         },
         rules: [
-          colophonUpdater,
+          Bindery.createRule({
+            selector: '.colophon-wrap',
+            beforeAdd: (el) => {
+              updateColophon(el, { version: Bindery.version });
+              return el;
+            }
+          }),
           Bindery.PageBreak({
             selector: 'h2',
             position: 'before',

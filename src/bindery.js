@@ -216,5 +216,7 @@ class Bindery {
       });
   }
 }
+Bindery.version = BINDERY_VERSION;
+
 
 export default Bindery;
