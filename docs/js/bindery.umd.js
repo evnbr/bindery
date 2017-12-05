@@ -1,11 +1,11 @@
-/* 📖 Bindery v2.0.0-alpha.10 */
+/* 📖 Bindery v2.0.0-alpha.10.1 */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global.Bindery = factory());
 }(this, (function () { 'use strict';
 
-var BINDERY_VERSION = 'v2.0.0-alpha.10'
+var BINDERY_VERSION = 'v2.0.0-alpha.10.1'
 
 function ___$insertStyle(css) {
   if (!css) {
