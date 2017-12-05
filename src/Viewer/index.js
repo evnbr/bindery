@@ -55,12 +55,22 @@ class Viewer {
       const mediaQueryList = window.matchMedia('print');
       mediaQueryList.addListener((mql) => {
         if (mql.matches) {
+          // before print
           this.setPrint();
         } else {
           // after print
         }
       });
     }
+    document.body.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.keyCode === 80) {
+        e.preventDefault();
+        this.setPrint();
+        setTimeout(() => {
+          window.print();
+        }, 10);
+      }
+    });
   }
 
   listenForResize() {
