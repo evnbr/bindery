@@ -5,6 +5,7 @@
   "main": "dist/bindery.cjs.js",
   "module": "dist/bindery.esm.js",
   "browser": "dist/bindery.umd.js",
+  "unpkg": "dist/bindery.min.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/evnbr/bindery.git"
@@ -37,6 +38,7 @@
     "build": "rollup -c && cp dist/bindery.umd.js docs/js && cp dist/bindery.umd.js.map docs/js",
     "dev": "rollup -c -w",
     "test": "jest",
+    "coverage": "jest --coverage",
     "docs": "cd docs && jekyll serve",
     "lint": "eslint src/ webpack.*.js --cache"
   },
