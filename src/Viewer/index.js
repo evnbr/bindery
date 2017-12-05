@@ -219,7 +219,9 @@ class Viewer {
     });
   }
 
-  renderProgress() {
+  renderProgress(book) {
+    this.book = book;
+
     this.controls.updateProgress(
       this.book.pages.length,
       this.book.estimatedProgress

@@ -118,11 +118,6 @@ class Controls {
     const marks = row(marksSelect);
     const sheetSize = row(sheetSizeSelect);
 
-    const startPaginating = () => {
-      this.binder.makeBook(() => {
-      });
-    };
-
     const headerContent = h('span', 'Loading');
 
     let playSlow;

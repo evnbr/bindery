@@ -4,77 +4,15 @@ import h from 'hyperscript';
 
 import paginate from './paginate';
 import scheduler from './Scheduler';
-import PageSetup from './PageSetup';
+import PageSetup from './Page/PageSetup';
 import Viewer from './Viewer';
 
 import Rules from './Rules/';
+import defaultRules from './Rules/defaultRules';
+
 import { OptionType, urlQuery, c } from './utils';
 
 import './main.scss';
-
-const { Rule, PageBreak, PageReference, Footnote } = Rules;
-
-
-const replacer = (element, number) => {
-  element.textContent = `${number}`;
-  return element;
-};
-
-
-const defaultRules = [
-  PageBreak({ selector: '[book-page-break="both"]', position: 'both' }),
-  PageBreak({ selector: '[book-page-break="avoid"]', position: 'avoid' }),
-
-  PageBreak({ selector: '[book-page-break="after"][book-page-continue="right"]', position: 'after', continue: 'right' }),
-  PageBreak({ selector: '[book-page-break="after"][book-page-continue="left"]', position: 'after', continue: 'left' }),
-  PageBreak({ selector: '[book-page-break="after"][book-page-continue="next"]', position: 'after', continue: 'next' }),
-
-  PageBreak({ selector: '[book-page-break="before"][book-page-continue="right"]', position: 'before', continue: 'right' }),
-  PageBreak({ selector: '[book-page-break="before"][book-page-continue="left"]', position: 'before', continue: 'left' }),
-  PageBreak({ selector: '[book-page-break="before"][book-page-continue="next"]', position: 'before', continue: 'next' }),
-
-  Footnote({
-    selector: '[book-footnote-text]',
-    render: (element, number) => {
-      const txt = element.getAttribute('book-footnote-text');
-      return `<i>${number}</i>${txt}`;
-    },
-  }),
-
-  PageReference({
-    selector: '[book-pages-with-text]',
-    replace: replacer,
-    createTest: (element) => {
-      const term = element.getAttribute('book-pages-with-text').toLowerCase().trim();
-      return (page) => {
-        const txt = page.textContent.toLowerCase();
-        return txt.includes(term);
-      };
-    },
-  }),
-
-  PageReference({
-    selector: '[book-pages-with-selector]',
-    replace: replacer,
-    createTest: (element) => {
-      const sel = element.getAttribute('book-pages-with-selector').trim();
-      return page => page.querySelector(sel);
-    },
-  }),
-
-  PageReference({
-    selector: '[book-pages-with]',
-    replace: replacer,
-    createTest: (element) => {
-      const term = element.textContent.toLowerCase().trim();
-      return (page) => {
-        const txt = page.textContent.toLowerCase();
-        return txt.includes(term);
-      };
-    },
-  }),
-];
-
 
 class Bindery {
   constructor(opts = {}) {
@@ -195,7 +133,7 @@ class Bindery {
 
   addRules(newRules) {
     newRules.forEach((rule) => {
-      if (rule instanceof Rule) {
+      if (rule instanceof Rules.Rule) {
         this.rules.push(rule);
       } else {
         throw Error(`Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`);
@@ -222,8 +160,7 @@ class Bindery {
         this.viewer.render();
         this.layoutComplete = true;
       },
-      progress: () => {
-      },
+      progress: () => { },
       error: (error) => {
         this.layoutComplete = true;
         this.viewer.displayError('Layout failed', error);
@@ -263,8 +200,7 @@ class Bindery {
 
     paginate(content, this.rules)
       .progress((book) => {
-        this.viewer.book = book;
-        this.viewer.renderProgress();
+        this.viewer.renderProgress(book);
       }).then((book) => {
         this.viewer.book = book;
         this.viewer.render();
