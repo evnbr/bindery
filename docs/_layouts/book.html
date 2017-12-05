@@ -6,13 +6,24 @@
 
     <script type="text/javascript" src='/bindery/js/bindery.umd.js'></script>
     <script>
+
+      const paperSize = { width: '5in', height: '8in' };
+
+      const colophonUpdater = Bindery.createRule({
+        selector: '.colophon-wrap',
+        beforeAdd: (el) => {
+          updateColophon(el, { version: Bindery.version });
+          return el;
+        }
+      });
+
       Bindery.makeBook({
         content: {
           url: '/bindery/book-content/',
           selector: '.content',
         },
         pageSetup: {
-          size: { width: '5in', height: '8in' },
+          size: paperSize,
           margin: {
             top: '0.3in',
             bottom: '1in',
@@ -21,6 +32,7 @@
           },
         },
         rules: [
+          colophonUpdater,
           Bindery.PageBreak({
             selector: 'h2',
             position: 'before',
@@ -69,6 +81,7 @@
       });
     </script>
     <script type='text/javascript' src='/bindery/js/moment.min.js'></script>
+    <script type='text/javascript' src='/bindery/js/platform.js'></script>
     <script type='text/javascript' src='/bindery/js/colophon.js'></script>
 
   </body>

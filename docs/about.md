@@ -33,17 +33,20 @@ programmatically. It's not a graphical user interface (though you could build on
 3. *[LaTeX](https://www.latex-project.org/)*— LaTeX is a markup language and typesetting system popular in the scientific community. Bindery is intended for everyone who knows web standards (or is learning). It takes advantage of all the existing tools and documentation—browsers, text editors, web inspectors, etc.
 4. *[CSS Regions](https://www.w3.org/TR/css-regions-1/)*— CSS Regions was an ill-fated Adobe-led effort to support magazine-like layouts on the web. A polyfill is available [here](https://github.com/FremyCompany/css-regions-polyfill). Bindery's pagination code is much more limited— it doesn't interpret your CSS rules, assumes there's only one flow per page, and assumes you're going to print it.
 
+<div class="colophon-wrap" markdown="1">
+
 ### Colophon
 Text is set in [Tiempos Headline](https://klim.co.nz/retail-fonts/tiempos-headline/) by [Kris Sowersby](https://klim.co.nz/), and
 code samples are set in [Input Mono](http://input.fontbureau.com/) by [David Jonathan Ross](https://djr.com/).
 
-This page was rendered at <span id='now'>[Time and Date]</span> with <span id='browser'>[Browser]</span> using the following user agent: <span id='userAgent'>[System]</span>.
-It is displayed at <span id='windowSize'>[Window Size]</span> pixels on a screen of <span id='screenSize'>[Screen Size]</span> pixels, with a device pixel ratio of <span id='devicePixelRatio'>[DPR]</span>.
+This page was rendered at <span id='now'>[Time and Date]</span> with <span id='browser'>[Browser]</span>.
+<span id='displayInfo'></span>
 
 This site was last updated at {{ site.time  | date: "%l:%M %p on %A, %B %d, %Y" }}. It is built with [Jekyll](https://jekyllrb.com/) and
 hosted on [Github Pages](https://pages.github.com/). Its source code is available [here](https://github.com/evnbr/bindery/).
 
-Made with 🌫 in San Francisco.
+</div>
 
 <script type='text/javascript' src='/bindery/js/moment.min.js'></script>
+<script type='text/javascript' src='/bindery/js/platform.js'></script>
 <script type='text/javascript' src='/bindery/js/colophon.js'></script>
