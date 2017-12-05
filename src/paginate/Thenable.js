@@ -22,8 +22,13 @@ class Thenable {
 
     this.resolve = this.resolve.bind(this);
     this.reject = this.reject.bind(this);
+    this.updateProgress = this.updateProgress.bind(this);
 
-    if (func) func(this.resolve, this.reject);
+    if (func) func(this.resolve, this.reject, this.updateProgress);
+  }
+
+  static resolved() {
+    return new Thenable(resolve => resolve());
   }
 
   then(func) {

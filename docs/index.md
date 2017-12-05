@@ -20,15 +20,12 @@ At its simplest, Bindery flows content over multiple pages. From there, the desi
 
 Web designers can think about books as an extension of responsive design, and print designers can express layouts programmatically, without the need for InDesign.
 
-<!-- - [View on Github](https://github.com/evnbr/bindery)  · ☆ <span id="stars">–</span> -->
-<!-- - <a href="https://raw.githubusercontent.com/evnbr/bindery/master/dist/bindery.min.js" download>Download bindery.min.js</a> · 88k -->
-
 <div class="home-btns">
-<a class="btn" href="/bindery/book">Try a Demo</a>
-<a class='btn' href="https://raw.githubusercontent.com/evnbr/bindery/master/dist/bindery.min.js" download>↓ Download · 73k</a>
-<a class="btn" href="https://github.com/evnbr/bindery">View on Github ↗</a>
-
-  <!-- <a class="btn" href="/bindery/intro">Get Started →</a> -->
+  <a class="btn" href="/bindery/book">Try a Demo</a>
+  <a  class="btn" href="https://unpkg.com/bindery/dist/bindery.min.js" download>
+    ↓ Download · 73k
+  </a>
+  <a class="btn" href="https://github.com/evnbr/bindery">View on Github ↗</a>
 </div>
 
 <script> setStars(); </script>

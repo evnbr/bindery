@@ -18,9 +18,9 @@ advanced:
   - title: Create your own rules
     id: 4_custom_rules
     desc: Change the background color per page, add fore-edge graphics
-  - title: Handle content from an external source
+  - title: Wikipedia article
     id: 6_wikipedia
-    desc: Format an existing wikipedia article
+    desc: Handle content from an external source
   - title: Too much content
     id: 5_maximum_content
 

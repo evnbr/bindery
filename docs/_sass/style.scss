@@ -398,11 +398,6 @@ h1 {
   margin: 2rem 0;
 }
 
-// h2 {
-//   padding: 2rem 0 0;
-//   font: 0.9rem/1.5 $system;
-//   font-weight: 700;
-// }
 h2 {
   margin: 3rem 0 1.5rem;
   font-size: 1.5rem;
@@ -410,14 +405,26 @@ h2 {
   // letter-spacing: 0;
 }
 
+
+.docs-content h2 {
+  position: relative;
+  // &::before {
+  //   content: "1";
+  //   position: absolute;
+  //   width: 2rem;
+  //   left: -3.5rem;
+  // }
+}
+
 .docs-content h3 {
-  // box-shadow: inset 0 0.5px 0 0 black;
-  // width: 2rem;
-  // white-space: nowrap;
-  // margin: 3rem 0 0;
-  // padding: 1.5rem 0 1.5rem;
-  // font-size: 1.3rem;
   font-style: italic;
+  position: relative;
+  // &::before {
+  //   content: "1.2";
+  //   position: absolute;
+  //   width: 2rem;
+  //   left: -3.5rem;
+  // }
 }
 
 h3 {
@@ -644,11 +651,30 @@ pre {
 }
 
 html.book {
-  font-size: 10pt;
+  font-size: 12pt;
   word-wrap: break-word;
 }
 
 .book {
+  h1, h2 {
+    margin-top: 0;
+    margin-bottom: 10rem;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    line-height: 8in;
+  }
+  h3 {
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .📖-running-header {
+    bottom: 24pt;
+    top: unset;
+  }
   .site-header {
     position: relative;
   }
@@ -688,7 +714,7 @@ sup {
 }
 
 .footnote {
-  font: 0.6rem/1.3 $mono;
+  font: 0.7rem/1.3 $mono;
   letter-spacing: -0.015em;
 }
 

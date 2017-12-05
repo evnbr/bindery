@@ -1,11 +1,11 @@
-/* 📖 Bindery v2.0.0-alpha.10 */
+/* 📖 Bindery v2.0.0-alpha.10.1 */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global.Bindery = factory());
 }(this, (function () { 'use strict';
 
-var BINDERY_VERSION = 'v2.0.0-alpha.10'
+var BINDERY_VERSION = 'v2.0.0-alpha.10.1'
 
 function ___$insertStyle(css) {
   if (!css) {
@@ -1854,6 +1854,15 @@ var Page = function () {
   return Page;
 }();
 
+// TODO: Combine isSplittable and shouldIgnoreOverflow
+// Walk up the tree to see if we are within
+// an overflow-ignoring node
+var shouldIgnoreOverflow = function shouldIgnoreOverflow(element) {
+  if (element.hasAttribute('data-ignore-overflow')) return true;
+  if (element.parentElement) return shouldIgnoreOverflow(element.parentElement);
+  return false;
+};
+
 // When there is no debugDelay,
 // the throttler will occassionally use rAF
 // to prevent stack overflow
@@ -1998,15 +2007,6 @@ var Scheduler = function () {
 
 var scheduler = new Scheduler();
 
-// TODO: Combine isSplittable and shouldIgnoreOverflow
-// Walk up the tree to see if we are within
-// an overflow-ignoring node
-var shouldIgnoreOverflow = function shouldIgnoreOverflow(element) {
-  if (element.hasAttribute('data-ignore-overflow')) return true;
-  if (element.parentElement) return shouldIgnoreOverflow(element.parentElement);
-  return false;
-};
-
 // promise-inspired thenable.
 // really just to make callbacks cleaner,
 // not guarenteed to be asynchronous.
@@ -2033,8 +2033,9 @@ var Thenable = function () {
 
     this.resolve = this.resolve.bind(this);
     this.reject = this.reject.bind(this);
+    this.updateProgress = this.updateProgress.bind(this);
 
-    if (func) func(this.resolve, this.reject);
+    if (func) func(this.resolve, this.reject, this.updateProgress);
   }
 
   createClass(Thenable, [{
@@ -2159,6 +2160,13 @@ var Thenable = function () {
       if (this.progressCallback !== null) {
         this.progressCallback.apply(this, arguments);
       }
+    }
+  }], [{
+    key: 'resolved',
+    value: function resolved() {
+      return new Thenable(function (resolve) {
+        return resolve();
+      });
     }
   }]);
   return Thenable;
@@ -2566,7 +2574,7 @@ var RuleSet = function () {
     }
   }, {
     key: 'afterAddElement',
-    value: function afterAddElement(originalElement, book, continueOnNewPage, makeNewPage, currentFlowElement) {
+    value: function afterAddElement(originalElement, book, continueOnNewPage, makeNewPage, moveToNext) {
       var addedElement = originalElement;
 
       var matchingRules = this.afterAddRules.filter(function (rule) {
@@ -2574,20 +2582,19 @@ var RuleSet = function () {
       });
       var uniqueRules = dedupe(matchingRules);
 
+      // TODO:
+      // While this does catch overflows, it introduces a few new bugs.
+      // It is pretty aggressive to move the entire node to the next page.
+      // - 1. there is no guarentee it will fit on the new page
+      // - 2. if it has childNodes, those side effects will not be undone,
+      // which means footnotes will get left on previous page.
+      // - 3. if it is a large paragraph, it will leave a large gap. the
+      // ideal approach would be to only need to invalidate
+      // the last line of text.
+
       uniqueRules.forEach(function (rule) {
-        addedElement = rule.afterAdd(addedElement, book, continueOnNewPage, makeNewPage, function overflowCallback(problemElement) {
-          // TODO:
-          // While this does catch overflows, it introduces a few new bugs.
-          // It is pretty aggressive to move the entire node to the next page.
-          // - 1. there is no guarentee it will fit on the new page
-          // - 2. if it has childNodes, those side effects will not be undone,
-          // which means footnotes will get left on previous page.
-          // - 3. if it is a large paragraph, it will leave a large gap. the
-          // ideal approach would be to only need to invalidate
-          // the last line of text.
-          problemElement.parentNode.removeChild(problemElement);
-          continueOnNewPage();
-          currentFlowElement().appendChild(problemElement);
+        addedElement = rule.afterAdd(addedElement, book, continueOnNewPage, makeNewPage, function (problemElement) {
+          moveToNext(problemElement);
           return rule.afterAdd(problemElement, book, continueOnNewPage, makeNewPage, function () {
             console.log('Couldn\'t apply ' + rule.name + ' to ' + elementToString(problemElement) + '. Caused overflows twice.');
           });
@@ -2809,6 +2816,10 @@ var isContent = function isContent(node) {
   return isElement(node) && !isScript(node);
 };
 
+var sec = function sec(ms) {
+  return (ms / 1000).toFixed(2);
+};
+
 // Walk up the tree to see if we can safely
 // insert a split into this node.
 var isSplittable = function isSplittable(element, selectorsNotToSplit) {
@@ -2827,289 +2838,279 @@ var isSplittable = function isSplittable(element, selectorsNotToSplit) {
 };
 
 var paginate$1 = function paginate(content, rules) {
-  var bookPromise = new Thenable();
-  // SETUP
-  var startLayoutTime = window.performance.now();
-  var layoutWaitingTime = 0;
-  var elementCount = 0;
-  var elementsProcessed = 0;
-  var ruleSet = new RuleSet(rules);
-  var measureArea = document.body.appendChild(hyperscript(c('.measure-area')));
+  return new Thenable(function (paginateResolve, paginateReject, progress) {
+    // SETUP
+    var layoutWaitingTime = 0;
+    var elementCount = 0;
+    var elementsProcessed = 0;
 
-  var breadcrumb = []; // Keep track of position in original tree
-  var book = new Book();
+    var ruleSet = new RuleSet(rules);
+    var measureArea = document.body.appendChild(hyperscript(c('.measure-area')));
 
-  var finishPagination = void 0;
+    var breadcrumb = []; // Keep track of position in original tree
+    var book = new Book();
 
-  var canSplit = function canSplit() {
-    return !shouldIgnoreOverflow(last(breadcrumb));
-  };
+    var canSplit = function canSplit() {
+      return !shouldIgnoreOverflow(last(breadcrumb));
+    };
 
-  var makeNewPage = function makeNewPage() {
-    var newPage = new Page();
-    measureArea.appendChild(newPage.element);
+    var makeNewPage = function makeNewPage() {
+      var newPage = new Page();
+      measureArea.appendChild(newPage.element);
 
-    ruleSet.startPage(newPage, book);
-    return newPage;
-  };
+      ruleSet.startPage(newPage, book);
+      return newPage;
+    };
 
-  var finishPage = function finishPage(page, ignoreOverflow) {
-    if (page && page.hasOverflowed()) {
-      console.warn('Bindery: Page overflowing', book.pageInProgress.element);
-      if (!page.suppressErrors && !ignoreOverflow) {
-        bookPromise.reject('Moved to new page when last one is still overflowing');
-        throw Error('Bindery: Moved to new page when last one is still overflowing');
+    var finishPage = function finishPage(page, ignoreOverflow) {
+      if (page && page.hasOverflowed()) {
+        console.warn('Bindery: Page overflowing', book.pageInProgress.element);
+        if (!page.suppressErrors && !ignoreOverflow) {
+          paginateReject('Moved to new page when last one is still overflowing');
+          throw Error('Bindery: Moved to new page when last one is still overflowing');
+        }
       }
-    }
 
-    // finished with this page, can display
-    book.pages = orderPages(book.pages, makeNewPage);
-    annotatePages(book.pages);
-    if (page) ruleSet.finishPage(page, book);
-  };
+      // finished with this page, can display
+      book.pages = orderPages(book.pages, makeNewPage);
+      annotatePages(book.pages);
+      if (page) ruleSet.finishPage(page, book);
+    };
 
-  // Creates clones for ever level of tag
-  // we were in when we overflowed the last page
-  var continueOnNewPage = function continueOnNewPage() {
-    var ignoreOverflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    // Creates clones for ever level of tag
+    // we were in when we overflowed the last page
+    var continueOnNewPage = function continueOnNewPage() {
+      var ignoreOverflow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-    if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      bookPromise.reject('Maximum page count exceeded');
-      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
-    }
-
-    finishPage(book.pageInProgress, ignoreOverflow);
-
-    breadcrumb = breadcrumbClone(breadcrumb, rules);
-    var newPage = makeNewPage();
-
-    book.pageInProgress = newPage;
-    bookPromise.updateProgress(book);
-
-    book.pages.push(newPage);
-
-    if (breadcrumb[0]) {
-      newPage.flowContent.appendChild(breadcrumb[0]);
-    }
-
-    // make sure the cloned page is valid.
-    if (newPage.hasOverflowed()) {
-      var suspect = last(breadcrumb);
-      if (suspect) {
-        console.warn('Bindery: Content overflows, probably due to a style set on ' + elementToString(suspect) + '.');
-        suspect.parentNode.removeChild(suspect);
-      } else {
-        console.warn('Bindery: Content overflows.');
+      if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
+        paginateReject('Maximum page count exceeded');
+        throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
       }
-    }
 
-    return newPage;
-  };
+      finishPage(book.pageInProgress, ignoreOverflow);
 
-  // Shifts this element to the next page. If any of its
-  // ancestors cannot be split across page, it will
-  // step up the tree to find the first ancestor
-  // that can be split, and move all of that descendants
-  // to the next page.
-  var moveElementToNextPage = function moveElementToNextPage(nodeToMove) {
-    // So this node won't get cloned. TODO: this is unclear
-    breadcrumb.pop();
+      breadcrumb = breadcrumbClone(breadcrumb, rules);
+      var newPage = makeNewPage();
 
-    if (breadcrumb.length < 1) {
-      throw Error('Bindery: Attempting to move the top-level element');
-    }
+      book.pageInProgress = newPage;
+      progress(book);
 
-    // find the nearest splittable parent
-    var willMove = nodeToMove;
-    var pathToRestore = [];
-    while (breadcrumb.length > 1 && !isSplittable(last(breadcrumb), ruleSet.selectorsNotToSplit)) {
-      // console.log('Not OK to split:', last(breadcrumb));
-      willMove = breadcrumb.pop();
-      pathToRestore.unshift(willMove);
-    }
+      book.pages.push(newPage);
 
-    // Once a node is moved to a new page, it should no longer trigger another
-    // move. otherwise tall elements will endlessly get shifted to the next page
-    willMove.setAttribute('data-bindery-did-move', true);
-
-    var parent = willMove.parentNode;
-    parent.removeChild(willMove);
-
-    if (breadcrumb.length > 1 && last(breadcrumb).textContent.trim() === '') {
-      parent.appendChild(willMove);
-      willMove = breadcrumb.pop();
-      pathToRestore.unshift(willMove);
-      willMove.parentNode.removeChild(willMove);
-    }
-
-    // If the page is empty when this node is removed,
-    // then it won't help to move it to the next page.
-    // Instead continue here until the node is done.
-    if (!book.pageInProgress.isEmpty) {
-      if (book.pageInProgress.hasOverflowed()) {
-        book.pageInProgress.suppressErrors = true;
+      if (breadcrumb[0]) {
+        newPage.flowContent.appendChild(breadcrumb[0]);
       }
-      continueOnNewPage();
-    }
 
-    // append node as first in new page
-    last(breadcrumb).appendChild(willMove);
+      // make sure the cloned page is valid.
+      if (newPage.hasOverflowed()) {
+        var suspect = last(breadcrumb);
+        if (suspect) {
+          console.warn('Bindery: Content overflows, probably due to a style set on ' + elementToString(suspect) + '.');
+          suspect.parentNode.removeChild(suspect);
+        } else {
+          console.warn('Bindery: Content overflows.');
+        }
+      }
 
-    // restore subpath
-    pathToRestore.forEach(function (restore) {
-      breadcrumb.push(restore);
-    });
+      return newPage;
+    };
 
-    breadcrumb.push(nodeToMove);
-  };
+    // Shifts this element to the next page. If any of its
+    // ancestors cannot be split across page, it will
+    // step up the tree to find the first ancestor
+    // that can be split, and move all of that descendants
+    // to the next page.
+    var moveElementToNextPage = function moveElementToNextPage(nodeToMove) {
+      // So this node won't get cloned. TODO: this is unclear
+      breadcrumb.pop();
 
-  var addTextWithoutChecks = function addTextWithoutChecks(child, parent) {
-    return new Thenable(function (resolve) {
-      parent.appendChild(child);
-      if (canSplit()) {
-        book.pageInProgress.suppressErrors = true;
+      if (breadcrumb.length < 1) {
+        throw Error('Bindery: Attempting to move the top-level element');
+      }
+
+      // find the nearest splittable parent
+      var willMove = nodeToMove;
+      var pathToRestore = [];
+      while (breadcrumb.length > 1 && !isSplittable(last(breadcrumb), ruleSet.selectorsNotToSplit)) {
+        // console.log('Not OK to split:', last(breadcrumb));
+        willMove = breadcrumb.pop();
+        pathToRestore.unshift(willMove);
+      }
+
+      // Once a node is moved to a new page, it should no longer trigger another
+      // move. otherwise tall elements will endlessly get shifted to the next page
+      willMove.setAttribute('data-bindery-did-move', true);
+
+      var parent = willMove.parentNode;
+      parent.removeChild(willMove);
+
+      if (breadcrumb.length > 1 && last(breadcrumb).textContent.trim() === '') {
+        parent.appendChild(willMove);
+        willMove = breadcrumb.pop();
+        pathToRestore.unshift(willMove);
+        willMove.parentNode.removeChild(willMove);
+      }
+
+      // If the page is empty when this node is removed,
+      // then it won't help to move it to the next page.
+      // Instead continue here until the node is done.
+      if (!book.pageInProgress.isEmpty) {
+        if (book.pageInProgress.hasOverflowed()) {
+          book.pageInProgress.suppressErrors = true;
+        }
         continueOnNewPage();
       }
-      resolve();
-    });
-  };
 
-  var addSplittableText = function addSplittableText(text) {
-    return new Thenable(function (resolve, reject) {
-      addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress).then(function (remainder) {
-        if (remainder) {
+      // append node as first in new page
+      last(breadcrumb).appendChild(willMove);
+
+      // restore subpath
+      pathToRestore.forEach(function (restore) {
+        breadcrumb.push(restore);
+      });
+
+      breadcrumb.push(nodeToMove);
+    };
+
+    var addTextWithoutChecks = function addTextWithoutChecks(child, parent) {
+      return new Thenable(function (resolve) {
+        parent.appendChild(child);
+        if (canSplit()) {
+          book.pageInProgress.suppressErrors = true;
           continueOnNewPage();
-          addSplittableText(remainder).then(resolve).catch(reject);
-        } else {
-          resolve();
         }
-      }).catch(reject);
-    });
-  };
+        resolve();
+      });
+    };
 
-  var addTextChild = function addTextChild(child, parent) {
-    if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
-      return addSplittableText(child).catch(function () {
+    var addSplittableText = function addSplittableText(text) {
+      return new Thenable(function (resolve, reject) {
+        addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress).then(function (remainder) {
+          if (remainder) {
+            continueOnNewPage();
+            addSplittableText(remainder).then(resolve).catch(reject);
+          } else {
+            resolve();
+          }
+        }).catch(reject);
+      });
+    };
+
+    var canSplitParent = function canSplitParent(parent) {
+      return isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent);
+    };
+
+    var addTextChild = function addTextChild(child, parent) {
+      return (canSplitParent(parent) ? addSplittableText(child).catch(function () {
         if (breadcrumb.length < 2) return addTextWithoutChecks(child, last(breadcrumb));
         moveElementToNextPage(parent);
         return addSplittableText(child);
-      }).catch(function () {
-        return addTextWithoutChecks(child, last(breadcrumb));
-      });
-    } else {
-      return addTextNode(child, last(breadcrumb), book.pageInProgress).catch(function () {
+      }) : addTextNode(child, last(breadcrumb), book.pageInProgress).catch(function () {
         if (canSplit()) moveElementToNextPage(parent);
         return addTextNode(child, last(breadcrumb), book.pageInProgress);
-      }).catch(function () {
+      })).catch(function () {
         return addTextWithoutChecks(child, last(breadcrumb));
       });
-    }
-  };
+    };
 
-  var addElementNode = void 0;
+    var addElementNode = void 0;
 
-  var addChild = function addChild(child, parent) {
-    if (isTextNode(child)) {
-      return addTextChild(child, parent);
-    } else if (isUnloadedImage(child)) {
-      var imgStart = performance.now();
-      return waitForImage(child).then(function () {
-        layoutWaitingTime += performance.now() - imgStart;
-        return addElementNode(child);
-      });
-    } else if (isContent(child)) {
-      return addElementNode(child);
-    }
-
-    // Skip comments and unknown node
-    return new Thenable(function (resolve) {
-      return resolve();
-    });
-  };
-
-  // Adds an element node by clearing its childNodes, then inserting them
-  // one by one recursively until thet overflow the page
-  addElementNode = function addElementNode(elementToAdd) {
-    return new Thenable(function (resolve) {
-      if (book.pageInProgress.hasOverflowed() && canSplit()) {
-        book.pageInProgress.suppressErrors = true;
-        continueOnNewPage();
-      }
-      var element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
-
-      if (!breadcrumb[0]) book.pageInProgress.flowContent.appendChild(element);else last(breadcrumb).appendChild(element);
-
-      breadcrumb.push(element);
-
-      var childNodes = [].concat(toConsumableArray(element.childNodes));
-      element.innerHTML = '';
-
-      // Overflows when empty
-      if (book.pageInProgress.hasOverflowed() && canSplit()) {
-        moveElementToNextPage(element);
-      }
-
-      var doneAdding = function doneAdding() {
-        // We're now done with this element and its children,
-        // so we pop up a level
-        var addedChild = breadcrumb.pop();
-        ruleSet.afterAddElement(addedChild, book, continueOnNewPage, makeNewPage, function () {
-          return last(breadcrumb);
+    var addChild = function addChild(child, parent) {
+      if (isTextNode(child)) {
+        return addTextChild(child, parent);
+      } else if (isUnloadedImage(child)) {
+        var imgStart = performance.now();
+        return waitForImage(child).then(function () {
+          layoutWaitingTime += performance.now() - imgStart;
+          return addElementNode(child);
         });
-        elementsProcessed += 1;
-        book.estimatedProgress = elementsProcessed / elementCount;
-        resolve();
-      };
+      } else if (isContent(child)) {
+        return addElementNode(child);
+      }
 
-      var index = 0;
-      var addNext = function addNext() {
-        if (index < childNodes.length) {
-          var child = childNodes[index];
-          index += 1;
-          addChild(child, element).then(addNext);
-        } else {
-          doneAdding();
+      // Skip comments and unknown nodes
+      return Thenable.resolved();
+    };
+
+    // Adds an element node by clearing its childNodes, then inserting them
+    // one by one recursively until thet overflow the page
+    addElementNode = function addElementNode(elementToAdd) {
+      return new Thenable(function (resolve) {
+        if (book.pageInProgress.hasOverflowed() && canSplit()) {
+          book.pageInProgress.suppressErrors = true;
+          continueOnNewPage();
         }
-      };
+        var element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
 
-      // kick it off
-      addNext();
-    });
-  };
+        if (!breadcrumb[0]) book.pageInProgress.flowContent.appendChild(element);else last(breadcrumb).appendChild(element);
 
-  var startPagination = function startPagination() {
-    ruleSet.setup();
-    content.style.margin = 0;
-    content.style.padding = 0;
-    elementCount = content.querySelectorAll('*').length;
-    continueOnNewPage();
-    addElementNode(content).then(finishPagination);
-  };
+        breadcrumb.push(element);
 
-  finishPagination = function finishPagination() {
-    document.body.removeChild(measureArea);
+        var childNodes = [].concat(toConsumableArray(element.childNodes));
+        element.innerHTML = '';
 
-    book.pages = orderPages(book.pages, makeNewPage);
-    annotatePages(book.pages);
+        // Overflows when empty
+        if (book.pageInProgress.hasOverflowed() && canSplit()) {
+          moveElementToNextPage(element);
+        }
 
-    book.setCompleted();
-    ruleSet.finishEveryPage(book);
+        var finishAdding = function finishAdding() {
+          // We're now done with this element and its children,
+          // so we pop up a level
+          var addedChild = breadcrumb.pop();
+          ruleSet.afterAddElement(addedChild, book, continueOnNewPage, makeNewPage, function (el) {
+            el.parentNode.removeChild(el);
+            continueOnNewPage();
+            last(breadcrumb).appendChild(el);
+          });
+          elementsProcessed += 1;
+          book.estimatedProgress = elementsProcessed / elementCount;
+          resolve();
+        };
 
-    if (!scheduler.isDebugging) {
-      var endLayoutTime = window.performance.now();
-      var totalTime = endLayoutTime - startLayoutTime;
-      var layoutTime = totalTime - layoutWaitingTime;
+        var index = 0;
+        var addNext = function addNext() {
+          if (index < childNodes.length) {
+            var child = childNodes[index];
+            index += 1;
+            addChild(child, element).then(addNext);
+          } else {
+            finishAdding();
+          }
+        };
 
-      var t = (totalTime / 1000).toFixed(2);
-      var l = (layoutTime / 1000).toFixed(2);
-      var w = (layoutWaitingTime / 1000).toFixed(2);
-      console.log('\uD83D\uDCD6 Book ready in ' + t + 's (Layout: ' + l + 's, Waiting for images: ' + w + 's)');
-    }
+        // kick it off
+        addNext();
+      });
+    };
 
-    bookPromise.resolve(book);
-  };
-  startPagination();
-  return bookPromise;
+    (function () {
+      var startLayoutTime = window.performance.now();
+
+      ruleSet.setup();
+      content.style.margin = 0;
+      content.style.padding = 0;
+      elementCount = content.querySelectorAll('*').length;
+      continueOnNewPage();
+      addElementNode(content).then(function () {
+        document.body.removeChild(measureArea);
+
+        book.pages = orderPages(book.pages, makeNewPage);
+        annotatePages(book.pages);
+
+        book.setCompleted();
+        ruleSet.finishEveryPage(book);
+
+        var endLayoutTime = window.performance.now();
+        var totalTime = endLayoutTime - startLayoutTime;
+        var layoutTime = totalTime - layoutWaitingTime;
+
+        console.log('\uD83D\uDCD6 Book ready in ' + sec(totalTime) + 's (Layout: ' + sec(layoutTime) + 's, Waiting for images: ' + sec(layoutWaitingTime) + 's)');
+
+        paginateResolve(book);
+      });
+    })();
+  });
 };
 
 var letter = { width: '8.5in', height: '11in' };
@@ -3393,10 +3394,6 @@ var Controls = function Controls(opts) {
   var marks = row(marksSelect);
   var sheetSize = row(sheetSizeSelect);
 
-  var startPaginating = function startPaginating() {
-    _this.binder.makeBook(function () {});
-  };
-
   var headerContent = hyperscript('span', 'Loading');
 
   var playSlow = void 0;
@@ -3435,30 +3432,9 @@ var Controls = function Controls(opts) {
 
   var debugControls = hyperscript(c('.debug-controls'), pause, playSlow, step, debugDone);
 
-  var refreshPaginationBtn = hyperscript('a', { onclick: function onclick() {
-      _this.binder.debug = false;
-      startPaginating();
-    } }, 'Refresh');
-  refreshPaginationBtn.classList.add(c('refresh'));
-  var refreshPaginationBtnDebug = hyperscript('a', '🐞', {
-    onclick: function onclick() {
-      playSlow.style.display = 'none';
-      step.style.display = 'none';
-      pause.style.display = '';
-      _this.binder.debug = true;
-      startPaginating();
-    }
-  });
   spinner = hyperscript(c('.spinner'));
   var progressBar = hyperscript(c('.progress-bar'));
-  var header = title(
-  // spinner,
-  headerContent
-  // h(c('.refresh-btns'),
-  //   refreshPaginationBtn,
-  //   refreshPaginationBtnDebug
-  // ),
-  );
+  var header = title(headerContent);
 
   this.setInProgress = function () {
     headerContent.textContent = 'Paginating';
@@ -3760,12 +3736,22 @@ var Viewer = function () {
         var mediaQueryList = window.matchMedia('print');
         mediaQueryList.addListener(function (mql) {
           if (mql.matches) {
+            // before print
             _this.setPrint();
           } else {
             // after print
           }
         });
       }
+      document.body.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.keyCode === 80) {
+          e.preventDefault();
+          _this.setPrint();
+          setTimeout(function () {
+            window.print();
+          }, 10);
+        }
+      });
     }
   }, {
     key: 'listenForResize',
@@ -3780,6 +3766,12 @@ var Viewer = function () {
           }, 20);
         }
       });
+    }
+  }, {
+    key: 'setInProgress',
+    value: function setInProgress() {
+      this.element.classList.add(c('in-progress'));
+      this.controls.setInProgress();
     }
   }, {
     key: 'setSheetSize',
@@ -3899,7 +3891,6 @@ var Viewer = function () {
       var _document = document,
           body = _document.body;
 
-
       if (!this.element.parentNode) {
         body.appendChild(this.element);
       }
@@ -3911,6 +3902,7 @@ var Viewer = function () {
       var scrollMax = body.scrollHeight - body.offsetHeight;
       var scrollPct = body.scrollTop / scrollMax;
 
+      this.controls.setDone();
       window.requestAnimationFrame(function () {
         if (_this4.mode === MODE_PREVIEW) _this4.renderGrid();else if (_this4.mode === MODE_FLIP) _this4.renderInteractive();else if (_this4.mode === MODE_SHEET) _this4.renderPrint();else _this4.renderGrid();
 
@@ -3920,8 +3912,12 @@ var Viewer = function () {
     }
   }, {
     key: 'renderProgress',
-    value: function renderProgress() {
+    value: function renderProgress(book) {
       var _this5 = this;
+
+      this.book = book;
+
+      this.controls.updateProgress(this.book.pages.length, this.book.estimatedProgress);
 
       var twoPageSpread = function twoPageSpread() {
         for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
@@ -4402,7 +4398,56 @@ var Rules = {
   }
 };
 
-___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid #ddd;box-shadow:0 2px 4px -1px rgba(0,0,0,.15);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:200px;height:300px;position:relative;display:flex;flex-direction:column;flex-wrap:nowrap;margin:auto}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;padding:10px;position:relative;padding-top:60px;min-height:90vh}.📖-measure-area,.📖-root{background:#f4f4f4;z-index:2}.📖-measure-area{position:fixed;padding:50px 20px;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all .2s}.📖-spread-wrapper{position:relative;display:flex;width:800px;margin:0 auto 32px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:100%!important}.📖-page3d{margin:auto;width:400px;height:600px;transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:12pt;background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:12pt;height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:12pt;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}@media screen{.📖-viewing .📖-controls{display:flex!important}}.📖-controls{font:14px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;display:none;flex-direction:row;align-items:start;position:fixed;top:0;left:0;right:0;z-index:3;margin:auto;color:#000;padding:10px;overflow:visible;-webkit-font-smoothing:antialiased}.📖-controls *{font:inherit;color:inherit;margin:0;padding:0;box-sizing:border-box}.📖-controls a{color:blue;text-decoration:none}.📖-row{flex-wrap:wrap;align-items:start;cursor:default;user-select:none}.📖-row,.📖-title{position:relative;display:flex}.📖-title{padding:8px 16px;transition:opacity .2s;white-space:nowrap;overflow:hidden;margin-right:auto}.📖-print-options{display:flex;opacity:0;max-width:0;border-radius:0;background:#e4e4e4;overflow:hidden;transition:all .4s;flex-wrap:nowrap;transition-delay:.2s}[bindery-view-mode=print] .📖-print-options{max-width:720px;margin-right:12px;opacity:1}.📖-in-progress .📖-print-options{opacity:0;display:none}.📖-controls .📖-print-options .📖-control{background-color:transparent}.📖-spinner{border:1px solid transparent;border-left-color:#000;width:20px;height:20px;border-radius:50%;vertical-align:middle;opacity:0;pointer-events:none;transition:all .2s;margin-right:16px}.📖-in-progress .📖-spinner{opacity:1;animation:b .6s linear infinite}.📖-debug .📖-spinner{animation:b 2s linear infinite}.📖-spinner.📖-paused{animation:none}@keyframes b{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.📖-controls .📖-btn{-webkit-appearance:none;cursor:pointer;display:inline-block;margin-right:8px;text-decoration:none}.📖-controls .📖-btn:hover{background:#ddd}.📖-controls .📖-btn:active{background:#eee}.📖-controls .📖-btn:last-child{margin-right:0}.📖-controls .📖-control{border-radius:0;color:#000;padding:8px 16px;background-color:#f4f4f4;border:0}.📖-controls .📖-btn-light{background:none;border:none}.📖-controls .📖-btn-main{background:blue;border-color:blue;color:#fff}.📖-controls .📖-btn-main:hover{background:blue;opacity:.7}.📖-controls .📖-btn-main:active{background:#000;opacity:1}.📖-view-row{margin-left:auto;margin-right:12px;transition:all .5s}.📖-in-progress .📖-view-row{opacity:0;pointer-events:none}.📖-debug .📖-view-row{display:none}.📖-btn-print{transition:all .5s}.📖-in-progress .📖-btn-print{opacity:0;pointer-events:none}.📖-debug .📖-btn-print{display:none}.📖-controls .📖-select-wrap{padding-right:32px;background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 14l5 5 5-5' stroke='%23000' fill='none'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:100%;transition:all .2s;white-space:nowrap;width:100%}.📖-controls .📖-select-wrap:active,.📖-controls .📖-select-wrap:hover{background-color:#ddd}.📖-controls .📖-select-wrap.📖-hidden-select{max-width:0;padding-left:0;padding-right:0;border-left-width:0;border-right-width:0;color:transparent}.📖-select{position:absolute;top:0;left:0;opacity:0;-webkit-appearance:none;-moz-appearance:none;padding:8px 16px;color:#000;border:transparent;width:100%}.📖-debug-controls{display:none}.📖-debug .📖-in-progress .📖-debug-controls{display:block}.📖-refresh-btns{opacity:0;position:absolute;top:0;left:0;padding:8px 0;transition:all .2s}.📖-in-progress .📖-refresh-btns{display:none}.📖-refresh-btns a{margin-left:1em;cursor:pointer}.📖-refresh-btns a:hover{color:#000}.📖-progress-bar{position:absolute;left:0;top:0;background:blue;width:0;transition:all .2s;opacity:0;height:0}.📖-in-progress .📖-progress-bar{opacity:1;height:2px}@media screen and (max-width:720px){.📖-print-options{max-width:unset;max-height:0}[bindery-view-mode=print] .📖-print-options{max-width:unset;max-height:240px;margin:0}.📖-root{transition:all .2s}[bindery-view-mode=print].📖-root{padding-top:120px}.📖-controls{height:98px}.📖-view-row{margin-left:auto}.📖-print-options{top:54px;right:10px;position:fixed;margin:0}.📖-print-options .📖-row{margin:0}}@media screen and (max-width:500px){[bindery-view-mode=print].📖-root{padding-top:190px}[bindery-view-mode=print].📖-root .📖-controls{background:#f4f4f4;height:170px}.📖-print-options{flex-direction:column;align-items:stretch;left:10px}.📖-hidden-select{display:none}}");
+var PageBreak$1 = Rules.PageBreak;
+var PageReference$1 = Rules.PageReference;
+var Footnote$1 = Rules.Footnote;
+var FullBleedPage$1 = Rules.FullBleedPage;
+var FullBleedSpread$1 = Rules.FullBleedSpread;
+
+
+var replacer = function replacer(element, number) {
+  element.textContent = '' + number;
+  return element;
+};
+
+var defaultRules = [PageBreak$1({ selector: '[book-page-break="both"]', position: 'both' }), PageBreak$1({ selector: '[book-page-break="avoid"]', position: 'avoid' }), PageBreak$1({ selector: '[book-page-break="after"][book-page-continue="right"]', position: 'after', continue: 'right' }), PageBreak$1({ selector: '[book-page-break="after"][book-page-continue="left"]', position: 'after', continue: 'left' }), PageBreak$1({ selector: '[book-page-break="after"][book-page-continue="next"]', position: 'after', continue: 'next' }), PageBreak$1({ selector: '[book-page-break="before"][book-page-continue="right"]', position: 'before', continue: 'right' }), PageBreak$1({ selector: '[book-page-break="before"][book-page-continue="left"]', position: 'before', continue: 'left' }), PageBreak$1({ selector: '[book-page-break="before"][book-page-continue="next"]', position: 'before', continue: 'next' }), FullBleedPage$1({ selector: '[book-full-bleed="page"]' }), FullBleedSpread$1({ selector: '[book-full-bleed="spread"]' }), Footnote$1({
+  selector: '[book-footnote-text]',
+  render: function render(element, number) {
+    var txt = element.getAttribute('book-footnote-text');
+    return '<i>' + number + '</i>' + txt;
+  }
+}), PageReference$1({
+  selector: '[book-pages-with-text]',
+  replace: replacer,
+  createTest: function createTest(element) {
+    var term = element.getAttribute('book-pages-with-text').toLowerCase().trim();
+    return function (page) {
+      var txt = page.textContent.toLowerCase();
+      return txt.includes(term);
+    };
+  }
+}), PageReference$1({
+  selector: '[book-pages-with-selector]',
+  replace: replacer,
+  createTest: function createTest(element) {
+    var sel = element.getAttribute('book-pages-with-selector').trim();
+    return function (page) {
+      return page.querySelector(sel);
+    };
+  }
+}), PageReference$1({
+  selector: '[book-pages-with]',
+  replace: replacer,
+  createTest: function createTest(element) {
+    var term = element.textContent.toLowerCase().trim();
+    return function (page) {
+      var txt = page.textContent.toLowerCase();
+      return txt.includes(term);
+    };
+  }
+})];
+
+___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid #ddd;box-shadow:0 2px 4px -1px rgba(0,0,0,.15);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:200px;height:300px;position:relative;display:flex;flex-direction:column;flex-wrap:nowrap;margin:auto}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;padding:10px;position:relative;padding-top:60px;min-height:90vh}.📖-measure-area,.📖-root{background:#f4f4f4;z-index:2}.📖-measure-area{position:fixed;padding:50px 20px;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all .2s}.📖-spread-wrapper{position:relative;display:flex;width:800px;margin:0 auto 32px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:100%!important}.📖-page3d{margin:auto;width:400px;height:600px;transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:12pt;background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:12pt;height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:12pt;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}@media screen{.📖-viewing .📖-controls{display:flex!important}}.📖-controls{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;display:none;flex-direction:row;align-items:start;position:fixed;top:0;left:0;right:0;z-index:3;margin:auto;color:#000;padding:10px;overflow:visible;-webkit-font-smoothing:antialiased}.📖-controls *{font:inherit;color:inherit;margin:0;padding:0;box-sizing:border-box}.📖-controls a{color:#0000c5;text-decoration:none}.📖-row{flex-wrap:wrap;align-items:start;cursor:default;user-select:none}.📖-row,.📖-title{position:relative;display:flex}.📖-title{padding:8px 16px;transition:opacity .2s;white-space:nowrap;overflow:hidden;margin-right:auto}.📖-print-options{display:flex;opacity:0;max-width:0;border-radius:0;background:#e4e4e4;overflow:hidden;transition:all .4s;flex-wrap:nowrap;transition-delay:.2s}[bindery-view-mode=print] .📖-print-options{max-width:720px;margin-right:12px;opacity:1}.📖-in-progress .📖-print-options{opacity:0;display:none}.📖-controls .📖-print-options .📖-control{background-color:transparent}.📖-spinner{border:1px solid transparent;border-left-color:#000;width:20px;height:20px;border-radius:50%;vertical-align:middle;opacity:0;pointer-events:none;transition:all .2s;margin-right:16px}.📖-in-progress .📖-spinner{opacity:1;animation:b .6s linear infinite}.📖-debug .📖-spinner{animation:b 2s linear infinite}.📖-spinner.📖-paused{animation:none}@keyframes b{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.📖-controls .📖-btn{-webkit-appearance:none;cursor:pointer;display:inline-block;margin-right:8px;text-decoration:none}.📖-controls .📖-btn:hover{background:#ddd}.📖-controls .📖-btn:active{background:#eee}.📖-controls .📖-btn:last-child{margin-right:0}.📖-controls .📖-control{border-radius:0;color:#000;padding:8px 16px;background-color:#f4f4f4;border:0}.📖-controls .📖-btn-light{background:none;border:none}.📖-controls .📖-btn-main{background:#0000c5;border-color:#0000c5;color:#fff}.📖-controls .📖-btn-main:hover{background:#0000c5;opacity:.7}.📖-controls .📖-btn-main:active{background:#000;opacity:1}.📖-view-row{margin-left:auto;margin-right:12px;transition:all .5s}.📖-in-progress .📖-view-row{opacity:0;pointer-events:none}.📖-debug .📖-view-row{display:none}.📖-btn-print{transition:all .5s}.📖-in-progress .📖-btn-print{opacity:0;pointer-events:none}.📖-debug .📖-btn-print{display:none}.📖-controls .📖-select-wrap{padding-right:32px;background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 14l5 5 5-5' stroke='%23000' fill='none'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:100%;transition:all .2s;white-space:nowrap;width:100%}.📖-controls .📖-select-wrap:active,.📖-controls .📖-select-wrap:hover{background-color:#ddd}.📖-controls .📖-select-wrap.📖-hidden-select{max-width:0;padding-left:0;padding-right:0;border-left-width:0;border-right-width:0;color:transparent}.📖-select{position:absolute;top:0;left:0;opacity:0;-webkit-appearance:none;-moz-appearance:none;padding:8px 16px;color:#000;border:transparent;width:100%}.📖-debug-controls{display:none}.📖-debug .📖-in-progress .📖-debug-controls{display:block}.📖-refresh-btns{opacity:0;position:absolute;top:0;left:0;padding:8px 0;transition:all .2s}.📖-in-progress .📖-refresh-btns{display:none}.📖-refresh-btns a{margin-left:1em;cursor:pointer}.📖-refresh-btns a:hover{color:#000}.📖-progress-bar{position:absolute;left:0;top:0;background:#0000c5;width:0;transition:all .2s;opacity:0;height:0}.📖-in-progress .📖-progress-bar{opacity:1;height:2px}@media screen and (max-width:720px){.📖-print-options{max-width:unset;max-height:0}[bindery-view-mode=print] .📖-print-options{max-width:unset;max-height:240px;margin:0}.📖-root{transition:all .2s}[bindery-view-mode=print].📖-root{padding-top:120px}.📖-controls{height:98px}.📖-view-row{margin-left:auto}.📖-print-options{top:54px;right:10px;position:fixed;margin:0}.📖-print-options .📖-row{margin:0}}@media screen and (max-width:500px){[bindery-view-mode=print].📖-root{padding-top:190px}[bindery-view-mode=print].📖-root .📖-controls{background:#f4f4f4;height:170px}.📖-print-options{flex-direction:column;align-items:stretch;left:10px}.📖-hidden-select{display:none}}");
 
 /* global BINDERY_VERSION */
 
@@ -4443,13 +4488,12 @@ var Bindery = function () {
     this.pageSetup = new PageSetup(opts.pageSetup);
 
     this.viewer = new Viewer({ bindery: this });
-    this.controls = this.viewer.controls;
 
     if (opts.startingView) {
       this.viewer.setMode(opts.startingView);
     }
 
-    this.rules = [];
+    this.rules = defaultRules;
     if (opts.rules) this.addRules(opts.rules);
 
     if (!opts.content) {
@@ -4555,7 +4599,6 @@ var Bindery = function () {
         success: function success(book) {
           _this3.viewer.book = book;
           _this3.viewer.render();
-          _this3.controls.setDone();
           _this3.layoutComplete = true;
         },
         progress: function progress() {},
@@ -4591,23 +4634,19 @@ var Bindery = function () {
       this.viewer.clear();
 
       document.body.classList.add(c('viewing'));
-      this.viewer.element.classList.add(c('in-progress'));
       if (scheduler.isDebugging) document.body.classList.add(c('debug'));
 
       this.pageSetup.updateStylesheet();
 
-      this.controls.setInProgress();
+      this.viewer.setInProgress();
 
       paginate$1(content, this.rules).progress(function (book) {
-        _this4.viewer.book = book;
-        _this4.controls.updateProgress(book.pages.length, book.estimatedProgress);
-        _this4.viewer.renderProgress();
+        _this4.viewer.renderProgress(book);
       }).then(function (book) {
         _this4.viewer.book = book;
         _this4.viewer.render();
 
         _this4.layoutComplete = true;
-        _this4.controls.setDone();
         if (doneBinding) doneBinding();
         _this4.viewer.element.classList.remove(c('in-progress'));
         document.body.classList.remove(c('debug'));
@@ -4628,6 +4667,8 @@ var Bindery = function () {
   }]);
   return Bindery;
 }();
+
+Bindery.version = BINDERY_VERSION;
 
 var BinderyWithRules = Object.assign(Bindery, Rules);
 

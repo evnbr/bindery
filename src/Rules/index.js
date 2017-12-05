@@ -9,6 +9,7 @@ import Replace from './Replace';
 import Rule from './Rule';
 import PageBreak from './PageBreak';
 
+
 export default {
   Rule,
   Split(options) {

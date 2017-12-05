@@ -68,11 +68,21 @@ class RuleSet {
     return addedElement;
   }
 
-  afterAddElement(originalElement, book, continueOnNewPage, makeNewPage, currentFlowElement) {
+  afterAddElement(originalElement, book, continueOnNewPage, makeNewPage, moveToNext) {
     let addedElement = originalElement;
 
     const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));
     const uniqueRules = dedupe(matchingRules);
+
+    // TODO:
+    // While this does catch overflows, it introduces a few new bugs.
+    // It is pretty aggressive to move the entire node to the next page.
+    // - 1. there is no guarentee it will fit on the new page
+    // - 2. if it has childNodes, those side effects will not be undone,
+    // which means footnotes will get left on previous page.
+    // - 3. if it is a large paragraph, it will leave a large gap. the
+    // ideal approach would be to only need to invalidate
+    // the last line of text.
 
     uniqueRules.forEach((rule) => {
       addedElement = rule.afterAdd(
@@ -80,19 +90,8 @@ class RuleSet {
         book,
         continueOnNewPage,
         makeNewPage,
-        function overflowCallback(problemElement) {
-          // TODO:
-          // While this does catch overflows, it introduces a few new bugs.
-          // It is pretty aggressive to move the entire node to the next page.
-          // - 1. there is no guarentee it will fit on the new page
-          // - 2. if it has childNodes, those side effects will not be undone,
-          // which means footnotes will get left on previous page.
-          // - 3. if it is a large paragraph, it will leave a large gap. the
-          // ideal approach would be to only need to invalidate
-          // the last line of text.
-          problemElement.parentNode.removeChild(problemElement);
-          continueOnNewPage();
-          currentFlowElement().appendChild(problemElement);
+        (problemElement) => {
+          moveToNext(problemElement);
           return rule.afterAdd(
             problemElement,
             book,

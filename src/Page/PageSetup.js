@@ -1,6 +1,6 @@
-import Page from './Page';
-import { isValidSize, parseVal } from './utils/convertUnits';
-import { c } from './utils';
+import Page from '../Page';
+import { isValidSize, parseVal } from '../utils/convertUnits';
+import { c } from '../utils';
 
 
 const letter = { width: '8.5in', height: '11in' };

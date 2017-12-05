@@ -3,7 +3,6 @@ import h from 'hyperscript';
 // Bindery
 import Book from './Book';
 import Page from '../Page';
-import scheduler from '../Scheduler';
 
 // paginate
 import shouldIgnoreOverflow from './shouldIgnoreOverflow';
@@ -28,6 +27,8 @@ const isImage = node => node.tagName === 'IMG';
 const isUnloadedImage = node => isImage(node) && !node.naturalWidth;
 const isContent = node => isElement(node) && !isScript(node);
 
+const sec = ms => (ms / 1000).toFixed(2);
+
 // Walk up the tree to see if we can safely
 // insert a split into this node.
 const isSplittable = (element, selectorsNotToSplit) => {
@@ -44,20 +45,17 @@ const isSplittable = (element, selectorsNotToSplit) => {
   return true;
 };
 
-const paginate = (content, rules) => {
-  const bookPromise = new Thenable();
+const paginate = (content, rules) => new Thenable((paginateResolve, paginateReject, progress) => {
   // SETUP
-  const startLayoutTime = window.performance.now();
   let layoutWaitingTime = 0;
   let elementCount = 0;
   let elementsProcessed = 0;
+
   const ruleSet = new RuleSet(rules);
   const measureArea = document.body.appendChild(h(c('.measure-area')));
 
   let breadcrumb = []; // Keep track of position in original tree
   const book = new Book();
-
-  let finishPagination;
 
   const canSplit = () => !shouldIgnoreOverflow(last(breadcrumb));
 
@@ -73,7 +71,7 @@ const paginate = (content, rules) => {
     if (page && page.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
       if (!page.suppressErrors && !ignoreOverflow) {
-        bookPromise.reject('Moved to new page when last one is still overflowing');
+        paginateReject('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
@@ -88,7 +86,7 @@ const paginate = (content, rules) => {
   // we were in when we overflowed the last page
   const continueOnNewPage = (ignoreOverflow = false) => {
     if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      bookPromise.reject('Maximum page count exceeded');
+      paginateReject('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
@@ -98,7 +96,7 @@ const paginate = (content, rules) => {
     const newPage = makeNewPage();
 
     book.pageInProgress = newPage;
-    bookPromise.updateProgress(book);
+    progress(book);
 
     book.pages.push(newPage);
 
@@ -196,26 +194,26 @@ const paginate = (content, rules) => {
       }).catch(reject);
   });
 
-  const addTextChild = (child, parent) => {
-    if (isSplittable(parent, ruleSet.selectorsNotToSplit) && !shouldIgnoreOverflow(parent)) {
-      return addSplittableText(child)
+  const canSplitParent = parent =>
+    isSplittable(parent, ruleSet.selectorsNotToSplit)
+    && !shouldIgnoreOverflow(parent);
+
+  const addTextChild = (child, parent) => (canSplitParent(parent)
+    ? addSplittableText(child)
         .catch(() => {
           if (breadcrumb.length < 2) return addTextWithoutChecks(child, last(breadcrumb));
           moveElementToNextPage(parent);
           return addSplittableText(child);
         })
-        .catch(() => addTextWithoutChecks(child, last(breadcrumb)));
-    } else {
-      return addTextNode(child, last(breadcrumb), book.pageInProgress)
+    : addTextNode(child, last(breadcrumb), book.pageInProgress)
         .catch(() => {
           if (canSplit()) moveElementToNextPage(parent);
           return addTextNode(child, last(breadcrumb), book.pageInProgress);
         })
-        .catch(() => addTextWithoutChecks(child, last(breadcrumb)));
-    }
-  };
+    ).catch(() => addTextWithoutChecks(child, last(breadcrumb)));
 
   let addElementNode;
+
 
   const addChild = (child, parent) => {
     if (isTextNode(child)) {
@@ -230,8 +228,8 @@ const paginate = (content, rules) => {
       return addElementNode(child);
     }
 
-    // Skip comments and unknown node
-    return new Thenable(resolve => resolve());
+    // Skip comments and unknown nodes
+    return Thenable.resolved();
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
@@ -256,7 +254,7 @@ const paginate = (content, rules) => {
       moveElementToNextPage(element);
     }
 
-    const doneAdding = () => {
+    const finishAdding = () => {
       // We're now done with this element and its children,
       // so we pop up a level
       const addedChild = breadcrumb.pop();
@@ -265,7 +263,11 @@ const paginate = (content, rules) => {
         book,
         continueOnNewPage,
         makeNewPage,
-        () => last(breadcrumb)
+        (el) => {
+          el.parentNode.removeChild(el);
+          continueOnNewPage();
+          last(breadcrumb).appendChild(el);
+        }
       );
       elementsProcessed += 1;
       book.estimatedProgress = elementsProcessed / elementCount;
@@ -279,7 +281,7 @@ const paginate = (content, rules) => {
         index += 1;
         addChild(child, element).then(addNext);
       } else {
-        doneAdding();
+        finishAdding();
       }
     };
 
@@ -287,39 +289,34 @@ const paginate = (content, rules) => {
     addNext();
   });
 
-  const startPagination = () => {
+
+  (() => {
+    const startLayoutTime = window.performance.now();
+
     ruleSet.setup();
     content.style.margin = 0;
     content.style.padding = 0;
     elementCount = content.querySelectorAll('*').length;
     continueOnNewPage();
-    addElementNode(content).then(finishPagination);
-  };
+    addElementNode(content).then(() => {
+      document.body.removeChild(measureArea);
 
-  finishPagination = () => {
-    document.body.removeChild(measureArea);
+      book.pages = orderPages(book.pages, makeNewPage);
+      annotatePages(book.pages);
 
-    book.pages = orderPages(book.pages, makeNewPage);
-    annotatePages(book.pages);
+      book.setCompleted();
+      ruleSet.finishEveryPage(book);
 
-    book.setCompleted();
-    ruleSet.finishEveryPage(book);
-
-    if (!scheduler.isDebugging) {
       const endLayoutTime = window.performance.now();
       const totalTime = endLayoutTime - startLayoutTime;
       const layoutTime = totalTime - layoutWaitingTime;
 
-      const t = (totalTime / 1000).toFixed(2);
-      const l = (layoutTime / 1000).toFixed(2);
-      const w = (layoutWaitingTime / 1000).toFixed(2);
-      console.log(`📖 Book ready in ${t}s (Layout: ${l}s, Waiting for images: ${w}s)`);
-    }
+      console.log(`📖 Book ready in ${sec(totalTime)}s (Layout: ${sec(layoutTime)}s, Waiting for images: ${sec(layoutWaitingTime)}s)`);
 
-    bookPromise.resolve(book);
-  };
-  startPagination();
-  return bookPromise;
-};
+      paginateResolve(book);
+    });
+  })();
+});
+
 
 export default paginate;

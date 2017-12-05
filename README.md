@@ -25,6 +25,22 @@ If you're designing a website, think about books as an extension of the responsi
 </script>
 ```
 
+<a href="https://unpkg.com/bindery/dist/bindery.min.js" class="btn" download>
+  ↓ Download bindery.min.js · 73k
+</a>
+
+Or use the hosted version from [unpkg](https://unpkg.com/) directly:
+
+```html
+<script src="https://unpkg.com/bindery/dist/bindery.min.js"></script>
+```
+
+You can also install bindery from [npm](https://www.npmjs.com/package/bindery):
+
+```
+npm install --save bindery
+```
+
 ### Using Rules
 
 ```html
@@ -54,12 +70,12 @@ For more, see the [Guide](https://evanbrooks.info/bindery/guide) and [Docs](http
 
 ### Developing
 
-ES6 / babel, bundled with rollup. The only runtime dependency
+Bundled with rollup. The only runtime dependency
 is [Hyperscript](https://github.com/hyperhype/hyperscript), for templating the UI, which is included in the bundle by default.
 
 When contributing, keep the following in mind: The goal of bindery.js is to provide an approachable jumping-off point for HTML-to-Print exploration. Because of this, it is intended to work out of the box as a script tag (without needing to run a dev server, set up a development environment, use preprocessors, or really know javascript at all).
 
-- `npm run-script build` - Updates all builds
+- `npm run-script build` - Updates dist/
 - `npm run-script test` - Runs Jest
 
 Note that the pagination code in Bindery is inherently fairly slow. Each step of pagination involves

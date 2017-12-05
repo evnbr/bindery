@@ -10,7 +10,7 @@ github_username:  evnbr
 
 # Build settings
 markdown: kramdown
-plugins:
+plugins_dir:
   - jekyll-feed
 
 # Exclude from processing.

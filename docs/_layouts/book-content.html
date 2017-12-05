@@ -17,16 +17,16 @@
         {% endunless %}{% endif %}
       {% endfor %}
 
-      <h3 class="toc-header">Contents</h3>
-      <ul class="toc">
+      <section class="toc">
         {% for p in pages_list %}
           {% if p.inBook and p.order %}
-            <li>
+            <div>
               <a href="#{{p.title}}">{{ p.title }}</a>
-            </li>
+              <span book-pages-with-selector="#{{p.title}}" style="float: right;"></span>
+            </div>
           {% endif %}
         {% endfor %}
-      </ul>
+      </section>
 
       {% for p in pages_list %}
         {% if p.inBook and p.order %}

@@ -6,20 +6,43 @@
 
     <script type="text/javascript" src='/bindery/js/bindery.umd.js'></script>
     <script>
+
+      const paperSize = { width: '5in', height: '8in' };
+
       Bindery.makeBook({
         content: {
           url: '/bindery/book-content/',
           selector: '.content',
         },
+        pageSetup: {
+          size: paperSize,
+          margin: {
+            top: '0.3in',
+            bottom: '1in',
+            inner: '0.3in',
+            outer: '0.3in',
+          },
+        },
         rules: [
+          Bindery.createRule({
+            selector: '.colophon-wrap',
+            beforeAdd: (el) => {
+              updateColophon(el, { version: Bindery.version });
+              return el;
+            }
+          }),
           Bindery.PageBreak({
-            selector: 'h1, h2',
+            selector: 'h2',
             position: 'before',
             continue: 'right',
           }),
           Bindery.PageBreak({
-            selector: '.toc-header',
+            selector: 'h1',
             position: 'before',
+            continue: 'right',
+          }),
+          Bindery.FullBleedPage({
+            selector: 'h1',
             continue: 'right',
           }),
           Bindery.PageBreak({
@@ -31,23 +54,9 @@
             selector: '.logo',
             continue: 'right',
           }),
-          // Bindery.PageBreak({
-          //   selector: '.logo',
-          //   position: 'after',
-          //   continue: 'right',
-          // }),
           Bindery.PageBreak({
             selector: '.highlight',
             position: 'avoid',
-          }),
-          Bindery.PageReference({
-            selector: '.toc a',
-            replace: (element, number) => {
-              let row = document.createElement('div');
-              row.innerHTML = `${element.textContent}`;
-              row.innerHTML += `<span style='float: right;'>${number}</span>`;
-              return row;
-            }
           }),
           Bindery.RunningHeader({
             render: (page) => {
@@ -70,6 +79,7 @@
       });
     </script>
     <script type='text/javascript' src='/bindery/js/moment.min.js'></script>
+    <script type='text/javascript' src='/bindery/js/platform.js'></script>
     <script type='text/javascript' src='/bindery/js/colophon.js'></script>
 
   </body>

@@ -4,10 +4,12 @@ import h from 'hyperscript';
 
 import paginate from './paginate';
 import scheduler from './Scheduler';
-import PageSetup from './PageSetup';
+import PageSetup from './Page/PageSetup';
 import Viewer from './Viewer';
 
 import Rules from './Rules/';
+import defaultRules from './Rules/defaultRules';
+
 import { OptionType, urlQuery, c } from './utils';
 
 import './main.scss';
@@ -46,13 +48,12 @@ class Bindery {
     this.pageSetup = new PageSetup(opts.pageSetup);
 
     this.viewer = new Viewer({ bindery: this });
-    this.controls = this.viewer.controls;
 
     if (opts.startingView) {
       this.viewer.setMode(opts.startingView);
     }
 
-    this.rules = [];
+    this.rules = defaultRules;
     if (opts.rules) this.addRules(opts.rules);
 
 
@@ -157,11 +158,9 @@ class Bindery {
       success: (book) => {
         this.viewer.book = book;
         this.viewer.render();
-        this.controls.setDone();
         this.layoutComplete = true;
       },
-      progress: () => {
-      },
+      progress: () => { },
       error: (error) => {
         this.layoutComplete = true;
         this.viewer.displayError('Layout failed', error);
@@ -193,24 +192,20 @@ class Bindery {
     this.viewer.clear();
 
     document.body.classList.add(c('viewing'));
-    this.viewer.element.classList.add(c('in-progress'));
     if (scheduler.isDebugging) document.body.classList.add(c('debug'));
 
     this.pageSetup.updateStylesheet();
 
-    this.controls.setInProgress();
+    this.viewer.setInProgress();
 
     paginate(content, this.rules)
       .progress((book) => {
-        this.viewer.book = book;
-        this.controls.updateProgress(book.pages.length, book.estimatedProgress);
-        this.viewer.renderProgress();
+        this.viewer.renderProgress(book);
       }).then((book) => {
         this.viewer.book = book;
         this.viewer.render();
 
         this.layoutComplete = true;
-        this.controls.setDone();
         if (doneBinding) doneBinding();
         this.viewer.element.classList.remove(c('in-progress'));
         document.body.classList.remove(c('debug'));
@@ -221,5 +216,7 @@ class Bindery {
       });
   }
 }
+Bindery.version = BINDERY_VERSION;
+
 
 export default Bindery;
