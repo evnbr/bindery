@@ -4,7 +4,7 @@ title:  Demos
 shortTitle: Demos
 permalink: /demos/
 order: 3
-inBook: true
+inBook: false
 ---
 
 <!-- ## Examples -->

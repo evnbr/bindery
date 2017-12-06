@@ -487,15 +487,27 @@ p code, li code {
     box-shadow: none;
     margin: 1.5rem -5%;
   }
-  pre, code {
-    font-size:  0.7rem;
-    line-height: 1.1rem;
-  }
+  // pre, code {
+  //   font-size:  0.7rem;
+  //   line-height: 1.1rem;
+  // }
   .btn, .post-content .btn {
     font-size: 0.7rem;
     margin-right: 0.2rem;
     margin-bottom: 0.2rem;
     margin-top: 0.25rem;
+  }
+}
+
+@mixin sideBySide {
+  width: 45%;
+  display: inline-block;
+  vertical-align: top;
+  pre {
+    width: 100%;
+  }
+  &:last-child pre {
+    box-shadow: none;
   }
 }
 
@@ -516,17 +528,10 @@ p code, li code {
     -webkit-mask: url(logo40.svg) no-repeat 50% 50%;
   }
   .code-compare > div {
-      width: 45%;
-      display: inline-block;
-      vertical-align: top;
-      pre {
-        width: 100%;
-      }
-      &:last-child pre {
-        box-shadow: none;
-      }
+    @include sideBySide;
   }
 }
+
 
 @media (max-width: $wide-enough-for-side-nav) {
   .page-content {
@@ -671,6 +676,10 @@ html.book {
     }
   }
 
+  .code-compare > div {
+    @include sideBySide;
+  }
+
   .📖-running-header {
     bottom: 24pt;
     top: unset;
@@ -689,6 +698,7 @@ html.book {
     white-space: pre-wrap;
     width: 100%;
     padding: 0;
+    margin: 1.5rem 0;
   }
   .highlighter-rouge:first-child .highlight {
     // margin-top: 0;
