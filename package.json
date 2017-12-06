@@ -1,11 +1,14 @@
 {
   "name": "bindery",
-  "version": "2.0.0-alpha.10.1",
+  "version": "2.0.0-alpha.10.2",
   "description": "Book layout in the browser",
   "main": "dist/bindery.cjs.js",
   "module": "dist/bindery.esm.js",
   "browser": "dist/bindery.umd.js",
   "unpkg": "dist/bindery.min.js",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/evnbr/bindery.git"
