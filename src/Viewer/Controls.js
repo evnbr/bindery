@@ -1,6 +1,6 @@
 import h from 'hyperscript';
 import c from '../utils/prefixClass';
-import { Mode, Paper, Layout } from '../Constants';
+import { Mode, Paper, Layout, Marks } from '../Constants';
 
 import {
   title,
@@ -15,16 +15,13 @@ import {
 const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
 
 class Controls {
-  constructor(opts) {
-    this.binder = opts.binder;
-    const viewer = opts.viewer;
-
+  constructor(initialState, actions) {
     let viewSelect;
     let marksSelect;
     let spinner;
 
     const print = () => {
-      viewer.setPrint();
+      actions.setMode(Mode.PRINT);
 
       const sel = viewSelect.querySelector('select');
       sel.value = Mode.PRINT;
@@ -35,7 +32,7 @@ class Controls {
 
     const printBtn = btnMain({ onclick: print }, 'Print');
 
-    const sheetSizes = supportsCustomPageSize ? [
+    const paperSizes = supportsCustomPageSize ? [
       option({ value: Paper.AUTO }, 'Auto'),
       option({ value: Paper.AUTO_BLEED }, 'Auto + Bleed'),
       option({ value: Paper.AUTO_MARKS }, 'Auto + Marks'),
@@ -46,25 +43,24 @@ class Controls {
     ] : [
       option({ value: Paper.LETTER_PORTRAIT, selected: true }, 'Default Page Size *'),
       option({ disabled: true }, 'Only Chrome supports custom page sizes. Set in your browser\'s print dialog instead.'),
-    ];
-    sheetSizes.forEach((opt) => {
-      if (opt.value === viewer.pageSetup.sheetSizeMode) { opt.selected = true; }
+    ].map((opt) => {
+      if (opt.value === initialState.paper) { opt.selected = true; }
+      return opt;
     });
 
     const updateSheetSizeNames = () => {
-      // const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
       if (!supportsCustomPageSize) return;
-      const size = this.binder.pageSetup.displaySize;
+      const size = actions.getPageSize();
       const sizeName = `${size.width} × ${size.height}`;
-      sheetSizes[0].textContent = `${sizeName}`;
-      sheetSizes[1].textContent = `${sizeName} + Bleed`;
-      sheetSizes[2].textContent = `${sizeName} + Marks`;
+      paperSizes[0].textContent = `${sizeName}`;
+      paperSizes[1].textContent = `${sizeName} + Bleed`;
+      paperSizes[2].textContent = `${sizeName} + Marks`;
     };
     updateSheetSizeNames();
 
-    const updateSheetSize = (e) => {
+    const updatePaper = (e) => {
       const newVal = e.target.value;
-      viewer.setSheetSize(newVal);
+      actions.setPaper(newVal);
       if (newVal === Paper.AUTO || newVal === Paper.AUTO_BLEED) {
         marksSelect.classList.add(c('hidden-select'));
       } else {
@@ -72,53 +68,30 @@ class Controls {
       }
     };
 
-    const sheetSizeSelect = select({ onchange: updateSheetSize }, ...sheetSizes);
+    const sheetSizeSelect = select({ onchange: updatePaper }, ...paperSizes);
 
-    const layoutOptions = [
-      option({ value: Layout.PAGES }, '1 Page / Sheet'),
-      option({ value: Layout.SPREADS }, '1 Spread / Sheet'),
-      option({ value: Layout.BOOKLET }, 'Booklet Sheets'),
-    ];
-    layoutOptions.forEach((opt) => {
-      if (opt.value === viewer.printArrange) { opt.selected = true; }
-    });
     const layoutSelect = select(
       { onchange: (e) => {
-        viewer.setPrintArrange(e.target.value);
+        actions.setLayout(e.target.value);
         updateSheetSizeNames();
       } },
-      ...layoutOptions
+      ...[
+        option({ value: Layout.PAGES }, '1 Page / Sheet'),
+        option({ value: Layout.SPREADS }, '1 Spread / Sheet'),
+        option({ value: Layout.BOOKLET }, 'Booklet Sheets'),
+      ].map((opt) => {
+        if (opt.value === initialState.layout) { opt.selected = true; }
+        return opt;
+      })
     );
     const arrangement = row(layoutSelect);
 
-    const updateMarks = (e) => {
-      switch (e.target.value) {
-      case 'marks_none':
-        viewer.isShowingCropMarks = false;
-        viewer.isShowingBleedMarks = false;
-        break;
-      case 'marks_crop':
-        viewer.isShowingCropMarks = true;
-        viewer.isShowingBleedMarks = false;
-        break;
-      case 'marks_bleed':
-        viewer.isShowingCropMarks = false;
-        viewer.isShowingBleedMarks = true;
-        break;
-      case 'marks_both':
-        viewer.isShowingCropMarks = true;
-        viewer.isShowingBleedMarks = true;
-        break;
-      default:
-      }
-    };
-
     marksSelect = select(
-      { onchange: updateMarks },
-      option({ value: 'marks_none' }, 'No Marks'),
-      option({ value: 'marks_crop', selected: true }, 'Crop Marks'),
-      option({ value: 'marks_bleed' }, 'Bleed Marks'),
-      option({ value: 'marks_both' }, 'Crop and Bleed'),
+      { onchange: e => actions.setMarks(e.target.value) },
+      option({ value: Marks.NONE }, 'No Marks'),
+      option({ value: Marks.CROP, selected: true }, 'Crop Marks'),
+      option({ value: Marks.BLEED }, 'Bleed Marks'),
+      option({ value: Marks.CROP }, 'Crop and Bleed'),
     );
     if (supportsCustomPageSize) {
       marksSelect.classList.add(c('hidden-select'));
@@ -189,9 +162,9 @@ class Controls {
       }
     };
 
-    this.setDone = () => {
+    this.setDone = (length) => {
       progressBar.style.width = '100%';
-      headerContent.textContent = `${viewer.book.pages.length} Pages`;
+      headerContent.textContent = `${length} Pages`;
     };
 
     this.setInvalid = () => {
@@ -205,19 +178,17 @@ class Controls {
     );
     options.classList.add(c('print-options'));
 
-    const updateView = (e) => {
-      viewer.mode = e.target.value;
-      viewer.render();
-    };
-    const viewOptions = [
-      option({ value: Mode.PREVIEW }, 'Preview'),
-      option({ value: Mode.FLIPBOOK }, 'Flipbook'),
-      option({ value: Mode.PRINT }, 'Print Preview'),
-    ];
-    viewOptions.forEach((opt) => {
-      if (opt.value === viewer.mode) { opt.selected = true; }
-    });
-    viewSelect = select({ onchange: updateView }, ...viewOptions);
+    viewSelect = select(
+      { onchange: e => actions.setMode(e.target.value) },
+      ...[
+        option({ value: Mode.PREVIEW }, 'Preview'),
+        option({ value: Mode.FLIPBOOK }, 'Flipbook'),
+        option({ value: Mode.PRINT }, 'Print Preview'),
+      ].map((opt) => {
+        if (opt.value === initialState.mode) { opt.selected = true; }
+        return opt;
+      })
+    );
     const viewRow = row(viewSelect);
     viewRow.classList.add(c('view-row'));
 

@@ -35,11 +35,26 @@ class Viewer {
     this.listenForPrint();
     this.listenForResize();
 
-    this.setGrid = this.setGrid.bind(this);
     this.setPrint = this.setPrint.bind(this);
-    this.setFlip = this.setFlip.bind(this);
 
-    this.controls = new Controls({ binder: bindery, viewer: this });
+    this.controls = new Controls(
+      { // Initial props
+        paper: this.pageSetup.sheetSizeMode,
+        layout: this.printArrange,
+        mode: this.mode,
+      },
+      { // Actions
+        setMode: (newMode) => {
+          if (newMode === this.mode) return;
+          this.mode = newMode;
+          this.render();
+        },
+        setPaper: this.setSheetSize.bind(this),
+        setLayout: this.setPrintArrange.bind(this),
+        setMarks: this.setMarks.bind(this),
+        getPageSize: () => this.pageSetup.displaySize,
+      }
+    );
 
     this.element.classList.add(c('in-progress'));
 
