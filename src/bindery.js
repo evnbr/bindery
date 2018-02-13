@@ -7,7 +7,7 @@ import scheduler from './Scheduler';
 import PageSetup from './Page/PageSetup';
 
 import Viewer from './Viewer';
-import { Mode, Paper, Layout } from './Constants';
+import { Mode, Paper, Layout, Marks } from './Constants';
 
 import Rules from './Rules/';
 import defaultRules from './Rules/defaultRules';
@@ -48,6 +48,7 @@ class Bindery {
       printSetup: OptionType.shape({
         name: 'printSetup',
         layout: OptionType.enum(...Object.values(Layout)),
+        marks: OptionType.enum(...Object.values(Marks)),
         paper: OptionType.enum(...Object.values(Paper)),
       }),
       rules: OptionType.array,
@@ -57,9 +58,11 @@ class Bindery {
     this.pageSetup.printOptions(opts.printSetup);
 
     const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
+    const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
     this.viewer = new Viewer({
       bindery: this,
       mode: opts.view || Mode.PREVIEW,
+      marks: startMarks,
       layout: startLayout,
     });
 

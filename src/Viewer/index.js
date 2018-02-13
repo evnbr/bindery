@@ -9,7 +9,7 @@ import orderPagesBooklet from './orderPagesBooklet';
 import padPages from './padPages';
 import { gridLayout, printLayout, flipLayout } from './Layouts';
 
-import { Mode, Layout } from '../Constants';
+import { Mode, Layout, Marks } from '../Constants';
 
 const modeAttr = {};
 modeAttr[Mode.PREVIEW] = 'preview';
@@ -17,7 +17,7 @@ modeAttr[Mode.PRINT] = 'print';
 modeAttr[Mode.FLIPBOOK] = 'flip';
 
 class Viewer {
-  constructor({ bindery, mode, layout }) {
+  constructor({ bindery, mode, layout, marks }) {
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
@@ -26,9 +26,8 @@ class Viewer {
 
     this.doubleSided = true;
     this.printArrange = layout;
-    this.isShowingCropMarks = true;
-    this.isShowingBleedMarks = false;
 
+    this.setMarks(marks);
     this.mode = mode;
     this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
     this.currentLeaf = 0;
@@ -107,7 +106,6 @@ class Viewer {
   get isShowingBleedMarks() {
     return this.element.classList.contains(c('show-bleed-marks'));
   }
-
   set isShowingBleedMarks(newVal) {
     if (newVal) {
       this.element.classList.add(c('show-bleed-marks'));
@@ -142,6 +140,28 @@ class Viewer {
     }
   }
 
+  setMarks(newVal) {
+    switch (newVal) {
+    case Marks.NONE:
+      this.isShowingCropMarks = false;
+      this.isShowingBleedMarks = false;
+      break;
+    case Marks.CROP:
+      this.isShowingCropMarks = true;
+      this.isShowingBleedMarks = false;
+      break;
+    case Marks.BLEED:
+      this.isShowingCropMarks = false;
+      this.isShowingBleedMarks = true;
+      break;
+    case Marks.BOTH:
+      this.isShowingCropMarks = true;
+      this.isShowingBleedMarks = true;
+      break;
+    default:
+    }
+  }
+
   displayError(title, text) {
     if (!this.element.parentNode) {
       document.body.appendChild(this.element);
@@ -169,18 +189,9 @@ class Viewer {
     this.doubleSided = !this.doubleSided;
     this.render();
   }
-  setGrid() {
-    if (this.mode === Mode.PREVIEW) return;
-    this.mode = Mode.PREVIEW;
-    this.render();
-  }
   setPrint() {
     if (this.mode === Mode.PRINT) return;
     this.mode = Mode.PRINT;
-    this.render();
-  }
-  setFlip() {
-    this.mode = Mode.FLIPBOOK;
     this.render();
   }
   render() {
@@ -197,7 +208,7 @@ class Viewer {
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
 
-    this.controls.setDone();
+    this.controls.setDone(this.book.pages.length);
     window.requestAnimationFrame(() => {
       if (this.mode === Mode.PREVIEW) this.renderGrid();
       else if (this.mode === Mode.FLIPBOOK) this.renderInteractive();
