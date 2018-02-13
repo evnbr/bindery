@@ -1,5 +1,6 @@
 import h from 'hyperscript';
 import c from '../utils/prefixClass';
+import { Mode, Paper, Layout } from '../Constants';
 
 import {
   title,
@@ -26,7 +27,7 @@ class Controls {
       viewer.setPrint();
 
       const sel = viewSelect.querySelector('select');
-      sel.value = 'view_print';
+      sel.value = Mode.PRINT;
       sel.dispatchEvent(new Event('change'));
 
       setTimeout(window.print, 10);
@@ -35,17 +36,20 @@ class Controls {
     const printBtn = btnMain({ onclick: print }, 'Print');
 
     const sheetSizes = supportsCustomPageSize ? [
-      option({ value: 'size_page', selected: true }, 'Auto'),
-      option({ value: 'size_page_bleed' }, 'Auto + Bleed'),
-      option({ value: 'size_page_marks' }, 'Auto + Marks'),
-      option({ value: 'size_letter_p' }, 'Letter Portrait'),
-      option({ value: 'size_letter_l' }, 'Letter Landscape'),
-      option({ value: 'size_a4_p' }, 'A4 Portrait'),
-      option({ value: 'size_a4_l' }, 'A4 Landscape'),
+      option({ value: Paper.AUTO }, 'Auto'),
+      option({ value: Paper.AUTO_BLEED }, 'Auto + Bleed'),
+      option({ value: Paper.AUTO_MARKS }, 'Auto + Marks'),
+      option({ value: Paper.LETTER_PORTRAIT }, 'Letter Portrait'),
+      option({ value: Paper.LETTER_LANDSCAPE }, 'Letter Landscape'),
+      option({ value: Paper.A4_PORTRAIT }, 'A4 Portrait'),
+      option({ value: Paper.A4_LANDSCAPE }, 'A4 Landscape'),
     ] : [
-      option({ value: 'size_letter_p', selected: true }, 'Default Page Size *'),
+      option({ value: Paper.LETTER_PORTRAIT, selected: true }, 'Default Page Size *'),
       option({ disabled: true }, 'Only Chrome supports custom page sizes. Set in your browser\'s print dialog instead.'),
     ];
+    sheetSizes.forEach((opt) => {
+      if (opt.value === viewer.pageSetup.sheetSizeMode) { opt.selected = true; }
+    });
 
     const updateSheetSizeNames = () => {
       // const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
@@ -61,27 +65,31 @@ class Controls {
     const updateSheetSize = (e) => {
       const newVal = e.target.value;
       viewer.setSheetSize(newVal);
-      if (newVal === 'size_page' || newVal === 'size_page_bleed') {
+      if (newVal === Paper.AUTO || newVal === Paper.AUTO_BLEED) {
         marksSelect.classList.add(c('hidden-select'));
       } else {
         marksSelect.classList.remove(c('hidden-select'));
       }
-
-      this.binder.pageSetup.updateStylesheet();
     };
 
     const sheetSizeSelect = select({ onchange: updateSheetSize }, ...sheetSizes);
 
-    const arrangeSelect = select(
+    const layoutOptions = [
+      option({ value: Layout.PAGES }, '1 Page / Sheet'),
+      option({ value: Layout.SPREADS }, '1 Spread / Sheet'),
+      option({ value: Layout.BOOKLET }, 'Booklet Sheets'),
+    ];
+    layoutOptions.forEach((opt) => {
+      if (opt.value === viewer.printArrange) { opt.selected = true; }
+    });
+    const layoutSelect = select(
       { onchange: (e) => {
         viewer.setPrintArrange(e.target.value);
         updateSheetSizeNames();
       } },
-      option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'),
-      option({ value: 'arrange_two' }, '1 Spread / Sheet'),
-      option({ value: 'arrange_booklet' }, 'Booklet Sheets'),
+      ...layoutOptions
     );
-    const arrangement = row(arrangeSelect);
+    const arrangement = row(layoutSelect);
 
     const updateMarks = (e) => {
       switch (e.target.value) {
@@ -198,17 +206,18 @@ class Controls {
     options.classList.add(c('print-options'));
 
     const updateView = (e) => {
-      const val = e.target.value;
-      if (val === 'view_grid') viewer.setGrid();
-      else if (val === 'view_flip') viewer.setFlip();
-      else if (val === 'view_print') viewer.setPrint();
+      viewer.mode = e.target.value;
+      viewer.render();
     };
-    viewSelect = select(
-      { onchange: updateView },
-      option({ value: 'view_grid' }, 'Preview'),
-      option({ value: 'view_flip' }, 'Flipbook'),
-      option({ value: 'view_print' }, 'Print Preview'),
-    );
+    const viewOptions = [
+      option({ value: Mode.PREVIEW }, 'Preview'),
+      option({ value: Mode.FLIPBOOK }, 'Flipbook'),
+      option({ value: Mode.PRINT }, 'Print Preview'),
+    ];
+    viewOptions.forEach((opt) => {
+      if (opt.value === viewer.mode) { opt.selected = true; }
+    });
+    viewSelect = select({ onchange: updateView }, ...viewOptions);
     const viewRow = row(viewSelect);
     viewRow.classList.add(c('view-row'));
 

@@ -9,16 +9,15 @@ import orderPagesBooklet from './orderPagesBooklet';
 import padPages from './padPages';
 import { gridLayout, printLayout, flipLayout } from './Layouts';
 
-const MODE_FLIP = 'interactive';
-const MODE_PREVIEW = 'grid';
-const MODE_SHEET = 'print';
+import { Mode, Layout } from '../Constants';
 
-const ARRANGE_ONE = 'arrange_one';
-const ARRANGE_SPREAD = 'arrange_two';
-const ARRANGE_BOOKLET = 'arrange_booklet';
+const modeAttr = {};
+modeAttr[Mode.PREVIEW] = 'preview';
+modeAttr[Mode.PRINT] = 'print';
+modeAttr[Mode.FLIPBOOK] = 'flip';
 
 class Viewer {
-  constructor({ bindery }) {
+  constructor({ bindery, mode, layout }) {
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
@@ -26,12 +25,12 @@ class Viewer {
     this.element = h(c('.root'), this.zoomBox);
 
     this.doubleSided = true;
-    this.printArrange = ARRANGE_ONE;
+    this.printArrange = layout;
     this.isShowingCropMarks = true;
     this.isShowingBleedMarks = false;
 
-    this.mode = MODE_PREVIEW;
-    this.element.setAttribute('bindery-view-mode', this.mode);
+    this.mode = mode;
+    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
     this.currentLeaf = 0;
 
     this.listenForPrint();
@@ -90,7 +89,7 @@ class Viewer {
   }
 
   get isTwoUp() {
-    return this.printArrange !== ARRANGE_ONE;
+    return this.printArrange !== Layout.PAGES;
   }
 
   get isShowingCropMarks() {
@@ -119,10 +118,10 @@ class Viewer {
   }
 
   setSheetSize(newVal) {
-    this.pageSetup.setSheetSizeMode(newVal);
+    this.pageSetup.sheetSizeMode = newVal;
     this.pageSetup.updateStylesheet();
 
-    if (this.mode !== MODE_SHEET) {
+    if (this.mode !== Mode.PRINT) {
       this.setPrint();
     }
     this.updateZoom();
@@ -136,7 +135,7 @@ class Viewer {
     this.pageSetup.setPrintTwoUp(this.isTwoUp);
     this.pageSetup.updateStylesheet();
 
-    if (this.mode === MODE_SHEET) {
+    if (this.mode === Mode.PRINT) {
       this.render();
     } else {
       this.setPrint();
@@ -170,37 +169,18 @@ class Viewer {
     this.doubleSided = !this.doubleSided;
     this.render();
   }
-  setMode(newMode) {
-    switch (newMode) {
-    case 'grid':
-    case 'default':
-      this.mode = MODE_PREVIEW;
-      break;
-    case 'interactive':
-    case 'flip':
-      this.mode = MODE_FLIP;
-      break;
-    case 'print':
-    case 'sheet':
-      this.mode = MODE_SHEET;
-      break;
-    default:
-      console.error(`Bindery: Unknown view mode "${newMode}"`);
-      break;
-    }
-  }
   setGrid() {
-    if (this.mode === MODE_PREVIEW) return;
-    this.mode = MODE_PREVIEW;
+    if (this.mode === Mode.PREVIEW) return;
+    this.mode = Mode.PREVIEW;
     this.render();
   }
   setPrint() {
-    if (this.mode === MODE_SHEET) return;
-    this.mode = MODE_SHEET;
+    if (this.mode === Mode.PRINT) return;
+    this.mode = Mode.PRINT;
     this.render();
   }
   setFlip() {
-    this.mode = MODE_FLIP;
+    this.mode = Mode.FLIPBOOK;
     this.render();
   }
   render() {
@@ -212,16 +192,16 @@ class Viewer {
 
     this.flaps = [];
     body.classList.add(c('viewing'));
-    this.element.setAttribute('bindery-view-mode', this.mode);
+    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
 
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
 
     this.controls.setDone();
     window.requestAnimationFrame(() => {
-      if (this.mode === MODE_PREVIEW) this.renderGrid();
-      else if (this.mode === MODE_FLIP) this.renderInteractive();
-      else if (this.mode === MODE_SHEET) this.renderPrint();
+      if (this.mode === Mode.PREVIEW) this.renderGrid();
+      else if (this.mode === Mode.FLIPBOOK) this.renderInteractive();
+      else if (this.mode === Mode.PRINT) this.renderPrint();
       else this.renderGrid();
 
       body.scrollTop = scrollMax * scrollPct;
@@ -283,10 +263,10 @@ class Viewer {
 
     this.zoomBox.innerHTML = '';
 
-    const isBooklet = this.printArrange === ARRANGE_BOOKLET;
+    const isBooklet = this.printArrange === Layout.BOOKLET;
 
     let pages = this.book.pages.slice();
-    if (this.printArrange === ARRANGE_SPREAD) {
+    if (this.printArrange === Layout.SPREADS) {
       pages = padPages(pages, () => new Page());
     } else if (isBooklet) {
       pages = orderPagesBooklet(pages, () => new Page());

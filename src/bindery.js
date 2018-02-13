@@ -5,7 +5,9 @@ import h from 'hyperscript';
 import paginate from './paginate';
 import scheduler from './Scheduler';
 import PageSetup from './Page/PageSetup';
+
 import Viewer from './Viewer';
+import { Mode, Paper, Layout } from './Constants';
 
 import Rules from './Rules/';
 import defaultRules from './Rules/defaultRules';
@@ -42,16 +44,24 @@ class Bindery {
           height: OptionType.length,
         }),
       }),
+      view: OptionType.enum(...Object.values(Mode)),
+      printSetup: OptionType.shape({
+        name: 'printSetup',
+        layout: OptionType.enum(...Object.values(Layout)),
+        paper: OptionType.enum(...Object.values(Paper)),
+      }),
       rules: OptionType.array,
     });
 
     this.pageSetup = new PageSetup(opts.pageSetup);
+    this.pageSetup.printOptions(opts.printSetup);
 
-    this.viewer = new Viewer({ bindery: this });
-
-    if (opts.startingView) {
-      this.viewer.setMode(opts.startingView);
-    }
+    const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
+    this.viewer = new Viewer({
+      bindery: this,
+      mode: opts.view || Mode.PREVIEW,
+      layout: startLayout,
+    });
 
     this.rules = defaultRules;
     if (opts.rules) this.addRules(opts.rules);
