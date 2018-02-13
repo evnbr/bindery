@@ -217,22 +217,27 @@ class Viewer {
       this.book.estimatedProgress
     );
 
-    const twoPageSpread = function (...arg) {
-      return h(c('.spread-wrapper') + c('.spread-size'), ...arg);
+    const shouldPreviewSpreads =
+      this.mode === Mode.PREVIEW
+      || (this.mode === Mode.PRINT && this.printArrange !== Layout.PAGES);
+    const limit = shouldPreviewSpreads ? 2 : 1;
+
+    const makeSpread = function (...arg) {
+      return h(c('.spread-wrapper') + c(shouldPreviewSpreads ? '.spread-size' : '.page-size'), ...arg);
     };
 
     this.book.pages.forEach((page, i) => {
       // If hasn't been added, or not in spread yet
       if (!this.zoomBox.contains(page.element) || page.element.parentNode === this.zoomBox) {
-        if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < 2) {
+        if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
           this.lastSpreadInProgress.appendChild(page.element);
         } else {
-          if (i === 0) {
+          if (i === 0 && shouldPreviewSpreads) {
             const spacer = new Page();
             spacer.element.style.visibility = 'hidden';
-            this.lastSpreadInProgress = twoPageSpread(spacer.element, page.element);
+            this.lastSpreadInProgress = makeSpread(spacer.element, page.element);
           } else {
-            this.lastSpreadInProgress = twoPageSpread(page.element);
+            this.lastSpreadInProgress = makeSpread(page.element);
           }
           this.zoomBox.appendChild(this.lastSpreadInProgress);
         }
