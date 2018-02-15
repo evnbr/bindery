@@ -42,6 +42,7 @@ class Viewer {
         paper: this.pageSetup.sheetSizeMode,
         layout: this.printArrange,
         mode: this.mode,
+        marks,
       },
       { // Actions
         setMode: (newMode) => {

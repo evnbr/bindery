@@ -32,7 +32,7 @@ class Controls {
 
     const printBtn = btnMain({ onclick: print }, 'Print');
 
-    const paperSizes = supportsCustomPageSize ? [
+    const paperSizes = (supportsCustomPageSize ? [
       option({ value: Paper.AUTO }, 'Auto'),
       option({ value: Paper.AUTO_BLEED }, 'Auto + Bleed'),
       option({ value: Paper.AUTO_MARKS }, 'Auto + Marks'),
@@ -43,7 +43,7 @@ class Controls {
     ] : [
       option({ value: Paper.LETTER_PORTRAIT, selected: true }, 'Default Page Size *'),
       option({ disabled: true }, 'Only Chrome supports custom page sizes. Set in your browser\'s print dialog instead.'),
-    ].map((opt) => {
+    ]).map((opt) => {
       if (opt.value === initialState.paper) { opt.selected = true; }
       return opt;
     });
@@ -88,10 +88,14 @@ class Controls {
 
     marksSelect = select(
       { onchange: e => actions.setMarks(e.target.value) },
-      option({ value: Marks.NONE }, 'No Marks'),
-      option({ value: Marks.CROP, selected: true }, 'Crop Marks'),
-      option({ value: Marks.BLEED }, 'Bleed Marks'),
-      option({ value: Marks.CROP }, 'Crop and Bleed'),
+      ...[option({ value: Marks.NONE }, 'No Marks'),
+        option({ value: Marks.CROP, selected: true }, 'Crop Marks'),
+        option({ value: Marks.BLEED }, 'Bleed Marks'),
+        option({ value: Marks.CROP }, 'Crop and Bleed'),
+      ].map((opt) => {
+        if (opt.value === initialState.marks) { opt.selected = true; }
+        return opt;
+      })
     );
     if (supportsCustomPageSize) {
       marksSelect.classList.add(c('hidden-select'));
