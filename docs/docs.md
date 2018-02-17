@@ -19,18 +19,6 @@ Bindery.makeBook({
 });
 ```
 
-<!-- Note that the above is a shortcut for the following, which you may want to use if you're
-integrating Bindery with your own UI.
-
-```js
-let bindery = new Bindery({
-  content: '#content',
-});
-
-// Later, in your own event handler
-bindery.makeBook();
-``` -->
-
 ### content
 
 If the content is on the same page, use a CSS selector or a reference to the node. If the content must be fetched from a remote page, pass an object in the form of `{ url: String, selector: String }`.
@@ -58,9 +46,9 @@ Bindery.makeBook({
 
 ### pageSetup
 
-- `size` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
-- `margin` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
-- `bleed` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
+- `size:` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
+- `margin:` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
+- `bleed:` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
 and [spreads](#fullbleedspread), and sets the position of bleed and
 crop marks.
 
@@ -75,7 +63,65 @@ Bindery.makeBook({
 });
 ```
 
+### printSetup
 
+Note that setting the paper size through bindery [only works in Chrome and Opera](https://caniuse.com/#feat=css-paged-media) as of 2017. Users with other browsers must set the size in the system print dialog.
+
+- `layout:`
+  - `Bindery.Layout.PAGES` One page per sheet, in numerical order `default`
+  - `Bindery.Layout.SPREADS` Two pages per sheet, in numerical order
+  - `Bindery.Layout.BOOKLET` Two pages per sheet, in booklet order. For printing double
+  sided and folding into a saddle stitched booklet.
+- `paper:`
+  - `Bindery.Paper.AUTO` Sets paper to the size of the page or, if the layout is
+   `spreads` or `booklet`, twice as wide as the page.
+   Note that marks will not be visible. `default`
+  - `Bindery.Paper.AUTO_BLEED` The size of the page plus the size of the bleed.
+  Note that marks will not be visible.
+  - `Bindery.Paper.AUTO_MARKS` The size of the page plus room for crop and bleed marks.
+  - `Bindery.Paper.LETTER_PORTRAIT`
+  - `Bindery.Paper.LETTER_LANDSCAPE`
+  - `Bindery.Paper.A4_PORTRAIT`
+  - `Bindery.Paper.A4_LANDSCAPE`
+- `marks:`
+  - `Bindery.Marks.NONE`
+  - `Bindery.Marks.CROP` Note that crop marks are always outset by the bleed amount.`default`
+  - `Bindery.Marks.BLEED`
+  - `Bindery.Marks.BOTH`
+
+```js
+Bindery.makeBook({
+  content: '#content',
+  printSetup: {
+    layout: 'booklet',
+    paper: Bindery.Paper.AUTO_BLEED,
+    marks: 'crop',
+  },
+});
+```
+
+
+### Preview Mode
+
+- `view:`
+  - `Bindery.View.PREVIEW` shows the spreads of the book as they will appear when
+the book is trimmed and bound. `default`
+  - `Bindery.View.PRINT` shows the complete printed sheet, which may include multiple pages,
+  marks, and bleed if those options are enabled.
+Note that when printing a booklet, pages will appear out of order.
+  - `Bindery.View.FLIPBOOK` shows a three-dimensional preview, making it easy
+to visualize which pages will end up on the backs of others.
+
+By default, Bindery will start in `PREVIEW` mode,
+and will switch to `PRINT` mode when the user begins to print.
+
+
+```js
+Bindery.makeBook({
+  content: '#content',
+  view: Bindery.View.PREVIEW
+})
+```
 
 ## Rules
 
@@ -321,7 +367,7 @@ page. Good for displaying figures and imagery. You can use CSS to do your own la
 - `selector:` Which elements the rule should be applied to.
 - `continue:` Where to resume the book flow after adding the
 full bleed page. `Optional`
-  - `'same'` `default` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup.
+  - `'same'` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup. `default`
   - `'next'` Continues on a new page
   - `'left'` Continues on the next left page, inserting another page when appropriate
   - `'right'` Continues on the next right page, inserting another page when appropriate
