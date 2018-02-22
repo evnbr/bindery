@@ -5,14 +5,15 @@
   <body>
 
     <script type="text/javascript" src='/bindery/js/bindery.umd.js'></script>
+    <script type="text/javascript" src='/bindery/js/bindery-controls.min.js'></script>
     <script>
-
       Bindery.makeBook({
         content: {
           url: '/bindery/book-content/',
           selector: '.content',
         },
         view: Bindery.View.PRINT,
+        ControlsComponent: BinderyControls,
         printSetup: {
           paper: Bindery.Paper.AUTO_MARKS,
           layout: Bindery.Layout.SPREADS,
