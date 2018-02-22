@@ -26,6 +26,7 @@ class Bindery {
       name: 'makeBook',
       autorun: OptionType.bool,
       content: OptionType.any,
+      ControlsComponent: OptionType.any,
       pageSetup: OptionType.shape({
         name: 'pageSetup',
         bleed: OptionType.length,
@@ -62,6 +63,7 @@ class Bindery {
       mode: opts.view || Mode.PREVIEW,
       marks: startMarks,
       layout: startLayout,
+      ControlsComponent: opts.ControlsComponent,
     });
 
     this.rules = defaultRules;

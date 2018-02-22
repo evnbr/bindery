@@ -29,7 +29,9 @@ const sassPlugin = () => sass({
         { removeTitle: true },
       ] },
     }),
-    cssnano(),
+    cssnano({
+      reduceIdents: false,
+    }),
   ])
     .process(css)
     .then(result => result.css),

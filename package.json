@@ -13,9 +13,6 @@
     "type": "git",
     "url": "git://github.com/evnbr/bindery.git"
   },
-  "dependencies": {
-    "hyperscript": "^2.0.2"
-  },
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-jest": "^20.0.3",

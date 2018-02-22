@@ -1,6 +1,5 @@
-
-import Controls from './Controls';
 import { c, el } from '../utils';
+// import Controls from './Controls';
 import Page from '../Page';
 
 import errorView from './error';
@@ -8,7 +7,7 @@ import orderPagesBooklet from './orderPagesBooklet';
 import padPages from './padPages';
 import { gridLayout, printLayout, flipLayout } from './Layouts';
 
-import { Mode, Layout, Marks } from '../Constants';
+import { Mode, Paper, Layout, Marks } from '../Constants';
 
 const modeAttr = {};
 modeAttr[Mode.PREVIEW] = 'preview';
@@ -16,7 +15,7 @@ modeAttr[Mode.PRINT] = 'print';
 modeAttr[Mode.FLIPBOOK] = 'flip';
 
 class Viewer {
-  constructor({ bindery, mode, layout, marks }) {
+  constructor({ bindery, mode, layout, marks, ControlsComponent }) {
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
@@ -37,29 +36,32 @@ class Viewer {
 
     this.setPrint = this.setPrint.bind(this);
 
-    this.controls = new Controls(
-      { // Initial props
-        paper: this.pageSetup.sheetSizeMode,
-        layout: this.printArrange,
-        mode: this.mode,
-        marks,
-      },
-      { // Actions
-        setMode: (newMode) => {
-          if (newMode === this.mode) return;
-          this.mode = newMode;
-          this.render();
+    if (ControlsComponent) {
+      this.controls = new ControlsComponent(
+        { Mode, Paper, Layout, Marks }, // Available options
+        { // Initial props
+          paper: this.pageSetup.sheetSizeMode,
+          layout: this.printArrange,
+          mode: this.mode,
+          marks,
         },
-        setPaper: this.setSheetSize.bind(this),
-        setLayout: this.setPrintArrange.bind(this),
-        setMarks: this.setMarks.bind(this),
-        getPageSize: () => this.pageSetup.displaySize,
-      }
-    );
+        { // Actions
+          setMode: (newMode) => {
+            if (newMode === this.mode) return;
+            this.mode = newMode;
+            this.render();
+          },
+          setPaper: this.setSheetSize.bind(this),
+          setLayout: this.setPrintArrange.bind(this),
+          setMarks: this.setMarks.bind(this),
+          getPageSize: () => this.pageSetup.displaySize,
+        }
+      );
+      this.element.appendChild(this.controls.element);
+    }
 
     this.element.classList.add(c('in-progress'));
 
-    this.element.appendChild(this.controls.element);
     document.body.appendChild(this.element);
   }
 
@@ -100,7 +102,7 @@ class Viewer {
 
   setInProgress() {
     this.element.classList.add(c('in-progress'));
-    this.controls.setInProgress();
+    if (this.controls) this.controls.setInProgress();
   }
 
   get isTwoUp() {
@@ -224,7 +226,7 @@ class Viewer {
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
 
-    this.controls.setDone(this.book.pages.length);
+    if (this.controls) this.controls.setDone(this.book.pages.length);
     this.progressBar.style.width = '100%';
 
     window.requestAnimationFrame(() => {
@@ -241,12 +243,14 @@ class Viewer {
   renderProgress(book) {
     this.book = book;
 
-    this.controls.updateProgress(
-      this.book.pages.length,
-      this.book.estimatedProgress
-    );
     this.progressBar.style.width = `${this.book.estimatedProgress * 100}%`;
 
+    if (this.controls) {
+      this.controls.updateProgress(
+        this.book.pages.length,
+        this.book.estimatedProgress
+      );
+    }
 
     const sideBySide =
       this.mode === Mode.PREVIEW
