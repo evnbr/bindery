@@ -13,6 +13,22 @@
     min-height: 90vh;
   }
 
+  .#{$pre}-progress-bar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: var(--bindery-ui-accent, $accent);
+    width: 0%;
+    transition: all 0.2s;
+    opacity: 0;
+    height: 0;
+    z-index: 99;
+    .#{$pre}-in-progress & {
+      opacity: 1;
+      height: 2px;
+    }
+  }
+
   .#{$pre}-measure-area {
     position: fixed;
     background: $background;
@@ -145,7 +161,7 @@ body.#{$pre}-viewing {
 .#{$pre}-spread-wrapper {
   position: relative;
   display: flex;
-  width: 800px;
+  justify-content: center;
   margin: 0 auto 32px;
 }
 
@@ -174,8 +190,8 @@ body.#{$pre}-viewing {
 
 .#{$pre}-page3d {
   margin: auto;
-  width: 400px;
-  height: 600px;
+  width: var(--bindery-page-width);
+  height: var(--bindery-page-height);
   transform: rotateY(0);
   transform-style: preserve-3d;
   transform-origin: left;

@@ -147,7 +147,6 @@ class Controls {
     );
 
     spinner = h(c('.spinner'));
-    const progressBar = h(c('.progress-bar'));
     const header = title(
       headerContent,
     );
@@ -161,13 +160,11 @@ class Controls {
       const t = performance.now();
       if (t - lastUpdate > 100) {
         lastUpdate = t;
-        progressBar.style.width = `${pct * 100}%`;
         headerContent.textContent = `${count} Pages`;
       }
     };
 
     this.setDone = (length) => {
-      progressBar.style.width = '100%';
       headerContent.textContent = `${length} Pages`;
     };
 
@@ -197,7 +194,6 @@ class Controls {
     viewRow.classList.add(c('view-row'));
 
     this.element = h(c('.controls'),
-      progressBar,
       header,
       debugControls,
       viewRow,

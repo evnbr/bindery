@@ -20,6 +20,7 @@ class Viewer {
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
+    this.progressBar = el('.progress-bar');
     this.zoomBox = el('zoom-wrap');
     this.element = el('root', [this.progressBar, this.zoomBox]);
 
@@ -224,6 +225,8 @@ class Viewer {
     const scrollPct = body.scrollTop / scrollMax;
 
     this.controls.setDone(this.book.pages.length);
+    this.progressBar.style.width = '100%';
+
     window.requestAnimationFrame(() => {
       if (this.mode === Mode.PREVIEW) this.renderGrid();
       else if (this.mode === Mode.FLIPBOOK) this.renderInteractive();
@@ -242,6 +245,8 @@ class Viewer {
       this.book.pages.length,
       this.book.estimatedProgress
     );
+    this.progressBar.style.width = `${this.book.estimatedProgress * 100}%`;
+
 
     const sideBySide =
       this.mode === Mode.PREVIEW
