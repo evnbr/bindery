@@ -7,7 +7,7 @@ order: 2
 inBook: true
 ---
 
-## Make a Book
+## Create a Book
 
 Use `Bindery.makeBook({ options })` to create a book and display it
 immediately on page load. It takes an object of options as described below.
@@ -100,32 +100,66 @@ Bindery.makeBook({
 });
 ```
 
-
-### Preview Mode
+## Previewing
 
 - `view:`
   - `Bindery.View.PREVIEW` shows the spreads of the book as they will appear when
-the book is trimmed and bound. `default`
+  the book is trimmed and bound. If you choose this mode, Bindery will switch to `PRINT`
+  before printing. `default`
   - `Bindery.View.PRINT` shows the complete printed sheet, which may include multiple pages,
   marks, and bleed if those options are enabled.
-Note that when printing a booklet, pages will appear out of order.
+  Note that when printing a booklet, pages will appear out of order.
   - `Bindery.View.FLIPBOOK` shows a three-dimensional preview, making it easy
-to visualize which pages will end up on the backs of others.
+to visualize which pages will end up on the backs of others. If you choose this mode,
+Bindery will switch to `PRINT` before printing.
 
-By default, Bindery will start in `PREVIEW` mode,
-and will switch to `PRINT` mode when the user begins to print.
 
 
 ```js
 Bindery.makeBook({
   content: '#content',
-  view: Bindery.View.PREVIEW
+  view: Bindery.View.FLIPBOOK,
 })
 ```
 
-## Rules
+### Controls
 
-You can set a series of rules that change the book flow and create related components.
+If you are frequently switching between views or print options,
+you can install `bindery-controls` to create a UI to configure without
+reloading.
+
+<div>
+  <a href="https://unpkg.com/bindery-controls/dist/bindery-controls.min.js" class="btn" download>
+    ↓ Download bindery-controls.min.js
+  </a>
+</div>
+
+```html
+<script type="text/javascript" src='/js/bindery.min.js'></script>
+<script type="text/javascript" src='/js/bindery-controls.min.js'></script>
+<script>
+  Bindery.makeBook({
+    content: '#content',
+    controls: BinderyControls,
+  })
+</script>
+```
+
+Or, you can also install [bindery-controls from npm](https://www.npmjs.com/package/bindery-controls):
+
+```
+npm install --save bindery-controls
+```
+
+
+
+## Book Flow
+
+Book content runs within the margins on the front and back of every
+page. You can set a series of rules that change the book flow.
+Rules are triggered by selectors, like CSS. For example, you might want to
+start all `h2` elements on a new page, and make all `.big-figure` elements
+into a full-bleed spread across two pages:
 
 ```js
 Bindery.makeBook({
@@ -180,6 +214,52 @@ Bindery.PageBreak({
 })
 ```
 
+### FullBleedPage
+Removes the selected element from the ordinary flow of the book and places it on its own
+page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed page. `Optional`
+  - `'same'` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup. `default`
+  - `'next'` Continues on a new page
+  - `'left'` Continues on the next left page, inserting another page when appropriate
+  - `'right'` Continues on the next right page, inserting another page when appropriate
+- `rotate:` Add a rotation the full-bleed content. `Optional`
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+  - `'inward'` The top will become the outside edge
+  - `'outward'` The top will become the inside edge
+
+```js
+Bindery.FullBleedPage({
+  selector: '.big-figure',
+  continue: 'same'
+}),
+```
+
+### FullBleedSpread
+The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed element. `Optional`
+  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
+  - `'next'` Continues on a new page after the spread.
+  - `'left'` Continues on the next left page after the spread
+  - `'right'` Continues on the next right page after the spread
+- `rotate:` Add a rotation the full-bleed content. `Optional`
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+
+```js
+Bindery.FullBleedSpread({
+  selector: '.wide-figure',
+  continue: 'next',
+  rotate: 'clockwise',
+}),
+```
+
 ### Split
 <!-- - `Bindery.Split({})` -->
 
@@ -224,6 +304,8 @@ Bindery.Split({
 </p>
 ```
 </div>
+
+## Page Elements
 
 ### RunningHeader
 An element added to each page. By default it will add a page number
@@ -361,62 +443,18 @@ altogether.</p>
 ```
 </div>
 
-### FullBleedPage
-Removes the selected element from the ordinary flow of the book and places it on its own
-page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
-- `selector:` Which elements the rule should be applied to.
-- `continue:` Where to resume the book flow after adding the
-full bleed page. `Optional`
-  - `'same'` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup. `default`
-  - `'next'` Continues on a new page
-  - `'left'` Continues on the next left page, inserting another page when appropriate
-  - `'right'` Continues on the next right page, inserting another page when appropriate
-- `rotate:` Add a rotation the full-bleed content. `Optional`
-  - `'none'` `default`
-  - `'clockwise'` The top will become the left edge
-  - `'counterclockwise'` The top will become the right edge
-  - `'inward'` The top will become the outside edge
-  - `'outward'` The top will become the inside edge
-
-```js
-Bindery.FullBleedPage({
-  selector: '.big-figure',
-  continue: 'same'
-}),
-```
-
-### FullBleedSpread
-The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
-- `selector:` Which elements the rule should be applied to.
-- `continue:` Where to resume the book flow after adding the
-full bleed element. `Optional`
-  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
-  - `'next'` Continues on a new page after the spread.
-  - `'left'` Continues on the next left page after the spread
-  - `'right'` Continues on the next right page after the spread
-- `rotate:` Add a rotation the full-bleed content. `Optional`
-  - `'none'` `default`
-  - `'clockwise'` The top will become the left edge
-  - `'counterclockwise'` The top will become the right edge
-
-```js
-Bindery.FullBleedSpread({
-  selector: '.wide-figure',
-  continue: 'next',
-  rotate: 'clockwise',
-}),
-```
-
-
 
 ## Referencing Pages
 
+If your web content has internal links or navigation, you can use a `PageReference`
+to insert the page number the content will eventually end up on. You can use
+them to create traditional book navigation elements, like a table of contents, index, endnotes,
+without having to update them every time you change the page size or style.
+
 ### PageReference
-Use PageReference to create a table of contents, index, endnotes, or anywhere
-you might otherwise use anchor links or in-page navigation on the web.
 - `selector:` Which elements the rule should be applied to.
 - `replace:` A function that takes an element and a page range, and must return
-a new element. By default, Bindery will simply insert the page range
+a new element. By default, Bindery will insert the page range
 after the original element. `Optional`
 - `createTest:` A function that takes your reference element and returns a test function.
 The test function receives a page element, and should return true if the
