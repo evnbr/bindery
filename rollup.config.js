@@ -10,6 +10,7 @@ import inlinesvg from 'postcss-svg';
 
 import pkg from './package.json';
 
+
 const baseConfig = {
   entry: 'src/index.js',
   moduleName: 'Bindery',
