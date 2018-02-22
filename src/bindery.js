@@ -55,7 +55,7 @@ class Bindery {
     });
 
     this.pageSetup = new PageSetup(opts.pageSetup);
-    this.pageSetup.printOptions(opts.printSetup);
+    this.pageSetup.setupPaper(opts.printSetup);
 
     const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
     const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;

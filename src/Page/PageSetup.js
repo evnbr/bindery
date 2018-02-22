@@ -27,7 +27,7 @@ class PageSetup {
     this.setBleed(opts.bleed || defaultPageSetup.bleed);
   }
 
-  printOptions(opts = {}) {
+  setupPaper(opts = {}) {
     this.sheetSizeMode = supportsCustomPageSize ? (opts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
     this.printTwoUp = opts.layout && opts.layout !== Layout.PAGES;
   }

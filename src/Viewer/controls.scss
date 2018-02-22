@@ -34,7 +34,7 @@ $btn-active: #eee;
   }
 
   a {
-    color: $accent;
+    color: var(--bindery-ui-accent, $accent);
     text-decoration: none;
   }
 }
@@ -63,7 +63,7 @@ $btn-active: #eee;
   display: flex;
   opacity: 0;
   max-width: 0;
-  border-radius: 0;
+  border-radius: 4px;
   background: #e4e4e4;
   overflow: hidden;
   transition: all 0.4s;
@@ -133,7 +133,7 @@ $btn-active: #eee;
 }
 
 .#{$pre}-controls .#{$pre}-control {
-  border-radius: 0;
+  border-radius: 4px;
   color: black;
   padding: $btn-pad;
   background-color: $background;
@@ -146,12 +146,12 @@ $btn-active: #eee;
 }
 
 .#{$pre}-controls .#{$pre}-btn-main {
-  background: $accent;
-  border-color: $accent;
+  background: var(--bindery-ui-accent, $accent);
+  border-color: var(--bindery-ui-accent, $accent);
   color: white;
 
   &:hover {
-    background: $accent;
+    background: var(--bindery-ui-accent, $accent);
     opacity: 0.7;
   }
 
@@ -257,7 +257,7 @@ $btn-active: #eee;
   position: absolute;
   left: 0;
   top: 0;
-  background: $accent;
+  background: var(--bindery-ui-accent, $accent);
   width: 0%;
   transition: all 0.2s;
   opacity: 0;
