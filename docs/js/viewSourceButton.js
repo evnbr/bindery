@@ -2,19 +2,31 @@ const sheet = document.createElement('style');
 
 sheet.innerHTML = `
 @media screen {
-  #viewSourceHeader.📖-view-source-header {
+  #view-source-header {
     display: block !important;
   }
 }
-.📖-view-source-header {
+#view-source-header {
   display: none;
-  bottom: 0;
-  left: 0;
-  right: unset;
-  top: unset;
-  background: transparent;
-  box-shadow: none;
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 999;
 }
+
+#view-source-header a {
+  font: 12px/1.5 -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.7);
+}
+
+#view-source-header a:hover {
+  background: rgba(0,0,0,0.8);
+}
+
 `;
 
 const segments = window.location.pathname.split('/');
@@ -22,11 +34,9 @@ let id = segments.pop();
 if (id === '') id = segments.pop();
 
 const buttons = document.createElement('div');
-buttons.classList.add('📖-view-source-header');
-buttons.classList.add('📖-controls');
-buttons.id = 'viewSourceHeader';
+buttons.id = 'view-source-header';
 buttons.innerHTML = `
-  <a class="📖-btn 📖-control" href="https://github.com/evnbr/bindery/tree/master/docs/examples/${id}">View Source ↗</a>
+  <a href="https://github.com/evnbr/bindery/tree/master/docs/examples/${id}">View Source ↗</a>
 `;
 
 document.head.appendChild(sheet);

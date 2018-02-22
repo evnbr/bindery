@@ -5,17 +5,22 @@
   <body>
 
     <script type="text/javascript" src='/bindery/js/bindery.umd.js'></script>
+    <script type="text/javascript" src='/bindery/js/bindery-controls.min.js'></script>
     <script>
-
-      const paperSize = { width: '5in', height: '8in' };
-
       Bindery.makeBook({
         content: {
           url: '/bindery/book-content/',
           selector: '.content',
         },
+        view: Bindery.View.PRINT,
+        ControlsComponent: BinderyControls,
+        printSetup: {
+          paper: Bindery.Paper.AUTO_MARKS,
+          layout: Bindery.Layout.SPREADS,
+          marks: Bindery.Marks.BOTH,
+        },
         pageSetup: {
-          size: paperSize,
+          size: { width: '4in', height: '6in' },
           margin: {
             top: '0.3in',
             bottom: '1in',

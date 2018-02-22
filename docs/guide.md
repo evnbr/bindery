@@ -40,13 +40,6 @@ You can also install bindery from [npm](https://www.npmjs.com/package/bindery):
 ```
 npm install --save bindery
 ```
-<!-- Then import it as a module:
-```js
-import Bindery from 'bindery';
-
-Bindery.makeBook({ content: '#content' });
-``` -->
-
 
 ### Styling a Book
 

@@ -1,11 +1,11 @@
 /* global BINDERY_VERSION */
 
-import h from 'hyperscript';
-
 import paginate from './paginate';
 import scheduler from './Scheduler';
 import PageSetup from './Page/PageSetup';
+
 import Viewer from './Viewer';
+import { Mode, Paper, Layout, Marks } from './Constants';
 
 import Rules from './Rules/';
 import defaultRules from './Rules/defaultRules';
@@ -26,6 +26,7 @@ class Bindery {
       name: 'makeBook',
       autorun: OptionType.bool,
       content: OptionType.any,
+      ControlsComponent: OptionType.any,
       pageSetup: OptionType.shape({
         name: 'pageSetup',
         bleed: OptionType.length,
@@ -42,16 +43,28 @@ class Bindery {
           height: OptionType.length,
         }),
       }),
+      view: OptionType.enum(...Object.values(Mode)),
+      printSetup: OptionType.shape({
+        name: 'printSetup',
+        layout: OptionType.enum(...Object.values(Layout)),
+        marks: OptionType.enum(...Object.values(Marks)),
+        paper: OptionType.enum(...Object.values(Paper)),
+      }),
       rules: OptionType.array,
     });
 
     this.pageSetup = new PageSetup(opts.pageSetup);
+    this.pageSetup.setupPaper(opts.printSetup);
 
-    this.viewer = new Viewer({ bindery: this });
-
-    if (opts.startingView) {
-      this.viewer.setMode(opts.startingView);
-    }
+    const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
+    const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
+    this.viewer = new Viewer({
+      bindery: this,
+      mode: opts.view || Mode.PREVIEW,
+      marks: startMarks,
+      layout: startLayout,
+      ControlsComponent: opts.ControlsComponent,
+    });
 
     this.rules = defaultRules;
     if (opts.rules) this.addRules(opts.rules);
@@ -99,7 +112,7 @@ class Bindery {
       }
       return '';
     }).then((fetchedContent) => {
-      const wrapper = h('div');
+      const wrapper = document.createElement('div');
       wrapper.innerHTML = fetchedContent;
       this.source = wrapper.querySelector(selector);
       if (!(this.source instanceof HTMLElement)) {

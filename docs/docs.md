@@ -7,7 +7,7 @@ order: 2
 inBook: true
 ---
 
-## Make a Book
+## Create a Book
 
 Use `Bindery.makeBook({ options })` to create a book and display it
 immediately on page load. It takes an object of options as described below.
@@ -18,18 +18,6 @@ Bindery.makeBook({
   content: '#content',
 });
 ```
-
-<!-- Note that the above is a shortcut for the following, which you may want to use if you're
-integrating Bindery with your own UI.
-
-```js
-let bindery = new Bindery({
-  content: '#content',
-});
-
-// Later, in your own event handler
-bindery.makeBook();
-``` -->
 
 ### content
 
@@ -58,9 +46,9 @@ Bindery.makeBook({
 
 ### pageSetup
 
-- `size` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
-- `margin` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
-- `bleed` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
+- `size:` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
+- `margin:` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
+- `bleed:` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
 and [spreads](#fullbleedspread), and sets the position of bleed and
 crop marks.
 
@@ -75,11 +63,103 @@ Bindery.makeBook({
 });
 ```
 
+### printSetup
+
+Note that setting the paper size through bindery [only works in Chrome and Opera](https://caniuse.com/#feat=css-paged-media) as of 2017. Users with other browsers must set the size in the system print dialog.
+
+- `layout:`
+  - `Bindery.Layout.PAGES` One page per sheet, in numerical order `default`
+  - `Bindery.Layout.SPREADS` Two pages per sheet, in numerical order
+  - `Bindery.Layout.BOOKLET` Two pages per sheet, in booklet order. For printing double
+  sided and folding into a saddle stitched booklet.
+- `paper:`
+  - `Bindery.Paper.AUTO` Sets paper to the size of the page or, if the layout is
+   `spreads` or `booklet`, twice as wide as the page.
+   Note that marks will not be visible. `default`
+  - `Bindery.Paper.AUTO_BLEED` The size of the page plus the size of the bleed.
+  Note that marks will not be visible.
+  - `Bindery.Paper.AUTO_MARKS` The size of the page plus room for crop and bleed marks.
+  - `Bindery.Paper.LETTER_PORTRAIT`
+  - `Bindery.Paper.LETTER_LANDSCAPE`
+  - `Bindery.Paper.A4_PORTRAIT`
+  - `Bindery.Paper.A4_LANDSCAPE`
+- `marks:`
+  - `Bindery.Marks.NONE`
+  - `Bindery.Marks.CROP` Note that crop marks are always outset by the bleed amount.`default`
+  - `Bindery.Marks.BLEED`
+  - `Bindery.Marks.BOTH`
+
+```js
+Bindery.makeBook({
+  content: '#content',
+  printSetup: {
+    layout: 'booklet',
+    paper: Bindery.Paper.AUTO_BLEED,
+    marks: 'crop',
+  },
+});
+```
+
+## Previewing
+
+- `view:`
+  - `Bindery.View.PREVIEW` shows the spreads of the book as they will appear when
+  the book is trimmed and bound. If you choose this mode, Bindery will switch to `PRINT`
+  before printing. `default`
+  - `Bindery.View.PRINT` shows the complete printed sheet, which may include multiple pages,
+  marks, and bleed if those options are enabled.
+  Note that when printing a booklet, pages will appear out of order.
+  - `Bindery.View.FLIPBOOK` shows a three-dimensional preview, making it easy
+to visualize which pages will end up on the backs of others. If you choose this mode,
+Bindery will switch to `PRINT` before printing.
 
 
-## Rules
 
-You can set a series of rules that change the book flow and create related components.
+```js
+Bindery.makeBook({
+  content: '#content',
+  view: Bindery.View.FLIPBOOK,
+})
+```
+
+### Controls
+
+If you are frequently switching between views or print options,
+you can install `bindery-controls` to create a UI to configure without
+reloading.
+
+<div>
+  <a href="https://unpkg.com/bindery-controls/dist/bindery-controls.min.js" class="btn" download>
+    ↓ Download bindery-controls.min.js
+  </a>
+</div>
+
+```html
+<script type="text/javascript" src='/js/bindery.min.js'></script>
+<script type="text/javascript" src='/js/bindery-controls.min.js'></script>
+<script>
+  Bindery.makeBook({
+    content: '#content',
+    controls: BinderyControls,
+  })
+</script>
+```
+
+Or, you can also install [bindery-controls from npm](https://www.npmjs.com/package/bindery-controls):
+
+```
+npm install --save bindery-controls
+```
+
+
+
+## Book Flow
+
+Book content runs within the margins on the front and back of every
+page. You can set a series of rules that change the book flow.
+Rules are triggered by selectors, like CSS. For example, you might want to
+start all `h2` elements on a new page, and make all `.big-figure` elements
+into a full-bleed spread across two pages:
 
 ```js
 Bindery.makeBook({
@@ -134,6 +214,52 @@ Bindery.PageBreak({
 })
 ```
 
+### FullBleedPage
+Removes the selected element from the ordinary flow of the book and places it on its own
+page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed page. `Optional`
+  - `'same'` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup. `default`
+  - `'next'` Continues on a new page
+  - `'left'` Continues on the next left page, inserting another page when appropriate
+  - `'right'` Continues on the next right page, inserting another page when appropriate
+- `rotate:` Add a rotation the full-bleed content. `Optional`
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+  - `'inward'` The top will become the outside edge
+  - `'outward'` The top will become the inside edge
+
+```js
+Bindery.FullBleedPage({
+  selector: '.big-figure',
+  continue: 'same'
+}),
+```
+
+### FullBleedSpread
+The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed element. `Optional`
+  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
+  - `'next'` Continues on a new page after the spread.
+  - `'left'` Continues on the next left page after the spread
+  - `'right'` Continues on the next right page after the spread
+- `rotate:` Add a rotation the full-bleed content. `Optional`
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+
+```js
+Bindery.FullBleedSpread({
+  selector: '.wide-figure',
+  continue: 'next',
+  rotate: 'clockwise',
+}),
+```
+
 ### Split
 <!-- - `Bindery.Split({})` -->
 
@@ -178,6 +304,8 @@ Bindery.Split({
 </p>
 ```
 </div>
+
+## Page Elements
 
 ### RunningHeader
 An element added to each page. By default it will add a page number
@@ -315,62 +443,18 @@ altogether.</p>
 ```
 </div>
 
-### FullBleedPage
-Removes the selected element from the ordinary flow of the book and places it on its own
-page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
-- `selector:` Which elements the rule should be applied to.
-- `continue:` Where to resume the book flow after adding the
-full bleed page. `Optional`
-  - `'same'` `default` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup.
-  - `'next'` Continues on a new page
-  - `'left'` Continues on the next left page, inserting another page when appropriate
-  - `'right'` Continues on the next right page, inserting another page when appropriate
-- `rotate:` Add a rotation the full-bleed content. `Optional`
-  - `'none'` `default`
-  - `'clockwise'` The top will become the left edge
-  - `'counterclockwise'` The top will become the right edge
-  - `'inward'` The top will become the outside edge
-  - `'outward'` The top will become the inside edge
-
-```js
-Bindery.FullBleedPage({
-  selector: '.big-figure',
-  continue: 'same'
-}),
-```
-
-### FullBleedSpread
-The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
-- `selector:` Which elements the rule should be applied to.
-- `continue:` Where to resume the book flow after adding the
-full bleed element. `Optional`
-  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
-  - `'next'` Continues on a new page after the spread.
-  - `'left'` Continues on the next left page after the spread
-  - `'right'` Continues on the next right page after the spread
-- `rotate:` Add a rotation the full-bleed content. `Optional`
-  - `'none'` `default`
-  - `'clockwise'` The top will become the left edge
-  - `'counterclockwise'` The top will become the right edge
-
-```js
-Bindery.FullBleedSpread({
-  selector: '.wide-figure',
-  continue: 'next',
-  rotate: 'clockwise',
-}),
-```
-
-
 
 ## Referencing Pages
 
+If your web content has internal links or navigation, you can use a `PageReference`
+to insert the page number the content will eventually end up on. You can use
+them to create traditional book navigation elements, like a table of contents, index, endnotes,
+without having to update them every time you change the page size or style.
+
 ### PageReference
-Use PageReference to create a table of contents, index, endnotes, or anywhere
-you might otherwise use anchor links or in-page navigation on the web.
 - `selector:` Which elements the rule should be applied to.
 - `replace:` A function that takes an element and a page range, and must return
-a new element. By default, Bindery will simply insert the page range
+a new element. By default, Bindery will insert the page range
 after the original element. `Optional`
 - `createTest:` A function that takes your reference element and returns a test function.
 The test function receives a page element, and should return true if the

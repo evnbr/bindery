@@ -1,14 +1,8 @@
-import h from 'hyperscript';
-import { c } from '../../utils';
+import { el } from '../../utils';
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 
-const twoPageSpread = function (...arg) {
-  return h(c('.spread-wrapper') + c('.spread-size'), ...arg);
-};
-const onePageSpread = function (...arg) {
-  return h(c('.spread-wrapper') + c('.page-size'), ...arg);
-};
-
+const twoPageSpread = children => el('.spread-wrapper.spread-size', children);
+const onePageSpread = children => el('.spread-wrapper.page-size', children);
 
 const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
   const printLayout = document.createDocumentFragment();
@@ -16,11 +10,7 @@ const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
   const marks = isTwoUp ? printMarksSpread : printMarksSingle;
   const spread = isTwoUp ? twoPageSpread : onePageSpread;
 
-  const printSheet = function (...arg) {
-    return h(c('.print-page'),
-      spread(...arg)
-    );
-  };
+  const printSheet = children => el('.print-page', [spread(children)]);
 
   if (isTwoUp) {
     for (let i = 0; i < pages.length; i += 2) {
@@ -29,12 +19,16 @@ const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
         const meta = bookletMeta(i, pages.length);
         spreadMarks.appendChild(meta);
       }
-      const sheet = printSheet(pages[i].element, pages[i + 1].element, spreadMarks);
+      const sheet = printSheet([
+        pages[i].element,
+        pages[i + 1].element,
+        spreadMarks]
+      );
       printLayout.appendChild(sheet);
     }
   } else {
     pages.forEach((pg) => {
-      const sheet = printSheet(pg.element, marks());
+      const sheet = printSheet([pg.element, marks()]);
       printLayout.appendChild(sheet);
     });
   }

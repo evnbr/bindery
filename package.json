@@ -1,6 +1,6 @@
 {
   "name": "bindery",
-  "version": "2.0.0-alpha.10.2",
+  "version": "2.1.0",
   "description": "Book layout in the browser",
   "main": "dist/bindery.cjs.js",
   "module": "dist/bindery.esm.js",
@@ -13,14 +13,12 @@
     "type": "git",
     "url": "git://github.com/evnbr/bindery.git"
   },
-  "dependencies": {
-    "hyperscript": "^2.0.2"
-  },
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-jest": "^20.0.3",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.0",
+    "babel-preset-es2015": "^6.24.1",
     "cssnano": "^3.10.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.2.0",
@@ -35,6 +33,7 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-postcss": "^0.5.5",
     "rollup-plugin-sass": "^0.5.3",
+    "rollup-plugin-sizes": "^0.4.2",
     "rollup-plugin-uglify": "^2.0.1"
   },
   "scripts": {
@@ -46,7 +45,11 @@
     "lint": "eslint src/ webpack.*.js --cache"
   },
   "jest": {
-    "collectCoverageFrom": ["**/src/**.{js,jsx}", "!**/node_modules/**", "!**/vendor/**"]
+    "collectCoverageFrom": [
+      "**/src/**.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**"
+    ]
   },
   "keywords": [
     "book",

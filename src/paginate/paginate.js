@@ -1,5 +1,3 @@
-import h from 'hyperscript';
-
 // Bindery
 import Book from './Book';
 import Page from '../Page';
@@ -15,7 +13,7 @@ import waitForImage from './waitForImage';
 
 // Utils
 import elToStr from '../utils/elementToString';
-import { c, last } from '../utils';
+import { c, el, last } from '../utils';
 import Thenable from './Thenable';
 
 const MAXIMUM_PAGE_LIMIT = 2000;
@@ -52,7 +50,7 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
   let elementsProcessed = 0;
 
   const ruleSet = new RuleSet(rules);
-  const measureArea = document.body.appendChild(h(c('.measure-area')));
+  const measureArea = document.body.appendChild(el('.measure-area'));
 
   let breadcrumb = []; // Keep track of position in original tree
   const book = new Book();

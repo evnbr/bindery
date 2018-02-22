@@ -1,6 +1,5 @@
-import h from 'hyperscript';
 import OutOfFlow from './OutOfFlow';
-import { OptionType, c } from '../utils';
+import { OptionType, c, el } from '../utils';
 
 // Options:
 // selector: String
@@ -33,9 +32,7 @@ class FullBleedSpread extends OutOfFlow {
 
     if (this.rotate !== 'none') {
       [leftPage, rightPage].forEach((page) => {
-        const rotateContainer = h(c('.rotate-container'));
-        rotateContainer.classList.add(c('spread-size-rotated'));
-        rotateContainer.classList.add(c(`rotate-spread-${this.rotate}`));
+        const rotateContainer = el(`.rotate-container.spread-size-rotated.rotate-spread-${this.rotate}`);
         rotateContainer.appendChild(page.background);
         page.element.appendChild(rotateContainer);
       });

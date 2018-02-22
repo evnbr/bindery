@@ -1,7 +1,5 @@
-import h from 'hyperscript';
-import { c } from '../utils';
-
-import Controls from './Controls';
+import { c, el } from '../utils';
+// import Controls from './Controls';
 import Page from '../Page';
 
 import errorView from './error';
@@ -9,43 +7,61 @@ import orderPagesBooklet from './orderPagesBooklet';
 import padPages from './padPages';
 import { gridLayout, printLayout, flipLayout } from './Layouts';
 
-const MODE_FLIP = 'interactive';
-const MODE_PREVIEW = 'grid';
-const MODE_SHEET = 'print';
+import { Mode, Paper, Layout, Marks } from '../Constants';
 
-const ARRANGE_ONE = 'arrange_one';
-const ARRANGE_SPREAD = 'arrange_two';
-const ARRANGE_BOOKLET = 'arrange_booklet';
+const modeAttr = {};
+modeAttr[Mode.PREVIEW] = 'preview';
+modeAttr[Mode.PRINT] = 'print';
+modeAttr[Mode.FLIPBOOK] = 'flip';
 
 class Viewer {
-  constructor({ bindery }) {
+  constructor({ bindery, mode, layout, marks, ControlsComponent }) {
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
-    this.zoomBox = h(c('.zoom-wrap'));
-    this.element = h(c('.root'), this.zoomBox);
+    this.progressBar = el('.progress-bar');
+    this.zoomBox = el('zoom-wrap');
+    this.element = el('root', [this.progressBar, this.zoomBox]);
 
     this.doubleSided = true;
-    this.printArrange = ARRANGE_ONE;
-    this.isShowingCropMarks = true;
-    this.isShowingBleedMarks = false;
+    this.printArrange = layout;
 
-    this.mode = MODE_PREVIEW;
-    this.element.setAttribute('bindery-view-mode', this.mode);
+    this.setMarks(marks);
+    this.mode = mode;
+    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
     this.currentLeaf = 0;
 
     this.listenForPrint();
     this.listenForResize();
 
-    this.setGrid = this.setGrid.bind(this);
     this.setPrint = this.setPrint.bind(this);
-    this.setFlip = this.setFlip.bind(this);
 
-    this.controls = new Controls({ binder: bindery, viewer: this });
+    if (ControlsComponent) {
+      this.controls = new ControlsComponent(
+        { Mode, Paper, Layout, Marks }, // Available options
+        { // Initial props
+          paper: this.pageSetup.sheetSizeMode,
+          layout: this.printArrange,
+          mode: this.mode,
+          marks,
+        },
+        { // Actions
+          setMode: (newMode) => {
+            if (newMode === this.mode) return;
+            this.mode = newMode;
+            this.render();
+          },
+          setPaper: this.setSheetSize.bind(this),
+          setLayout: this.setPrintArrange.bind(this),
+          setMarks: this.setMarks.bind(this),
+          getPageSize: () => this.pageSetup.displaySize,
+        }
+      );
+      this.element.appendChild(this.controls.element);
+    }
 
     this.element.classList.add(c('in-progress'));
 
-    this.element.appendChild(this.controls.element);
     document.body.appendChild(this.element);
   }
 
@@ -86,11 +102,11 @@ class Viewer {
 
   setInProgress() {
     this.element.classList.add(c('in-progress'));
-    this.controls.setInProgress();
+    if (this.controls) this.controls.setInProgress();
   }
 
   get isTwoUp() {
-    return this.printArrange !== ARRANGE_ONE;
+    return this.printArrange !== Layout.PAGES;
   }
 
   get isShowingCropMarks() {
@@ -108,7 +124,6 @@ class Viewer {
   get isShowingBleedMarks() {
     return this.element.classList.contains(c('show-bleed-marks'));
   }
-
   set isShowingBleedMarks(newVal) {
     if (newVal) {
       this.element.classList.add(c('show-bleed-marks'));
@@ -119,10 +134,10 @@ class Viewer {
   }
 
   setSheetSize(newVal) {
-    this.pageSetup.setSheetSizeMode(newVal);
+    this.pageSetup.sheetSizeMode = newVal;
     this.pageSetup.updateStylesheet();
 
-    if (this.mode !== MODE_SHEET) {
+    if (this.mode !== Mode.PRINT) {
       this.setPrint();
     }
     this.updateZoom();
@@ -136,10 +151,32 @@ class Viewer {
     this.pageSetup.setPrintTwoUp(this.isTwoUp);
     this.pageSetup.updateStylesheet();
 
-    if (this.mode === MODE_SHEET) {
+    if (this.mode === Mode.PRINT) {
       this.render();
     } else {
       this.setPrint();
+    }
+  }
+
+  setMarks(newVal) {
+    switch (newVal) {
+    case Marks.NONE:
+      this.isShowingCropMarks = false;
+      this.isShowingBleedMarks = false;
+      break;
+    case Marks.CROP:
+      this.isShowingCropMarks = true;
+      this.isShowingBleedMarks = false;
+      break;
+    case Marks.BLEED:
+      this.isShowingCropMarks = false;
+      this.isShowingBleedMarks = true;
+      break;
+    case Marks.BOTH:
+      this.isShowingCropMarks = true;
+      this.isShowingBleedMarks = true;
+      break;
+    default:
     }
   }
 
@@ -170,37 +207,9 @@ class Viewer {
     this.doubleSided = !this.doubleSided;
     this.render();
   }
-  setMode(newMode) {
-    switch (newMode) {
-    case 'grid':
-    case 'default':
-      this.mode = MODE_PREVIEW;
-      break;
-    case 'interactive':
-    case 'flip':
-      this.mode = MODE_FLIP;
-      break;
-    case 'print':
-    case 'sheet':
-      this.mode = MODE_SHEET;
-      break;
-    default:
-      console.error(`Bindery: Unknown view mode "${newMode}"`);
-      break;
-    }
-  }
-  setGrid() {
-    if (this.mode === MODE_PREVIEW) return;
-    this.mode = MODE_PREVIEW;
-    this.render();
-  }
   setPrint() {
-    if (this.mode === MODE_SHEET) return;
-    this.mode = MODE_SHEET;
-    this.render();
-  }
-  setFlip() {
-    this.mode = MODE_FLIP;
+    if (this.mode === Mode.PRINT) return;
+    this.mode = Mode.PRINT;
     this.render();
   }
   render() {
@@ -212,16 +221,18 @@ class Viewer {
 
     this.flaps = [];
     body.classList.add(c('viewing'));
-    this.element.setAttribute('bindery-view-mode', this.mode);
+    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
 
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
 
-    this.controls.setDone();
+    if (this.controls) this.controls.setDone(this.book.pages.length);
+    this.progressBar.style.width = '100%';
+
     window.requestAnimationFrame(() => {
-      if (this.mode === MODE_PREVIEW) this.renderGrid();
-      else if (this.mode === MODE_FLIP) this.renderInteractive();
-      else if (this.mode === MODE_SHEET) this.renderPrint();
+      if (this.mode === Mode.PREVIEW) this.renderGrid();
+      else if (this.mode === Mode.FLIPBOOK) this.renderInteractive();
+      else if (this.mode === Mode.PRINT) this.renderPrint();
       else this.renderGrid();
 
       body.scrollTop = scrollMax * scrollPct;
@@ -232,27 +243,36 @@ class Viewer {
   renderProgress(book) {
     this.book = book;
 
-    this.controls.updateProgress(
-      this.book.pages.length,
-      this.book.estimatedProgress
-    );
+    this.progressBar.style.width = `${this.book.estimatedProgress * 100}%`;
 
-    const twoPageSpread = function (...arg) {
-      return h(c('.spread-wrapper') + c('.spread-size'), ...arg);
+    if (this.controls) {
+      this.controls.updateProgress(
+        this.book.pages.length,
+        this.book.estimatedProgress
+      );
+    }
+
+    const sideBySide =
+      this.mode === Mode.PREVIEW
+      || (this.mode === Mode.PRINT && this.printArrange !== Layout.PAGES);
+    const limit = sideBySide ? 2 : 1;
+
+    const makeSpread = function (...arg) {
+      return el('.spread-wrapper', [...arg]);
     };
 
     this.book.pages.forEach((page, i) => {
       // If hasn't been added, or not in spread yet
       if (!this.zoomBox.contains(page.element) || page.element.parentNode === this.zoomBox) {
-        if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < 2) {
+        if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
           this.lastSpreadInProgress.appendChild(page.element);
         } else {
-          if (i === 0) {
+          if (i === 0 && sideBySide) {
             const spacer = new Page();
             spacer.element.style.visibility = 'hidden';
-            this.lastSpreadInProgress = twoPageSpread(spacer.element, page.element);
+            this.lastSpreadInProgress = makeSpread(spacer.element, page.element);
           } else {
-            this.lastSpreadInProgress = twoPageSpread(page.element);
+            this.lastSpreadInProgress = makeSpread(page.element);
           }
           this.zoomBox.appendChild(this.lastSpreadInProgress);
         }
@@ -283,10 +303,10 @@ class Viewer {
 
     this.zoomBox.innerHTML = '';
 
-    const isBooklet = this.printArrange === ARRANGE_BOOKLET;
+    const isBooklet = this.printArrange === Layout.BOOKLET;
 
     let pages = this.book.pages.slice();
-    if (this.printArrange === ARRANGE_SPREAD) {
+    if (this.printArrange === Layout.SPREADS) {
       pages = padPages(pages, () => new Page());
     } else if (isBooklet) {
       pages = orderPagesBooklet(pages, () => new Page());

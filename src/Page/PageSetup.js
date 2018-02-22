@@ -1,6 +1,7 @@
 import Page from '../Page';
 import { isValidSize, parseVal } from '../utils/convertUnits';
 import { c } from '../utils';
+import { Paper, Layout } from '../Constants';
 
 
 const letter = { width: '8.5in', height: '11in' };
@@ -24,9 +25,11 @@ class PageSetup {
     this.setSize(opts.size || defaultPageSetup.size);
     this.setMargin(opts.margin || defaultPageSetup.margin);
     this.setBleed(opts.bleed || defaultPageSetup.bleed);
+  }
 
-    this.printTwoUp = false;
-    this.sheetSizeMode = supportsCustomPageSize ? 'size_page' : 'size_page_marks';
+  setupPaper(opts = {}) {
+    this.sheetSizeMode = supportsCustomPageSize ? (opts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
+    this.printTwoUp = opts.layout && opts.layout !== Layout.PAGES;
   }
 
   setSize(size) {
@@ -41,10 +44,6 @@ class PageSetup {
 
   setBleed(newBleed) {
     this.bleed = newBleed;
-  }
-
-  setSheetSizeMode(mode) {
-    this.sheetSizeMode = mode;
   }
 
   setPrintTwoUp(newVal) {
@@ -73,26 +72,26 @@ class PageSetup {
     const b = this.bleed;
 
     switch (this.sheetSizeMode) {
-    case 'size_page':
+    case Paper.AUTO:
       return { width, height };
-    case 'size_page_bleed':
+    case Paper.AUTO_BLEED:
       return {
         width: `calc(${width} + ${b} + ${b})`,
         height: `calc(${height} + ${b} + ${b})`,
       };
-    case 'size_page_marks':
+    case Paper.AUTO_MARKS:
       // TODO: 24pt marks is hardcoded
       return {
         width: `calc(${width} + ${b} + ${b} + 24pt)`,
         height: `calc(${height} + ${b} + ${b} + 24pt)`,
       };
-    case 'size_letter_l':
+    case Paper.LETTER_LANDSCAPE:
       return { width: letter.height, height: letter.width };
-    case 'size_letter_p':
+    case Paper.LETTER_PORTRAIT:
       return letter;
-    case 'size_a4_p':
+    case Paper.A4_PORTRAIT:
       return a4;
-    case 'size_a4_l':
+    case Paper.A4_LANDSCAPE:
       return { width: a4.height, height: a4.width };
     default:
     }
@@ -131,9 +130,9 @@ ${c('.show-crop')} ${c('.print-page')} ${c('.spread-wrapper')},
 ${c('.show-bleed-marks')} ${c('.print-page')} ${c('.spread-wrapper')} {
   margin: calc(${this.bleed} + 12pt) auto;
 }
-${c('.page-size')} {
-  height: ${this.size.height};
-  width: ${this.size.width};
+html {
+  --bindery-page-width: ${this.size.width};
+  --bindery-page-height: ${this.size.height};
 }
 ${c('.page-size-rotated')} {
   height: ${this.size.width};

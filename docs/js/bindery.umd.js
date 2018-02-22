@@ -1,11 +1,11 @@
-/* 📖 Bindery v2.0.0-alpha.10.1 */
+/* 📖 Bindery v2.1.0 */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global.Bindery = factory());
 }(this, (function () { 'use strict';
 
-var BINDERY_VERSION = 'v2.0.0-alpha.10.1'
+var BINDERY_VERSION = 'v2.1.0'
 
 function ___$insertStyle(css) {
   if (!css) {
@@ -23,1389 +23,6 @@ function ___$insertStyle(css) {
 
   return css;
 }
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
-/*!
- * Cross-Browser Split 1.1.1
- * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
- * Available under the MIT License
- * ECMAScript compliant, uniform cross-browser split method
- */
-
-/**
- * Splits a string into an array of strings using a regex or string separator. Matches of the
- * separator are not included in the result array. However, if `separator` is a regex that contains
- * capturing groups, backreferences are spliced into the result each time `separator` is matched.
- * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
- * cross-browser.
- * @param {String} str String to split.
- * @param {RegExp|String} separator Regex or string to use for separating the string.
- * @param {Number} [limit] Maximum number of items to include in the result array.
- * @returns {Array} Array of substrings.
- * @example
- *
- * // Basic use
- * split('a b c d', ' ');
- * // -> ['a', 'b', 'c', 'd']
- *
- * // With limit
- * split('a b c d', ' ', 2);
- * // -> ['a', 'b']
- *
- * // Backreferences in result array
- * split('..word1 word2..', /([a-z]+)(\d+)/i);
- * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
- */
-var browserSplit = (function split(undef) {
-
-  var nativeSplit = String.prototype.split,
-    compliantExecNpcg = /()??/.exec("")[1] === undef,
-    // NPCG: nonparticipating capturing group
-    self;
-
-  self = function(str, separator, limit) {
-    // If `separator` is not a regex, use `nativeSplit`
-    if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
-      return nativeSplit.call(str, separator, limit);
-    }
-    var output = [],
-      flags = (separator.ignoreCase ? "i" : "") + (separator.multiline ? "m" : "") + (separator.extended ? "x" : "") + // Proposed for ES6
-      (separator.sticky ? "y" : ""),
-      // Firefox 3+
-      lastLastIndex = 0,
-      // Make `global` and avoid `lastIndex` issues by working with a copy
-      separator = new RegExp(separator.source, flags + "g"),
-      separator2, match, lastIndex, lastLength;
-    str += ""; // Type-convert
-    if (!compliantExecNpcg) {
-      // Doesn't need flags gy, but they don't hurt
-      separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
-    }
-    /* Values for `limit`, per the spec:
-     * If undefined: 4294967295 // Math.pow(2, 32) - 1
-     * If 0, Infinity, or NaN: 0
-     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
-     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
-     * If other: Type-convert, then use the above rules
-     */
-    limit = limit === undef ? -1 >>> 0 : // Math.pow(2, 32) - 1
-    limit >>> 0; // ToUint32(limit)
-    while (match = separator.exec(str)) {
-      // `separator.lastIndex` is not reliable cross-browser
-      lastIndex = match.index + match[0].length;
-      if (lastIndex > lastLastIndex) {
-        output.push(str.slice(lastLastIndex, match.index));
-        // Fix browsers whose `exec` methods don't consistently return `undefined` for
-        // nonparticipating capturing groups
-        if (!compliantExecNpcg && match.length > 1) {
-          match[0].replace(separator2, function() {
-            for (var i = 1; i < arguments.length - 2; i++) {
-              if (arguments[i] === undef) {
-                match[i] = undef;
-              }
-            }
-          });
-        }
-        if (match.length > 1 && match.index < str.length) {
-          Array.prototype.push.apply(output, match.slice(1));
-        }
-        lastLength = match[0].length;
-        lastLastIndex = lastIndex;
-        if (output.length >= limit) {
-          break;
-        }
-      }
-      if (separator.lastIndex === match.index) {
-        separator.lastIndex++; // Avoid an infinite loop
-      }
-    }
-    if (lastLastIndex === str.length) {
-      if (lastLength || !separator.test("")) {
-        output.push("");
-      }
-    } else {
-      output.push(str.slice(lastLastIndex));
-    }
-    return output.length > limit ? output.slice(0, limit) : output;
-  };
-
-  return self;
-})();
-
-var indexOf = [].indexOf;
-
-var indexof = function(arr, obj){
-  if (indexOf) return arr.indexOf(obj);
-  for (var i = 0; i < arr.length; ++i) {
-    if (arr[i] === obj) return i;
-  }
-  return -1;
-};
-
-// contains, add, remove, toggle
-
-
-var classList = ClassList;
-
-function ClassList(elem) {
-    var cl = elem.classList;
-
-    if (cl) {
-        return cl
-    }
-
-    var classList = {
-        add: add
-        , remove: remove
-        , contains: contains
-        , toggle: toggle
-        , toString: $toString
-        , length: 0
-        , item: item
-    };
-
-    return classList
-
-    function add(token) {
-        var list = getTokens();
-        if (indexof(list, token) > -1) {
-            return
-        }
-        list.push(token);
-        setTokens(list);
-    }
-
-    function remove(token) {
-        var list = getTokens()
-            , index = indexof(list, token);
-
-        if (index === -1) {
-            return
-        }
-
-        list.splice(index, 1);
-        setTokens(list);
-    }
-
-    function contains(token) {
-        return indexof(getTokens(), token) > -1
-    }
-
-    function toggle(token) {
-        if (contains(token)) {
-            remove(token);
-            return false
-        } else {
-            add(token);
-            return true
-        }
-    }
-
-    function $toString() {
-        return elem.className
-    }
-
-    function item(index) {
-        var tokens = getTokens();
-        return tokens[index] || null
-    }
-
-    function getTokens() {
-        var className = elem.className;
-
-        return filter(className.split(" "), isTruthy)
-    }
-
-    function setTokens(list) {
-        var length = list.length;
-
-        elem.className = list.join(" ");
-        classList.length = length;
-
-        for (var i = 0; i < list.length; i++) {
-            classList[i] = list[i];
-        }
-
-        delete list[length];
-    }
-}
-
-function filter (arr, fn) {
-    var ret = [];
-    for (var i = 0; i < arr.length; i++) {
-        if (fn(arr[i])) ret.push(arr[i]);
-    }
-    return ret
-}
-
-function isTruthy(value) {
-    return !!value
-}
-
-/**
- * Utils for HTML attributes
- * @module html-attributes
- */
-
-// property to attribute names
-var PROPS_TO_ATTRS = {
-  'className': 'class',
-  'htmlFor': 'for',
-};
-
-// map of attributes to the elements they affect
-// see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
-var HTML_ATTRIBUTES = {
-  'accept': new Set([
-    'form',
-    'input',
-  ]),
-
-  'accept-charset': new Set([
-    'form',
-  ]),
-
-  'accesskey': 'GLOBAL',
-
-  'action': new Set([
-    'form',
-  ]),
-
-  'align': new Set([
-    'applet',
-    'caption',
-    'col',
-    'colgroup',
-    'hr',
-    'iframe',
-    'img',
-    'table',
-    'tbody',
-    'td',
-    'tfoot',
-    'th',
-    'thead',
-    'tr',
-  ]),
-
-  'alt': new Set([
-    'applet',
-    'area',
-    'img',
-    'input',
-  ]),
-
-  'async': new Set([
-    'script',
-  ]),
-
-  'autocomplete': new Set([
-    'form',
-    'input',
-  ]),
-
-  'autofocus': new Set([
-    'button',
-    'input',
-    'keygen',
-    'select',
-    'textarea',
-  ]),
-
-  'autoplay': new Set([
-    'audio',
-    'video',
-  ]),
-
-  'autosave': new Set([
-    'input',
-  ]),
-
-  'bgcolor': new Set([
-    'body',
-    'col',
-    'colgroup',
-    'marquee',
-    'table',
-    'tbody',
-    'tfoot',
-    'td',
-    'th',
-    'tr',
-  ]),
-
-  'border': new Set([
-    'img',
-    'object',
-    'table',
-  ]),
-
-  'buffered': new Set([
-    'audio',
-    'video',
-  ]),
-
-  'challenge': new Set([
-    'keygen',
-  ]),
-
-  'charset': new Set([
-    'meta',
-    'script',
-  ]),
-
-  'checked': new Set([
-    'command',
-    'input',
-  ]),
-
-  'cite': new Set([
-    'blockquote',
-    'del',
-    'ins',
-    'q',
-  ]),
-
-  'class': 'GLOBAL',
-
-  'code': new Set([
-    'applet',
-  ]),
-
-  'codebase': new Set([
-    'applet',
-  ]),
-
-  'color': new Set([
-    'basefont',
-    'font',
-    'hr',
-  ]),
-
-  'cols': new Set([
-    'textarea',
-  ]),
-
-  'colspan': new Set([
-    'td',
-    'th',
-  ]),
-
-  'content': new Set([
-    'meta',
-  ]),
-
-  'contenteditable': 'GLOBAL',
-
-  'contextmenu': 'GLOBAL',
-
-  'controls': new Set([
-    'audio',
-    'video',
-  ]),
-
-  'coords': new Set([
-    'area',
-  ]),
-
-  'data': new Set([
-    'object',
-  ]),
-
-  'datetime': new Set([
-    'del',
-    'ins',
-    'time',
-  ]),
-
-  'default': new Set([
-    'track',
-  ]),
-
-  'defer': new Set([
-    'script',
-  ]),
-
-  'dir': 'GLOBAL',
-
-  'dirname': new Set([
-    'input',
-    'textarea',
-  ]),
-
-  'disabled': new Set([
-    'button',
-    'command',
-    'fieldset',
-    'input',
-    'keygen',
-    'optgroup',
-    'option',
-    'select',
-    'textarea',
-  ]),
-
-  'download': new Set([
-    'a',
-    'area',
-  ]),
-
-  'draggable': 'GLOBAL',
-
-  'dropzone': 'GLOBAL',
-
-  'enctype': new Set([
-    'form',
-  ]),
-
-  'for': new Set([
-    'label',
-    'output',
-  ]),
-
-  'form': new Set([
-    'button',
-    'fieldset',
-    'input',
-    'keygen',
-    'label',
-    'meter',
-    'object',
-    'output',
-    'progress',
-    'select',
-    'textarea',
-  ]),
-
-  'formaction': new Set([
-    'input',
-    'button',
-  ]),
-
-  'headers': new Set([
-    'td',
-    'th',
-  ]),
-
-  'height': new Set([
-    'canvas',
-    'embed',
-    'iframe',
-    'img',
-    'input',
-    'object',
-    'video',
-  ]),
-
-  'hidden': 'GLOBAL',
-
-  'high': new Set([
-    'meter',
-  ]),
-
-  'href': new Set([
-    'a',
-    'area',
-    'base',
-    'link',
-  ]),
-
-  'hreflang': new Set([
-    'a',
-    'area',
-    'link',
-  ]),
-
-  'http-equiv': new Set([
-    'meta',
-  ]),
-
-  'icon': new Set([
-    'command',
-  ]),
-
-  'id': 'GLOBAL',
-
-  'ismap': new Set([
-    'img',
-  ]),
-
-  'itemprop': 'GLOBAL',
-
-  'keytype': new Set([
-    'keygen',
-  ]),
-
-  'kind': new Set([
-    'track',
-  ]),
-
-  'label': new Set([
-    'track',
-  ]),
-
-  'lang': 'GLOBAL',
-
-  'language': new Set([
-    'script',
-  ]),
-
-  'list': new Set([
-    'input',
-  ]),
-
-  'loop': new Set([
-    'audio',
-    'bgsound',
-    'marquee',
-    'video',
-  ]),
-
-  'low': new Set([
-    'meter',
-  ]),
-
-  'manifest': new Set([
-    'html',
-  ]),
-
-  'max': new Set([
-    'input',
-    'meter',
-    'progress',
-  ]),
-
-  'maxlength': new Set([
-    'input',
-    'textarea',
-  ]),
-
-  'media': new Set([
-    'a',
-    'area',
-    'link',
-    'source',
-    'style',
-  ]),
-
-  'method': new Set([
-    'form',
-  ]),
-
-  'min': new Set([
-    'input',
-    'meter',
-  ]),
-
-  'multiple': new Set([
-    'input',
-    'select',
-  ]),
-
-  'muted': new Set([
-    'video',
-  ]),
-
-  'name': new Set([
-    'button',
-    'form',
-    'fieldset',
-    'iframe',
-    'input',
-    'keygen',
-    'object',
-    'output',
-    'select',
-    'textarea',
-    'map',
-    'meta',
-    'param',
-  ]),
-
-  'novalidate': new Set([
-    'form',
-  ]),
-
-  'open': new Set([
-    'details',
-  ]),
-
-  'optimum': new Set([
-    'meter',
-  ]),
-
-  'pattern': new Set([
-    'input',
-  ]),
-
-  'ping': new Set([
-    'a',
-    'area',
-  ]),
-
-  'placeholder': new Set([
-    'input',
-    'textarea',
-  ]),
-
-  'poster': new Set([
-    'video',
-  ]),
-
-  'preload': new Set([
-    'audio',
-    'video',
-  ]),
-
-  'radiogroup': new Set([
-    'command',
-  ]),
-
-  'readonly': new Set([
-    'input',
-    'textarea',
-  ]),
-
-  'rel': new Set([
-    'a',
-    'area',
-    'link',
-  ]),
-
-  'required': new Set([
-    'input',
-    'select',
-    'textarea',
-  ]),
-
-  'reversed': new Set([
-    'ol',
-  ]),
-
-  'rows': new Set([
-    'textarea',
-  ]),
-
-  'rowspan': new Set([
-    'td',
-    'th',
-  ]),
-
-  'sandbox': new Set([
-    'iframe',
-  ]),
-
-  'scope': new Set([
-    'th',
-  ]),
-
-  'scoped': new Set([
-    'style',
-  ]),
-
-  'seamless': new Set([
-    'iframe',
-  ]),
-
-  'selected': new Set([
-    'option',
-  ]),
-
-  'shape': new Set([
-    'a',
-    'area',
-  ]),
-
-  'size': new Set([
-    'input',
-    'select',
-  ]),
-
-  'sizes': new Set([
-    'img',
-    'link',
-    'source',
-  ]),
-
-  'span': new Set([
-    'col',
-    'colgroup',
-  ]),
-
-  'spellcheck': 'GLOBAL',
-
-  'src': new Set([
-    'audio',
-    'embed',
-    'iframe',
-    'img',
-    'input',
-    'script',
-    'source',
-    'track',
-    'video',
-  ]),
-
-  'srcdoc': new Set([
-    'iframe',
-  ]),
-
-  'srclang': new Set([
-    'track',
-  ]),
-
-  'srcset': new Set([
-    'img',
-  ]),
-
-  'start': new Set([
-    'ol',
-  ]),
-
-  'step': new Set([
-    'input',
-  ]),
-
-  'style': 'GLOBAL',
-
-  'summary': new Set([
-    'table',
-  ]),
-
-  'tabindex': 'GLOBAL',
-
-  'target': new Set([
-    'a',
-    'area',
-    'base',
-    'form',
-  ]),
-
-  'title': 'GLOBAL',
-
-  'type': new Set([
-    'button',
-    'input',
-    'command',
-    'embed',
-    'object',
-    'script',
-    'source',
-    'style',
-    'menu',
-  ]),
-
-  'usemap': new Set([
-    'img',
-    'input',
-    'object',
-  ]),
-
-  'value': new Set([
-    'button',
-    'option',
-    'input',
-    'li',
-    'meter',
-    'progress',
-    'param',
-  ]),
-
-  'width': new Set([
-    'canvas',
-    'embed',
-    'iframe',
-    'img',
-    'input',
-    'object',
-    'video',
-  ]),
-
-  'wrap': new Set([
-    'textarea',
-  ]),
-};
-
-function isStandardAttribute(attrName, tagName) {
-  tagName = tagName.toLowerCase();
-  var attr = HTML_ATTRIBUTES[attrName.toLowerCase()];
-  return !!attr && (
-    attr === 'GLOBAL' ||
-    attr.has(tagName)
-  );
-}
-
-function propToAttr(prop) {
-  return PROPS_TO_ATTRS[prop] || prop;
-}
-
-var htmlAttributes = {
-  isStandardAttribute: isStandardAttribute,
-  propToAttr: propToAttr,
-};
-
-function Document() {}
-
-Document.prototype.createTextNode = function(v) {
-    var n = new Text();
-    n.textContent = v;
-    n.nodeName = '#text';
-    n.nodeType = 3;
-    return n;
-};
-
-Document.prototype.createElement = function(nodeName) {
-    var el = new Element();
-    el.nodeName = el.tagName = nodeName;
-    return el;
-};
-
-Document.prototype.createComment = function(data) {
-    var el = new Comment();
-    el.data = data;
-    return el;
-};
-
-
-function Node$1 () {}
-
-Text.prototype = new Node$1();
-
-Element.prototype = new Node$1();
-
-Comment.prototype = new Node$1();
-
-
-function Style (el) {
-  this.el = el;
-  this.styles = [];
-}
-
-Style.prototype.setProperty = function (n,v) {
-    this.el._setProperty(this.styles, {name: n, value:v});
-};
-
-Style.prototype.getProperty = function(n) {
-    return this.el._getProperty(this.styles, n);
-};
-
-Style.prototype.__defineGetter__('cssText', function () {
-    var stylified = '';
-    this.styles.forEach(function(s){
-      stylified+=s.name+':'+s.value+';';
-    });
-    return stylified;
-});
-
-Style.prototype.__defineSetter__('cssText', function (v) {
-    this.styles.length = 0;
-
-    // parse cssText and set style attributes
-    v.split(';').forEach(function(part){
-      var splitPoint = part.indexOf(':');
-      if (splitPoint){
-        var key = part.slice(0, splitPoint).trim();
-        var value = part.slice(splitPoint+1).trim();
-        this.setProperty(key, value);
-      }
-    }, this);
-});
-
-function Attribute(name, value){
-  if (name) {
-    this.name = name;
-    this.value = value ? value : '';
-  }
-}
-
-
-function Element() {
-    var self = this;
-
-    this.style = new Style(this);
-    this.classList = classList(this);
-    this.childNodes = [];
-    this.attributes = [];
-    this.dataset = {};
-    this.className = '';
-
-    this._setProperty = function(arr, obj, key, val) {
-      var p = self._getProperty(arr, key);
-      if (p) {
-        p.value = String(val);
-        return;
-      }
-      arr.push('function' === typeof obj ? new obj(key.toLowerCase(),String(val)) : obj);
-    };
-
-    this._getProperty = function (arr, key) {
-      if (!key) return;
-      key = key.toLowerCase();
-      for (var i=0;i<arr.length;i++) {
-        if (key == arr[i].name) return arr[i];
-      }
-    };
-}
-
-Element.prototype.nodeType = 1;
-
-Element.prototype.appendChild = function (child) {
-    child.parentElement = this;
-    this.childNodes.push(child);
-    return child;
-};
-
-Element.prototype.setAttribute = function (n, v) {
-  if (n == 'style'){
-    this.style.cssText = v;
-  } else {
-    this._setProperty(this.attributes, Attribute, n, v);
-  }
-};
-
-Element.prototype.getAttribute = function (n) {
-  if (n == 'style'){
-    return this.style.cssText
-  } else {
-    var result = this._getProperty(this.attributes, n);
-    return typeof result !== 'undefined' ? result.value : null;
-  }
-};
-
-Element.prototype.removeAttribute = function (n) {
-  if (n === 'class') {
-    delete this.className;
-  } else {
-    for (var i = 0, len = this.attributes.length; i < len; i++) {
-      if (this.attributes[i].name === n) {
-        this.attributes.splice(i, 1);
-        break;
-      }
-    }
-  }
-};
-
-Element.prototype.replaceChild = function(newChild, oldChild) {
-    var self = this;
-    var replaced = false;
-    this.childNodes.forEach(function(child, index){
-        if (child === oldChild) {
-            self.childNodes[index] = newChild;
-            newChild.parentElement = this;
-            replaced = true;
-        }
-    });
-    if (replaced) return oldChild;
-};
-
-Element.prototype.removeChild = function(rChild) {
-    var self = this;
-    var removed = true;
-    this.childNodes.forEach(function(child, index){
-        if (child === rChild) {
-          // use splice to keep a clean childNode array
-          self.childNodes.splice(index, 1);
-          rChild.parentElement = null;
-          removed = true;
-        }
-    });
-    if (removed) return rChild;
-};
-
-Element.prototype.insertBefore = function (newChild, existingChild) {
-  var childNodes = this.childNodes;
-
-  if (existingChild === null) {
-    childNodes.push(newChild);
-  } else {
-    for (var i = 0, len = childNodes.length; i < len; i++) {
-      var child = childNodes[i];
-      if (child === existingChild) {
-        i === 0 ? childNodes.unshift(newChild) : childNodes.splice(i, 0, newChild);
-        break;
-      }
-    }
-  }
-  newChild.parentElement = this;
-
-  return newChild;
-};
-
-Element.prototype.addEventListener = function(type, listener, useCapture, wantsUntrusted) {
-  // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget.addEventListener
-  // There is an implementation there but probably not worth it.
-};
-
-Element.prototype.removeEventListener = function(type, listener, useCapture) {
-  // https://developer.mozilla.org/en/docs/Web/API/EventTarget.removeEventListener
-  // There is an implementation there but probably not worth it.
-};
-
-Element.prototype.insertAdjacentHTML = function(position, text) {
-  // https://developer.mozilla.org/en-US/docs/Web/API/Element.insertAdjacentHTML
-  // Not too much work to implement similar to innerHTML below.
-};
-
-Element.prototype.__defineGetter__('innerHTML', function () {
-    // regurgitate set innerHTML
-    var s = this.childNodes.html || '';
-    this.childNodes.forEach(function (e) {
-      s += (e.outerHTML || e.textContent);
-    });
-    return s
-});
-
-Element.prototype.__defineSetter__('innerHTML', function (v) {
-    //only handle this simple case that doesn't need parsing
-    //this case is useful... parsing is hard and will need added deps!
-    this.childNodes.length = 0;
-
-    // hack to preserve set innerHTML - no parsing just regurgitation
-    this.childNodes.html = v;
-});
-
-
-Element.prototype.__defineGetter__('outerHTML', function () {
-  var a = [],  self = this;
-  var VOID_ELEMENTS = {
-    AREA: true,
-    BASE: true,
-    BR: true,
-    COL: true,
-    EMBED: true,
-    HR: true,
-    IMG: true,
-    INPUT: true,
-    KEYGEN: true,
-    LINK: true,
-    META: true,
-    PARAM: true,
-    SOURCE: true,
-    TRACK: true,
-    WBR: true
-  };
-
-  function _stringify(arr) {
-    var attr = [], value;
-    arr.forEach(function(a){
-      value = ('style' != a.name) ? a.value : self.style.cssText;
-      attr.push(a.name+'='+'\"'+escapeAttribute(value)+'\"');
-    });
-    return attr.length ? ' '+attr.join(" ") : '';
-  }
-
-  function _dataify(data) {
-    var attr = [], value;
-    Object.keys(data).forEach(function(name){
-      attr.push('data-'+name+'='+'\"'+escapeAttribute(data[name])+'\"');
-    });
-    return attr.length ? ' '+attr.join(" ") : '';
-  }
-
-  function _propertify() {
-    var props = [];
-    for (var key in self) {
-      var attrName = htmlAttributes.propToAttr(key);
-      if (
-        self.hasOwnProperty(key) &&
-        ['string', 'boolean', 'number'].indexOf(typeof self[key]) !== -1 &&
-        htmlAttributes.isStandardAttribute(attrName, self.nodeName) &&
-        _shouldOutputProp(key, attrName)
-      ) {
-        props.push({name: attrName, value: self[key]});
-      }
-    }
-    return props ? _stringify(props) : '';
-  }
-
-  function _shouldOutputProp(prop, attr) {
-    if (self.getAttribute(attr)) {
-      // let explicitly-set attributes override props
-      return false;
-    } else {
-      if (prop === 'className' && !self[prop]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  var attrs = this.style.cssText ? this.attributes.concat([{name: 'style'}]) : this.attributes;
-
-  a.push('<'+this.nodeName + _propertify() + _stringify(attrs) + _dataify(this.dataset) +'>');
-
-  if (!VOID_ELEMENTS[this.nodeName.toUpperCase()]){
-    a.push(this.innerHTML);
-    a.push('</'+this.nodeName+'>');
-  }
-
-  return a.join('')
-});
-
-Element.prototype.__defineGetter__('textContent', function () {
-  var s = '';
-  this.childNodes.forEach(function (e) {
-    s += e.textContent;
-  });
-  return s
-});
-
-Element.prototype.__defineSetter__('textContent', function (v) {
-  var textNode = new Text();
-  textNode.textContent = v;
-  this.childNodes = [textNode];
-  return v
-});
-
-Element.prototype.addEventListener = function(t, l) {};
-
-function escapeHTML(s) {
-  return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-}
-
-function escapeAttribute(s) {
-  return escapeHTML(s).replace(/"/g, '&quot;')
-}
-
-Element.prototype.nodeValue = null;
-
-function Text(){}
-
-Text.prototype.nodeType = 3;
-
-Text.prototype.nodeName = '#text';
-
-Text.prototype.__defineGetter__('textContent', function() {
-  return escapeHTML(this.value || '');
-});
-
-Text.prototype.__defineSetter__('textContent', function(v) {
-  this.value = v;
-});
-
-Text.prototype.__defineGetter__('nodeValue', function() {
-  return escapeHTML(this.value || '');
-});
-
-Text.prototype.__defineSetter__('nodeValue', function(v) {
-  this.value = v;
-});
-
-Text.prototype.__defineGetter__('length', function() {
-  return (this.value || '').length;
-});
-
-Text.prototype.replaceData = function(offset, length, str) {
-  this.value = this.value.slice(0, offset) + str + this.value.slice(offset + length);
-};
-
-function Comment(){}
-
-Comment.prototype.nodeType = 8;
-
-Comment.prototype.nodeName = '#comment';
-
-Comment.prototype.__defineGetter__('data', function() {
-  return this.value
-});
-
-Comment.prototype.__defineSetter__('data', function(v) {
-  this.value = v;
-});
-
-Comment.prototype.__defineGetter__('outerHTML', function() {
-  return '<!--' + escapeHTML(this.value || '') + '-->'
-});
-
-Comment.prototype.__defineGetter__('nodeValue', function() {
-  return escapeHTML(this.value || '');
-});
-
-Comment.prototype.__defineSetter__('nodeValue', function(v) {
-  this.value = v;
-});
-
-function defineParentNode (obj) {
-  obj.__defineGetter__('parentNode', function () { return this.parentElement });
-}
-
-defineParentNode(Element.prototype);
-defineParentNode(Comment.prototype);
-defineParentNode(Text.prototype);
-defineParentNode(Node$1.prototype);
-
-var htmlElement = {
-  Document: Document,
-  Node: Node$1,
-  Element: Element,
-  Comment: Comment,
-  Text: Text,
-  document: new Document(),
-};
-
-var hyperscript = createCommonjsModule(function (module) {
-var w = typeof window === 'undefined' ? htmlElement : window;
-var document = w.document;
-var Text = w.Text;
-
-function context () {
-
-  var cleanupFuncs = [];
-
-  function h() {
-    var args = [].slice.call(arguments), e = null;
-    function item (l) {
-      var r;
-      function parseClass (string) {
-        // Our minimal parser doesn’t understand escaping CSS special
-        // characters like `#`. Don’t use them. More reading:
-        // https://mathiasbynens.be/notes/css-escapes .
-
-        var m = browserSplit(string, /([\.#]?[^\s#.]+)/);
-        if(/^\.|#/.test(m[1]))
-          e = document.createElement('div');
-        forEach(m, function (v) {
-          var s = v.substring(1,v.length);
-          if(!v) return
-          if(!e)
-            e = document.createElement(v);
-          else if (v[0] === '.')
-            classList(e).add(s);
-          else if (v[0] === '#')
-            e.setAttribute('id', s);
-        });
-      }
-
-      if(l == null)
-        ;
-      else if('string' === typeof l) {
-        if(!e)
-          parseClass(l);
-        else
-          e.appendChild(r = document.createTextNode(l));
-      }
-      else if('number' === typeof l
-        || 'boolean' === typeof l
-        || l instanceof Date
-        || l instanceof RegExp ) {
-          e.appendChild(r = document.createTextNode(l.toString()));
-      }
-      //there might be a better way to handle this...
-      else if (isArray(l))
-        forEach(l, item);
-      else if(isNode(l))
-        e.appendChild(r = l);
-      else if(l instanceof Text)
-        e.appendChild(r = l);
-      else if ('object' === typeof l) {
-        for (var k in l) {
-          if('function' === typeof l[k]) {
-            if(/^on\w+/.test(k)) {
-              (function (k, l) { // capture k, l in the closure
-                if (e.addEventListener){
-                  e.addEventListener(k.substring(2), l[k], false);
-                  cleanupFuncs.push(function(){
-                    e.removeEventListener(k.substring(2), l[k], false);
-                  });
-                }else{
-                  e.attachEvent(k, l[k]);
-                  cleanupFuncs.push(function(){
-                    e.detachEvent(k, l[k]);
-                  });
-                }
-              })(k, l);
-            } else {
-              // observable
-              e[k] = l[k]();
-              cleanupFuncs.push(l[k](function (v) {
-                e[k] = v;
-              }));
-            }
-          }
-          else if(k === 'style') {
-            if('string' === typeof l[k]) {
-              e.style.cssText = l[k];
-            }else{
-              for (var s in l[k]) (function(s, v) {
-                if('function' === typeof v) {
-                  // observable
-                  e.style.setProperty(s, v());
-                  cleanupFuncs.push(v(function (val) {
-                    e.style.setProperty(s, val);
-                  }));
-                } else
-                  var match = l[k][s].match(/(.*)\W+!important\W*$/);
-                  if (match) {
-                    e.style.setProperty(s, match[1], 'important');
-                  } else {
-                    e.style.setProperty(s, l[k][s]);
-                  }
-              })(s, l[k][s]);
-            }
-          } else if(k === 'attrs') {
-            for (var v in l[k]) {
-              e.setAttribute(v, l[k][v]);
-            }
-          }
-          else if (k.substr(0, 5) === "data-") {
-            e.setAttribute(k, l[k]);
-          } else {
-            e[k] = l[k];
-          }
-        }
-      } else if ('function' === typeof l) {
-        //assume it's an observable!
-        var v = l();
-        e.appendChild(r = isNode(v) ? v : document.createTextNode(v));
-
-        cleanupFuncs.push(l(function (v) {
-          if(isNode(v) && r.parentElement)
-            r.parentElement.replaceChild(v, r), r = v;
-          else
-            r.textContent = v;
-        }));
-      }
-
-      return r
-    }
-    while(args.length)
-      item(args.shift());
-
-    return e
-  }
-
-  h.cleanup = function () {
-    for (var i = 0; i < cleanupFuncs.length; i++){
-      cleanupFuncs[i]();
-    }
-    cleanupFuncs.length = 0;
-  };
-
-  return h
-}
-
-var h = module.exports = context();
-h.context = context;
-
-function isNode (el) {
-  return el && el.nodeName && el.nodeType
-}
-
-function forEach (arr, fn) {
-  if (arr.forEach) return arr.forEach(fn)
-  for (var i = 0; i < arr.length; i++) fn(arr[i], i);
-}
-
-function isArray (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]'
-}
-});
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -1756,15 +373,34 @@ var c = function c(str) {
   return prefix(str);
 };
 
+// Small utility to create div with namespaced classes
+var el = function el(className) {
+  var content = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+  var div = document.createElement('div');
+  div.className = className.split('.').filter(function (txt) {
+    return txt !== '';
+  }).map(c).join(' ');
+
+  if (typeof content === 'string') {
+    div.textContent = content;
+  } else if (Array.isArray(content)) {
+    content.forEach(function (child) {
+      return div.appendChild(child);
+    });
+  }
+  return div;
+};
+
 var Page = function () {
   function Page() {
     classCallCheck(this, Page);
 
-    this.flowContent = hyperscript(c('.content'));
-    this.flowBox = hyperscript(c('.flowbox'), this.flowContent);
-    this.footer = hyperscript(c('.footer'));
-    this.background = hyperscript(c('.background'));
-    this.element = hyperscript(c('.page') + c('.page-size'), this.background, this.flowBox, this.footer);
+    this.flowContent = el('content');
+    this.flowBox = el('flowbox', [this.flowContent]);
+    this.footer = el('footer');
+    this.background = el('background');
+    this.element = el('page', [this.background, this.flowBox, this.footer]);
   }
 
   createClass(Page, [{
@@ -1840,7 +476,7 @@ var Page = function () {
 
       var testPage = new Page();
       var measureArea = document.querySelector(c('.measure-area'));
-      if (!measureArea) measureArea = document.body.appendChild(hyperscript(c('.measure-area')));
+      if (!measureArea) measureArea = document.body.appendChild(el('measure-area'));
 
       measureArea.innerHTML = '';
       measureArea.appendChild(testPage.element);
@@ -2334,9 +970,7 @@ var FullBleedPage = function (_OutOfFlow) {
         book.pages.push(newPage);
       }
       if (this.rotate !== 'none') {
-        var rotateContainer = hyperscript(c('.rotate-container'));
-        rotateContainer.classList.add(c('page-size-rotated'));
-        rotateContainer.classList.add(c('rotate-' + this.rotate));
+        var rotateContainer = el('.rotate-container.page-size-rotated.rotate-' + this.rotate);
         rotateContainer.appendChild(newPage.background);
         newPage.element.appendChild(rotateContainer);
       }
@@ -2390,9 +1024,7 @@ var FullBleedSpread = function (_OutOfFlow) {
 
       if (this.rotate !== 'none') {
         [leftPage, rightPage].forEach(function (page) {
-          var rotateContainer = hyperscript(c('.rotate-container'));
-          rotateContainer.classList.add(c('spread-size-rotated'));
-          rotateContainer.classList.add(c('rotate-spread-' + _this2.rotate));
+          var rotateContainer = el('.rotate-container.spread-size-rotated.rotate-spread-' + _this2.rotate);
           rotateContainer.appendChild(page.background);
           page.element.appendChild(rotateContainer);
         });
@@ -2845,7 +1477,7 @@ var paginate$1 = function paginate(content, rules) {
     var elementsProcessed = 0;
 
     var ruleSet = new RuleSet(rules);
-    var measureArea = document.body.appendChild(hyperscript(c('.measure-area')));
+    var measureArea = document.body.appendChild(el('.measure-area'));
 
     var breadcrumb = []; // Keep track of position in original tree
     var book = new Book();
@@ -3113,6 +1745,34 @@ var paginate$1 = function paginate(content, rules) {
   });
 };
 
+var Mode = Object.freeze({
+  FLIPBOOK: 'view_flipbook',
+  PREVIEW: 'view_preview',
+  PRINT: 'view_print'
+});
+
+var Paper = Object.freeze({
+  AUTO: 'paper_auto',
+  AUTO_BLEED: 'paper_auto_bleed',
+  AUTO_MARKS: 'paper_auto_marks',
+  LETTER_PORTRAIT: 'paper_letter_p',
+  LETTER_LANDSCAPE: 'paper_letter_l',
+  A4_PORTRAIT: 'paper_a4_p',
+  A4_LANDSCAPE: 'paper_a4_l'
+});
+
+var Layout = Object.freeze({
+  PAGES: 'layout_pages',
+  SPREADS: 'layout_spreads',
+  BOOKLET: 'layout_booklet'
+});
+
+var Marks = Object.freeze({
+  NONE: 'marks_none',
+  SPREADS: 'layout_spreads',
+  BOTH: 'marks_both'
+});
+
 var letter = { width: '8.5in', height: '11in' };
 var a4 = { width: '210mm', height: '297mm' };
 var defaultPageSetup = {
@@ -3136,12 +1796,17 @@ var PageSetup = function () {
     this.setSize(opts.size || defaultPageSetup.size);
     this.setMargin(opts.margin || defaultPageSetup.margin);
     this.setBleed(opts.bleed || defaultPageSetup.bleed);
-
-    this.printTwoUp = false;
-    this.sheetSizeMode = supportsCustomPageSize ? 'size_page' : 'size_page_marks';
   }
 
   createClass(PageSetup, [{
+    key: 'setupPaper',
+    value: function setupPaper() {
+      var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      this.sheetSizeMode = supportsCustomPageSize ? opts.paper || Paper.AUTO : Paper.AUTO_MARKS;
+      this.printTwoUp = opts.layout && opts.layout !== Layout.PAGES;
+    }
+  }, {
     key: 'setSize',
     value: function setSize(size) {
       isValidSize(size);
@@ -3157,11 +1822,6 @@ var PageSetup = function () {
     key: 'setBleed',
     value: function setBleed(newBleed) {
       this.bleed = newBleed;
-    }
-  }, {
-    key: 'setSheetSizeMode',
-    value: function setSheetSizeMode(mode) {
-      this.sheetSizeMode = mode;
     }
   }, {
     key: 'setPrintTwoUp',
@@ -3196,7 +1856,7 @@ var PageSetup = function () {
       }
       var w = parseVal(this.size.width);
 
-      sheet.innerHTML = '\n@page { size: ' + this.sheetSize.width + ' ' + this.sheetSize.height + '; }\n' + c('.print-page') + ' { width: ' + this.sheetSize.width + '; height: ' + this.sheetSize.height + ';}\n\n' + c('.show-crop') + ' ' + c('.print-page') + ' ' + c('.spread-wrapper') + ',\n' + c('.show-bleed-marks') + ' ' + c('.print-page') + ' ' + c('.spread-wrapper') + ' {\n  margin: calc(' + this.bleed + ' + 12pt) auto;\n}\n' + c('.page-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + this.size.width + ';\n}\n' + c('.page-size-rotated') + ' {\n  height: ' + this.size.width + ';\n  width: ' + this.size.height + ';\n}\n' + c('.spread-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + w.val * 2 + w.unit + ';\n}\n' + c('.spread-size-rotated') + ' {\n  height: ' + w.val * 2 + w.unit + ';\n  width: ' + this.size.height + ';\n}\n' + c('.flowbox') + ',\n' + c('.footer') + ' {\n  margin-left: ' + this.margin.inner + ';\n  margin-right: ' + this.margin.outer + ';\n}\n' + c('.left') + ' ' + c('.flowbox') + ',\n' + c('.left') + ' ' + c('.footer') + ' {\n  margin-left: ' + this.margin.outer + ';\n  margin-right: ' + this.margin.inner + ';\n}\n\n' + c('.left') + ' ' + c('.running-header') + ' {\n  left: ' + this.margin.outer + ';\n}\n' + c('.right') + ' ' + c('.running-header') + ' {\n  right: ' + this.margin.outer + ';\n}\n\n' + c('.flowbox') + ' { margin-top: ' + this.margin.top + '; }\n' + c('.footer') + '{ margin-bottom: ' + this.margin.bottom + '; }\n\n' + c('.bleed-left') + ',\n' + c('.bleed-right') + ',\n' + c('.crop-left') + ',\n' + c('.crop-right') + ',\n' + c('.crop-fold') + ' {\n  top: calc( -12pt - ' + this.bleed + ' );\n  bottom: calc( -12pt - ' + this.bleed + ' );\n}\n\n' + c('.bleed-top') + ',\n' + c('.bleed-bottom') + ',\n' + c('.crop-top') + ',\n' + c('.crop-bottom') + ' {\n  left: calc( -12pt - ' + this.bleed + ' );\n  right: calc( -12pt - ' + this.bleed + ' );\n}\n' + c('.bleed-left') + '   { left: -' + this.bleed + '; }\n' + c('.bleed-right') + '  { right: -' + this.bleed + '; }\n' + c('.bleed-top') + '    { top: -' + this.bleed + '; }\n' + c('.bleed-bottom') + ' { bottom: -' + this.bleed + '; }\n\n' + c('.background') + ' {\n  top: -' + this.bleed + ';\n  bottom: -' + this.bleed + ';\n  left: -' + this.bleed + ';\n  right: -' + this.bleed + ';\n}\n\n' + c('.spread') + c('.right') + ' > ' + c('.background') + ' {\n  left: calc(-100% - ' + this.bleed + ');\n}\n' + c('.spread') + c('.left') + ' > ' + c('.background') + ' {\n  right: calc(-100% - ' + this.bleed + ');\n}\n    ';
+      sheet.innerHTML = '\n@page { size: ' + this.sheetSize.width + ' ' + this.sheetSize.height + '; }\n' + c('.print-page') + ' { width: ' + this.sheetSize.width + '; height: ' + this.sheetSize.height + ';}\n\n' + c('.show-crop') + ' ' + c('.print-page') + ' ' + c('.spread-wrapper') + ',\n' + c('.show-bleed-marks') + ' ' + c('.print-page') + ' ' + c('.spread-wrapper') + ' {\n  margin: calc(' + this.bleed + ' + 12pt) auto;\n}\nhtml {\n  --bindery-page-width: ' + this.size.width + ';\n  --bindery-page-height: ' + this.size.height + ';\n}\n' + c('.page-size-rotated') + ' {\n  height: ' + this.size.width + ';\n  width: ' + this.size.height + ';\n}\n' + c('.spread-size') + ' {\n  height: ' + this.size.height + ';\n  width: ' + w.val * 2 + w.unit + ';\n}\n' + c('.spread-size-rotated') + ' {\n  height: ' + w.val * 2 + w.unit + ';\n  width: ' + this.size.height + ';\n}\n' + c('.flowbox') + ',\n' + c('.footer') + ' {\n  margin-left: ' + this.margin.inner + ';\n  margin-right: ' + this.margin.outer + ';\n}\n' + c('.left') + ' ' + c('.flowbox') + ',\n' + c('.left') + ' ' + c('.footer') + ' {\n  margin-left: ' + this.margin.outer + ';\n  margin-right: ' + this.margin.inner + ';\n}\n\n' + c('.left') + ' ' + c('.running-header') + ' {\n  left: ' + this.margin.outer + ';\n}\n' + c('.right') + ' ' + c('.running-header') + ' {\n  right: ' + this.margin.outer + ';\n}\n\n' + c('.flowbox') + ' { margin-top: ' + this.margin.top + '; }\n' + c('.footer') + '{ margin-bottom: ' + this.margin.bottom + '; }\n\n' + c('.bleed-left') + ',\n' + c('.bleed-right') + ',\n' + c('.crop-left') + ',\n' + c('.crop-right') + ',\n' + c('.crop-fold') + ' {\n  top: calc( -12pt - ' + this.bleed + ' );\n  bottom: calc( -12pt - ' + this.bleed + ' );\n}\n\n' + c('.bleed-top') + ',\n' + c('.bleed-bottom') + ',\n' + c('.crop-top') + ',\n' + c('.crop-bottom') + ' {\n  left: calc( -12pt - ' + this.bleed + ' );\n  right: calc( -12pt - ' + this.bleed + ' );\n}\n' + c('.bleed-left') + '   { left: -' + this.bleed + '; }\n' + c('.bleed-right') + '  { right: -' + this.bleed + '; }\n' + c('.bleed-top') + '    { top: -' + this.bleed + '; }\n' + c('.bleed-bottom') + ' { bottom: -' + this.bleed + '; }\n\n' + c('.background') + ' {\n  top: -' + this.bleed + ';\n  bottom: -' + this.bleed + ';\n  left: -' + this.bleed + ';\n  right: -' + this.bleed + ';\n}\n\n' + c('.spread') + c('.right') + ' > ' + c('.background') + ' {\n  left: calc(-100% - ' + this.bleed + ');\n}\n' + c('.spread') + c('.left') + ' > ' + c('.background') + ' {\n  right: calc(-100% - ' + this.bleed + ');\n}\n    ';
       document.head.appendChild(sheet);
     }
   }, {
@@ -3220,26 +1880,26 @@ var PageSetup = function () {
       var b = this.bleed;
 
       switch (this.sheetSizeMode) {
-        case 'size_page':
+        case Paper.AUTO:
           return { width: width, height: height };
-        case 'size_page_bleed':
+        case Paper.AUTO_BLEED:
           return {
             width: 'calc(' + width + ' + ' + b + ' + ' + b + ')',
             height: 'calc(' + height + ' + ' + b + ' + ' + b + ')'
           };
-        case 'size_page_marks':
+        case Paper.AUTO_MARKS:
           // TODO: 24pt marks is hardcoded
           return {
             width: 'calc(' + width + ' + ' + b + ' + ' + b + ' + 24pt)',
             height: 'calc(' + height + ' + ' + b + ' + ' + b + ' + 24pt)'
           };
-        case 'size_letter_l':
+        case Paper.LETTER_LANDSCAPE:
           return { width: letter.height, height: letter.width };
-        case 'size_letter_p':
+        case Paper.LETTER_PORTRAIT:
           return letter;
-        case 'size_a4_p':
+        case Paper.A4_PORTRAIT:
           return a4;
-        case 'size_a4_l':
+        case Paper.A4_LANDSCAPE:
           return { width: a4.height, height: a4.width };
         default:
       }
@@ -3249,233 +1909,10 @@ var PageSetup = function () {
   return PageSetup;
 }();
 
-var title = function title() {
-  for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
-    arg[_key] = arguments[_key];
-  }
-
-  return hyperscript.apply(undefined, [c('.title')].concat(arg));
-};
-
-var row = function row() {
-  for (var _len3 = arguments.length, arg = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-    arg[_key3] = arguments[_key3];
-  }
-
-  return hyperscript.apply(undefined, [c('.row')].concat(arg));
-};
-
-// Button
-var btn = function btn() {
-  for (var _len4 = arguments.length, arg = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-    arg[_key4] = arguments[_key4];
-  }
-
-  return hyperscript.apply(undefined, ['button' + c('.control') + c('.btn')].concat(arg));
-};
-
-var btnMain = function btnMain() {
-  for (var _len6 = arguments.length, arg = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-    arg[_key6] = arguments[_key6];
-  }
-
-  return hyperscript.apply(undefined, ['button' + c('.control') + c('.btn') + c('.btn-main')].concat(arg));
-};
-
-var select = function select() {
-  var selectVal = hyperscript(c('.select-val'), 'Value');
-
-  for (var _len7 = arguments.length, arg = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-    arg[_key7] = arguments[_key7];
-  }
-
-  var selectEl = hyperscript.apply(undefined, ['select.' + c('select')].concat(arg));
-  var updateVal = function updateVal() {
-    selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
-  };
-  selectEl.addEventListener('change', updateVal);
-  updateVal();
-  return hyperscript('' + c('.select-wrap') + c('.control'), selectVal, selectEl);
-};
-
-var option = function option() {
-  for (var _len8 = arguments.length, arg = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-    arg[_key8] = arguments[_key8];
-  }
-
-  return hyperscript.apply(undefined, ['option'].concat(arg));
-};
-
-var supportsCustomPageSize$1 = !!window.chrome && !!window.chrome.webstore;
-
-var Controls = function Controls(opts) {
-  var _this = this;
-
-  classCallCheck(this, Controls);
-
-  this.binder = opts.binder;
-  var viewer = opts.viewer;
-
-  var viewSelect = void 0;
-  var marksSelect = void 0;
-  var spinner = void 0;
-
-  var print = function print() {
-    viewer.setPrint();
-
-    var sel = viewSelect.querySelector('select');
-    sel.value = 'view_print';
-    sel.dispatchEvent(new Event('change'));
-
-    setTimeout(window.print, 10);
-  };
-
-  var printBtn = btnMain({ onclick: print }, 'Print');
-
-  var sheetSizes = supportsCustomPageSize$1 ? [option({ value: 'size_page', selected: true }, 'Auto'), option({ value: 'size_page_bleed' }, 'Auto + Bleed'), option({ value: 'size_page_marks' }, 'Auto + Marks'), option({ value: 'size_letter_p' }, 'Letter Portrait'), option({ value: 'size_letter_l' }, 'Letter Landscape'), option({ value: 'size_a4_p' }, 'A4 Portrait'), option({ value: 'size_a4_l' }, 'A4 Landscape')] : [option({ value: 'size_letter_p', selected: true }, 'Default Page Size *'), option({ disabled: true }, 'Only Chrome supports custom page sizes. Set in your browser\'s print dialog instead.')];
-
-  var updateSheetSizeNames = function updateSheetSizeNames() {
-    // const layout = viewer.printArrange === 'arrange_one' ? 'Page' : 'Spread';
-    if (!supportsCustomPageSize$1) return;
-    var size = _this.binder.pageSetup.displaySize;
-    var sizeName = size.width + ' \xD7 ' + size.height;
-    sheetSizes[0].textContent = '' + sizeName;
-    sheetSizes[1].textContent = sizeName + ' + Bleed';
-    sheetSizes[2].textContent = sizeName + ' + Marks';
-  };
-  updateSheetSizeNames();
-
-  var updateSheetSize = function updateSheetSize(e) {
-    var newVal = e.target.value;
-    viewer.setSheetSize(newVal);
-    if (newVal === 'size_page' || newVal === 'size_page_bleed') {
-      marksSelect.classList.add(c('hidden-select'));
-    } else {
-      marksSelect.classList.remove(c('hidden-select'));
-    }
-
-    _this.binder.pageSetup.updateStylesheet();
-  };
-
-  var sheetSizeSelect = select.apply(undefined, [{ onchange: updateSheetSize }].concat(sheetSizes));
-
-  var arrangeSelect = select({ onchange: function onchange(e) {
-      viewer.setPrintArrange(e.target.value);
-      updateSheetSizeNames();
-    } }, option({ value: 'arrange_one', selected: true }, '1 Page / Sheet'), option({ value: 'arrange_two' }, '1 Spread / Sheet'), option({ value: 'arrange_booklet' }, 'Booklet Sheets'));
-  var arrangement = row(arrangeSelect);
-
-  var updateMarks = function updateMarks(e) {
-    switch (e.target.value) {
-      case 'marks_none':
-        viewer.isShowingCropMarks = false;
-        viewer.isShowingBleedMarks = false;
-        break;
-      case 'marks_crop':
-        viewer.isShowingCropMarks = true;
-        viewer.isShowingBleedMarks = false;
-        break;
-      case 'marks_bleed':
-        viewer.isShowingCropMarks = false;
-        viewer.isShowingBleedMarks = true;
-        break;
-      case 'marks_both':
-        viewer.isShowingCropMarks = true;
-        viewer.isShowingBleedMarks = true;
-        break;
-      default:
-    }
-  };
-
-  marksSelect = select({ onchange: updateMarks }, option({ value: 'marks_none' }, 'No Marks'), option({ value: 'marks_crop', selected: true }, 'Crop Marks'), option({ value: 'marks_bleed' }, 'Bleed Marks'), option({ value: 'marks_both' }, 'Crop and Bleed'));
-  if (supportsCustomPageSize$1) {
-    marksSelect.classList.add(c('hidden-select'));
-  }
-  var marks = row(marksSelect);
-  var sheetSize = row(sheetSizeSelect);
-
-  var headerContent = hyperscript('span', 'Loading');
-
-  var playSlow = void 0;
-  var step = btn('→', {
-    style: { display: 'none' },
-    onclick: function onclick() {
-      window.binderyDebug.step();
-      document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
-    }
-  });
-  var pause = btn('❙❙', {
-    onclick: function onclick() {
-      window.binderyDebug.pause();
-      spinner.classList.add(c('paused'));
-      pause.style.display = 'none';
-      playSlow.style.display = '';
-      step.style.display = '';
-    }
-  });
-  playSlow = btn('▶️', {
-    style: { display: 'none' },
-    onclick: function onclick() {
-      window.binderyDebug.resume();
-      spinner.classList.remove(c('paused'));
-      playSlow.style.display = 'none';
-      pause.style.display = '';
-      step.style.display = 'none';
-    }
-  });
-  var debugDone = btn('Finish', {
-    onclick: function onclick() {
-      spinner.classList.remove(c('paused'));
-      window.binderyDebug.finish();
-    }
-  });
-
-  var debugControls = hyperscript(c('.debug-controls'), pause, playSlow, step, debugDone);
-
-  spinner = hyperscript(c('.spinner'));
-  var progressBar = hyperscript(c('.progress-bar'));
-  var header = title(headerContent);
-
-  this.setInProgress = function () {
-    headerContent.textContent = 'Paginating';
-  };
-
-  var lastUpdate = 0;
-  this.updateProgress = function (count, pct) {
-    var t = performance.now();
-    if (t - lastUpdate > 100) {
-      lastUpdate = t;
-      progressBar.style.width = pct * 100 + '%';
-      headerContent.textContent = count + ' Pages';
-    }
-  };
-
-  this.setDone = function () {
-    progressBar.style.width = '100%';
-    headerContent.textContent = viewer.book.pages.length + ' Pages';
-  };
-
-  this.setInvalid = function () {};
-
-  printBtn.classList.add(c('btn-print'));
-  var options = row(arrangement, sheetSize, marks);
-  options.classList.add(c('print-options'));
-
-  var updateView = function updateView(e) {
-    var val = e.target.value;
-    if (val === 'view_grid') viewer.setGrid();else if (val === 'view_flip') viewer.setFlip();else if (val === 'view_print') viewer.setPrint();
-  };
-  viewSelect = select({ onchange: updateView }, option({ value: 'view_grid' }, 'Preview'), option({ value: 'view_flip' }, 'Flipbook'), option({ value: 'view_print' }, 'Print Preview'));
-  var viewRow = row(viewSelect);
-  viewRow.classList.add(c('view-row'));
-
-  this.element = hyperscript(c('.controls'), progressBar, header, debugControls, viewRow, options, printBtn);
-};
-
 /* global BINDERY_VERSION */
 
 var errorView = function (title, text) {
-  return hyperscript(c('.error'), hyperscript(c('.error-title'), title), hyperscript(c('.error-text'), text), hyperscript(c('.error-footer'), 'Bindery ' + BINDERY_VERSION));
+  return el('.error', [el('.error-title', title), el('.error-text', text), el('.error-footer', 'Bindery ' + BINDERY_VERSION)]);
 };
 
 var orderPagesBooklet = function orderPagesBooklet(pages, makePage) {
@@ -3512,31 +1949,23 @@ var padPages = function padPages(pages, makePage) {
   return pages;
 };
 
-var twoPageSpread = function twoPageSpread() {
-  for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
-    arg[_key] = arguments[_key];
-  }
-
-  return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
+var twoPageSpread = function twoPageSpread(children) {
+  return el('.spread-wrapper.spread-size', children);
 };
-var onePageSpread = function onePageSpread() {
-  for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    arg[_key2] = arguments[_key2];
-  }
-
-  return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.page-size')].concat(arg));
+var onePageSpread = function onePageSpread(children) {
+  return el('.spread-wrapper.page-size', children);
 };
 
 var renderGridLayout = function renderGridLayout(pages, isTwoUp) {
   var gridLayout = document.createDocumentFragment();
   if (isTwoUp) {
     for (var i = 0; i < pages.length; i += 2) {
-      var wrap = twoPageSpread(pages[i].element, pages[i + 1].element);
+      var wrap = twoPageSpread([pages[i].element, pages[i + 1].element]);
       gridLayout.appendChild(wrap);
     }
   } else {
     pages.forEach(function (pg) {
-      var wrap = onePageSpread(pg.element);
+      var wrap = onePageSpread([pg.element]);
       gridLayout.appendChild(wrap);
     });
   }
@@ -3544,38 +1973,37 @@ var renderGridLayout = function renderGridLayout(pages, isTwoUp) {
   return gridLayout;
 };
 
+var directions = ['top', 'bottom', 'left', 'right'];
 var bleedMarks = function bleedMarks() {
-  return [hyperscript(c('.bleed-top')), hyperscript(c('.bleed-bottom')), hyperscript(c('.bleed-left')), hyperscript(c('.bleed-right'))];
+  return directions.map(function (dir) {
+    return el('.bleed-' + dir);
+  });
 };
 var cropMarks = function cropMarks() {
-  return [hyperscript(c('.crop-top')), hyperscript(c('.crop-bottom')), hyperscript(c('.crop-left')), hyperscript(c('.crop-right'))];
+  return directions.map(function (dir) {
+    return el('.crop' + dir);
+  });
 };
+
 var printMarksSingle = function printMarksSingle() {
-  return hyperscript.apply(undefined, [c('.print-mark-wrap')].concat(toConsumableArray(cropMarks()), toConsumableArray(bleedMarks())));
+  return el('.print-mark-wrap', [].concat(toConsumableArray(cropMarks()), toConsumableArray(bleedMarks())));
 };
+
 var printMarksSpread = function printMarksSpread() {
-  return hyperscript.apply(undefined, [c('.print-mark-wrap'), hyperscript(c('.crop-fold'))].concat(toConsumableArray(cropMarks()), toConsumableArray(bleedMarks())));
+  return el('.print-mark-wrap', [el('.crop-fold')].concat(toConsumableArray(cropMarks()), toConsumableArray(bleedMarks())));
 };
 
 var bookletMeta = function bookletMeta(i, len) {
   var isFront = i % 4 === 0;
   var sheetIndex = parseInt((i + 1) / 4, 10) + 1;
-  return hyperscript(c('.print-meta'), 'Sheet ' + sheetIndex + ' of ' + len / 4 + ': ' + (isFront ? 'Outside' : 'Inside'));
+  return el('.print-meta', 'Sheet ' + sheetIndex + ' of ' + len / 4 + ': ' + (isFront ? 'Outside' : 'Inside'));
 };
 
-var twoPageSpread$1 = function twoPageSpread() {
-  for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
-    arg[_key] = arguments[_key];
-  }
-
-  return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
+var twoPageSpread$1 = function twoPageSpread(children) {
+  return el('.spread-wrapper.spread-size', children);
 };
-var onePageSpread$1 = function onePageSpread() {
-  for (var _len2 = arguments.length, arg = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    arg[_key2] = arguments[_key2];
-  }
-
-  return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.page-size')].concat(arg));
+var onePageSpread$1 = function onePageSpread(children) {
+  return el('.spread-wrapper.page-size', children);
 };
 
 var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, isBooklet) {
@@ -3584,8 +2012,8 @@ var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, isBooklet) {
   var marks = isTwoUp ? printMarksSpread : printMarksSingle;
   var spread = isTwoUp ? twoPageSpread$1 : onePageSpread$1;
 
-  var printSheet = function printSheet() {
-    return hyperscript(c('.print-page'), spread.apply(undefined, arguments));
+  var printSheet = function printSheet(children) {
+    return el('.print-page', [spread(children)]);
   };
 
   if (isTwoUp) {
@@ -3595,12 +2023,12 @@ var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, isBooklet) {
         var meta = bookletMeta(i, pages.length);
         spreadMarks.appendChild(meta);
       }
-      var sheet = printSheet(pages[i].element, pages[i + 1].element, spreadMarks);
+      var sheet = printSheet([pages[i].element, pages[i + 1].element, spreadMarks]);
       printLayout.appendChild(sheet);
     }
   } else {
     pages.forEach(function (pg) {
-      var sheet = printSheet(pg.element, marks());
+      var sheet = printSheet([pg.element, marks()]);
       printLayout.appendChild(sheet);
     });
   }
@@ -3610,8 +2038,8 @@ var renderPrintLayout = function renderPrintLayout(pages, isTwoUp, isBooklet) {
 
 var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
   var flipLayout = document.createDocumentFragment();
-  var sizer = hyperscript(c('.spread-size') + c('.flip-sizer'));
-  var flapHolder = hyperscript(c('.spread-size') + c('.flap-holder'));
+  var sizer = el('.spread-size.flip-sizer');
+  var flapHolder = el('.spread-size.flap-holder');
   sizer.appendChild(flapHolder);
   flipLayout.appendChild(sizer);
   var flaps = [];
@@ -3643,11 +2071,10 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
   var _loop = function _loop(i) {
     leafIndex += 1;
     var li = leafIndex;
-    var flap = hyperscript(c('.page3d') + c('.page-size'), {
-      onclick: function onclick() {
-        var newLeaf = li - 1;
-        setLeaf(newLeaf);
-      }
+    var flap = el('.page3d');
+    flap.addEventListener('click', function () {
+      var newLeaf = li - 1;
+      setLeaf(newLeaf);
     });
 
     var rightPage = pages[i].element;
@@ -3660,7 +2087,7 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
       leftPage.classList.add(c('page3d-back'));
       flap.appendChild(leftPage);
     } else {
-      leftPage = hyperscript(c('.page') + c('.page3d-back'));
+      leftPage = el('.page.page3d-back');
       flap.appendChild(leftPage);
     }
     // TODO: Dynamically add/remove pages.
@@ -3681,46 +2108,68 @@ var renderFlipLayout = function renderFlipLayout(pages, doubleSided) {
   return flipLayout;
 };
 
-var MODE_FLIP = 'interactive';
-var MODE_PREVIEW = 'grid';
-var MODE_SHEET = 'print';
-
-var ARRANGE_ONE = 'arrange_one';
-var ARRANGE_SPREAD = 'arrange_two';
-var ARRANGE_BOOKLET = 'arrange_booklet';
+// import Controls from './Controls';
+var modeAttr = {};
+modeAttr[Mode.PREVIEW] = 'preview';
+modeAttr[Mode.PRINT] = 'print';
+modeAttr[Mode.FLIPBOOK] = 'flip';
 
 var Viewer = function () {
   function Viewer(_ref) {
-    var bindery = _ref.bindery;
+    var _this = this;
+
+    var bindery = _ref.bindery,
+        mode = _ref.mode,
+        layout = _ref.layout,
+        marks = _ref.marks,
+        ControlsComponent = _ref.ControlsComponent;
     classCallCheck(this, Viewer);
 
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
-    this.zoomBox = hyperscript(c('.zoom-wrap'));
-    this.element = hyperscript(c('.root'), this.zoomBox);
+    this.progressBar = el('.progress-bar');
+    this.zoomBox = el('zoom-wrap');
+    this.element = el('root', [this.progressBar, this.zoomBox]);
 
     this.doubleSided = true;
-    this.printArrange = ARRANGE_ONE;
-    this.isShowingCropMarks = true;
-    this.isShowingBleedMarks = false;
+    this.printArrange = layout;
 
-    this.mode = MODE_PREVIEW;
-    this.element.setAttribute('bindery-view-mode', this.mode);
+    this.setMarks(marks);
+    this.mode = mode;
+    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
     this.currentLeaf = 0;
 
     this.listenForPrint();
     this.listenForResize();
 
-    this.setGrid = this.setGrid.bind(this);
     this.setPrint = this.setPrint.bind(this);
-    this.setFlip = this.setFlip.bind(this);
 
-    this.controls = new Controls({ binder: bindery, viewer: this });
+    if (ControlsComponent) {
+      this.controls = new ControlsComponent({ Mode: Mode, Paper: Paper, Layout: Layout, Marks: Marks }, // Available options
+      { // Initial props
+        paper: this.pageSetup.sheetSizeMode,
+        layout: this.printArrange,
+        mode: this.mode,
+        marks: marks
+      }, { // Actions
+        setMode: function setMode(newMode) {
+          if (newMode === _this.mode) return;
+          _this.mode = newMode;
+          _this.render();
+        },
+        setPaper: this.setSheetSize.bind(this),
+        setLayout: this.setPrintArrange.bind(this),
+        setMarks: this.setMarks.bind(this),
+        getPageSize: function getPageSize() {
+          return _this.pageSetup.displaySize;
+        }
+      });
+      this.element.appendChild(this.controls.element);
+    }
 
     this.element.classList.add(c('in-progress'));
 
-    this.element.appendChild(this.controls.element);
     document.body.appendChild(this.element);
   }
 
@@ -3730,14 +2179,14 @@ var Viewer = function () {
   createClass(Viewer, [{
     key: 'listenForPrint',
     value: function listenForPrint() {
-      var _this = this;
+      var _this2 = this;
 
       if (window.matchMedia) {
         var mediaQueryList = window.matchMedia('print');
         mediaQueryList.addListener(function (mql) {
           if (mql.matches) {
             // before print
-            _this.setPrint();
+            _this2.setPrint();
           } else {
             // after print
           }
@@ -3746,7 +2195,7 @@ var Viewer = function () {
       document.body.addEventListener('keydown', function (e) {
         if ((e.ctrlKey || e.metaKey) && e.keyCode === 80) {
           e.preventDefault();
-          _this.setPrint();
+          _this2.setPrint();
           setTimeout(function () {
             window.print();
           }, 10);
@@ -3756,13 +2205,13 @@ var Viewer = function () {
   }, {
     key: 'listenForResize',
     value: function listenForResize() {
-      var _this2 = this;
+      var _this3 = this;
 
       window.addEventListener('resize', function () {
-        if (!_this2.throttleResize) {
-          _this2.updateZoom();
-          _this2.throttleResize = setTimeout(function () {
-            _this2.throttleResize = null;
+        if (!_this3.throttleResize) {
+          _this3.updateZoom();
+          _this3.throttleResize = setTimeout(function () {
+            _this3.throttleResize = null;
           }, 20);
         }
       });
@@ -3771,22 +2220,22 @@ var Viewer = function () {
     key: 'setInProgress',
     value: function setInProgress() {
       this.element.classList.add(c('in-progress'));
-      this.controls.setInProgress();
+      if (this.controls) this.controls.setInProgress();
     }
   }, {
     key: 'setSheetSize',
     value: function setSheetSize(newVal) {
-      var _this3 = this;
+      var _this4 = this;
 
-      this.pageSetup.setSheetSizeMode(newVal);
+      this.pageSetup.sheetSizeMode = newVal;
       this.pageSetup.updateStylesheet();
 
-      if (this.mode !== MODE_SHEET) {
+      if (this.mode !== Mode.PRINT) {
         this.setPrint();
       }
       this.updateZoom();
       setTimeout(function () {
-        _this3.updateZoom();
+        _this4.updateZoom();
       }, 300);
     }
   }, {
@@ -3798,10 +2247,33 @@ var Viewer = function () {
       this.pageSetup.setPrintTwoUp(this.isTwoUp);
       this.pageSetup.updateStylesheet();
 
-      if (this.mode === MODE_SHEET) {
+      if (this.mode === Mode.PRINT) {
         this.render();
       } else {
         this.setPrint();
+      }
+    }
+  }, {
+    key: 'setMarks',
+    value: function setMarks(newVal) {
+      switch (newVal) {
+        case Marks.NONE:
+          this.isShowingCropMarks = false;
+          this.isShowingBleedMarks = false;
+          break;
+        case Marks.CROP:
+          this.isShowingCropMarks = true;
+          this.isShowingBleedMarks = false;
+          break;
+        case Marks.BLEED:
+          this.isShowingCropMarks = false;
+          this.isShowingBleedMarks = true;
+          break;
+        case Marks.BOTH:
+          this.isShowingCropMarks = true;
+          this.isShowingBleedMarks = true;
+          break;
+        default:
       }
     }
   }, {
@@ -3842,50 +2314,16 @@ var Viewer = function () {
       this.render();
     }
   }, {
-    key: 'setMode',
-    value: function setMode(newMode) {
-      switch (newMode) {
-        case 'grid':
-        case 'default':
-          this.mode = MODE_PREVIEW;
-          break;
-        case 'interactive':
-        case 'flip':
-          this.mode = MODE_FLIP;
-          break;
-        case 'print':
-        case 'sheet':
-          this.mode = MODE_SHEET;
-          break;
-        default:
-          console.error('Bindery: Unknown view mode "' + newMode + '"');
-          break;
-      }
-    }
-  }, {
-    key: 'setGrid',
-    value: function setGrid() {
-      if (this.mode === MODE_PREVIEW) return;
-      this.mode = MODE_PREVIEW;
-      this.render();
-    }
-  }, {
     key: 'setPrint',
     value: function setPrint() {
-      if (this.mode === MODE_SHEET) return;
-      this.mode = MODE_SHEET;
-      this.render();
-    }
-  }, {
-    key: 'setFlip',
-    value: function setFlip() {
-      this.mode = MODE_FLIP;
+      if (this.mode === Mode.PRINT) return;
+      this.mode = Mode.PRINT;
       this.render();
     }
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       if (!this.book) return;
       var _document = document,
@@ -3897,50 +2335,59 @@ var Viewer = function () {
 
       this.flaps = [];
       body.classList.add(c('viewing'));
-      this.element.setAttribute('bindery-view-mode', this.mode);
+      this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
 
       var scrollMax = body.scrollHeight - body.offsetHeight;
       var scrollPct = body.scrollTop / scrollMax;
 
-      this.controls.setDone();
+      if (this.controls) this.controls.setDone(this.book.pages.length);
+      this.progressBar.style.width = '100%';
+
       window.requestAnimationFrame(function () {
-        if (_this4.mode === MODE_PREVIEW) _this4.renderGrid();else if (_this4.mode === MODE_FLIP) _this4.renderInteractive();else if (_this4.mode === MODE_SHEET) _this4.renderPrint();else _this4.renderGrid();
+        if (_this5.mode === Mode.PREVIEW) _this5.renderGrid();else if (_this5.mode === Mode.FLIPBOOK) _this5.renderInteractive();else if (_this5.mode === Mode.PRINT) _this5.renderPrint();else _this5.renderGrid();
 
         body.scrollTop = scrollMax * scrollPct;
-        _this4.updateZoom();
+        _this5.updateZoom();
       });
     }
   }, {
     key: 'renderProgress',
     value: function renderProgress(book) {
-      var _this5 = this;
+      var _this6 = this;
 
       this.book = book;
 
-      this.controls.updateProgress(this.book.pages.length, this.book.estimatedProgress);
+      this.progressBar.style.width = this.book.estimatedProgress * 100 + '%';
 
-      var twoPageSpread = function twoPageSpread() {
+      if (this.controls) {
+        this.controls.updateProgress(this.book.pages.length, this.book.estimatedProgress);
+      }
+
+      var sideBySide = this.mode === Mode.PREVIEW || this.mode === Mode.PRINT && this.printArrange !== Layout.PAGES;
+      var limit = sideBySide ? 2 : 1;
+
+      var makeSpread = function makeSpread() {
         for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
           arg[_key] = arguments[_key];
         }
 
-        return hyperscript.apply(undefined, [c('.spread-wrapper') + c('.spread-size')].concat(arg));
+        return el('.spread-wrapper', [].concat(arg));
       };
 
       this.book.pages.forEach(function (page, i) {
         // If hasn't been added, or not in spread yet
-        if (!_this5.zoomBox.contains(page.element) || page.element.parentNode === _this5.zoomBox) {
-          if (_this5.lastSpreadInProgress && _this5.lastSpreadInProgress.children.length < 2) {
-            _this5.lastSpreadInProgress.appendChild(page.element);
+        if (!_this6.zoomBox.contains(page.element) || page.element.parentNode === _this6.zoomBox) {
+          if (_this6.lastSpreadInProgress && _this6.lastSpreadInProgress.children.length < limit) {
+            _this6.lastSpreadInProgress.appendChild(page.element);
           } else {
-            if (i === 0) {
+            if (i === 0 && sideBySide) {
               var spacer = new Page();
               spacer.element.style.visibility = 'hidden';
-              _this5.lastSpreadInProgress = twoPageSpread(spacer.element, page.element);
+              _this6.lastSpreadInProgress = makeSpread(spacer.element, page.element);
             } else {
-              _this5.lastSpreadInProgress = twoPageSpread(page.element);
+              _this6.lastSpreadInProgress = makeSpread(page.element);
             }
-            _this5.zoomBox.appendChild(_this5.lastSpreadInProgress);
+            _this6.zoomBox.appendChild(_this6.lastSpreadInProgress);
           }
         }
       });
@@ -3971,10 +2418,10 @@ var Viewer = function () {
 
       this.zoomBox.innerHTML = '';
 
-      var isBooklet = this.printArrange === ARRANGE_BOOKLET;
+      var isBooklet = this.printArrange === Layout.BOOKLET;
 
       var pages = this.book.pages.slice();
-      if (this.printArrange === ARRANGE_SPREAD) {
+      if (this.printArrange === Layout.SPREADS) {
         pages = padPages(pages, function () {
           return new Page();
         });
@@ -4021,7 +2468,7 @@ var Viewer = function () {
   }, {
     key: 'isTwoUp',
     get: function get$$1() {
-      return this.printArrange !== ARRANGE_ONE;
+      return this.printArrange !== Layout.PAGES;
     }
   }, {
     key: 'isShowingCropMarks',
@@ -4114,17 +2561,17 @@ var Counter = function (_Rule) {
     }
   }, {
     key: 'beforeAdd',
-    value: function beforeAdd(el) {
-      if (el.matches(this.incrementEl)) {
+    value: function beforeAdd(el$$1) {
+      if (el$$1.matches(this.incrementEl)) {
         this.counterValue += 1;
       }
-      if (el.matches(this.resetEl)) {
+      if (el$$1.matches(this.resetEl)) {
         this.counterValue = 0;
       }
-      if (el.matches(this.replaceEl)) {
-        return this.createReplacement(el);
+      if (el$$1.matches(this.replaceEl)) {
+        return this.createReplacement(el$$1);
       }
-      return el;
+      return el$$1;
     }
   }, {
     key: 'createReplacement',
@@ -4218,7 +2665,7 @@ var Footnote = function (_Replace) {
     value: function afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
       var number = book.pageInProgress.footer.children.length + 1;
 
-      var footnote = hyperscript('.footnote');
+      var footnote = el('.footnote');
       var contents = this.render(element, number);
       if (contents instanceof HTMLElement) footnote.appendChild(contents);else footnote.innerHTML = contents;
 
@@ -4308,8 +2755,8 @@ var PageReference = function (_Replace) {
         selector = selector.replace('#', '');
         // extra resilient in case it starts with a number ie wikipedia
         selector = '[id="' + selector + '"]';
-        return function (el) {
-          return el.querySelector(selector);
+        return function (el$$1) {
+          return el$$1.querySelector(selector);
         };
       }
       return null;
@@ -4349,9 +2796,9 @@ var RunningHeader = function (_Rule) {
     key: 'eachPage',
     value: function eachPage(page) {
       if (!page.runningHeader) {
-        var el = hyperscript(c('.running-header'));
-        page.element.appendChild(el);
-        page.runningHeader = el;
+        var elmt = el('.running-header');
+        page.element.appendChild(elmt);
+        page.runningHeader = elmt;
       }
       page.runningHeader.innerHTML = this.render(page);
     }
@@ -4447,7 +2894,7 @@ var defaultRules = [PageBreak$1({ selector: '[book-page-break="both"]', position
   }
 })];
 
-___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid #ddd;box-shadow:0 2px 4px -1px rgba(0,0,0,.15);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:200px;height:300px;position:relative;display:flex;flex-direction:column;flex-wrap:nowrap;margin:auto}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;padding:10px;position:relative;padding-top:60px;min-height:90vh}.📖-measure-area,.📖-root{background:#f4f4f4;z-index:2}.📖-measure-area{position:fixed;padding:50px 20px;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:all .2s}.📖-spread-wrapper{position:relative;display:flex;width:800px;margin:0 auto 32px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:100%!important}.📖-page3d{margin:auto;width:400px;height:600px;transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:12pt;background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:12pt;height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:12pt;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}@media screen{.📖-viewing .📖-controls{display:flex!important}}.📖-controls{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;display:none;flex-direction:row;align-items:start;position:fixed;top:0;left:0;right:0;z-index:3;margin:auto;color:#000;padding:10px;overflow:visible;-webkit-font-smoothing:antialiased}.📖-controls *{font:inherit;color:inherit;margin:0;padding:0;box-sizing:border-box}.📖-controls a{color:#0000c5;text-decoration:none}.📖-row{flex-wrap:wrap;align-items:start;cursor:default;user-select:none}.📖-row,.📖-title{position:relative;display:flex}.📖-title{padding:8px 16px;transition:opacity .2s;white-space:nowrap;overflow:hidden;margin-right:auto}.📖-print-options{display:flex;opacity:0;max-width:0;border-radius:0;background:#e4e4e4;overflow:hidden;transition:all .4s;flex-wrap:nowrap;transition-delay:.2s}[bindery-view-mode=print] .📖-print-options{max-width:720px;margin-right:12px;opacity:1}.📖-in-progress .📖-print-options{opacity:0;display:none}.📖-controls .📖-print-options .📖-control{background-color:transparent}.📖-spinner{border:1px solid transparent;border-left-color:#000;width:20px;height:20px;border-radius:50%;vertical-align:middle;opacity:0;pointer-events:none;transition:all .2s;margin-right:16px}.📖-in-progress .📖-spinner{opacity:1;animation:b .6s linear infinite}.📖-debug .📖-spinner{animation:b 2s linear infinite}.📖-spinner.📖-paused{animation:none}@keyframes b{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.📖-controls .📖-btn{-webkit-appearance:none;cursor:pointer;display:inline-block;margin-right:8px;text-decoration:none}.📖-controls .📖-btn:hover{background:#ddd}.📖-controls .📖-btn:active{background:#eee}.📖-controls .📖-btn:last-child{margin-right:0}.📖-controls .📖-control{border-radius:0;color:#000;padding:8px 16px;background-color:#f4f4f4;border:0}.📖-controls .📖-btn-light{background:none;border:none}.📖-controls .📖-btn-main{background:#0000c5;border-color:#0000c5;color:#fff}.📖-controls .📖-btn-main:hover{background:#0000c5;opacity:.7}.📖-controls .📖-btn-main:active{background:#000;opacity:1}.📖-view-row{margin-left:auto;margin-right:12px;transition:all .5s}.📖-in-progress .📖-view-row{opacity:0;pointer-events:none}.📖-debug .📖-view-row{display:none}.📖-btn-print{transition:all .5s}.📖-in-progress .📖-btn-print{opacity:0;pointer-events:none}.📖-debug .📖-btn-print{display:none}.📖-controls .📖-select-wrap{padding-right:32px;background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 14l5 5 5-5' stroke='%23000' fill='none'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:100%;transition:all .2s;white-space:nowrap;width:100%}.📖-controls .📖-select-wrap:active,.📖-controls .📖-select-wrap:hover{background-color:#ddd}.📖-controls .📖-select-wrap.📖-hidden-select{max-width:0;padding-left:0;padding-right:0;border-left-width:0;border-right-width:0;color:transparent}.📖-select{position:absolute;top:0;left:0;opacity:0;-webkit-appearance:none;-moz-appearance:none;padding:8px 16px;color:#000;border:transparent;width:100%}.📖-debug-controls{display:none}.📖-debug .📖-in-progress .📖-debug-controls{display:block}.📖-refresh-btns{opacity:0;position:absolute;top:0;left:0;padding:8px 0;transition:all .2s}.📖-in-progress .📖-refresh-btns{display:none}.📖-refresh-btns a{margin-left:1em;cursor:pointer}.📖-refresh-btns a:hover{color:#000}.📖-progress-bar{position:absolute;left:0;top:0;background:#0000c5;width:0;transition:all .2s;opacity:0;height:0}.📖-in-progress .📖-progress-bar{opacity:1;height:2px}@media screen and (max-width:720px){.📖-print-options{max-width:unset;max-height:0}[bindery-view-mode=print] .📖-print-options{max-width:unset;max-height:240px;margin:0}.📖-root{transition:all .2s}[bindery-view-mode=print].📖-root{padding-top:120px}.📖-controls{height:98px}.📖-view-row{margin-left:auto}.📖-print-options{top:54px;right:10px;position:fixed;margin:0}.📖-print-options .📖-row{margin:0}}@media screen and (max-width:500px){[bindery-view-mode=print].📖-root{padding-top:190px}[bindery-view-mode=print].📖-root .📖-controls{background:#f4f4f4;height:170px}.📖-print-options{flex-direction:column;align-items:stretch;left:10px}.📖-hidden-select{display:none}}");
+___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid #ddd;box-shadow:0 2px 4px -1px rgba(0,0,0,.15);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:var(--bindery-page-width);height:var(--bindery-page-height);position:relative;display:flex;flex-direction:column;flex-wrap:nowrap}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;background:#f4f4f4;padding:10px;z-index:2;position:relative;padding-top:60px;min-height:90vh}.📖-progress-bar{position:fixed;left:0;top:0;background:var(--bindery-ui-accent,#0000c5);width:0;transition:all .2s;opacity:0;height:0;z-index:2}.📖-in-progress .📖-progress-bar{opacity:1;height:2px}.📖-measure-area{position:fixed;background:#f4f4f4;padding:50px 20px;z-index:2;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:pulse 1s infinite}}@keyframes pulse{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;overflow:hidden;align-items:center;transition:all .2s}.📖-print-page,.📖-spread-wrapper{position:relative;display:flex;justify-content:center}.📖-spread-wrapper{margin:0 auto 32px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:100%!important}.📖-page3d{margin:auto;width:var(--bindery-page-width);height:var(--bindery-page-height);transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:12pt;background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:12pt;height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:12pt;text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}");
 
 /* global BINDERY_VERSION */
 
@@ -4466,6 +2913,7 @@ var Bindery = function () {
       name: 'makeBook',
       autorun: OptionType.bool,
       content: OptionType.any,
+      ControlsComponent: OptionType.any,
       pageSetup: OptionType.shape({
         name: 'pageSetup',
         bleed: OptionType.length,
@@ -4482,16 +2930,28 @@ var Bindery = function () {
           height: OptionType.length
         })
       }),
+      view: OptionType.enum.apply(OptionType, toConsumableArray(Object.values(Mode))),
+      printSetup: OptionType.shape({
+        name: 'printSetup',
+        layout: OptionType.enum.apply(OptionType, toConsumableArray(Object.values(Layout))),
+        marks: OptionType.enum.apply(OptionType, toConsumableArray(Object.values(Marks))),
+        paper: OptionType.enum.apply(OptionType, toConsumableArray(Object.values(Paper)))
+      }),
       rules: OptionType.array
     });
 
     this.pageSetup = new PageSetup(opts.pageSetup);
+    this.pageSetup.setupPaper(opts.printSetup);
 
-    this.viewer = new Viewer({ bindery: this });
-
-    if (opts.startingView) {
-      this.viewer.setMode(opts.startingView);
-    }
+    var startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
+    var startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
+    this.viewer = new Viewer({
+      bindery: this,
+      mode: opts.view || Mode.PREVIEW,
+      marks: startMarks,
+      layout: startLayout,
+      ControlsComponent: opts.ControlsComponent
+    });
 
     this.rules = defaultRules;
     if (opts.rules) this.addRules(opts.rules);
@@ -4539,7 +2999,7 @@ var Bindery = function () {
         }
         return '';
       }).then(function (fetchedContent) {
-        var wrapper = hyperscript('div');
+        var wrapper = document.createElement('div');
         wrapper.innerHTML = fetchedContent;
         _this.source = wrapper.querySelector(selector);
         if (!(_this.source instanceof HTMLElement)) {
@@ -4671,6 +3131,10 @@ var Bindery = function () {
 Bindery.version = BINDERY_VERSION;
 
 var BinderyWithRules = Object.assign(Bindery, Rules);
+BinderyWithRules.View = Mode;
+BinderyWithRules.Paper = Paper;
+BinderyWithRules.Layout = Layout;
+BinderyWithRules.Marks = Marks;
 
 return BinderyWithRules;
 
