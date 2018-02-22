@@ -130,9 +130,9 @@ ${c('.show-crop')} ${c('.print-page')} ${c('.spread-wrapper')},
 ${c('.show-bleed-marks')} ${c('.print-page')} ${c('.spread-wrapper')} {
   margin: calc(${this.bleed} + 12pt) auto;
 }
-${c('.page-size')} {
-  height: ${this.size.height};
-  width: ${this.size.width};
+html {
+  --bindery-page-width: ${this.size.width};
+  --bindery-page-height: ${this.size.height};
 }
 ${c('.page-size-rotated')} {
   height: ${this.size.width};

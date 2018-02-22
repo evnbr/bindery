@@ -38,13 +38,12 @@ li.#{$pre}-continuation {
 }
 
 .#{$pre}-page {
-  width: 200px;
-  height: 300px;
+  width: var(--bindery-page-width);
+  height: var(--bindery-page-height);
   position: relative;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  margin: auto;
 }
 
 .#{$pre}-flowbox {
