@@ -1,6 +1,5 @@
-import h from 'hyperscript';
 import Rule from './Rule';
-import { OptionType, c } from '../utils';
+import { OptionType, el } from '../utils';
 
 // Options:
 // selector: String
@@ -17,9 +16,9 @@ class RunningHeader extends Rule {
   }
   eachPage(page) {
     if (!page.runningHeader) {
-      const el = h(c('.running-header'));
-      page.element.appendChild(el);
-      page.runningHeader = el;
+      const elmt = el('.running-header');
+      page.element.appendChild(elmt);
+      page.runningHeader = elmt;
     }
     page.runningHeader.innerHTML = this.render(page);
   }

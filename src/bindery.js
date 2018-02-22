@@ -1,7 +1,5 @@
 /* global BINDERY_VERSION */
 
-import h from 'hyperscript';
-
 import paginate from './paginate';
 import scheduler from './Scheduler';
 import PageSetup from './Page/PageSetup';
@@ -112,7 +110,7 @@ class Bindery {
       }
       return '';
     }).then((fetchedContent) => {
-      const wrapper = h('div');
+      const wrapper = document.createElement('div');
       wrapper.innerHTML = fetchedContent;
       this.source = wrapper.querySelector(selector);
       if (!(this.source instanceof HTMLElement)) {

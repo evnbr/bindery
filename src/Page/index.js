@@ -1,18 +1,12 @@
-import h from 'hyperscript';
-import { c } from '../utils';
-
+import { c, el } from '../utils';
 
 class Page {
   constructor() {
-    this.flowContent = h(c('.content'));
-    this.flowBox = h(c('.flowbox'), this.flowContent);
-    this.footer = h(c('.footer'));
-    this.background = h(c('.background'));
-    this.element = h(c('.page') + c('.page-size'),
-      this.background,
-      this.flowBox,
-      this.footer,
-    );
+    this.flowContent = el('content');
+    this.flowBox = el('flowbox', [this.flowContent]);
+    this.footer = el('footer');
+    this.background = el('background');
+    this.element = el('page', [this.background, this.flowBox, this.footer]);
   }
   overflowAmount() {
     const contentH = this.flowContent.offsetHeight;
@@ -33,7 +27,7 @@ class Page {
 
     const testPage = new Page();
     let measureArea = document.querySelector(c('.measure-area'));
-    if (!measureArea) measureArea = document.body.appendChild(h(c('.measure-area')));
+    if (!measureArea) measureArea = document.body.appendChild(el('measure-area'));
 
     measureArea.innerHTML = '';
     measureArea.appendChild(testPage.element);

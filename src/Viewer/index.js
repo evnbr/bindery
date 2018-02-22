@@ -1,7 +1,6 @@
-import h from 'hyperscript';
-import { c } from '../utils';
 
 import Controls from './Controls';
+import { c, el } from '../utils';
 import Page from '../Page';
 
 import errorView from './error';
@@ -21,8 +20,8 @@ class Viewer {
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
-    this.zoomBox = h(c('.zoom-wrap'));
-    this.element = h(c('.root'), this.zoomBox);
+    this.zoomBox = el('zoom-wrap');
+    this.element = el('root', [this.progressBar, this.zoomBox]);
 
     this.doubleSided = true;
     this.printArrange = layout;
@@ -244,13 +243,13 @@ class Viewer {
       this.book.estimatedProgress
     );
 
-    const shouldPreviewSpreads =
+    const sideBySide =
       this.mode === Mode.PREVIEW
       || (this.mode === Mode.PRINT && this.printArrange !== Layout.PAGES);
-    const limit = shouldPreviewSpreads ? 2 : 1;
+    const limit = sideBySide ? 2 : 1;
 
     const makeSpread = function (...arg) {
-      return h(c('.spread-wrapper') + c(shouldPreviewSpreads ? '.spread-size' : '.page-size'), ...arg);
+      return el('.spread-wrapper', [...arg]);
     };
 
     this.book.pages.forEach((page, i) => {
@@ -259,7 +258,7 @@ class Viewer {
         if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
           this.lastSpreadInProgress.appendChild(page.element);
         } else {
-          if (i === 0 && shouldPreviewSpreads) {
+          if (i === 0 && sideBySide) {
             const spacer = new Page();
             spacer.element.style.visibility = 'hidden';
             this.lastSpreadInProgress = makeSpread(spacer.element, page.element);

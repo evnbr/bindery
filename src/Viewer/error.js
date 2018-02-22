@@ -1,12 +1,11 @@
 /* global BINDERY_VERSION */
 
-import h from 'hyperscript';
-import { c } from '../utils';
+import { el } from '../utils';
 
 export default function (title, text) {
-  return h(c('.error'),
-    h(c('.error-title'), title),
-    h(c('.error-text'), text),
-    h(c('.error-footer'), `Bindery ${BINDERY_VERSION}`),
-  );
+  return el('.error', [
+    el('.error-title', title),
+    el('.error-text', text),
+    el('.error-footer', `Bindery ${BINDERY_VERSION}`),
+  ]);
 }

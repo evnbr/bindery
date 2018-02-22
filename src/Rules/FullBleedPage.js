@@ -1,6 +1,5 @@
-import h from 'hyperscript';
 import OutOfFlow from './OutOfFlow';
-import { OptionType, c } from '../utils';
+import { OptionType, c, el } from '../utils';
 
 // Options:
 // selector: String
@@ -29,9 +28,7 @@ class FullBleedPage extends OutOfFlow {
       book.pages.push(newPage);
     }
     if (this.rotate !== 'none') {
-      const rotateContainer = h(c('.rotate-container'));
-      rotateContainer.classList.add(c('page-size-rotated'));
-      rotateContainer.classList.add(c(`rotate-${this.rotate}`));
+      const rotateContainer = el(`.rotate-container.page-size-rotated.rotate-${this.rotate}`);
       rotateContainer.appendChild(newPage.background);
       newPage.element.appendChild(rotateContainer);
     }
