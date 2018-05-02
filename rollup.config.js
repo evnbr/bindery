@@ -47,9 +47,9 @@ export default [
       resolve(),
       commonjs(),
       sassPlugin(),
-      babel({
-        exclude: ['node_modules/**'],
-      }),
+      // babel({
+      //   exclude: ['node_modules/**'],
+      // }),
     ],
   }),
 
@@ -62,10 +62,10 @@ export default [
       resolve(),
       commonjs(),
       sassPlugin(),
-      uglify(),
-      babel({
-        exclude: ['node_modules/**'],
-      }),
+      // uglify(),
+      // babel({
+      //   exclude: ['node_modules/**'],
+      // }),
     ],
   }),
 
@@ -79,9 +79,9 @@ export default [
     plugins: [
       resolve(),
       sassPlugin(),
-      babel({
-        exclude: ['node_modules/**'],
-      }),
+      // babel({
+      //   exclude: ['node_modules/**'],
+      // }),
     ],
   }),
 ];

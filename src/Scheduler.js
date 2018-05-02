@@ -6,6 +6,13 @@
 const MAX_CALLS = 800;
 const MAX_TIME = 50; // ms
 
+
+const delay1 = () => new Promise((resolve) => {
+  requestAnimationFrame((t) => {
+    resolve(t);
+  });
+});
+
 class Scheduler {
   constructor() {
     this.numberOfCalls = 0;
@@ -37,34 +44,47 @@ class Scheduler {
     }
   }
 
-  throttle(func) {
-    this.callsSinceResume += 1;
-
-    if (this.callsSinceResume > this.resumeLimit) {
-      this.endResume();
-    }
-
-    const handlerTime = performance.now() - this.lastWaitedTime;
-
-    if (this.isPaused) {
-      this.queuedFunc = func;
-    } else if (this.useDelay) {
-      setTimeout(func, this.delayTime);
-    } else if (this.numberOfCalls < MAX_CALLS && handlerTime < MAX_TIME) {
-      this.numberOfCalls += 1;
-      func();
-    } else {
-      this.numberOfCalls = 0;
-      if (document.hidden) {  // Tab in background
-        setTimeout(func, 1);
-      } else {
-        requestAnimationFrame((t) => {
-          this.lastWaitedTime = t;
-          func();
-        });
-      }
-    }
+  shouldYield() {
+    const timeSinceYield = performance.now() - this.lastWaitedTime;
+    return this.isPaused || this.numberOfCalls > MAX_CALLS || timeSinceYield > MAX_TIME;
   }
+
+  async nextFrame() {
+    this.lastWaitedTime = await delay1();
+  }
+
+  async yieldIfNecessary() {
+    if (this.shouldYield()) await this.nextFrame();
+  }
+
+  // throttle(func) {
+  //   this.callsSinceResume += 1;
+  //
+  //   if (this.callsSinceResume > this.resumeLimit) {
+  //     this.endResume();
+  //   }
+  //
+  //   const handlerTime = performance.now() - this.lastWaitedTime;
+  //
+  //   if (this.isPaused) {
+  //     this.queuedFunc = func;
+  //   } else if (this.useDelay) {
+  //     setTimeout(func, this.delayTime);
+  //   } else if (this.numberOfCalls < MAX_CALLS && handlerTime < MAX_TIME) {
+  //     this.numberOfCalls += 1;
+  //     func();
+  //   } else {
+  //     this.numberOfCalls = 0;
+  //     if (document.hidden) {  // Tab in background
+  //       setTimeout(func, 1);
+  //     } else {
+  //       requestAnimationFrame((t) => {
+  //         this.lastWaitedTime = t;
+  //         func();
+  //       });
+  //     }
+  //   }
+  // }
   pause() {
     if (this.isPaused) return 'Already paused';
     this.isPaused = true;

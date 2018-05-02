@@ -17,6 +17,7 @@ module.exports = {
     'no-console': 0,
     'class-methods-use-this': 0,
     'func-names': ['error', 'as-needed'],
-    'no-param-reassign': ['error', { 'props': false }]
+    'no-param-reassign': ['error', { 'props': false }],
+    'no-await-in-loop': 'off',
   },
 };
