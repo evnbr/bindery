@@ -14,7 +14,6 @@ import waitForImage from './waitForImage';
 // Utils
 import elToStr from '../utils/elementToString';
 import { c, el, last } from '../utils';
-import Thenable from './Thenable';
 
 const MAXIMUM_PAGE_LIMIT = 2000;
 
@@ -43,7 +42,7 @@ const isSplittable = (element, selectorsNotToSplit) => {
   return true;
 };
 
-const paginate = (content, rules) => new Thenable((paginateResolve, paginateReject, progress) => {
+const paginate = (content, rules, progressCallback) => {
   // SETUP
   let layoutWaitingTime = 0;
   let elementCount = 0;
@@ -69,7 +68,6 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
     if (page && page.hasOverflowed()) {
       console.warn('Bindery: Page overflowing', book.pageInProgress.element);
       if (!page.suppressErrors && !ignoreOverflow) {
-        paginateReject('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
@@ -84,7 +82,6 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
   // we were in when we overflowed the last page
   const continueOnNewPage = (ignoreOverflow = false) => {
     if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      paginateReject('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
@@ -94,7 +91,7 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
     const newPage = makeNewPage();
 
     book.pageInProgress = newPage;
-    progress(book);
+    progressCallback(book);
 
     book.pages.push(newPage);
 
@@ -314,11 +311,11 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
 
     console.log(`📖 Book ready in ${sec(totalTime)}s (Layout: ${sec(layoutTime)}s, Waiting for images: ${sec(layoutWaitingTime)}s)`);
 
-    paginateResolve(book);
+    return book;
   };
 
-  init();
-});
+  return init();
+};
 
 
 export default paginate;

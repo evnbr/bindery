@@ -212,7 +212,8 @@ class Viewer {
     this.mode = Mode.PRINT;
     this.render();
   }
-  render() {
+  render(newBook) {
+    if (newBook) this.book = newBook;
     if (!this.book) return;
     const { body } = document;
     if (!this.element.parentNode) {
