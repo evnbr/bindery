@@ -63,7 +63,7 @@ const paginate = (content, rules, progressCallback) => {
 
   const finishPage = (page, ignoreOverflow) => {
     if (page && page.hasOverflowed()) {
-      console.warn('Bindery: Page overflowing', book.pageInProgress.element);
+      console.warn(`Bindery: Page ~${book.pageCount} is overflowing`, book.pageInProgress.element);
       if (!page.suppressErrors && !ignoreOverflow) {
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
@@ -202,29 +202,31 @@ const paginate = (content, rules, progressCallback) => {
 
   let addElementNode;
 
-  const addTextChild = async (child, parent) => {
+  const addTextChild = async (textNode, parent) => {
     let hasAdded = false;
     if (canSplitParent(parent)) {
-      hasAdded = await addSplittableText(child);
+      hasAdded = await addSplittableText(textNode);
       if (!hasAdded) {
         if (breadcrumb.length < 2) {
-          addTextWithoutChecks(child, last(breadcrumb));
+          addTextWithoutChecks(textNode, last(breadcrumb));
           return;
         }
         // try on next page
         moveElementToNextPage(parent);
-        hasAdded = await addSplittableText(child);
+        hasAdded = await addSplittableText(textNode);
       }
     } else {
-      hasAdded = await addTextNode(child, last(breadcrumb), book.pageInProgress);
+      hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
       if (!hasAdded) {
         // try on next page
-        if (canSplit()) moveElementToNextPage(parent);
-        hasAdded = await addTextNode(child, last(breadcrumb), book.pageInProgress);
+        if (canSplit()) {
+          moveElementToNextPage(parent);
+          hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
+        }
       }
     }
     if (!hasAdded) {
-      addTextWithoutChecks(child, last(breadcrumb));
+      addTextWithoutChecks(textNode, last(breadcrumb));
     }
   };
 

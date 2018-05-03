@@ -29,20 +29,19 @@ const addTextNodeIncremental = async (textNode, parent, page) => {
   while (!page.hasOverflowed() && pos < originalText.length) {
     // advance to next non-space character
     pos += 1;
-    while (originalText.charAt(pos) !== ' ' && pos < originalText.length) pos += 1;
+    while (pos < originalText.length && originalText.charAt(pos) !== ' ') pos += 1;
 
-    // reveal more text
-    textNode.nodeValue = originalText.substr(0, pos);
-    await scheduler.yieldIfNecessary();
+    if (pos < originalText.length) {
+      // reveal more text
+      textNode.nodeValue = originalText.substr(0, pos);
+      await scheduler.yieldIfNecessary();
+    }
   }
 
   // Early return, we added the whole thing wastefully
   if (pos > originalText.length - 1) {
     return true;
   }
-
-  // We need to split this text node
-
   // Back out to word boundary
   if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
   while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
