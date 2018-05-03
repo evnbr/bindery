@@ -23,7 +23,7 @@ Web designers can think about books as an extension of responsive design, and pr
 <div class="home-btns">
   <a class="btn" href="/bindery/book">Try a Demo</a>
   <a  class="btn" href="https://unpkg.com/bindery/dist/bindery.min.js" download>
-    ↓ Download · 73k
+    ↓ Download · 54k
   </a>
   <a class="btn" href="https://github.com/evnbr/bindery">View on Github ↗</a>
 </div>

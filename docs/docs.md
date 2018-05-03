@@ -93,9 +93,9 @@ Note that setting the paper size through bindery [only works in Chrome and Opera
 Bindery.makeBook({
   content: '#content',
   printSetup: {
-    layout: 'booklet',
+    layout: Bindery.Layout.BOOKLET,
     paper: Bindery.Paper.AUTO_BLEED,
-    marks: 'crop',
+    marks: Bindery.Marks.CROP,
   },
 });
 ```
