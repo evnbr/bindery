@@ -46,7 +46,7 @@ li.continuation {
   flex-wrap: nowrap;
 }
 
-.flowbox {
+.flow-box {
   position: relative;
   margin: 60px 40px;
   margin-bottom: 0;
@@ -54,7 +54,7 @@ li.continuation {
   min-height: 0;
 }
 
-.content {
+.flow-content {
   padding: 0.1px;   /* prevent margin collapse */
   position: relative;
 }
@@ -67,7 +67,7 @@ li.continuation {
 }
 
 /*Bleed as layer*/
-.background {
+.page-background {
   position: absolute;
   z-index: 0;
   overflow: hidden;
@@ -128,19 +128,19 @@ li.continuation {
   margin: calc(var(--bindery-bleed) + 12pt) auto;
 }
 
-.background {
+.page-background {
   top: calc(-1 * var(--bindery-bleed));
   bottom: calc(-1 * var(--bindery-bleed));
   left: calc(-1 * var(--bindery-bleed));
   right: calc(-1 * var(--bindery-bleed));
 }
 
-.flowbox,
+.flow-box,
 .footer {
   margin-left: var(--bindery-margin-inner);
   margin-right: var(--bindery-margin-outer);
 }
-.left .flowbox,
+.left .flow-box,
 .left .footer {
   margin-left: var(--bindery-margin-outer);
   margin-right: var(--bindery-margin-inner);
@@ -153,33 +153,12 @@ li.continuation {
   right: var(--bindery-margin-outer);
 }
 
-.flowbox { margin-top: var(--bindery-margin-top); }
-.footer{ margin-bottom: var(--bindery-margin-bottom); }
+.flow-box { margin-top: var(--bindery-margin-top); }
+.footer { margin-bottom: var(--bindery-margin-bottom); }
 
-.bleed-left,
-.bleed-right,
-.crop-left,
-.crop-right,
-.crop-fold {
-  top: calc( -1 * var(--bindery-mark-length) - var(--bindery-bleed) );
-  bottom: calc( -1 * var(--bindery-mark-length) - var(--bindery-bleed) );
-}
-
-.bleed-top,
-.bleed-bottom,
-.crop-top,
-.crop-bottom {
-  left: calc( -12pt - var(--bindery-bleed) );
-  right: calc( -12pt - var(--bindery-bleed) );
-}
-.bleed-left   { left: -var(--bindery-bleed); }
-.bleed-right  { right: -var(--bindery-bleed); }
-.bleed-top    { top: -var(--bindery-bleed); }
-.bleed-bottom { bottom: -var(--bindery-bleed); }
-
-.spread.right > .background {
+.spread.right > .page-background {
   left: calc(-100% - var(--bindery-bleed));
 }
-.spread.left > .background {
+.spread.left > .page-background {
   right: calc(-100% - var(--bindery-bleed));
 }

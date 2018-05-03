@@ -66,30 +66,29 @@
   }
 }
 
-.crop-fold,
-.crop-left,
-.crop-right,
-.bleed-left,
-.bleed-right {
+.mark-crop-fold,
+.mark-crop-left,
+.mark-crop-right,
+.mark-bleed-left,
+.mark-bleed-right {
   width: 1px;
   margin: auto;
   @include vertical-mark
 }
-.crop-top,
-.crop-bottom,
-.bleed-top,
-.bleed-bottom {
+.mark-crop-top,
+.mark-crop-bottom,
+.mark-bleed-top,
+.mark-bleed-bottom {
   height: 1px;
   @include horizontal-mark
 }
 
 
 
-.crop {
+.mark-crop {
   &-fold { right: 0; left: 0; }
   &-left { left: 0; }
   &-right { right: 0; }
-
 
   &-top {
     top: 0;
@@ -110,3 +109,24 @@
   left: 0;
   right: 0;
 }
+
+.mark-bleed-left,
+.mark-bleed-right,
+.mark-crop-left,
+.mark-crop-right,
+.mark-crop-fold {
+  top: calc( -1 * var(--bindery-mark-length) - var(--bindery-bleed) );
+  bottom: calc( -1 * var(--bindery-mark-length) - var(--bindery-bleed) );
+}
+
+.mark-bleed-top,
+.mark-bleed-bottom,
+.mark-crop-top,
+.mark-crop-bottom {
+  left: calc( -12pt - var(--bindery-bleed) );
+  right: calc( -12pt - var(--bindery-bleed) );
+}
+.mark-bleed-left   { left: calc( -1 * var(--bindery-bleed)); }
+.mark-bleed-right  { right: calc( -1 * var(--bindery-bleed)); }
+.mark-bleed-top    { top: calc( -1 * var(--bindery-bleed)); }
+.mark-bleed-bottom { bottom: calc( -1 * var(--bindery-bleed)); }

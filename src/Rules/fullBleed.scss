@@ -28,28 +28,28 @@
 
   &.rotate-clockwise {
     .left & {
-      .background { bottom: 0; }
+      .page-background { bottom: 0; }
     }
     .right & {
-      .background { top: 0; }
+      .page-background { top: 0; }
     }
   }
 
   &.rotate-counterclockwise {
     .left & {
-      .background { top: 0; }
+      .page-background { top: 0; }
     }
     .right & {
-      .background { bottom: 0; }
+      .page-background { bottom: 0; }
     }
   }
 
   &.rotate-inward {
-    .background { bottom: 0; }
+    .page-background { bottom: 0; }
   }
 
   &.rotate-outward {
-    .background { top: 0; }
+    .page-background { top: 0; }
   }
 
   &.rotate-spread-clockwise {

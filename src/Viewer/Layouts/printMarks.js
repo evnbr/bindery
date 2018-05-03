@@ -1,15 +1,15 @@
 import { createEl } from '../../utils';
 
 const directions = ['top', 'bottom', 'left', 'right'];
-const bleedMarks = () => directions.map(dir => createEl(`.bleed-${dir}`));
-const cropMarks = () => directions.map(dir => createEl(`.crop-${dir}`));
+const bleedMarks = () => directions.map(dir => createEl(`.mark-bleed-${dir}`));
+const cropMarks = () => directions.map(dir => createEl(`.mark-crop-${dir}`));
 
 const printMarksSingle = () => createEl('.print-mark-wrap', [
   ...cropMarks(), ...bleedMarks(),
 ]);
 
 const printMarksSpread = () => createEl('.print-mark-wrap', [
-  createEl('.crop-fold'), ...cropMarks(), ...bleedMarks(),
+  createEl('.mark-crop-fold'), ...cropMarks(), ...bleedMarks(),
 ]);
 
 const bookletMeta = (i, len) => {

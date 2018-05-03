@@ -2,10 +2,10 @@ import { c, createEl } from '../utils';
 
 class Page {
   constructor() {
-    this.flowContent = createEl('content');
-    this.flowBox = createEl('flowbox', [this.flowContent]);
+    this.flowContent = createEl('flow-content');
+    this.flowBox = createEl('flow-box', [this.flowContent]);
     this.footer = createEl('footer');
-    this.background = createEl('background');
+    this.background = createEl('page-background');
     this.element = createEl('page', [this.background, this.flowBox, this.footer]);
   }
   overflowAmount() {
