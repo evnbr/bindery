@@ -186,22 +186,6 @@ const paginate = (content, rules, progressCallback) => {
     isSplittable(parent, ruleSet.selectorsNotToSplit)
     && !shouldIgnoreOverflow(parent);
 
-  // const addTextChild = (child, parent) => (canSplitParent(parent)
-  //   ? addSplittableText(child)
-  //       .catch(() => {
-  //         if (breadcrumb.length < 2) return addTextWithoutChecks(child, last(breadcrumb));
-  //         moveElementToNextPage(parent);
-  //         return addSplittableText(child);
-  //       })
-  //   : addTextNode(child, last(breadcrumb), book.pageInProgress)
-  //       .catch(() => {
-  //         if (canSplit()) moveElementToNextPage(parent);
-  //         return addTextNode(child, last(breadcrumb), book.pageInProgress);
-  //       })
-  //   ).catch(() => addTextWithoutChecks(child, last(breadcrumb)));
-
-  let addElementNode;
-
   const addTextChild = async (textNode, parent) => {
     let hasAdded = false;
     if (canSplitParent(parent)) {
@@ -217,12 +201,9 @@ const paginate = (content, rules, progressCallback) => {
       }
     } else {
       hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
-      if (!hasAdded) {
-        // try on next page
-        if (canSplit()) {
-          moveElementToNextPage(parent);
-          hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
-        }
+      if (!hasAdded && canSplit()) {
+        moveElementToNextPage(parent);
+        hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
       }
     }
     if (!hasAdded) {
@@ -230,6 +211,7 @@ const paginate = (content, rules, progressCallback) => {
     }
   };
 
+  let addElementNode;
   const addChild = async (child, parent) => {
     if (isTextNode(child)) {
       await addTextChild(child, parent);
