@@ -206,16 +206,20 @@ const paginate = (content, rules, progressCallback) => {
     let hasAdded = false;
     if (canSplitParent(parent)) {
       hasAdded = await addSplittableText(child);
-      if (!hasAdded && breadcrumb.length > 1) {
+      if (!hasAdded) {
+        if (breadcrumb.length < 2) {
+          addTextWithoutChecks(child, last(breadcrumb));
+          return;
+        }
         // try on next page
         moveElementToNextPage(parent);
         hasAdded = await addSplittableText(child);
       }
     } else {
       hasAdded = await addTextNode(child, last(breadcrumb), book.pageInProgress);
-      if (!hasAdded && canSplit()) {
+      if (!hasAdded) {
         // try on next page
-        moveElementToNextPage(parent);
+        if (canSplit()) moveElementToNextPage(parent);
         hasAdded = await addTextNode(child, last(breadcrumb), book.pageInProgress);
       }
     }

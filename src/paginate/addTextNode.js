@@ -4,11 +4,10 @@ import shouldIgnoreOverflow from './shouldIgnoreOverflow';
 // Try adding a text node in one go
 const addTextNode = async (textNode, parent, page) => {
   parent.appendChild(textNode);
-
   const success = !page.hasOverflowed();
   if (!success) parent.removeChild(textNode);
   await scheduler.yieldIfNecessary();
-  return success; // TODO
+  return success;
 };
 
 // Try adding a text node by incrementally adding words
@@ -20,21 +19,24 @@ const addTextNodeIncremental = async (textNode, parent, page) => {
   parent.appendChild(textNode);
 
   if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
-    // TODO Early return, we added the whole thing in one go
     return true;
   }
 
   // Add letter by letter until overflow
   let pos = 0;
-  while (!page.hasOverflowed() && pos > originalText.length - 1) {
-    textNode.nodeValue = originalText.substr(0, pos);
-    pos += 1;
+  textNode.nodeValue = originalText.substr(0, pos);
+
+  while (!page.hasOverflowed() && pos < originalText.length) {
     // advance to next non-space character
+    pos += 1;
     while (originalText.charAt(pos) !== ' ' && pos < originalText.length) pos += 1;
+
+    // reveal more text
+    textNode.nodeValue = originalText.substr(0, pos);
     await scheduler.yieldIfNecessary();
   }
 
-  // TODO Early return, we added the whole thing wastefully
+  // Early return, we added the whole thing wastefully
   if (pos > originalText.length - 1) {
     return true;
   }
