@@ -1,7 +1,6 @@
 /* global BINDERY_VERSION */
 
 import paginate from './paginate';
-import scheduler from './Scheduler';
 import PageSetup from './Page/PageSetup';
 
 import Viewer from './Viewer';
@@ -10,7 +9,7 @@ import { Mode, Paper, Layout, Marks } from './Constants';
 import Rules from './Rules/';
 import defaultRules from './Rules/defaultRules';
 
-import { OptionType, urlQuery, c } from './utils';
+import { OptionType, c } from './utils';
 
 import './main.scss';
 
@@ -26,7 +25,6 @@ class Bindery {
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
-    scheduler.isDebugging = opts.debug || urlQuery('debug') || false;
 
     OptionType.validate(opts, {
       name: 'makeBook',
@@ -196,10 +194,7 @@ class Bindery {
     this.viewer.clear();
 
     document.body.classList.add(c('viewing'));
-    if (scheduler.isDebugging) document.body.classList.add(c('debug'));
-
     this.pageSetup.updateStyleVars();
-
     this.viewer.setInProgress();
 
     try {
@@ -212,11 +207,11 @@ class Bindery {
       this.layoutComplete = true;
       if (doneBinding) doneBinding();
       this.viewer.element.classList.remove(c('in-progress'));
-      document.body.classList.remove(c('debug'));
     } catch (e) {
       this.layoutComplete = true;
       this.viewer.element.classList.remove(c('in-progress'));
       this.viewer.displayError('Layout couldn\'t complete', e);
+      console.error(e);
     }
   }
 }
