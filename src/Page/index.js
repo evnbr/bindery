@@ -1,12 +1,12 @@
-import { c, el } from '../utils';
+import { c, createEl } from '../utils';
 
 class Page {
   constructor() {
-    this.flowContent = el('content');
-    this.flowBox = el('flowbox', [this.flowContent]);
-    this.footer = el('footer');
-    this.background = el('background');
-    this.element = el('page', [this.background, this.flowBox, this.footer]);
+    this.flowContent = createEl('content');
+    this.flowBox = createEl('flowbox', [this.flowContent]);
+    this.footer = createEl('footer');
+    this.background = createEl('background');
+    this.element = createEl('page', [this.background, this.flowBox, this.footer]);
   }
   overflowAmount() {
     const contentH = this.flowContent.offsetHeight;
@@ -27,7 +27,7 @@ class Page {
 
     const testPage = new Page();
     let measureArea = document.querySelector(c('.measure-area'));
-    if (!measureArea) measureArea = document.body.appendChild(el('measure-area'));
+    if (!measureArea) measureArea = document.body.appendChild(createEl('measure-area'));
 
     measureArea.innerHTML = '';
     measureArea.appendChild(testPage.element);

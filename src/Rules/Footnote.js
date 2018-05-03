@@ -1,5 +1,5 @@
 import Replace from './Replace';
-import { OptionType, el } from '../utils';
+import { OptionType, createEl } from '../utils';
 
 // Options:
 // selector: String
@@ -19,7 +19,7 @@ class Footnote extends Replace {
   afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
     const number = book.pageInProgress.footer.children.length + 1;
 
-    const footnote = el('.footnote');
+    const footnote = createEl('.footnote');
     const contents = this.render(element, number);
     if (contents instanceof HTMLElement) footnote.appendChild(contents);
     else footnote.innerHTML = contents;

@@ -2,7 +2,7 @@ import c from './prefixClass';
 
 
 // Small utility to create div with namespaced classes
-const el = (className, content = []) => {
+const createEl = (className, content = []) => {
   const div = document.createElement('div');
   div.className = className.split('.').filter(txt => txt !== '').map(c).join(' ');
 
@@ -14,4 +14,4 @@ const el = (className, content = []) => {
   return div;
 };
 
-export default el;
+export default createEl;

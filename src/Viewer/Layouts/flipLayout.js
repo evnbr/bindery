@@ -1,9 +1,9 @@
-import { c, el } from '../../utils';
+import { c, createEl } from '../../utils';
 
 const renderFlipLayout = (pages, doubleSided) => {
   const flipLayout = document.createDocumentFragment();
-  const sizer = el('.spread-size.flip-sizer');
-  const flapHolder = el('.spread-size.flap-holder');
+  const sizer = createEl('.spread-size.flip-sizer');
+  const flapHolder = createEl('.spread-size.flap-holder');
   sizer.appendChild(flapHolder);
   flipLayout.appendChild(sizer);
   const flaps = [];
@@ -34,7 +34,7 @@ const renderFlipLayout = (pages, doubleSided) => {
   for (let i = 1; i < pages.length - 1; i += (doubleSided ? 2 : 1)) {
     leafIndex += 1;
     const li = leafIndex;
-    const flap = el('.page3d');
+    const flap = createEl('.page3d');
     flap.addEventListener('click', () => {
       const newLeaf = li - 1;
       setLeaf(newLeaf);
@@ -50,7 +50,7 @@ const renderFlipLayout = (pages, doubleSided) => {
       leftPage.classList.add(c('page3d-back'));
       flap.appendChild(leftPage);
     } else {
-      leftPage = el('.page.page3d-back');
+      leftPage = createEl('.page.page3d-back');
       flap.appendChild(leftPage);
     }
     // TODO: Dynamically add/remove pages.

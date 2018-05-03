@@ -13,7 +13,7 @@ import waitForImage from './waitForImage';
 
 // Utils
 import elToStr from '../utils/elementToString';
-import { c, el, last } from '../utils';
+import { c, last } from '../utils';
 
 const MAXIMUM_PAGE_LIMIT = 2000;
 
@@ -49,7 +49,6 @@ const paginate = (content, rules, progressCallback) => {
   let elementsProcessed = 0;
 
   const ruleSet = new RuleSet(rules);
-  const measureArea = document.body.appendChild(el('.measure-area'));
 
   let breadcrumb = []; // Keep track of position in original tree
   const book = new Book();
@@ -58,8 +57,6 @@ const paginate = (content, rules, progressCallback) => {
 
   const makeNewPage = () => {
     const newPage = new Page();
-    measureArea.appendChild(newPage.element);
-
     ruleSet.startPage(newPage, book);
     return newPage;
   };
@@ -297,7 +294,6 @@ const paginate = (content, rules, progressCallback) => {
     continueOnNewPage();
 
     await addElementNode(content);
-    document.body.removeChild(measureArea);
 
     book.pages = orderPages(book.pages, makeNewPage);
     annotatePages(book.pages);
