@@ -1,4 +1,4 @@
-import { c, el } from '../utils';
+import { c, createEl } from '../utils';
 // import Controls from './Controls';
 import Page from '../Page';
 
@@ -19,9 +19,9 @@ class Viewer {
     this.book = null;
     this.pageSetup = bindery.pageSetup;
 
-    this.progressBar = el('.progress-bar');
-    this.zoomBox = el('zoom-wrap');
-    this.element = el('root', [this.progressBar, this.zoomBox]);
+    this.progressBar = createEl('.progress-bar');
+    this.zoomBox = createEl('zoom-wrap');
+    this.element = createEl('root', [this.progressBar, this.zoomBox]);
 
     this.doubleSided = true;
     this.printArrange = layout;
@@ -135,7 +135,7 @@ class Viewer {
 
   setSheetSize(newVal) {
     this.pageSetup.sheetSizeMode = newVal;
-    this.pageSetup.updateStylesheet();
+    this.pageSetup.updateStyleVars();
 
     if (this.mode !== Mode.PRINT) {
       this.setPrint();
@@ -149,7 +149,7 @@ class Viewer {
     this.printArrange = newVal;
 
     this.pageSetup.setPrintTwoUp(this.isTwoUp);
-    this.pageSetup.updateStylesheet();
+    this.pageSetup.updateStyleVars();
 
     if (this.mode === Mode.PRINT) {
       this.render();
@@ -212,7 +212,8 @@ class Viewer {
     this.mode = Mode.PRINT;
     this.render();
   }
-  render() {
+  render(newBook) {
+    if (newBook) this.book = newBook;
     if (!this.book) return;
     const { body } = document;
     if (!this.element.parentNode) {
@@ -258,7 +259,7 @@ class Viewer {
     const limit = sideBySide ? 2 : 1;
 
     const makeSpread = function (...arg) {
-      return el('.spread-wrapper', [...arg]);
+      return createEl('.spread-wrapper', [...arg]);
     };
 
     this.book.pages.forEach((page, i) => {

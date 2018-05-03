@@ -1,8 +1,8 @@
-import { el } from '../../utils';
+import { createEl } from '../../utils';
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 
-const twoPageSpread = children => el('.spread-wrapper.spread-size', children);
-const onePageSpread = children => el('.spread-wrapper.page-size', children);
+const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
+const onePageSpread = children => createEl('.spread-wrapper.page-size', children);
 
 const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
   const printLayout = document.createDocumentFragment();
@@ -10,7 +10,7 @@ const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
   const marks = isTwoUp ? printMarksSpread : printMarksSingle;
   const spread = isTwoUp ? twoPageSpread : onePageSpread;
 
-  const printSheet = children => el('.print-page', [spread(children)]);
+  const printSheet = children => createEl('.print-page', [spread(children)]);
 
   if (isTwoUp) {
     for (let i = 0; i < pages.length; i += 2) {

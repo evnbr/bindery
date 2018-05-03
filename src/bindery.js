@@ -1,7 +1,6 @@
 /* global BINDERY_VERSION */
 
 import paginate from './paginate';
-import scheduler from './Scheduler';
 import PageSetup from './Page/PageSetup';
 
 import Viewer from './Viewer';
@@ -10,9 +9,15 @@ import { Mode, Paper, Layout, Marks } from './Constants';
 import Rules from './Rules/';
 import defaultRules from './Rules/defaultRules';
 
-import { OptionType, urlQuery, c } from './utils';
+import { OptionType, c } from './utils';
 
 import './main.scss';
+
+const parseHTML = (text, selector) => {
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = text;
+  return wrapper.querySelector(selector);
+};
 
 class Bindery {
   constructor(opts = {}) {
@@ -20,7 +25,6 @@ class Bindery {
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
-    scheduler.isDebugging = opts.debug || urlQuery('debug') || false;
 
     OptionType.validate(opts, {
       name: 'makeBook',
@@ -103,39 +107,24 @@ class Bindery {
     return new Bindery(opts);
   }
 
-  fetchSource(url, selector) {
-    fetch(url).then((response) => {
-      if (response.status === 404) {
-        this.viewer.displayError('404', `Could not find file at "${url}"`);
-      } else if (response.status === 200) {
-        return response.text();
-      }
-      return '';
-    }).then((fetchedContent) => {
-      const wrapper = document.createElement('div');
-      wrapper.innerHTML = fetchedContent;
-      this.source = wrapper.querySelector(selector);
-      if (!(this.source instanceof HTMLElement)) {
-        this.viewer.displayError(
-          'Source not specified',
-          `Could not find element that matches selector "${selector}"`
-        );
-        console.error(`Bindery: Could not find element that matches selector "${selector}"`);
-        return;
-      }
-      if (this.autorun) {
-        this.makeBook();
-      }
-    }).catch((error) => {
-      console.error(error);
-      const scheme = window.location.href.split('://')[0];
-      if (scheme === 'file') {
-        this.viewer.displayError(
-          `Can't fetch content from "${url}"`,
-          'Web pages can\'t fetch content unless they are on a server.'
-        );
-      }
-    });
+  async fetchSource(url, selector) {
+    const response = await fetch(url);
+    if (response.status !== 200) {
+      this.viewer.displayError(response.status, `Could not find file at "${url}"`);
+      return;
+    }
+    const fetchedContent = await response.text();
+    const sourceNode = parseHTML(fetchedContent, selector);
+    if (!(sourceNode instanceof HTMLElement)) {
+      this.viewer.displayError(
+        'Source not specified',
+        `Could not find element that matches selector "${selector}"`
+      );
+      console.error(`Bindery: Could not find element that matches selector "${selector}"`);
+      return;
+    }
+    this.source = sourceNode;
+    if (this.autorun) this.makeBook();
   }
 
   cancel() {
@@ -163,7 +152,7 @@ class Bindery {
 
     document.body.classList.add(c('viewing'));
 
-    this.pageSetup.updateStylesheet();
+    this.pageSetup.updateStyleVars();
 
     paginate({
       content,
@@ -181,7 +170,7 @@ class Bindery {
     });
   }
 
-  makeBook(doneBinding) {
+  async makeBook(doneBinding) {
     if (!this.source) {
       document.body.classList.add(c('viewing'));
       return;
@@ -205,28 +194,25 @@ class Bindery {
     this.viewer.clear();
 
     document.body.classList.add(c('viewing'));
-    if (scheduler.isDebugging) document.body.classList.add(c('debug'));
-
-    this.pageSetup.updateStylesheet();
-
+    this.pageSetup.updateStyleVars();
     this.viewer.setInProgress();
 
-    paginate(content, this.rules)
-      .progress((book) => {
-        this.viewer.renderProgress(book);
-      }).then((book) => {
-        this.viewer.book = book;
-        this.viewer.render();
-
-        this.layoutComplete = true;
-        if (doneBinding) doneBinding();
-        this.viewer.element.classList.remove(c('in-progress'));
-        document.body.classList.remove(c('debug'));
-      }).catch((error) => {
-        this.layoutComplete = true;
-        this.viewer.element.classList.remove(c('in-progress'));
-        this.viewer.displayError('Layout couldn\'t complete', error);
-      });
+    try {
+      const book = await paginate(
+        content,
+        this.rules,
+        partialBook => this.viewer.renderProgress(partialBook)
+      );
+      this.viewer.render(book);
+      this.layoutComplete = true;
+      if (doneBinding) doneBinding();
+      this.viewer.element.classList.remove(c('in-progress'));
+    } catch (e) {
+      this.layoutComplete = true;
+      this.viewer.element.classList.remove(c('in-progress'));
+      this.viewer.displayError('Layout couldn\'t complete', e);
+      console.error(e);
+    }
   }
 }
 Bindery.version = BINDERY_VERSION;

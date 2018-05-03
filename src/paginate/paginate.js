@@ -9,12 +9,11 @@ import RuleSet from './RuleSet';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
 import breadcrumbClone from './breadcrumbClone';
-import waitForImage from './waitForImage';
+import ensureImageLoaded from './ensureImageLoaded';
 
 // Utils
 import elToStr from '../utils/elementToString';
-import { c, el, last } from '../utils';
-import Thenable from './Thenable';
+import { c, last } from '../utils';
 
 const MAXIMUM_PAGE_LIMIT = 2000;
 
@@ -43,14 +42,13 @@ const isSplittable = (element, selectorsNotToSplit) => {
   return true;
 };
 
-const paginate = (content, rules) => new Thenable((paginateResolve, paginateReject, progress) => {
+const paginate = (content, rules, progressCallback) => {
   // SETUP
   let layoutWaitingTime = 0;
   let elementCount = 0;
   let elementsProcessed = 0;
 
   const ruleSet = new RuleSet(rules);
-  const measureArea = document.body.appendChild(el('.measure-area'));
 
   let breadcrumb = []; // Keep track of position in original tree
   const book = new Book();
@@ -59,17 +57,14 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
 
   const makeNewPage = () => {
     const newPage = new Page();
-    measureArea.appendChild(newPage.element);
-
     ruleSet.startPage(newPage, book);
     return newPage;
   };
 
   const finishPage = (page, ignoreOverflow) => {
     if (page && page.hasOverflowed()) {
-      console.warn('Bindery: Page overflowing', book.pageInProgress.element);
+      console.warn(`Bindery: Page ~${book.pageCount} is overflowing`, book.pageInProgress.element);
       if (!page.suppressErrors && !ignoreOverflow) {
-        paginateReject('Moved to new page when last one is still overflowing');
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
@@ -84,7 +79,6 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
   // we were in when we overflowed the last page
   const continueOnNewPage = (ignoreOverflow = false) => {
     if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      paginateReject('Maximum page count exceeded');
       throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
     }
 
@@ -94,7 +88,7 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
     const newPage = makeNewPage();
 
     book.pageInProgress = newPage;
-    progress(book);
+    progressCallback(book);
 
     book.pages.push(newPage);
 
@@ -171,68 +165,88 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
     breadcrumb.push(nodeToMove);
   };
 
-  const addTextWithoutChecks = (child, parent) => new Thenable((resolve) => {
+  const addTextWithoutChecks = (child, parent) => {
     parent.appendChild(child);
     if (canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
     }
-    resolve();
-  });
+  };
 
-  const addSplittableText = text => new Thenable((resolve, reject) => {
-    addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress)
-      .then((remainder) => {
-        if (remainder) {
-          continueOnNewPage();
-          addSplittableText(remainder).then(resolve).catch(reject);
-        } else {
-          resolve();
-        }
-      }).catch(reject);
-  });
+  const addSplittableText = async (text) => {
+    const result = await addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress);
+    if (isTextNode(result)) {
+      continueOnNewPage();
+      return addSplittableText(result);
+    }
+    return result;
+  };
 
   const canSplitParent = parent =>
     isSplittable(parent, ruleSet.selectorsNotToSplit)
     && !shouldIgnoreOverflow(parent);
 
-  const addTextChild = (child, parent) => (canSplitParent(parent)
-    ? addSplittableText(child)
-        .catch(() => {
-          if (breadcrumb.length < 2) return addTextWithoutChecks(child, last(breadcrumb));
-          moveElementToNextPage(parent);
-          return addSplittableText(child);
-        })
-    : addTextNode(child, last(breadcrumb), book.pageInProgress)
-        .catch(() => {
-          if (canSplit()) moveElementToNextPage(parent);
-          return addTextNode(child, last(breadcrumb), book.pageInProgress);
-        })
-    ).catch(() => addTextWithoutChecks(child, last(breadcrumb)));
+  // const addTextChild = (child, parent) => (canSplitParent(parent)
+  //   ? addSplittableText(child)
+  //       .catch(() => {
+  //         if (breadcrumb.length < 2) return addTextWithoutChecks(child, last(breadcrumb));
+  //         moveElementToNextPage(parent);
+  //         return addSplittableText(child);
+  //       })
+  //   : addTextNode(child, last(breadcrumb), book.pageInProgress)
+  //       .catch(() => {
+  //         if (canSplit()) moveElementToNextPage(parent);
+  //         return addTextNode(child, last(breadcrumb), book.pageInProgress);
+  //       })
+  //   ).catch(() => addTextWithoutChecks(child, last(breadcrumb)));
 
   let addElementNode;
 
-
-  const addChild = (child, parent) => {
-    if (isTextNode(child)) {
-      return addTextChild(child, parent);
-    } else if (isUnloadedImage(child)) {
-      const imgStart = performance.now();
-      return waitForImage(child).then(() => {
-        layoutWaitingTime += (performance.now() - imgStart);
-        return addElementNode(child);
-      });
-    } else if (isContent(child)) {
-      return addElementNode(child);
+  const addTextChild = async (textNode, parent) => {
+    let hasAdded = false;
+    if (canSplitParent(parent)) {
+      hasAdded = await addSplittableText(textNode);
+      if (!hasAdded) {
+        if (breadcrumb.length < 2) {
+          addTextWithoutChecks(textNode, last(breadcrumb));
+          return;
+        }
+        // try on next page
+        moveElementToNextPage(parent);
+        hasAdded = await addSplittableText(textNode);
+      }
+    } else {
+      hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
+      if (!hasAdded) {
+        // try on next page
+        if (canSplit()) {
+          moveElementToNextPage(parent);
+          hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
+        }
+      }
     }
+    if (!hasAdded) {
+      addTextWithoutChecks(textNode, last(breadcrumb));
+    }
+  };
 
-    // Skip comments and unknown nodes
-    return Thenable.resolved();
+  const addChild = async (child, parent) => {
+    if (isTextNode(child)) {
+      await addTextChild(child, parent);
+    } else if (isUnloadedImage(child)) {
+      const waitTime = await ensureImageLoaded(child);
+      layoutWaitingTime += waitTime;
+      await addElementNode(child);
+    } else if (isContent(child)) {
+      await addElementNode(child);
+    } else {
+      // Skip comments and unknown nodes
+    }
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
-  addElementNode = elementToAdd => new Thenable((resolve) => {
+  addElementNode = async (elementToAdd) => {
     if (book.pageInProgress.hasOverflowed() && canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
@@ -252,43 +266,29 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
       moveElementToNextPage(element);
     }
 
-    const finishAdding = () => {
-      // We're now done with this element and its children,
-      // so we pop up a level
-      const addedChild = breadcrumb.pop();
-      ruleSet.afterAddElement(
-        addedChild,
-        book,
-        continueOnNewPage,
-        makeNewPage,
-        (el) => {
-          el.parentNode.removeChild(el);
-          continueOnNewPage();
-          last(breadcrumb).appendChild(el);
-        }
-      );
-      elementsProcessed += 1;
-      book.estimatedProgress = elementsProcessed / elementCount;
-      resolve();
-    };
+    for (let i = 0; i < childNodes.length; i += 1) {
+      const child = childNodes[i];
+      await addChild(child, element);
+    }
 
-    let index = 0;
-    const addNext = () => {
-      if (index < childNodes.length) {
-        const child = childNodes[index];
-        index += 1;
-        addChild(child, element).then(addNext);
-      } else {
-        finishAdding();
+    const addedChild = breadcrumb.pop();
+    ruleSet.afterAddElement(
+      addedChild,
+      book,
+      continueOnNewPage,
+      makeNewPage,
+      (el) => {
+        el.parentNode.removeChild(el);
+        continueOnNewPage();
+        last(breadcrumb).appendChild(el);
       }
-    };
+    );
+    elementsProcessed += 1;
+    book.estimatedProgress = elementsProcessed / elementCount;
+  };
 
-    // kick it off
-    addNext();
-  });
 
-
-  (() => {
+  const init = async () => {
     const startLayoutTime = window.performance.now();
 
     ruleSet.setup();
@@ -296,25 +296,26 @@ const paginate = (content, rules) => new Thenable((paginateResolve, paginateReje
     content.style.padding = 0;
     elementCount = content.querySelectorAll('*').length;
     continueOnNewPage();
-    addElementNode(content).then(() => {
-      document.body.removeChild(measureArea);
 
-      book.pages = orderPages(book.pages, makeNewPage);
-      annotatePages(book.pages);
+    await addElementNode(content);
 
-      book.setCompleted();
-      ruleSet.finishEveryPage(book);
+    book.pages = orderPages(book.pages, makeNewPage);
+    annotatePages(book.pages);
 
-      const endLayoutTime = window.performance.now();
-      const totalTime = endLayoutTime - startLayoutTime;
-      const layoutTime = totalTime - layoutWaitingTime;
+    book.setCompleted();
+    ruleSet.finishEveryPage(book);
 
-      console.log(`📖 Book ready in ${sec(totalTime)}s (Layout: ${sec(layoutTime)}s, Waiting for images: ${sec(layoutWaitingTime)}s)`);
+    const endLayoutTime = window.performance.now();
+    const totalTime = endLayoutTime - startLayoutTime;
+    const layoutTime = totalTime - layoutWaitingTime;
 
-      paginateResolve(book);
-    });
-  })();
-});
+    console.log(`📖 Book ready in ${sec(totalTime)}s (Layout: ${sec(layoutTime)}s, Waiting for images: ${sec(layoutWaitingTime)}s)`);
+
+    return book;
+  };
+
+  return init();
+};
 
 
 export default paginate;

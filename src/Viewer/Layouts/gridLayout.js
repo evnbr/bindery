@@ -1,7 +1,7 @@
-import { el } from '../../utils';
+import { createEl } from '../../utils';
 
-const twoPageSpread = children => el('.spread-wrapper.spread-size', children);
-const onePageSpread = children => el('.spread-wrapper.page-size', children);
+const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
+const onePageSpread = children => createEl('.spread-wrapper.page-size', children);
 
 const renderGridLayout = (pages, isTwoUp) => {
   const gridLayout = document.createDocumentFragment();

@@ -1,72 +1,66 @@
 import scheduler from '../Scheduler';
 import shouldIgnoreOverflow from './shouldIgnoreOverflow';
-import Thenable from './Thenable';
 
 // Try adding a text node in one go
-const addTextNode = (textNode, parent, page) => new Thenable((resolve, reject) => {
+const addTextNode = async (textNode, parent, page) => {
   parent.appendChild(textNode);
-
-  if (page.hasOverflowed()) {
-    parent.removeChild(textNode);
-    scheduler.throttle(reject);
-  } else {
-    scheduler.throttle(resolve);
-  }
-});
+  const success = !page.hasOverflowed();
+  if (!success) parent.removeChild(textNode);
+  await scheduler.yieldIfNecessary();
+  return success;
+};
 
 // Try adding a text node by incrementally adding words
 // until it just barely doesnt overflow.
 // Binary search would probably be better but its not currenty
 // the bottleneck.
-const addTextNodeIncremental = (textNode, parent, page) => new Thenable((resolve, reject) => {
+const addTextNodeIncremental = async (textNode, parent, page) => {
   const originalText = textNode.nodeValue;
   parent.appendChild(textNode);
 
   if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
-    scheduler.throttle(resolve);
-    return;
+    return true;
   }
 
+  // Add letter by letter until overflow
   let pos = 0;
+  textNode.nodeValue = originalText.substr(0, pos);
 
-  const splitTextStep = () => {
-    textNode.nodeValue = originalText.substr(0, pos);
-
-    if (page.hasOverflowed()) {
-      // Back out to word boundary
-      if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
-      while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
-
-      if (pos < 1) {
-        textNode.nodeValue = originalText;
-        textNode.parentNode.removeChild(textNode);
-        scheduler.throttle(reject);
-        return;
-      }
-
-      // console.log(`Text breaks at ${pos}: ${originalText.substr(0, pos)}`);
-
-      const fittingText = originalText.substr(0, pos);
-      const overflowingText = originalText.substr(pos);
-      textNode.nodeValue = fittingText;
-
-      // Start on new page
-      const remainingTextNode = document.createTextNode(overflowingText);
-      scheduler.throttle(() => resolve(remainingTextNode));
-      return;
-    }
-    if (pos > originalText.length - 1) {
-      scheduler.throttle(resolve);
-      return;
-    }
-
+  while (!page.hasOverflowed() && pos < originalText.length) {
+    // advance to next non-space character
     pos += 1;
-    while (originalText.charAt(pos) !== ' ' && pos < originalText.length) pos += 1;
+    while (pos < originalText.length && originalText.charAt(pos) !== ' ') pos += 1;
 
-    scheduler.throttle(splitTextStep);
-  };
+    if (pos < originalText.length) {
+      // reveal more text
+      textNode.nodeValue = originalText.substr(0, pos);
+      await scheduler.yieldIfNecessary();
+    }
+  }
 
-  splitTextStep();
-});
+  // Early return, we added the whole thing wastefully
+  if (pos > originalText.length - 1) {
+    return true;
+  }
+  // Back out to word boundary
+  if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
+  while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
+
+  if (pos < 1) {
+    // We didn't even add a complete word, don't add node
+    textNode.nodeValue = originalText;
+    textNode.parentNode.removeChild(textNode);
+    return false; // TODO
+  }
+
+  // trim text to word
+  const fittingText = originalText.substr(0, pos);
+  const overflowingText = originalText.substr(pos);
+  textNode.nodeValue = fittingText;
+
+  // Create a new text node for the next page
+  const remainingTextNode = document.createTextNode(overflowingText);
+  return remainingTextNode;
+};
 
 export { addTextNode, addTextNodeIncremental };

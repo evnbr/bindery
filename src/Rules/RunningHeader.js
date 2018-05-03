@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import { OptionType, el } from '../utils';
+import { OptionType, createEl } from '../utils';
 
 // Options:
 // selector: String
@@ -16,7 +16,7 @@ class RunningHeader extends Rule {
   }
   eachPage(page) {
     if (!page.runningHeader) {
-      const elmt = el('.running-header');
+      const elmt = createEl('.running-header');
       page.element.appendChild(elmt);
       page.runningHeader = elmt;
     }
