@@ -1,6 +1,5 @@
 import Page from '../Page';
 import { isValidSize, parseVal } from '../utils/convertUnits';
-import { c } from '../utils';
 import { Paper, Layout } from '../Constants';
 
 
@@ -69,21 +68,20 @@ class PageSetup {
       ? this.spreadSizeStyle().width
       : this.size.width;
     const height = this.size.height;
-    const b = this.bleed;
 
     switch (this.sheetSizeMode) {
     case Paper.AUTO:
       return { width, height };
     case Paper.AUTO_BLEED:
       return {
-        width: `calc(${width} + ${b} + ${b})`,
-        height: `calc(${height} + ${b} + ${b})`,
+        width: `calc(${width} + 2 * var(--bleed))`,
+        height: `calc(${height} + 2 * var(--bleed))`,
       };
     case Paper.AUTO_MARKS:
       // TODO: 24pt marks is hardcoded
       return {
-        width: `calc(${width} + ${b} + ${b} + 24pt)`,
-        height: `calc(${height} + ${b} + ${b} + 24pt)`,
+        width: `calc(${width} + 2 * var(--bindery-bleed) + 2 * var(--bindery-mark-length))`,
+        height: `calc(${height} + 2 * var(--bindery-bleed) + 2 * var(--bindery-mark-length))`,
       };
     case Paper.LETTER_LANDSCAPE:
       return { width: letter.height, height: letter.width };
@@ -99,7 +97,7 @@ class PageSetup {
   }
 
   isSizeValid() {
-    this.updateStylesheet();
+    this.updateStyleVars();
     return Page.isSizeValid();
   }
 
@@ -111,7 +109,7 @@ class PageSetup {
     };
   }
 
-  updateStylesheet() {
+  updateStyleVars() {
     let sheet;
     const existing = document.querySelector('#binderyPageSetup');
     if (existing) {
@@ -120,88 +118,18 @@ class PageSetup {
       sheet = document.createElement('style');
       sheet.id = 'binderyPageSetup';
     }
-    const w = parseVal(this.size.width);
-
-    sheet.innerHTML = `
-@page { size: ${this.sheetSize.width} ${this.sheetSize.height}; }
-${c('.print-page')} { width: ${this.sheetSize.width}; height: ${this.sheetSize.height};}
-
-${c('.show-crop')} ${c('.print-page')} ${c('.spread-wrapper')},
-${c('.show-bleed-marks')} ${c('.print-page')} ${c('.spread-wrapper')} {
-  margin: calc(${this.bleed} + 12pt) auto;
-}
-html {
-  --bindery-page-width: ${this.size.width};
-  --bindery-page-height: ${this.size.height};
-}
-${c('.page-size-rotated')} {
-  height: ${this.size.width};
-  width: ${this.size.height};
-}
-${c('.spread-size')} {
-  height: ${this.size.height};
-  width: ${w.val * 2}${w.unit};
-}
-${c('.spread-size-rotated')} {
-  height: ${w.val * 2}${w.unit};
-  width: ${this.size.height};
-}
-${c('.flowbox')},
-${c('.footer')} {
-  margin-left: ${this.margin.inner};
-  margin-right: ${this.margin.outer};
-}
-${c('.left')} ${c('.flowbox')},
-${c('.left')} ${c('.footer')} {
-  margin-left: ${this.margin.outer};
-  margin-right: ${this.margin.inner};
-}
-
-${c('.left')} ${c('.running-header')} {
-  left: ${this.margin.outer};
-}
-${c('.right')} ${c('.running-header')} {
-  right: ${this.margin.outer};
-}
-
-${c('.flowbox')} { margin-top: ${this.margin.top}; }
-${c('.footer')}{ margin-bottom: ${this.margin.bottom}; }
-
-${c('.bleed-left')},
-${c('.bleed-right')},
-${c('.crop-left')},
-${c('.crop-right')},
-${c('.crop-fold')} {
-  top: calc( -12pt - ${this.bleed} );
-  bottom: calc( -12pt - ${this.bleed} );
-}
-
-${c('.bleed-top')},
-${c('.bleed-bottom')},
-${c('.crop-top')},
-${c('.crop-bottom')} {
-  left: calc( -12pt - ${this.bleed} );
-  right: calc( -12pt - ${this.bleed} );
-}
-${c('.bleed-left')}   { left: -${this.bleed}; }
-${c('.bleed-right')}  { right: -${this.bleed}; }
-${c('.bleed-top')}    { top: -${this.bleed}; }
-${c('.bleed-bottom')} { bottom: -${this.bleed}; }
-
-${c('.background')} {
-  top: -${this.bleed};
-  bottom: -${this.bleed};
-  left: -${this.bleed};
-  right: -${this.bleed};
-}
-
-${c('.spread')}${c('.right')} > ${c('.background')} {
-  left: calc(-100% - ${this.bleed});
-}
-${c('.spread')}${c('.left')} > ${c('.background')} {
-  right: calc(-100% - ${this.bleed});
-}
-    `;
+    sheet.innerHTML = `html {
+      --bindery-page-width: ${this.size.width};
+      --bindery-page-height: ${this.size.height};
+      --bindery-sheet-width: ${this.sheetSize.width};
+      --bindery-sheet-height: ${this.sheetSize.height};
+      --bindery-margin-inner: ${this.margin.inner};
+      --bindery-margin-outer: ${this.margin.outer};
+      --bindery-margin-top: ${this.margin.top};
+      --bindery-margin-bottom: ${this.margin.bottom};
+      --bindery-bleed: ${this.bleed};
+      --bindery-mark-length: 12pt;
+    }`;
     document.head.appendChild(sheet);
   }
 }

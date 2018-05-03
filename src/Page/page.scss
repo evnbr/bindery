@@ -102,3 +102,84 @@ li.#{$pre}-continuation {
     text-align: right;
   }
 }
+
+.#{$pre}-print-page {
+  width: var(--bindery-sheet-width);
+  height: var(--bindery-sheet-height);
+}
+
+.#{$pre}-page-size-rotated {
+  height: var(--bindery-page-width);
+  width: var(--bindery-page-height);
+}
+
+.#{$pre}-spread-size {
+  height: var(--bindery-page-height);
+  width: calc(var(--bindery-page-width) * 2);
+}
+
+.#{$pre}-spread-size-rotated {
+  width: var(--bindery-page-height);
+  height: calc(var(--bindery-page-width) * 2);
+}
+
+.#{$pre}-.show-crop .#{$pre}-.print-page .#{$pre}-.spread-wrapper,
+.#{$pre}-.show-bleed-marks .#{$pre}-.print-page .#{$pre}-.spread-wrapper {
+  margin: calc(var(--bindery-bleed) + 12pt) auto;
+}
+
+.#{$pre}-background {
+  top: calc(-1 * var(--bindery-bleed));
+  bottom: calc(-1 * var(--bindery-bleed));
+  left: calc(-1 * var(--bindery-bleed));
+  right: calc(-1 * var(--bindery-bleed));
+}
+
+.#{$pre}-flowbox,
+.#{$pre}-footer {
+  margin-left: var(--bindery-margin-inner);
+  margin-right: var(--bindery-margin-outer);
+}
+.#{$pre}-left .#{$pre}-flowbox,
+.#{$pre}-left .#{$pre}-footer {
+  margin-left: var(--bindery-margin-outer);
+  margin-right: var(--bindery-margin-inner);
+}
+
+.#{$pre}-left .#{$pre}-running-header {
+  left: var(--bindery-margin-outer);
+}
+.#{$pre}-right .#{$pre}-running-header {
+  right: var(--bindery-margin-outer);
+}
+
+.#{$pre}-flowbox { margin-top: var(--bindery-margin-top); }
+.#{$pre}-footer{ margin-bottom: var(--bindery-margin-bottom); }
+
+.#{$pre}-bleed-left,
+.#{$pre}-bleed-right,
+.#{$pre}-crop-left,
+.#{$pre}-crop-right,
+.#{$pre}-crop-fold {
+  top: calc( -1 * var(--bindery-mark-length) - var(--bindery-bleed) );
+  bottom: calc( -1 * var(--bindery-mark-length) - var(--bindery-bleed) );
+}
+
+.#{$pre}-bleed-top,
+.#{$pre}-bleed-bottom,
+.#{$pre}-crop-top,
+.#{$pre}-crop-bottom {
+  left: calc( -12pt - var(--bindery-bleed) );
+  right: calc( -12pt - var(--bindery-bleed) );
+}
+.#{$pre}-bleed-left   { left: -var(--bindery-bleed); }
+.#{$pre}-bleed-right  { right: -var(--bindery-bleed); }
+.#{$pre}-bleed-top    { top: -var(--bindery-bleed); }
+.#{$pre}-bleed-bottom { bottom: -var(--bindery-bleed); }
+
+.#{$pre}-spread.#{$pre}-right > .#{$pre}-background {
+  left: calc(-100% - var(--bindery-bleed));
+}
+.#{$pre}-spread.#{$pre}-left > .#{$pre}-background {
+  right: calc(-100% - var(--bindery-bleed));
+}

@@ -154,7 +154,7 @@ class Bindery {
 
     document.body.classList.add(c('viewing'));
 
-    this.pageSetup.updateStylesheet();
+    this.pageSetup.updateStyleVars();
 
     paginate({
       content,
@@ -198,7 +198,7 @@ class Bindery {
     document.body.classList.add(c('viewing'));
     if (scheduler.isDebugging) document.body.classList.add(c('debug'));
 
-    this.pageSetup.updateStylesheet();
+    this.pageSetup.updateStyleVars();
 
     this.viewer.setInProgress();
 

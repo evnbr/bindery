@@ -1,5 +1,3 @@
-$markLen: 12pt;
-
 .#{$pre}-print-mark-wrap {
   display: none;
   position: absolute;
@@ -52,7 +50,7 @@ $markLen: 12pt;
   &::before,
   &:after {
     width: 1px;
-    height: $markLen;
+    height: var(--bindery-mark-length);
     background-image: linear-gradient(to right, black 0%, black 51%, transparent 51%);
     background-size: 1px 100%;
   }
@@ -61,7 +59,7 @@ $markLen: 12pt;
 @mixin horizontal-mark {
   &::before,
   &:after {
-    width: $markLen;
+    width: var(--bindery-mark-length);
     height: 1px;
     background-image: linear-gradient(to bottom, black 0%, black 51%, transparent 51%);
     background-size: 100% 1px;
@@ -102,7 +100,7 @@ $markLen: 12pt;
 }
 
 .#{$pre}-print-meta {
-  padding: 12pt;
+  padding: var(--bindery-mark-length);
   text-align: center;
   font-family: $system;
   font-size: 8pt;

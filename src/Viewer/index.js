@@ -135,7 +135,7 @@ class Viewer {
 
   setSheetSize(newVal) {
     this.pageSetup.sheetSizeMode = newVal;
-    this.pageSetup.updateStylesheet();
+    this.pageSetup.updateStyleVars();
 
     if (this.mode !== Mode.PRINT) {
       this.setPrint();
@@ -149,7 +149,7 @@ class Viewer {
     this.printArrange = newVal;
 
     this.pageSetup.setPrintTwoUp(this.isTwoUp);
-    this.pageSetup.updateStylesheet();
+    this.pageSetup.updateStyleVars();
 
     if (this.mode === Mode.PRINT) {
       this.render();
