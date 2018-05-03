@@ -4,6 +4,7 @@ import minify from 'rollup-plugin-babel-minify';
 
 import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
+import prefixer from 'postcss-class-prefix';
 import cssnano from 'cssnano';
 import inlinesvg from 'postcss-svg';
 
@@ -20,6 +21,7 @@ const baseConfig = {
 const sassPlugin = () => sass({
   insert: true,
   processor: css => postcss([
+    prefixer('📖-'),
     inlinesvg({
       func: 'url',
       dirs: './src',

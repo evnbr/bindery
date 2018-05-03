@@ -9,58 +9,58 @@
   transform-origin: top left;
 }
 
-.#{$pre}-rotate-container.#{$pre}-rotate-clockwise,
-.#{$pre}-left .#{$pre}-rotate-container.#{$pre}-rotate-spread-clockwise,
-.#{$pre}-right .#{$pre}-rotate-container.#{$pre}-rotate-inward,
-.#{$pre}-left .#{$pre}-rotate-container.#{$pre}-rotate-outward {
+.rotate-container.rotate-clockwise,
+.left .rotate-container.rotate-spread-clockwise,
+.right .rotate-container.rotate-inward,
+.left .rotate-container.rotate-outward {
   @include rotate-face-left
 }
 
-.#{$pre}-rotate-container.#{$pre}-rotate-counterclockwise,
-.#{$pre}-left .#{$pre}-rotate-container.#{$pre}-rotate-spread-counterclockwise,
-.#{$pre}-left .#{$pre}-rotate-container.#{$pre}-rotate-inward,
-.#{$pre}-right .#{$pre}-rotate-container.#{$pre}-rotate-outward {
+.rotate-container.rotate-counterclockwise,
+.left .rotate-container.rotate-spread-counterclockwise,
+.left .rotate-container.rotate-inward,
+.right .rotate-container.rotate-outward {
   @include rotate-face-right
 }
 
-.#{$pre}-rotate-container {
+.rotate-container {
   position: absolute;
 
-  &.#{$pre}-rotate-clockwise {
-    .#{$pre}-left & {
-      .#{$pre}-background { bottom: 0; }
+  &.rotate-clockwise {
+    .left & {
+      .background { bottom: 0; }
     }
-    .#{$pre}-right & {
-      .#{$pre}-background { top: 0; }
-    }
-  }
-
-  &.#{$pre}-rotate-counterclockwise {
-    .#{$pre}-left & {
-      .#{$pre}-background { top: 0; }
-    }
-    .#{$pre}-right & {
-      .#{$pre}-background { bottom: 0; }
+    .right & {
+      .background { top: 0; }
     }
   }
 
-  &.#{$pre}-rotate-inward {
-    .#{$pre}-background { bottom: 0; }
+  &.rotate-counterclockwise {
+    .left & {
+      .background { top: 0; }
+    }
+    .right & {
+      .background { bottom: 0; }
+    }
   }
 
-  &.#{$pre}-rotate-outward {
-    .#{$pre}-background { top: 0; }
+  &.rotate-inward {
+    .background { bottom: 0; }
   }
 
-  &.#{$pre}-rotate-spread-clockwise {
-    .#{$pre}-right & {
+  &.rotate-outward {
+    .background { top: 0; }
+  }
+
+  &.rotate-spread-clockwise {
+    .right & {
       transform: rotate(90deg) translate3d(0, -50%, 0);
       transform-origin: top left;
     }
   }
 
-  &.#{$pre}-rotate-spread-counterclockwise {
-    .#{$pre}-right & {
+  &.rotate-spread-counterclockwise {
+    .right & {
       transform: rotate(-90deg) translate3d(-100%, -50%, 0);
       transform-origin: top left;
     }

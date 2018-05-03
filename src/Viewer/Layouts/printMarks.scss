@@ -1,4 +1,4 @@
-.#{$pre}-print-mark-wrap {
+.print-mark-wrap {
   display: none;
   position: absolute;
   pointer-events: none;
@@ -8,17 +8,17 @@
   right: 0;
   z-index: 999;
 
-  .#{$pre}-show-crop &,
-  .#{$pre}-show-bleed-marks & {
+  .show-crop &,
+  .show-bleed-marks & {
     display: block;
   }
 
-  .#{$pre}-show-crop & {
+  .show-crop & {
     > [class*='crop'] {
       display: block;
     }
   }
-  .#{$pre}-show-bleed-marks & {
+  .show-bleed-marks & {
     > [class*='bleed'] {
       display: block;
     }
@@ -66,26 +66,26 @@
   }
 }
 
-.#{$pre}-crop-fold,
-.#{$pre}-crop-left,
-.#{$pre}-crop-right,
-.#{$pre}-bleed-left,
-.#{$pre}-bleed-right {
+.crop-fold,
+.crop-left,
+.crop-right,
+.bleed-left,
+.bleed-right {
   width: 1px;
   margin: auto;
   @include vertical-mark
 }
-.#{$pre}-crop-top,
-.#{$pre}-crop-bottom,
-.#{$pre}-bleed-top,
-.#{$pre}-bleed-bottom {
+.crop-top,
+.crop-bottom,
+.bleed-top,
+.bleed-bottom {
   height: 1px;
   @include horizontal-mark
 }
 
 
 
-.#{$pre}-crop {
+.crop {
   &-fold { right: 0; left: 0; }
   &-left { left: 0; }
   &-right { right: 0; }
@@ -99,7 +99,7 @@
   }
 }
 
-.#{$pre}-print-meta {
+.print-meta {
   padding: var(--bindery-mark-length);
   text-align: center;
   font-family: $system;
