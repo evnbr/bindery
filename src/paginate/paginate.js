@@ -9,7 +9,7 @@ import RuleSet from './RuleSet';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
 import breadcrumbClone from './breadcrumbClone';
-import waitForImage from './waitForImage';
+import ensureImageLoaded from './ensureImageLoaded';
 
 // Utils
 import elToStr from '../utils/elementToString';
@@ -224,14 +224,12 @@ const paginate = (content, rules, progressCallback) => {
     }
   };
 
-
   const addChild = async (child, parent) => {
     if (isTextNode(child)) {
       await addTextChild(child, parent);
     } else if (isUnloadedImage(child)) {
-      const imgStart = performance.now();
-      await waitForImage(child);
-      layoutWaitingTime += (performance.now() - imgStart);
+      const waitTime = await ensureImageLoaded(child);
+      layoutWaitingTime += waitTime;
       await addElementNode(child);
     } else if (isContent(child)) {
       await addElementNode(child);

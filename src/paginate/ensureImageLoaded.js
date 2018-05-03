@@ -5,7 +5,8 @@ const wait10 = () => new Promise((resolve) => {
   setTimeout(() => { resolve(); }, 10);
 });
 
-const waitForImage = async (image) => {
+const ensureImageLoaded = async (image) => {
+  const imgStart = performance.now();
   let failed = false;
   image.addEventListener('error', () => { failed = true; });
   image.src = image.src;
@@ -13,6 +14,8 @@ const waitForImage = async (image) => {
   while (!image.naturalWidth && !failed) {
     await wait10();
   }
+
+  return performance.now() - imgStart;
 };
 
-export default waitForImage;
+export default ensureImageLoaded;
