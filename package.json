@@ -34,7 +34,7 @@
     "rollup-plugin-postcss": "^0.5.5",
     "rollup-plugin-sass": "^0.5.3",
     "rollup-plugin-sizes": "^0.4.2",
-    "rollup-plugin-uglify": "^2.0.1"
+    "rollup-plugin-babel-minify": "^4.0.0"
   },
   "scripts": {
     "build": "rollup -c && cp dist/bindery.umd.js docs/js && cp dist/bindery.umd.js.map docs/js",
