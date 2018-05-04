@@ -16,7 +16,7 @@ test('Returns when image gets naturalWidth', async (done) => {
   done();
 });
 
-test('Error listener also returns', (done) => {
+test('Error listener also returns', async (done) => {
   let errorListener;
   const mockImage = {
     src: 'test.jpg',
@@ -24,10 +24,9 @@ test('Error listener also returns', (done) => {
       errorListener = func;
     },
   };
-
-  ensureImageLoaded(mockImage).then(done);
-
   setTimeout(() => {
     errorListener();
   }, 100);
+  await ensureImageLoaded(mockImage);
+  done();
 });

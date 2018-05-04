@@ -49,7 +49,7 @@ const addTextNodeIncremental = async (textNode, parent, page) => {
   if (pos < 1) {
     // We didn't even add a complete word, don't add node
     textNode.nodeValue = originalText;
-    textNode.parentNode.removeChild(textNode);
+    parent.removeChild(textNode);
     return false; // TODO
   }
 
