@@ -9,7 +9,7 @@ import RuleSet from './RuleSet';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
 import breadcrumbClone from './breadcrumbClone';
-import ensureImageLoaded from './ensureImageLoaded';
+import Estimator from './Estimator';
 
 // Utils
 import elToStr from '../utils/elementToString';
@@ -23,8 +23,6 @@ const isScript = node => node.tagName === 'SCRIPT';
 const isImage = node => node.tagName === 'IMG';
 const isUnloadedImage = node => isImage(node) && !node.naturalWidth;
 const isContent = node => isElement(node) && !isScript(node);
-
-const sec = ms => (ms / 1000).toFixed(2);
 
 // Walk up the tree to see if we can safely
 // insert a split into this node.
@@ -44,15 +42,15 @@ const isSplittable = (element, selectorsNotToSplit) => {
 
 const paginate = (content, rules, progressCallback) => {
   // SETUP
-  let layoutWaitingTime = 0;
-  let elementCount = 0;
-  let elementsProcessed = 0;
-
+  const estimator = new Estimator();
   const ruleSet = new RuleSet(rules);
   const book = new Book();
 
   let breadcrumb = []; // Keep track of position in original tree
-  const currentElement = () => last(breadcrumb);
+  const currentElement = () => {
+    if (breadcrumb.length > 0) return last(breadcrumb);
+    return book.pageInProgress.flowContent;
+  };
   const hasOverflowed = () => book.pageInProgress.hasOverflowed();
 
   const canSplit = () => !shouldIgnoreOverflow(currentElement());
@@ -163,9 +161,12 @@ const paginate = (content, rules, progressCallback) => {
 
     // restore subpath
     pathToRestore.forEach((restore) => { breadcrumb.push(restore); });
-
     breadcrumb.push(nodeToMove);
   };
+
+  const canSplitParent = parent =>
+    isSplittable(parent, ruleSet.selectorsNotToSplit)
+    && !shouldIgnoreOverflow(parent);
 
   const addTextWithoutChecks = (child, parent) => {
     parent.appendChild(child);
@@ -175,42 +176,39 @@ const paginate = (content, rules, progressCallback) => {
     }
   };
 
-  const addSplittableText = async (text) => {
-    const result = await addTextNodeIncremental(
-      text,
-      currentElement(),
-      hasOverflowed);
-    if (isTextNode(result)) {
-      continueOnNewPage();
-      return addSplittableText(result);
-    }
-    return result;
-  };
-
-  const canSplitParent = parent =>
-    isSplittable(parent, ruleSet.selectorsNotToSplit)
-    && !shouldIgnoreOverflow(parent);
-
-  const addTextChild = async (textNode, parent) => {
-    let hasAdded = false;
-    if (canSplitParent(parent)) {
-      hasAdded = await addSplittableText(textNode);
-      if (!hasAdded && breadcrumb.length > 1) {
-        // try on next page
-        moveElementToNextPage(parent);
-        hasAdded = await addSplittableText(textNode);
-      }
-    } else {
+  const addTextWithoutSplitting = async (textNode, parent) => {
+    let hasAdded = await addTextNode(textNode, currentElement(), hasOverflowed);
+    if (!hasAdded && canSplit()) {
+      // try on next page
+      moveElementToNextPage(parent);
       hasAdded = await addTextNode(textNode, currentElement(), hasOverflowed);
-      if (!hasAdded && canSplit()) {
-        moveElementToNextPage(parent);
-        hasAdded = await addTextNode(textNode, currentElement(), hasOverflowed);
-      }
     }
     if (!hasAdded) {
       addTextWithoutChecks(textNode, currentElement());
     }
   };
+
+  const tryAddingSplittableText = async (text) => {
+    const result = await addTextNodeIncremental(text, currentElement(), hasOverflowed);
+    if (isTextNode(result)) {
+      continueOnNewPage();
+      return tryAddingSplittableText(result);
+    }
+    return result;
+  };
+
+  const addTextWithSplitting = async (textNode, parent) => {
+    let hasAdded = await tryAddingSplittableText(textNode);
+    if (!hasAdded && breadcrumb.length > 1) {
+      // try on next page
+      moveElementToNextPage(parent);
+      hasAdded = await tryAddingSplittableText(textNode);
+    }
+    if (!hasAdded) {
+      addTextWithoutChecks(textNode, currentElement());
+    }
+  };
+
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
@@ -219,13 +217,20 @@ const paginate = (content, rules, progressCallback) => {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
     }
+
+    // Ensure images are loaded before measuring
+    if (isUnloadedImage(elementToAdd)) {
+      await estimator.ensureImageLoaded(elementToAdd);
+    }
+
+    // Before adding
     const element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
 
-    if (!breadcrumb[0]) book.pageInProgress.flowContent.appendChild(element);
-    else currentElement().appendChild(element);
-
+    // Insert element
+    currentElement().appendChild(element);
     breadcrumb.push(element);
 
+    // Clear element
     const childNodes = [...element.childNodes];
     element.innerHTML = '';
 
@@ -234,14 +239,12 @@ const paginate = (content, rules, progressCallback) => {
       moveElementToNextPage(element);
     }
 
+    const shouldSplit = canSplitParent(element);
+    // Add children
     for (let i = 0; i < childNodes.length; i += 1) {
       const child = childNodes[i];
       if (isTextNode(child)) {
-        await addTextChild(child, element);
-      } else if (isUnloadedImage(child)) {
-        const waitTime = await ensureImageLoaded(child);
-        layoutWaitingTime += waitTime;
-        await addElementNode(child);
+        await (shouldSplit ? addTextWithSplitting : addTextWithoutSplitting)(child, element);
       } else if (isContent(child)) {
         await addElementNode(child);
       } else {
@@ -249,6 +252,7 @@ const paginate = (content, rules, progressCallback) => {
       }
     }
 
+    // After adding
     const addedChild = breadcrumb.pop();
     ruleSet.afterAddElement(
       addedChild,
@@ -261,18 +265,17 @@ const paginate = (content, rules, progressCallback) => {
         currentElement().appendChild(el);
       }
     );
-    elementsProcessed += 1;
-    book.estimatedProgress = elementsProcessed / elementCount;
+    estimator.increment();
+    book.estimatedProgress = estimator.progress;
   };
 
 
   const init = async () => {
-    const startLayoutTime = window.performance.now();
-
+    estimator.capacity = content.querySelectorAll('*').length;
+    estimator.start();
     ruleSet.setup();
     content.style.margin = 0;
     content.style.padding = 0;
-    elementCount = content.querySelectorAll('*').length;
     continueOnNewPage();
 
     await addElementNode(content);
@@ -282,12 +285,7 @@ const paginate = (content, rules, progressCallback) => {
 
     book.setCompleted();
     ruleSet.finishEveryPage(book);
-
-    const endLayoutTime = window.performance.now();
-    const totalTime = endLayoutTime - startLayoutTime;
-    const layoutTime = totalTime - layoutWaitingTime;
-
-    console.log(`📖 Book ready in ${sec(totalTime)}s (Layout: ${sec(layoutTime)}s, Waiting for images: ${sec(layoutWaitingTime)}s)`);
+    estimator.end();
 
     return book;
   };
