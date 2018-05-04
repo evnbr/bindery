@@ -61,43 +61,24 @@ const paginate = (content, rules, progressCallback) => {
     return newPage;
   };
 
-  const finishPage = (page, ignoreOverflow) => {
-    if (page && page.hasOverflowed()) {
-      console.warn(`Bindery: Page ~${book.pageCount} is overflowing`, book.pageInProgress.element);
+  const finishPage = (page) => {
+    // finished with this page, can display
+    book.pages = orderPages(book.pages, makeNewPage);
+    annotatePages(book.pages);
+    ruleSet.finishPage(page, book);
+  };
+
+  const validateCompletedPage = (page, ignoreOverflow) => {
+    if (page.hasOverflowed()) {
+      console.warn(`Bindery: Page ~${book.pageCount} is overflowing`, page.element);
       if (!page.suppressErrors && !ignoreOverflow) {
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
-
-    // finished with this page, can display
-    book.pages = orderPages(book.pages, makeNewPage);
-    annotatePages(book.pages);
-    if (page) ruleSet.finishPage(page, book);
   };
 
-  // Creates clones for ever level of tag
-  // we were in when we overflowed the last page
-  const continueOnNewPage = (ignoreOverflow = false) => {
-    if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
-    }
-
-    finishPage(book.pageInProgress, ignoreOverflow);
-
-    breadcrumb = breadcrumbClone(breadcrumb, rules);
-    const newPage = makeNewPage();
-
-    book.pageInProgress = newPage;
-    progressCallback(book);
-
-    book.pages.push(newPage);
-
-    if (breadcrumb[0]) {
-      newPage.flowContent.appendChild(breadcrumb[0]);
-    }
-
-    // make sure the cloned page is valid.
-    if (newPage.hasOverflowed()) {
+  const validateNewPage = (page) => {
+    if (page.hasOverflowed()) {
       const suspect = currentElement();
       if (suspect) {
         console.warn(`Bindery: Content overflows, probably due to a style set on ${elToStr(suspect)}.`);
@@ -106,7 +87,32 @@ const paginate = (content, rules, progressCallback) => {
         console.warn('Bindery: Content overflows.');
       }
     }
+    if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
+      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
+    }
+  };
 
+  // Creates clones for ever level of tag
+  // we were in when we overflowed the last page
+  const continueOnNewPage = (ignoreOverflow = false) => {
+    const oldPage = book.pageInProgress;
+    if (oldPage) {
+      validateCompletedPage(oldPage, ignoreOverflow);
+      finishPage(oldPage);
+    }
+
+    breadcrumb = breadcrumbClone(breadcrumb, rules);
+    const newPage = makeNewPage();
+
+    book.pageInProgress = newPage;
+    book.pages.push(newPage);
+
+    if (breadcrumb[0]) {
+      newPage.flowContent.appendChild(breadcrumb[0]);
+    }
+
+    progressCallback(book);
+    validateNewPage(newPage); // TODO: element must be in dom before validating
     return newPage;
   };
 
@@ -156,7 +162,7 @@ const paginate = (content, rules, progressCallback) => {
       continueOnNewPage();
     }
 
-    // append node as first in new page
+    // append moved node as first in new page
     currentElement().appendChild(willMove);
 
     // restore subpath
@@ -168,8 +174,8 @@ const paginate = (content, rules, progressCallback) => {
     isSplittable(parent, ruleSet.selectorsNotToSplit)
     && !shouldIgnoreOverflow(parent);
 
-  const addTextWithoutChecks = (child, parent) => {
-    parent.appendChild(child);
+  const addTextWithoutChecks = (textNode, parent) => {
+    parent.appendChild(textNode);
     if (canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
@@ -188,8 +194,8 @@ const paginate = (content, rules, progressCallback) => {
     }
   };
 
-  const tryAddingSplittableText = async (text) => {
-    const result = await addTextNodeIncremental(text, currentElement(), hasOverflowed);
+  const tryAddingSplittableText = async (textNode) => {
+    const result = await addTextNodeIncremental(textNode, currentElement(), hasOverflowed);
     if (isTextNode(result)) {
       continueOnNewPage();
       return tryAddingSplittableText(result);
@@ -223,7 +229,7 @@ const paginate = (content, rules, progressCallback) => {
       await estimator.ensureImageLoaded(elementToAdd);
     }
 
-    // Before adding
+    // Transforms before adding
     const element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
 
     // Insert element
@@ -252,7 +258,7 @@ const paginate = (content, rules, progressCallback) => {
       }
     }
 
-    // After adding
+    // Transforms after adding
     const addedChild = breadcrumb.pop();
     ruleSet.afterAddElement(
       addedChild,
