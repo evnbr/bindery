@@ -190,11 +190,7 @@ const paginate = (content, rules, progressCallback) => {
     let hasAdded = false;
     if (canSplitParent(parent)) {
       hasAdded = await addSplittableText(textNode);
-      if (!hasAdded) {
-        if (breadcrumb.length < 2) {
-          addTextWithoutChecks(textNode, last(breadcrumb));
-          return;
-        }
+      if (!hasAdded && breadcrumb.length > 1) {
         // try on next page
         moveElementToNextPage(parent);
         hasAdded = await addSplittableText(textNode);
@@ -211,24 +207,9 @@ const paginate = (content, rules, progressCallback) => {
     }
   };
 
-  let addElementNode;
-  const addChild = async (child, parent) => {
-    if (isTextNode(child)) {
-      await addTextChild(child, parent);
-    } else if (isUnloadedImage(child)) {
-      const waitTime = await ensureImageLoaded(child);
-      layoutWaitingTime += waitTime;
-      await addElementNode(child);
-    } else if (isContent(child)) {
-      await addElementNode(child);
-    } else {
-      // Skip comments and unknown nodes
-    }
-  };
-
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
-  addElementNode = async (elementToAdd) => {
+  const addElementNode = async (elementToAdd) => {
     if (book.pageInProgress.hasOverflowed() && canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
@@ -250,7 +231,17 @@ const paginate = (content, rules, progressCallback) => {
 
     for (let i = 0; i < childNodes.length; i += 1) {
       const child = childNodes[i];
-      await addChild(child, element);
+      if (isTextNode(child)) {
+        await addTextChild(child, element);
+      } else if (isUnloadedImage(child)) {
+        const waitTime = await ensureImageLoaded(child);
+        layoutWaitingTime += waitTime;
+        await addElementNode(child);
+      } else if (isContent(child)) {
+        await addElementNode(child);
+      } else {
+        // Skip comments and unknown nodes
+      }
     }
 
     const addedChild = breadcrumb.pop();

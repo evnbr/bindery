@@ -109,16 +109,19 @@ class PageSetup {
     };
   }
 
-  updateStyleVars() {
-    let sheet;
+  get styleSheet() {
     const existing = document.querySelector('#binderyPageSetup');
     if (existing) {
-      sheet = existing;
-    } else {
-      sheet = document.createElement('style');
-      sheet.id = 'binderyPageSetup';
+      return existing;
     }
-    sheet.innerHTML = `html {
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'binderyPageSetup';
+    document.head.appendChild(styleSheet);
+    return styleSheet;
+  }
+
+  updateStyleVars() {
+    this.styleSheet.innerHTML = `html {
       --bindery-page-width: ${this.size.width};
       --bindery-page-height: ${this.size.height};
       --bindery-sheet-width: ${this.sheetSize.width};
