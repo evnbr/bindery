@@ -74,8 +74,8 @@ class PageSetup {
       return { width, height };
     case Paper.AUTO_BLEED:
       return {
-        width: `calc(${width} + 2 * var(--bleed))`,
-        height: `calc(${height} + 2 * var(--bleed))`,
+        width: `calc(${width} + 2 * var(--bindery-bleed))`,
+        height: `calc(${height} + 2 * var(--bindery-bleed))`,
       };
     case Paper.AUTO_MARKS:
       // TODO: 24pt marks is hardcoded
@@ -130,7 +130,6 @@ class PageSetup {
       --bindery-bleed: ${this.bleed};
       --bindery-mark-length: 12pt;
     }`;
-    document.head.appendChild(sheet);
   }
 }
 
