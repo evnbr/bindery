@@ -49,11 +49,13 @@ const paginate = (content, rules, progressCallback) => {
   let elementsProcessed = 0;
 
   const ruleSet = new RuleSet(rules);
-
-  let breadcrumb = []; // Keep track of position in original tree
   const book = new Book();
 
-  const canSplit = () => !shouldIgnoreOverflow(last(breadcrumb));
+  let breadcrumb = []; // Keep track of position in original tree
+  const currentElement = () => last(breadcrumb);
+  const hasOverflowed = () => book.pageInProgress.hasOverflowed();
+
+  const canSplit = () => !shouldIgnoreOverflow(currentElement());
 
   const makeNewPage = () => {
     const newPage = new Page();
@@ -98,7 +100,7 @@ const paginate = (content, rules, progressCallback) => {
 
     // make sure the cloned page is valid.
     if (newPage.hasOverflowed()) {
-      const suspect = last(breadcrumb);
+      const suspect = currentElement();
       if (suspect) {
         console.warn(`Bindery: Content overflows, probably due to a style set on ${elToStr(suspect)}.`);
         suspect.parentNode.removeChild(suspect);
@@ -126,8 +128,8 @@ const paginate = (content, rules, progressCallback) => {
     // find the nearest splittable parent
     let willMove = nodeToMove;
     const pathToRestore = [];
-    while (breadcrumb.length > 1 && !isSplittable(last(breadcrumb), ruleSet.selectorsNotToSplit)) {
-      // console.log('Not OK to split:', last(breadcrumb));
+    while (breadcrumb.length > 1 && !isSplittable(currentElement(), ruleSet.selectorsNotToSplit)) {
+      // console.log('Not OK to split:', currentElement());
       willMove = breadcrumb.pop();
       pathToRestore.unshift(willMove);
     }
@@ -139,7 +141,7 @@ const paginate = (content, rules, progressCallback) => {
     const parent = willMove.parentNode;
     parent.removeChild(willMove);
 
-    if (breadcrumb.length > 1 && last(breadcrumb).textContent.trim() === '') {
+    if (breadcrumb.length > 1 && currentElement().textContent.trim() === '') {
       parent.appendChild(willMove);
       willMove = breadcrumb.pop();
       pathToRestore.unshift(willMove);
@@ -150,14 +152,14 @@ const paginate = (content, rules, progressCallback) => {
     // then it won't help to move it to the next page.
     // Instead continue here until the node is done.
     if (!book.pageInProgress.isEmpty) {
-      if (book.pageInProgress.hasOverflowed()) {
+      if (hasOverflowed()) {
         book.pageInProgress.suppressErrors = true;
       }
       continueOnNewPage();
     }
 
     // append node as first in new page
-    last(breadcrumb).appendChild(willMove);
+    currentElement().appendChild(willMove);
 
     // restore subpath
     pathToRestore.forEach((restore) => { breadcrumb.push(restore); });
@@ -174,7 +176,10 @@ const paginate = (content, rules, progressCallback) => {
   };
 
   const addSplittableText = async (text) => {
-    const result = await addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress);
+    const result = await addTextNodeIncremental(
+      text,
+      currentElement(),
+      hasOverflowed);
     if (isTextNode(result)) {
       continueOnNewPage();
       return addSplittableText(result);
@@ -196,28 +201,28 @@ const paginate = (content, rules, progressCallback) => {
         hasAdded = await addSplittableText(textNode);
       }
     } else {
-      hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
+      hasAdded = await addTextNode(textNode, currentElement(), hasOverflowed);
       if (!hasAdded && canSplit()) {
         moveElementToNextPage(parent);
-        hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
+        hasAdded = await addTextNode(textNode, currentElement(), hasOverflowed);
       }
     }
     if (!hasAdded) {
-      addTextWithoutChecks(textNode, last(breadcrumb));
+      addTextWithoutChecks(textNode, currentElement());
     }
   };
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
   const addElementNode = async (elementToAdd) => {
-    if (book.pageInProgress.hasOverflowed() && canSplit()) {
+    if (hasOverflowed() && canSplit()) {
       book.pageInProgress.suppressErrors = true;
       continueOnNewPage();
     }
     const element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
 
     if (!breadcrumb[0]) book.pageInProgress.flowContent.appendChild(element);
-    else last(breadcrumb).appendChild(element);
+    else currentElement().appendChild(element);
 
     breadcrumb.push(element);
 
@@ -225,7 +230,7 @@ const paginate = (content, rules, progressCallback) => {
     element.innerHTML = '';
 
     // Overflows when empty
-    if (book.pageInProgress.hasOverflowed() && canSplit()) {
+    if (hasOverflowed() && canSplit()) {
       moveElementToNextPage(element);
     }
 
@@ -253,7 +258,7 @@ const paginate = (content, rules, progressCallback) => {
       (el) => {
         el.parentNode.removeChild(el);
         continueOnNewPage();
-        last(breadcrumb).appendChild(el);
+        currentElement().appendChild(el);
       }
     );
     elementsProcessed += 1;

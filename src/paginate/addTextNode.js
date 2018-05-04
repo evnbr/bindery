@@ -2,9 +2,9 @@ import scheduler from '../Scheduler';
 import shouldIgnoreOverflow from './shouldIgnoreOverflow';
 
 // Try adding a text node in one go
-const addTextNode = async (textNode, parent, page) => {
+const addTextNode = async (textNode, parent, hasOverflowed) => {
   parent.appendChild(textNode);
-  const success = !page.hasOverflowed();
+  const success = !hasOverflowed();
   if (!success) parent.removeChild(textNode);
   await scheduler.yieldIfNecessary();
   return success;
@@ -14,11 +14,11 @@ const addTextNode = async (textNode, parent, page) => {
 // until it just barely doesnt overflow.
 // Binary search would probably be better but its not currenty
 // the bottleneck.
-const addTextNodeIncremental = async (textNode, parent, page) => {
+const addTextNodeIncremental = async (textNode, parent, hasOverflowed) => {
   const originalText = textNode.nodeValue;
   parent.appendChild(textNode);
 
-  if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
+  if (!hasOverflowed() || shouldIgnoreOverflow(parent)) {
     return true;
   }
 
@@ -26,7 +26,7 @@ const addTextNodeIncremental = async (textNode, parent, page) => {
   let pos = 0;
   textNode.nodeValue = originalText.substr(0, pos);
 
-  while (!page.hasOverflowed() && pos < originalText.length) {
+  while (!hasOverflowed() && pos < originalText.length) {
     // advance to next non-space character
     pos += 1;
     while (pos < originalText.length && originalText.charAt(pos) !== ' ') pos += 1;
