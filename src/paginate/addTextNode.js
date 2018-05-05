@@ -1,7 +1,10 @@
 import scheduler from '../Scheduler';
 import shouldIgnoreOverflow from './shouldIgnoreOverflow';
+import { isTextNode } from './nodeTypes';
 
-// Try adding a text node in one go
+
+// Try adding a text node in one go.
+// Returns true if all the text fits, false if none fits.
 const addTextNode = async (textNode, parent, hasOverflowed) => {
   parent.appendChild(textNode);
   const success = !hasOverflowed();
@@ -10,11 +13,13 @@ const addTextNode = async (textNode, parent, hasOverflowed) => {
   return success;
 };
 
+
 // Try adding a text node by incrementally adding words
 // until it just barely doesnt overflow.
-// Binary search would probably be better but its not currenty
-// the bottleneck.
-const addTextNodeIncremental = async (textNode, parent, hasOverflowed) => {
+//
+// Returns true if all the text fits, false if none fits,
+// or new textnode containing the remainder text.
+const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
   const originalText = textNode.nodeValue;
   parent.appendChild(textNode);
 
@@ -63,4 +68,16 @@ const addTextNodeIncremental = async (textNode, parent, hasOverflowed) => {
   return remainingTextNode;
 };
 
-export { addTextNode, addTextNodeIncremental };
+
+// Fills text across multiple elements by requesting a continuation
+// once the current element overflows
+const addTextNodeAcrossElements = async (textNode, parent, continuation, hasOverflowed) => {
+  const result = await addTextNodeUntilOverflow(textNode, parent, hasOverflowed);
+  if (isTextNode(result)) {
+    const nextElement = continuation();
+    return addTextNodeAcrossElements(result, nextElement, continuation, hasOverflowed);
+  }
+  return result;
+};
+
+export { addTextNode, addTextNodeUntilOverflow, addTextNodeAcrossElements };

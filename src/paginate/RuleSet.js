@@ -39,7 +39,7 @@ class RuleSet {
       if (rule.setup) rule.setup();
     });
   }
-  startPage(pg, book) {
+  applyPageStartRules(pg, book) {
     this.rules.forEach((rule) => {
       if (rule.afterPageCreated) rule.afterPageCreated(pg, book);
     });
@@ -51,12 +51,12 @@ class RuleSet {
       });
     });
   }
-  finishPage(page, book) {
+  applyPageDoneRules(page, book) {
     this.pageRules.forEach((rule) => {
       rule.eachPage(page, book);
     });
   }
-  beforeAddElement(element, book, continueOnNewPage, makeNewPage) {
+  applyBeforeAddRules(element, book, continueOnNewPage, makeNewPage) {
     let addedElement = element;
 
     const matchingRules = this.beforeAddRules.filter(rule => addedElement.matches(rule.selector));
@@ -68,7 +68,7 @@ class RuleSet {
     return addedElement;
   }
 
-  afterAddElement(originalElement, book, continueOnNewPage, makeNewPage, moveToNext) {
+  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage, moveToNext) {
     let addedElement = originalElement;
 
     const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));

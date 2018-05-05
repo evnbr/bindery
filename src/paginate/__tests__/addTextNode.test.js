@@ -1,4 +1,4 @@
-import { addTextNode, addTextNodeIncremental } from '../addTextNode';
+import { addTextNode, addTextNodeUntilOverflow } from '../addTextNode';
 
 global.performance = { now: jest.fn() };
 
@@ -35,54 +35,54 @@ test('addTextNode succeeds if page never overflows', () => {
 
 // ----
 //
-// addTextNodeIncremental
+// addTextUntilOverflow
 
-test('addTextNodeIncremental cancels if page instantly overflows', () => {
+test('addTextUntilOverflow cancels if page instantly overflows', () => {
   const testContent = 'Test text content';
   const mockParent = document.createElement('div');
   const textNode = document.createTextNode(testContent);
   const hasOverflowed = () => true;
 
-  addTextNodeIncremental(textNode, mockParent, hasOverflowed).then((result) => {
+  addTextNodeUntilOverflow(textNode, mockParent, hasOverflowed).then((result) => {
     expect(result).toBe(false);
     expect(textNode.nodeValue).toBe(testContent);
     expect(textNode.parentNode).toBeNull();
   });
 });
 
-test('addTextNodeIncremental succeeds if content instantly fits', () => {
+test('addTextUntilOverflow succeeds if content instantly fits', () => {
   const testContent = 'Test text content';
   const mockParent = document.createElement('div');
   const textNode = document.createTextNode(testContent);
   const hasOverflowed = () => false;
 
-  addTextNodeIncremental(textNode, mockParent, hasOverflowed).then((result) => {
+  addTextNodeUntilOverflow(textNode, mockParent, hasOverflowed).then((result) => {
     expect(result).toBe(true);
     expect(textNode.nodeValue).toBe(testContent);
     expect(textNode.parentNode).toBe(mockParent);
   });
 });
 
-test('addTextNodeIncremental cancels if page overflows when not empty (ie inline block that collapses without content)', () => {
+test('addTextUntilOverflow cancels if page overflows when not empty (ie inline block that collapses without content)', () => {
   const testContent = 'Test text content';
   const mockParent = document.createElement('div');
   const textNode = document.createTextNode(testContent);
   const page = () => textNode.nodeValue !== '';
 
-  addTextNodeIncremental(textNode, mockParent, page).then((result) => {
+  addTextNodeUntilOverflow(textNode, mockParent, page).then((result) => {
     expect(result).toBe(false);
     expect(textNode.nodeValue).toBe(testContent);
     expect(textNode.parentNode).toBeNull();
   });
 });
 
-test('addTextNodeIncremental succeeds when break on word boundary', () => {
+test('addTextUntilOverflow succeeds when break on word boundary', () => {
   const testContent = 'Test text content';
   const mockParent = document.createElement('div');
   const textNode = document.createTextNode(testContent);
   const hasOverflowed = () => textNode.nodeValue.length > 4;
 
-  return addTextNodeIncremental(textNode, mockParent, hasOverflowed).then((result) => {
+  return addTextNodeUntilOverflow(textNode, mockParent, hasOverflowed).then((result) => {
     expect(textNode.nodeValue).toBe('Test');
     expect(textNode.parentNode).toBe(mockParent);
     expect(result.nodeType).toBe(Node.TEXT_NODE);
@@ -91,13 +91,13 @@ test('addTextNodeIncremental succeeds when break on word boundary', () => {
   });
 });
 
-test('addTextNodeIncremental backs up to word boundary', () => {
+test('addTextUntilOverflow backs up to word boundary', () => {
   const testContent = 'Test text content';
   const mockParent = document.createElement('div');
   const textNode = document.createTextNode(testContent);
   const hasOverflowed = () => textNode.nodeValue.length > 7;
 
-  return addTextNodeIncremental(textNode, mockParent, hasOverflowed).then((result) => {
+  return addTextNodeUntilOverflow(textNode, mockParent, hasOverflowed).then((result) => {
     expect(textNode.nodeValue).toBe('Test');
     expect(textNode.parentNode).toBe(mockParent);
     expect(result.nodeType).toBe(Node.TEXT_NODE);
@@ -106,13 +106,13 @@ test('addTextNodeIncremental backs up to word boundary', () => {
   });
 });
 
-test('addTextNodeIncremental cancels entirely when backing up past first word', () => {
+test('addTextUntilOverflow cancels entirely when backing up past first word', () => {
   const testContent = 'Test text content';
   const mockParent = document.createElement('div');
   const textNode = document.createTextNode(testContent);
   const hasOverflowed = () => textNode.nodeValue.length > 2;
 
-  return addTextNodeIncremental(textNode, mockParent, hasOverflowed).then((result) => {
+  return addTextNodeUntilOverflow(textNode, mockParent, hasOverflowed).then((result) => {
     expect(result).toBe(false);
     expect(textNode.nodeValue).toBe(testContent);
     expect(textNode.parentNode).toBeNull();
