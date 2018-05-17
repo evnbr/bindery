@@ -59,3 +59,60 @@ test('Handles shapes', () => {
     title: 'example',
   })).toBe(false);
 });
+
+describe('Margins', () => {
+  test('Handles margins', () => {
+    expect(OptionType.margin({
+      top: '12px',
+      inner: '12px',
+      outer: '12px',
+      bottom: '12px',
+    })).toBe(true);
+  });
+  test('Reject non-length side', () => {
+    expect(OptionType.margin({
+      top: '12px',
+      inner: 12,
+      outer: '12px',
+      bottom: '12px',
+    })).toBe(false);
+  });
+
+  // test('Reject margins with missing sides', () => {
+  //   expect(OptionType.margin({
+  //     top: '12px',
+  //     bottom: '12px',
+  //   })).toBe(false);
+  // });
+  test('Reject margins with extra side', () => {
+    expect(OptionType.margin({
+      top: '12px',
+      huh: '12px',
+      inner: '12px',
+      outer: '12px',
+      bottom: '12px',
+    })).toBe(false);
+  });
+});
+
+describe('Sizes', () => {
+  test('Handles sizes', () => {
+    expect(OptionType.size({
+      width: '12px',
+      height: '12px',
+    })).toBe(true);
+  });
+  test('Reject non-length side', () => {
+    expect(OptionType.size({
+      width: '12px',
+      height: 12,
+    })).toBe(false);
+  });
+  test('Reject extra side', () => {
+    expect(OptionType.size({
+      width: '12px',
+      height: '12px',
+      hm: '12px',
+    })).toBe(false);
+  });
+});
