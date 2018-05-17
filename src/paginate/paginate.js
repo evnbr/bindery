@@ -184,17 +184,18 @@ const paginate = (content, rules, progressCallback) => {
     }
   };
 
+  const continuedElement = () => {
+    continueOnNewPage();
+    return currentElement();
+  };
+
   const addSplittableTextNode = async (textNode) => {
     const el = currentElement();
-    const nextElement = () => {
-      continueOnNewPage();
-      return currentElement();
-    };
-    let hasAdded = await addTextNodeAcrossElements(textNode, el, nextElement, hasOverflowed);
+    let hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
     if (!hasAdded && breadcrumb.length > 1) {
       // try on next page
       moveCurrentElementToNextPage();
-      hasAdded = await addTextNodeAcrossElements(textNode, el, nextElement, hasOverflowed);
+      hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
     }
     if (!hasAdded) {
       addTextWithoutChecks(textNode, currentElement());

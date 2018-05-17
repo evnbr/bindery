@@ -43,10 +43,6 @@ const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
     }
   }
 
-  // Early return, we added the whole thing wastefully
-  if (pos > originalText.length - 1) {
-    return true;
-  }
   // Back out to word boundary
   if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
   while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
