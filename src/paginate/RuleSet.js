@@ -29,15 +29,13 @@ const dedupe = (inputRules) => {
 class RuleSet {
   constructor(rules) {
     this.rules = rules;
+    // separate by lifecycle
     this.pageRules = rules.filter(r => r.eachPage);
     this.beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
     this.afterAddRules = rules.filter(r => r.selector && r.afterAdd);
-    this.selectorsNotToSplit = rules.filter(rule => rule.avoidSplit).map(rule => rule.selector);
-  }
-  setup() {
-    this.rules.forEach((rule) => {
-      if (rule.setup) rule.setup();
-    });
+    this.selectorsNotToSplit = rules.filter(r => r.avoidSplit).map(r => r.selector);
+    // setup
+    this.rules.filter(r => r.setup).forEach(r => r.setup());
   }
   applyPageStartRules(pg, book) {
     this.rules.forEach((rule) => {

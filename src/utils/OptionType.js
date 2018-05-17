@@ -24,6 +24,20 @@ const isBool = val => typeof val === 'boolean';
 const isStr = val => typeof val === 'string';
 const isArr = val => Array.isArray(val);
 
+const isShape = validShape => userShape => isObj(userShape) && validate(userShape, validShape);
+const isMargin = val => isShape({
+  name: 'margin',
+  top: isValidLength,
+  inner: isValidLength,
+  outer: isValidLength,
+  bottom: isValidLength,
+})(val);
+const isSize = val => isShape({
+  name: 'size',
+  width: isValidLength,
+  height: isValidLength,
+})(val);
+
 const OptionType = {
   enum(...enumCases) {
     const enumCheck = function enumCheck(str) { return enumCases.includes(str); };
@@ -31,18 +45,16 @@ const OptionType = {
     enumCheck.name = `enum ( '${enumCases.join('\' | \'')}' )`;
     return enumCheck;
   },
-  any() {
-    return true;
-  },
+  any() { return true; },
   string: isStr,
   length: isValidLength,
   bool: isBool,
   func: isFunc,
   obj: isObj,
   array: isArr,
-  shape(validShape) {
-    return userShape => isObj(userShape) && validate(userShape, validShape);
-  },
+  shape: isShape,
+  margin: isMargin,
+  size: isSize,
   validate,
 };
 

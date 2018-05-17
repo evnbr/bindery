@@ -32,15 +32,6 @@ const isSplittable = (element, noSplit) => {
   return true;
 };
 
-const validateCompletedPage = (page, allowOverflow) => {
-  if (page.hasOverflowed()) {
-    console.warn(`Bindery: Page ~${page.number} is overflowing`, page.element);
-    if (!page.suppressErrors && !allowOverflow) {
-      throw Error('Bindery: Moved to new page when last one is still overflowing');
-    }
-  }
-};
-
 const paginate = (content, rules, progressCallback) => {
   // Global state for a pagination run
   const estimator = new Estimator();
@@ -64,7 +55,7 @@ const paginate = (content, rules, progressCallback) => {
     book.pages = orderPages(book.pages, makeNewPage);
     annotatePages(book.pages);
     ruleSet.applyPageDoneRules(page, book);
-    validateCompletedPage(page, allowOverflow);
+    page.validateEnd(allowOverflow);
     book.validate();
   };
 
@@ -161,7 +152,7 @@ const paginate = (content, rules, progressCallback) => {
 
     for (const child of childNodes) {
       if (isTextNode(child)) {
-        await (shouldSplit ? addSplittableTextNode : addWholeTextNode)(child, element);
+        await (shouldSplit ? addSplittableTextNode : addWholeTextNode)(child);
       } else if (isContent(child)) {
         await addElementNode(child);
       } else {
@@ -178,7 +169,6 @@ const paginate = (content, rules, progressCallback) => {
 
   const init = async () => {
     estimator.startWith(content);
-    ruleSet.setup();
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();

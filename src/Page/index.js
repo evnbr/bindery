@@ -36,6 +36,15 @@ class Page {
     }
   }
 
+  validateEnd(allowOverflow) {
+    if (this.hasOverflowed()) {
+      console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
+      if (!this.suppressErrors && !allowOverflow) {
+        throw Error('Bindery: Moved to new page when last one is still overflowing');
+      }
+    }
+  }
+
   static isSizeValid() {
     document.body.classList.remove(c('viewing'));
 

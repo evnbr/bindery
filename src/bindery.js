@@ -19,42 +19,35 @@ const parseHTML = (text, selector) => {
   return wrapper.querySelector(selector);
 };
 
+const T = OptionType;
+
 class Bindery {
   constructor(opts = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
+    if (!opts.content) {
+      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
+      console.error('Bindery: You must include a source element or selector');
+      return;
+    }
+
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
 
-    OptionType.validate(opts, {
+    T.validate(opts, {
       name: 'makeBook',
-      autorun: OptionType.bool,
-      content: OptionType.any,
-      ControlsComponent: OptionType.any,
-      pageSetup: OptionType.shape({
-        name: 'pageSetup',
-        bleed: OptionType.length,
-        margin: OptionType.shape({
-          name: 'margin',
-          top: OptionType.length,
-          inner: OptionType.length,
-          outer: OptionType.length,
-          bottom: OptionType.length,
-        }),
-        size: OptionType.shape({
-          name: 'size',
-          width: OptionType.length,
-          height: OptionType.length,
-        }),
-      }),
-      view: OptionType.enum(...Object.values(Mode)),
-      printSetup: OptionType.shape({
+      autorun: T.bool,
+      content: T.any,
+      ControlsComponent: T.any,
+      pageSetup: T.shape({ name: 'pageSetup', bleed: T.length, margin: T.margin, size: T.size }),
+      view: T.enum(...Object.values(Mode)),
+      printSetup: T.shape({
         name: 'printSetup',
-        layout: OptionType.enum(...Object.values(Layout)),
-        marks: OptionType.enum(...Object.values(Marks)),
-        paper: OptionType.enum(...Object.values(Paper)),
+        layout: T.enum(...Object.values(Layout)),
+        marks: T.enum(...Object.values(Marks)),
+        paper: T.enum(...Object.values(Paper)),
       }),
-      rules: OptionType.array,
+      rules: T.array,
     });
 
     this.pageSetup = new PageSetup(opts.pageSetup);
@@ -73,32 +66,10 @@ class Bindery {
     this.rules = defaultRules;
     if (opts.rules) this.addRules(opts.rules);
 
-
-    if (!opts.content) {
-      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
-      console.error('Bindery: You must include a source element or selector');
-    } else if (typeof opts.content === 'string') {
-      this.source = document.querySelector(opts.content);
-      if (!(this.source instanceof HTMLElement)) {
-        this.viewer.displayError('Content not specified', `Could not find element that matches selector "${opts.content}"`);
-        console.error(`Bindery: Could not find element that matches selector "${opts.content}"`);
-        return;
-      }
-      if (this.autorun) {
-        this.makeBook();
-      }
-    } else if (typeof opts.content === 'object' && opts.content.url) {
-      const url = opts.content.url;
-      const selector = opts.content.selector;
-      this.fetchSource(url, selector);
-    } else if (opts.content instanceof HTMLElement) {
-      this.source = opts.content;
-      if (this.autorun) {
-        this.makeBook();
-      }
-    } else {
-      console.error('Bindery: Source must be an element or selector');
-    }
+    this.getSource(opts.content).then((src) => {
+      this.source = src;
+      if (src && this.autorun) this.makeBook();
+    });
   }
 
   // Convenience constructor
@@ -107,11 +78,29 @@ class Bindery {
     return new Bindery(opts);
   }
 
-  async fetchSource(url, selector) {
+  async getSource(content) {
+    if (content instanceof HTMLElement) return content;
+    if (typeof content === 'string') {
+      const el = document.querySelector(content);
+      if (!(el instanceof HTMLElement)) {
+        this.viewer.displayError('Content not specified', `Could not find element that matches selector "${content}"`);
+        console.error(`Bindery: Could not find element that matches selector "${content}"`);
+      }
+      return el;
+    }
+    if (typeof content === 'object' && content.url) {
+      const url = content.url;
+      const selector = content.selector;
+      return this.fetchRemoteSource(url, selector);
+    }
+    throw Error('Bindery: Source must be an element or selector');
+  }
+
+  async fetchRemoteSource(url, selector) {
     const response = await fetch(url);
     if (response.status !== 200) {
       this.viewer.displayError(response.status, `Could not find file at "${url}"`);
-      return;
+      return null;
     }
     const fetchedContent = await response.text();
     const sourceNode = parseHTML(fetchedContent, selector);
@@ -121,10 +110,9 @@ class Bindery {
         `Could not find element that matches selector "${selector}"`
       );
       console.error(`Bindery: Could not find element that matches selector "${selector}"`);
-      return;
+      return null;
     }
-    this.source = sourceNode;
-    if (this.autorun) this.makeBook();
+    return sourceNode;
   }
 
   cancel() {
@@ -143,40 +131,11 @@ class Bindery {
     });
   }
 
-  updateBookSilent() {
-    this.layoutComplete = false;
-
-    this.source.style.display = '';
-    const content = this.source.cloneNode(true);
-    this.source.style.display = 'none';
-
-    document.body.classList.add(c('viewing'));
-
-    this.pageSetup.updateStyleVars();
-
-    paginate({
-      content,
-      rules: this.rules,
-      success: (book) => {
-        this.viewer.book = book;
-        this.viewer.render();
-        this.layoutComplete = true;
-      },
-      progress: () => { },
-      error: (error) => {
-        this.layoutComplete = true;
-        this.viewer.displayError('Layout failed', error);
-      },
-    });
-  }
-
   async makeBook(doneBinding) {
     if (!this.source) {
       document.body.classList.add(c('viewing'));
       return;
     }
-
-    this.layoutComplete = false;
 
     if (!this.pageSetup.isSizeValid()) {
       this.viewer.displayError(
@@ -190,9 +149,8 @@ class Bindery {
     const content = this.source.cloneNode(true);
     this.source.style.display = 'none';
 
-    // In case we're updating an existing layout
-    this.viewer.clear();
-
+    this.layoutInProgress = true;
+    this.viewer.clear(); // In case we're updating an existing layout
     document.body.classList.add(c('viewing'));
     this.pageSetup.updateStyleVars();
     this.viewer.setInProgress();
@@ -204,11 +162,11 @@ class Bindery {
         partialBook => this.viewer.renderProgress(partialBook)
       );
       this.viewer.render(book);
-      this.layoutComplete = true;
+      this.layoutInProgress = false;
       if (doneBinding) doneBinding();
       this.viewer.element.classList.remove(c('in-progress'));
     } catch (e) {
-      this.layoutComplete = true;
+      this.layoutInProgress = false;
       this.viewer.element.classList.remove(c('in-progress'));
       this.viewer.displayError('Layout couldn\'t complete', e);
       console.error(e);
