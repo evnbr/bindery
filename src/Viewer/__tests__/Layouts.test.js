@@ -7,8 +7,13 @@ const pages = [
   { element: document.createElement('div') },
 ];
 
-test('creates grid layout', () => {
+test('creates two-up grid layout', () => {
   const grid = gridLayout(pages, true);
+  expect(grid instanceof DocumentFragment).toBe(true);
+});
+
+test('creates one-up grid layout', () => {
+  const grid = gridLayout(pages, false);
   expect(grid instanceof DocumentFragment).toBe(true);
 });
 
