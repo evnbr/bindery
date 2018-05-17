@@ -22,7 +22,8 @@ const Layout = Object.freeze({
 
 const Marks = Object.freeze({
   NONE: 'marks_none',
-  SPREADS: 'layout_spreads',
+  CROP: 'marks_crop',
+  BLEED: 'marks_bleed',
   BOTH: 'marks_both',
 });
 
