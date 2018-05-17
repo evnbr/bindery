@@ -8,6 +8,8 @@ import prefixer from 'postcss-class-prefix';
 import cssnano from 'cssnano';
 import inlinesvg from 'postcss-svg';
 
+import gzip from 'rollup-plugin-gzip';
+
 import pkg from './package.json';
 
 
@@ -63,6 +65,7 @@ export default [
       minify({
         comments: false,
       }),
+      gzip(),
     ],
   }),
 
