@@ -8,7 +8,8 @@ class Estimator {
     this.capacity = 0;
     this.elementsProcessed = 0;
   }
-  start() {
+  startWith(content) {
+    this.capacity = content.querySelectorAll('*').length;
     this.startLayoutTime = window.performance.now();
   }
   increment() {

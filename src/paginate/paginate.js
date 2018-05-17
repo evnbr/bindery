@@ -177,8 +177,7 @@ const paginate = (content, rules, progressCallback) => {
   };
 
   const init = async () => {
-    estimator.capacity = content.querySelectorAll('*').length;
-    estimator.start();
+    estimator.startWith(content);
     ruleSet.setup();
     content.style.margin = 0;
     content.style.padding = 0;
