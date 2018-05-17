@@ -280,8 +280,8 @@ class Viewer {
       }
     });
 
-    if (this.book.pageInProgress) {
-      this.zoomBox.appendChild(this.book.pageInProgress.element);
+    if (this.book.currentPage) {
+      this.zoomBox.appendChild(this.book.currentPage.element);
     }
 
     this.updateZoom();

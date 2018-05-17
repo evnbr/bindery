@@ -17,22 +17,22 @@ class Footnote extends Replace {
     });
   }
   afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
-    const number = book.pageInProgress.footer.children.length + 1;
+    const number = book.currentPage.footer.children.length + 1;
 
     const footnote = createEl('.footnote');
     const contents = this.render(element, number);
     if (contents instanceof HTMLElement) footnote.appendChild(contents);
     else footnote.innerHTML = contents;
 
-    book.pageInProgress.footer.appendChild(footnote);
+    book.currentPage.footer.appendChild(footnote);
 
     return super.afterAdd(element, book, continueOnNewPage, makeNewPage, (overflowEl) => {
-      book.pageInProgress.footer.removeChild(footnote);
+      book.currentPage.footer.removeChild(footnote);
       return overflowCallback(overflowEl);
     });
   }
   createReplacement(book, element) {
-    const number = book.pageInProgress.footer.children.length;
+    const number = book.currentPage.footer.children.length;
     return this.replace(element, number);
   }
   replace(element, number) {

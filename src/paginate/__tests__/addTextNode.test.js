@@ -167,7 +167,6 @@ describe('addTextNodeAcrossElements', () => {
     const next = () => nextPages.pop();
     const hasOverflowed = () => p1.textContent.length > 4 || p2.textContent.length > 6;
 
-    console.log('--');
     return addTextNodeAcrossElements(textNode, p1, next, hasOverflowed).then((result) => {
       expect(result).toBe(true);
       // expect(nextPages.length).toBe(0);

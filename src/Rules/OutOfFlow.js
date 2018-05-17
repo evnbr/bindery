@@ -16,10 +16,10 @@ class OutOfFlow extends Rule {
     this.createOutOfFlowPages(elmt, book, makeNewPage);
 
     // Catches cases when we didn't need to create a new page. but unclear
-    if (this.continue !== 'same' || book.pageInProgress.hasOutOfFlowContent) {
+    if (this.continue !== 'same' || book.currentPage.hasOutOfFlowContent) {
       continueOnNewPage(true);
       if (this.continue === 'left' || this.continue === 'right') {
-        book.pageInProgress.setPreference(this.continue);
+        book.currentPage.setPreference(this.continue);
       }
     }
 

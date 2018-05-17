@@ -19,11 +19,11 @@ class PageBreak extends Rule {
   }
   beforeAdd(elmt, book, continueOnNewPage) {
     if (this.position === 'before' || this.position === 'both') {
-      if (!book.pageInProgress.isEmpty) {
+      if (!book.currentPage.isEmpty) {
         continueOnNewPage();
       }
       if (this.continue !== 'next') {
-        book.pageInProgress.setPreference(this.continue);
+        book.currentPage.setPreference(this.continue);
       }
     }
     return elmt;

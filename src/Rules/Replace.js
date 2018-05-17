@@ -18,7 +18,7 @@ class Replace extends Rule {
     const replacement = this.createReplacement(book, defensiveClone);
     parent.replaceChild(replacement, element);
 
-    if (book.pageInProgress.hasOverflowed()) {
+    if (book.currentPage.hasOverflowed()) {
       parent.replaceChild(element, replacement);
 
       return overflowCallback(element);

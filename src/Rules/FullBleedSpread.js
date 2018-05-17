@@ -20,8 +20,8 @@ class FullBleedSpread extends OutOfFlow {
     elmt.parentNode.removeChild(elmt);
 
     let leftPage;
-    if (book.pageInProgress.isEmpty) {
-      leftPage = book.pageInProgress;
+    if (book.currentPage.isEmpty) {
+      leftPage = book.currentPage;
     } else {
       leftPage = makeNewPage();
       book.pages.push(leftPage);

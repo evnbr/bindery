@@ -1,4 +1,4 @@
-import { c, createEl } from '../utils';
+import { c, createEl, last } from '../utils';
 
 class Page {
   constructor() {
@@ -7,6 +7,7 @@ class Page {
     this.footer = createEl('footer');
     this.background = createEl('page-background');
     this.element = createEl('page', [this.background, this.flowBox, this.footer]);
+    this.breadcrumb = null;
   }
   overflowAmount() {
     const contentH = this.flowContent.offsetHeight;
@@ -71,6 +72,11 @@ class Page {
       && this.flowContent.textContent.trim() === ''
       && this.flowContent.offsetHeight < 1
     );
+  }
+
+  get currentElement() {
+    if (this.breadcrumb.length > 0) return last(this.breadcrumb);
+    return this.flowContent;
   }
 
   get isLeft() {
