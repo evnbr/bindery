@@ -68,7 +68,7 @@ class RuleSet {
     return addedElement;
   }
 
-  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage, moveToNext) {
+  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage) {
     let addedElement = originalElement;
 
     const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));
@@ -91,7 +91,9 @@ class RuleSet {
         continueOnNewPage,
         makeNewPage,
         (problemElement) => {
-          moveToNext(problemElement);
+          problemElement.parentNode.removeChild(problemElement);
+          const newPage = continueOnNewPage();
+          newPage.currentElement.appendChild(problemElement);
           return rule.afterAdd(
             problemElement,
             book,

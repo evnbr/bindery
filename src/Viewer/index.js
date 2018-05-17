@@ -1,5 +1,4 @@
 import { c, createEl } from '../utils';
-// import Controls from './Controls';
 import Page from '../Page';
 
 import errorView from './error';
@@ -244,13 +243,10 @@ class Viewer {
   renderProgress(book) {
     this.book = book;
 
-    this.progressBar.style.width = `${this.book.estimatedProgress * 100}%`;
+    this.progressBar.style.width = `${book.estimatedProgress * 100}%`;
 
     if (this.controls) {
-      this.controls.updateProgress(
-        this.book.pages.length,
-        this.book.estimatedProgress
-      );
+      this.controls.updateProgress(book.pageCount, book.estimatedProgress);
     }
 
     const sideBySide =

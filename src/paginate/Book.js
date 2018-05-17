@@ -1,3 +1,5 @@
+const MAXIMUM_PAGE_LIMIT = 2000;
+
 class Book {
   constructor() {
     this.pages = [];
@@ -34,6 +36,12 @@ class Book {
       func();
     });
     this.queued = [];
+  }
+
+  validate() {
+    if (this.pageCount > MAXIMUM_PAGE_LIMIT) {
+      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
+    }
   }
 }
 

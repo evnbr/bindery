@@ -13,16 +13,13 @@ import breadcrumbClone from './breadcrumbClone';
 import Estimator from './Estimator';
 
 // Utils
-import elToStr from '../utils/elementToString';
 import { c } from '../utils';
 import { isTextNode, isUnloadedImage, isContent } from './nodeTypes';
 
-const MAXIMUM_PAGE_LIMIT = 2000;
-
 // Walk up the tree to see if we can safely
 // insert a split into this node.
-const isSplittable = (element, selectorsNotToSplit) => {
-  if (selectorsNotToSplit.some(sel => element.matches(sel))) {
+const isSplittable = (element, noSplit) => {
+  if (noSplit.some(sel => element.matches(sel))) {
     if (element.hasAttribute('data-bindery-did-move')
       || element.classList.contains(c('continuation'))) {
       return true; // ignore rules and split it anyways.
@@ -30,15 +27,15 @@ const isSplittable = (element, selectorsNotToSplit) => {
     return false;
   }
   if (element.parentElement) {
-    return isSplittable(element.parentElement, selectorsNotToSplit);
+    return isSplittable(element.parentElement, noSplit);
   }
   return true;
 };
 
-const validateCompletedPage = (page, ignoreOverflow) => {
+const validateCompletedPage = (page, allowOverflow) => {
   if (page.hasOverflowed()) {
     console.warn(`Bindery: Page ~${page.number} is overflowing`, page.element);
-    if (!page.suppressErrors && !ignoreOverflow) {
+    if (!page.suppressErrors && !allowOverflow) {
       throw Error('Bindery: Moved to new page when last one is still overflowing');
     }
   }
@@ -49,14 +46,12 @@ const paginate = (content, rules, progressCallback) => {
   const estimator = new Estimator();
   const ruleSet = new RuleSet(rules);
   const book = new Book();
+  const noSplit = ruleSet.selectorsNotToSplit;
 
   const hasOverflowed = () => book.currentPage.hasOverflowed();
   const canSplitCurrentElement = () => !shouldIgnoreOverflow(book.currentPage.currentElement);
-  const canSplitElement = element =>
-    isSplittable(element, ruleSet.selectorsNotToSplit)
-    && !shouldIgnoreOverflow(element);
-  const canSplitElementAlt = element =>
-    isSplittable(element, ruleSet.selectorsNotToSplit);
+  const canSplitElement = el => isSplittable(el, noSplit) && !shouldIgnoreOverflow(el);
+  const canSplitElementAlt = el => isSplittable(el, noSplit);
 
   const makeNewPage = () => {
     const newPage = new Page();
@@ -64,27 +59,13 @@ const paginate = (content, rules, progressCallback) => {
     return newPage;
   };
 
-  const finishPage = (page, ignoreOverflow) => {
+  const finishPage = (page, allowOverflow) => {
     // finished with this page, can display
     book.pages = orderPages(book.pages, makeNewPage);
     annotatePages(book.pages);
     ruleSet.applyPageDoneRules(page, book);
-    validateCompletedPage(page, ignoreOverflow);
-  };
-
-  const validateNewPage = (page) => {
-    if (page.hasOverflowed()) {
-      const suspect = page.currentElement;
-      if (suspect) {
-        console.warn(`Bindery: Content overflows, probably due to a style set on ${elToStr(suspect)}.`);
-        suspect.parentNode.removeChild(suspect);
-      } else {
-        console.warn('Bindery: Content overflows.');
-      }
-    }
-    if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
-    }
+    validateCompletedPage(page, allowOverflow);
+    book.validate();
   };
 
   // Creates clones for ever level of tag
@@ -104,7 +85,7 @@ const paginate = (content, rules, progressCallback) => {
     }
 
     progressCallback(book);
-    validateNewPage(newPage); // TODO: element must be in dom before validating
+    newPage.validate(); // TODO: element must be in dom before validating
     return newPage;
   };
 
@@ -189,22 +170,11 @@ const paginate = (content, rules, progressCallback) => {
     }
 
     // Transforms after adding
-    const addedChild = book.currentPage.breadcrumb.pop();
-    ruleSet.applyAfterAddRules(
-      addedChild,
-      book,
-      continueOnNewPage,
-      makeNewPage,
-      (el) => {
-        el.parentNode.removeChild(el);
-        const newPage = continueOnNewPage();
-        newPage.currentElement.appendChild(el);
-      }
-    );
+    const addedElement = book.currentPage.breadcrumb.pop();
+    ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage);
     estimator.increment();
     book.estimatedProgress = estimator.progress;
   };
-
 
   const init = async () => {
     estimator.capacity = content.querySelectorAll('*').length;

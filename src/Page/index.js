@@ -1,4 +1,5 @@
 import { c, createEl, last } from '../utils';
+import elToStr from '../utils/elementToString';
 
 class Page {
   constructor() {
@@ -21,6 +22,18 @@ class Page {
   }
   hasOverflowed() {
     return this.overflowAmount() > -5;
+  }
+
+  validate() {
+    if (this.hasOverflowed()) {
+      const suspect = this.currentElement;
+      if (suspect) {
+        console.warn(`Bindery: Content overflows, probably due to a style set on ${elToStr(suspect)}.`);
+        suspect.parentNode.removeChild(suspect);
+      } else {
+        console.warn('Bindery: Content overflows.');
+      }
+    }
   }
 
   static isSizeValid() {
