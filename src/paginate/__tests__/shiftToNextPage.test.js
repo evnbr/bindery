@@ -14,9 +14,9 @@ const mockPage = (path) => {
     for (let i = 0; i < path.length - 1; i += 1) {
       path[i].appendChild(path[i + 1]);
     }
-    page.breadcrumb = path;
+    page.path = path;
   } else {
-    page.breadcrumb = [];
+    page.path = [];
   }
   page.hasOverflowed = () => false;
   return page;
@@ -40,8 +40,8 @@ test('Shifts one element when none of its parents complain', () => {
   const canSplit = () => true;
 
   shiftToNextPage(page, next, canSplit);
-  expect(page.breadcrumb).toEqual([a, b, c]);
-  expect(nextPage.breadcrumb).toEqual([d]);
+  expect(page.path).toEqual([a, b, c]);
+  expect(nextPage.path).toEqual([d]);
 });
 
 test('Shifts two elements when parent would be empty', () => {
@@ -52,8 +52,8 @@ test('Shifts two elements when parent would be empty', () => {
   const canSplit = () => true;
 
   shiftToNextPage(page, next, canSplit);
-  expect(page.breadcrumb).toEqual([a, b]);
-  expect(nextPage.breadcrumb).toEqual([c, d]);
+  expect(page.path).toEqual([a, b]);
+  expect(nextPage.path).toEqual([c, d]);
 });
 
 test('Shifts two elements when parent can\t split', () => {
@@ -63,8 +63,8 @@ test('Shifts two elements when parent can\t split', () => {
   const canSplit = elmt => elmt !== c;
 
   shiftToNextPage(page, next, canSplit);
-  expect(page.breadcrumb).toEqual([a, b]);
-  expect(nextPage.breadcrumb).toEqual([c, d]);
+  expect(page.path).toEqual([a, b]);
+  expect(nextPage.path).toEqual([c, d]);
 });
 
 test('Shifts three elements when grandparent can\t split', () => {
@@ -74,8 +74,8 @@ test('Shifts three elements when grandparent can\t split', () => {
   const canSplit = elmt => elmt !== c && elmt !== b;
 
   shiftToNextPage(page, next, canSplit);
-  expect(page.breadcrumb).toEqual([a]);
-  expect(nextPage.breadcrumb).toEqual([b, c, d]);
+  expect(page.path).toEqual([a]);
+  expect(nextPage.path).toEqual([b, c, d]);
 });
 
 test('Does not shift elements if whole page would be empty', () => {
@@ -86,6 +86,6 @@ test('Does not shift elements if whole page would be empty', () => {
   const canSplit = () => false;
 
   shiftToNextPage(page, next, canSplit);
-  expect(page.breadcrumb).toEqual([a, b, c, d]);
-  expect(nextPage.breadcrumb).toEqual([]);
+  expect(page.path).toEqual([a, b, c, d]);
+  expect(nextPage.path).toEqual([]);
 });
