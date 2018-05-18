@@ -5,17 +5,17 @@
 // to the next page.
 const shiftToNextPage = (page, continueOnNewPage, canSplitElement) => {
   // So this node won't get cloned. TODO: this is unclear
-  const elementToMove = page.breadcrumb.pop();
+  const elementToMove = page.path.pop();
 
-  if (page.breadcrumb.length < 1) {
+  if (page.path.length < 1) {
     throw Error('Bindery: Attempting to move the top-level element');
   }
 
   // find the nearest splittable parent
   let nearestElementThatCanBeMoved = elementToMove;
   const pathToRestore = [];
-  while (page.breadcrumb.length > 1 && !canSplitElement(page.currentElement)) {
-    nearestElementThatCanBeMoved = page.breadcrumb.pop();
+  while (page.path.length > 1 && !canSplitElement(page.currentElement)) {
+    nearestElementThatCanBeMoved = page.path.pop();
     pathToRestore.unshift(nearestElementThatCanBeMoved);
   }
 
@@ -28,9 +28,9 @@ const shiftToNextPage = (page, continueOnNewPage, canSplitElement) => {
 
   // If the nearest ancestor would be empty without this node,
   // move it to the next page too.
-  if (page.breadcrumb.length > 1 && page.currentElement.textContent.trim() === '') {
+  if (page.path.length > 1 && page.currentElement.textContent.trim() === '') {
     parent.appendChild(nearestElementThatCanBeMoved);
-    nearestElementThatCanBeMoved = page.breadcrumb.pop();
+    nearestElementThatCanBeMoved = page.path.pop();
     pathToRestore.unshift(nearestElementThatCanBeMoved);
     nearestElementThatCanBeMoved.parentNode.removeChild(nearestElementThatCanBeMoved);
   }
@@ -50,8 +50,8 @@ const shiftToNextPage = (page, continueOnNewPage, canSplitElement) => {
   newPage.currentElement.appendChild(nearestElementThatCanBeMoved);
 
   // restore subpath
-  pathToRestore.forEach(r => newPage.breadcrumb.push(r));
-  newPage.breadcrumb.push(elementToMove);
+  pathToRestore.forEach(r => newPage.path.push(r));
+  newPage.path.push(elementToMove);
 };
 
 export default shiftToNextPage;

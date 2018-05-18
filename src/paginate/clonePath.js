@@ -2,9 +2,9 @@ import { c } from '../utils';
 
 // @param rules: array of Bindery.Rules
 // @return: A new function that clones the given
-// breadcrumb according to those rules. (original : Array) => clone : Array
+// path according to those rules. (original : Array) => clone : Array
 //
-// The breadcrumb is an array of nested elments,
+// The path is an array of nested elments,
 // for example .content > article > p > a).
 //
 // It's shallowly cloned every time we move to the next page,
@@ -15,8 +15,8 @@ import { c } from '../utils';
 // which lets you add classes to the original and cloned element
 // to customize styling.
 
-const breadcrumbClone = (origBreadcrumb, rules) => {
-  const newBreadcrumb = [];
+const clonePath = (oldPath, rules) => {
+  const newPath = [];
 
   // TODO check if element actually matches
   const toNextClasses = rules
@@ -36,8 +36,8 @@ const breadcrumbClone = (origBreadcrumb, rules) => {
     fromPrevClasses.forEach(cl => node.classList.add(cl));
   };
 
-  for (let i = origBreadcrumb.length - 1; i >= 0; i -= 1) {
-    const original = origBreadcrumb[i];
+  for (let i = oldPath.length - 1; i >= 0; i -= 1) {
+    const original = oldPath[i];
     const clone = original.cloneNode(false); // shallow
     clone.innerHTML = '';
 
@@ -52,7 +52,7 @@ const breadcrumbClone = (origBreadcrumb, rules) => {
         // the OL is also a continuation
         prevStart = parseInt(original.getAttribute('start'), 10);
       }
-      if (i < origBreadcrumb.length - 1 && origBreadcrumb[i + 1].tagName === 'LI') {
+      if (i < oldPath.length - 1 && oldPath[i + 1].tagName === 'LI') {
         // the first list item is a continuation
         prevStart -= 1;
       }
@@ -61,11 +61,11 @@ const breadcrumbClone = (origBreadcrumb, rules) => {
       clone.setAttribute('start', newStart);
     }
 
-    if (i < origBreadcrumb.length - 1) clone.appendChild(newBreadcrumb[i + 1]);
-    newBreadcrumb[i] = clone;
+    if (i < oldPath.length - 1) clone.appendChild(newPath[i + 1]);
+    newPath[i] = clone;
   }
 
-  return newBreadcrumb;
+  return newPath;
 };
 
-export default breadcrumbClone;
+export default clonePath;

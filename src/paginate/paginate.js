@@ -9,7 +9,7 @@ import { addTextNode, addTextNodeAcrossElements } from './addTextNode';
 import RuleSet from './RuleSet';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
-import breadcrumbClone from './breadcrumbClone';
+import clonePath from './clonePath';
 import Estimator from './Estimator';
 
 // Utils
@@ -66,13 +66,13 @@ const paginate = (content, rules, progressCallback) => {
     if (oldPage) finishPage(oldPage, ignoreOverflow);
 
     const newPage = makeNewPage();
-    newPage.breadcrumb = oldPage ? breadcrumbClone(oldPage.breadcrumb, rules) : [];
+    newPage.path = oldPage ? clonePath(oldPage.path, rules) : [];
 
     book.currentPage = newPage;
     book.pages.push(newPage);
 
-    if (newPage.breadcrumb[0]) {
-      newPage.flowContent.appendChild(newPage.breadcrumb[0]);
+    if (newPage.path[0]) {
+      newPage.flowContent.appendChild(newPage.path[0]);
     }
 
     progressCallback(book);
@@ -108,7 +108,7 @@ const paginate = (content, rules, progressCallback) => {
   const addSplittableTextNode = async (textNode) => {
     const el = book.currentPage.currentElement;
     let hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
-    if (!hasAdded && book.currentPage.breadcrumb.length > 1) {
+    if (!hasAdded && book.currentPage.path.length > 1) {
       // try on next page
       shiftToNextPage(book.currentPage, continueOnNewPage, canSplitElementAlt);
       hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
@@ -137,7 +137,7 @@ const paginate = (content, rules, progressCallback) => {
 
     // Insert element
     book.currentPage.currentElement.appendChild(element);
-    book.currentPage.breadcrumb.push(element);
+    book.currentPage.path.push(element);
 
     // Clear element
     const childNodes = [...element.childNodes];
@@ -161,7 +161,7 @@ const paginate = (content, rules, progressCallback) => {
     }
 
     // Transforms after adding
-    const addedElement = book.currentPage.breadcrumb.pop();
+    const addedElement = book.currentPage.path.pop();
     ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage);
     estimator.increment();
     book.estimatedProgress = estimator.progress;

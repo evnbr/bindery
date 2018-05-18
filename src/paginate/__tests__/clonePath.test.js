@@ -1,4 +1,4 @@
-import breadcrumbClone from '../breadcrumbClone';
+import clonePath from '../clonePath';
 
 
 test('Clone has same tagNames', () => {
@@ -8,7 +8,7 @@ test('Clone has same tagNames', () => {
     document.createElement('span'),
   ];
 
-  const newCrumb = breadcrumbClone(crumb, []);
+  const newCrumb = clonePath(crumb, []);
 
   expect(newCrumb.length).toBe(crumb.length);
   expect(newCrumb[0].tagName).toBe('SECTION');
@@ -20,7 +20,7 @@ test('Split elements get classes from custom rule', () => {
   const div = document.createElement('div');
   const span = document.createElement('span');
   const crumb = [div, span];
-  const newCrumb = breadcrumbClone(crumb, [
+  const newCrumb = clonePath(crumb, [
     { customFromPreviousClass: 'fromPrev', customToNextClass: 'toNext' },
   ]);
 
@@ -36,7 +36,7 @@ test('Ordered List numbering continues on next page', () => {
   ol.appendChild(document.createElement('li'));
 
   const crumb = [ol];
-  const newCrumb = breadcrumbClone(crumb, [
+  const newCrumb = clonePath(crumb, [
     { customFromPrevClass: 'fromPrev', customToNextClass: 'toNext' },
   ]);
 
@@ -51,7 +51,7 @@ test('Ordered List numbering is one less if list element continues on next page'
   ol.appendChild(li2);
 
   const crumb = [ol, li2];
-  const newCrumb = breadcrumbClone(crumb, [
+  const newCrumb = clonePath(crumb, [
     { customFromPrevClass: 'fromPrev', customToNextClass: 'toNext' },
   ]);
 
@@ -65,7 +65,7 @@ test('Ordered List numbering starts from previous start value', () => {
   ol.appendChild(document.createElement('li'));
 
   const crumb = [ol];
-  const newCrumb = breadcrumbClone(crumb, [
+  const newCrumb = clonePath(crumb, [
     { customFromPrevClass: 'fromPrev', customToNextClass: 'toNext' },
   ]);
 
