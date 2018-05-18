@@ -3,7 +3,7 @@ import Book from './Book';
 import Page from '../Page';
 
 // paginate
-import shouldIgnoreOverflow from './shouldIgnoreOverflow';
+import { ignoreOverflow, isSplittable } from './canSplit';
 import shiftToNextPage from './shiftToNextPage';
 import { addTextNode, addTextNodeAcrossElements } from './addTextNode';
 import RuleSet from './RuleSet';
@@ -13,24 +13,7 @@ import clonePath from './clonePath';
 import Estimator from './Estimator';
 
 // Utils
-import { c } from '../utils';
 import { isTextNode, isUnloadedImage, isContent } from './nodeTypes';
-
-// Walk up the tree to see if we can safely
-// insert a split into this node.
-const isSplittable = (element, noSplit) => {
-  if (noSplit.some(sel => element.matches(sel))) {
-    if (element.hasAttribute('data-bindery-did-move')
-      || element.classList.contains(c('continuation'))) {
-      return true; // ignore rules and split it anyways.
-    }
-    return false;
-  }
-  if (element.parentElement) {
-    return isSplittable(element.parentElement, noSplit);
-  }
-  return true;
-};
 
 const paginate = (content, rules, progressCallback) => {
   // Global state for a pagination run
@@ -40,8 +23,8 @@ const paginate = (content, rules, progressCallback) => {
   const noSplit = ruleSet.selectorsNotToSplit;
 
   const hasOverflowed = () => book.currentPage.hasOverflowed();
-  const canSplitCurrentElement = () => !shouldIgnoreOverflow(book.currentPage.currentElement);
-  const canSplitElement = el => isSplittable(el, noSplit) && !shouldIgnoreOverflow(el);
+  const ignoreCurrentOverflow = () => ignoreOverflow(book.currentPage.currentElement);
+  const canSplitElement = el => isSplittable(el, noSplit) && !ignoreOverflow(el);
   const canSplitElementAlt = el => isSplittable(el, noSplit);
 
   const makeNewPage = () => {
@@ -61,9 +44,9 @@ const paginate = (content, rules, progressCallback) => {
 
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
-  const continueOnNewPage = (ignoreOverflow = false) => {
+  const continueOnNewPage = (allowOverflow = false) => {
     const oldPage = book.currentPage;
-    if (oldPage) finishPage(oldPage, ignoreOverflow);
+    if (oldPage) finishPage(oldPage, allowOverflow);
 
     const newPage = makeNewPage();
     newPage.path = oldPage ? clonePath(oldPage.path, rules) : [];
@@ -75,14 +58,14 @@ const paginate = (content, rules, progressCallback) => {
       newPage.flowContent.appendChild(newPage.path[0]);
     }
 
-    progressCallback(book);
+    progressCallback(book); // assuming this will display new page
     newPage.validate(); // TODO: element must be in dom before validating
     return newPage;
   };
 
   const addTextWithoutChecks = (textNode, parent) => {
     parent.appendChild(textNode);
-    if (canSplitCurrentElement()) {
+    if (!ignoreCurrentOverflow()) {
       book.currentPage.suppressErrors = true;
       continueOnNewPage();
     }
@@ -90,7 +73,7 @@ const paginate = (content, rules, progressCallback) => {
 
   const addWholeTextNode = async (textNode) => {
     let hasAdded = await addTextNode(textNode, book.currentPage.currentElement, hasOverflowed);
-    if (!hasAdded && canSplitCurrentElement()) {
+    if (!hasAdded && !ignoreCurrentOverflow()) {
       // try on next page
       shiftToNextPage(book.currentPage, continueOnNewPage, canSplitElementAlt);
       hasAdded = await addTextNode(textNode, book.currentPage.currentElement, hasOverflowed);
@@ -122,15 +105,13 @@ const paginate = (content, rules, progressCallback) => {
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
   const addElementNode = async (elementToAdd) => {
-    if (hasOverflowed() && canSplitCurrentElement()) {
+    if (hasOverflowed() && !ignoreCurrentOverflow()) {
       book.currentPage.suppressErrors = true;
       continueOnNewPage();
     }
 
     // Ensure images are loaded before measuring
-    if (isUnloadedImage(elementToAdd)) {
-      await estimator.ensureImageLoaded(elementToAdd);
-    }
+    if (isUnloadedImage(elementToAdd)) await estimator.ensureImageLoaded(elementToAdd);
 
     // Transforms before adding
     const element = ruleSet.applyBeforeAddRules(elementToAdd, book, continueOnNewPage, makeNewPage);
@@ -144,7 +125,7 @@ const paginate = (content, rules, progressCallback) => {
     element.innerHTML = '';
 
     // Overflows when empty
-    if (hasOverflowed() && canSplitCurrentElement()) {
+    if (hasOverflowed() && !ignoreCurrentOverflow()) {
       shiftToNextPage(book.currentPage, continueOnNewPage, canSplitElementAlt);
     }
 

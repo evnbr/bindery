@@ -1,5 +1,5 @@
 import scheduler from '../Scheduler';
-import shouldIgnoreOverflow from './shouldIgnoreOverflow';
+import { ignoreOverflow } from './canSplit';
 import { isTextNode } from './nodeTypes';
 
 
@@ -23,7 +23,7 @@ const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
   const originalText = textNode.nodeValue;
   parent.appendChild(textNode);
 
-  if (!hasOverflowed() || shouldIgnoreOverflow(parent)) {
+  if (!hasOverflowed() || ignoreOverflow(parent)) {
     return true;
   }
 
