@@ -1,4 +1,4 @@
-import c from '../prefixClass';
+import { c } from '../index';
 
 test('Adds prefix', () => {
   expect(c('classname')).toEqual('📖-classname');
