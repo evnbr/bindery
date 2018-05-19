@@ -1,11 +1,12 @@
 import Page from './Page';
+import { stylesheet } from './utils';
 import { parseVal } from './utils/convertUnits';
 import { Paper, Layout } from './Constants';
 
 
 const letter = { width: '8.5in', height: '11in' };
 const a4 = { width: '210mm', height: '297mm' };
-const defaultPageSetup = {
+const defaultOpts = {
   bleed: '12pt',
   size: { width: '4in', height: '6in' },
   margin: {
@@ -21,9 +22,10 @@ const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
 class PageSetup {
 
   constructor(opts = {}) {
-    this.size = opts.size || defaultPageSetup.size;
-    this.margin = opts.margin || defaultPageSetup.margin;
-    this.bleed = opts.bleed || defaultPageSetup.bleed;
+    this.size = opts.size || defaultOpts.size;
+    this.margin = opts.margin || defaultOpts.margin;
+    this.bleed = opts.bleed || defaultOpts.bleed;
+    this.markLength = '12pt';
   }
 
   setupPaper(opts = {}) {
@@ -49,18 +51,20 @@ class PageSetup {
     const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
 
+    const bleedAmount = `2 * ${this.bleed}`;
+    const marksAmount = `2 * ${this.bleed} + 2 * ${this.markLength}`;
     switch (this.sheetSizeMode) {
     case Paper.AUTO:
       return { width, height };
     case Paper.AUTO_BLEED:
       return {
-        width: `calc(${width} + 2 * var(--bindery-bleed))`,
-        height: `calc(${height} + 2 * var(--bindery-bleed))`,
+        width: `calc(${width} + ${bleedAmount})`,
+        height: `calc(${height} + ${bleedAmount})`,
       };
     case Paper.AUTO_MARKS:
       return {
-        width: `calc(${width} + 2 * var(--bindery-bleed) + 2 * var(--bindery-mark-length))`,
-        height: `calc(${height} + 2 * var(--bindery-bleed) + 2 * var(--bindery-mark-length))`,
+        width: `calc(${width} + ${marksAmount})`,
+        height: `calc(${height} + ${marksAmount})`,
       };
     case Paper.LETTER_LANDSCAPE:
       return { width: letter.height, height: letter.width };
@@ -89,19 +93,23 @@ class PageSetup {
   }
 
   updateStyleVars() {
+    const page = this.size;
+    const sheet = this.sheetSize;
+    stylesheet('pageSize').innerHTML = `@page { size: ${sheet.width} ${sheet.height}; }`;
+
     Object.entries({
-      'page-width': this.size.width,
-      'page-height': this.size.height,
-      'sheet-width': this.sheetSize.width,
-      'sheet-height': this.sheetSize.height,
+      'page-width': page.width,
+      'page-height': page.height,
+      'sheet-width': sheet.width,
+      'sheet-height': sheet.height,
       'margin-inner': this.margin.inner,
       'margin-outer': this.margin.outer,
       'margin-top': this.margin.top,
       'margin-bottom': this.margin.bottom,
       bleed: this.bleed,
-      'mark-length': '12pt',
+      'mark-length': this.markLength,
     }).forEach(([k, v]) => {
-      document.body.style.setProperty(`--bindery-${k}`, v);
+      document.documentElement.style.setProperty(`--bindery-${k}`, v);
     });
   }
 }

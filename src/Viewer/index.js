@@ -13,6 +13,8 @@ modeAttr[Mode.PREVIEW] = 'preview';
 modeAttr[Mode.PRINT] = 'print';
 modeAttr[Mode.FLIPBOOK] = 'flip';
 
+const isCommandP = e => (e.ctrlKey || e.metaKey) && e.keyCode === 80;
+
 class Viewer {
   constructor({ pageSetup, mode, layout, marks, ControlsComponent }) {
     this.book = null;
@@ -78,12 +80,10 @@ class Viewer {
       });
     }
     document.body.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.keyCode === 80) {
+      if (isCommandP(e)) {
         e.preventDefault();
         this.setPrint();
-        setTimeout(() => {
-          window.print();
-        }, 10);
+        setTimeout(() => window.print(), 50);
       }
     });
   }
