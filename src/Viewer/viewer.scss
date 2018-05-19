@@ -1,16 +1,12 @@
 @media screen {
-  .viewing {
-    background: $background !important;
-  }
   .root {
     transition: opacity 0.2s;
     opacity: 1;
     background: $background;
-    padding: 10px;
     z-index: 99;
     position: relative;
-    padding-top: 60px;
-    min-height: 90vh;
+    padding-top: 72px;
+    min-height: 100vh;
   }
 
   .progress-bar {
@@ -26,6 +22,24 @@
     .in-progress & {
       opacity: 1;
       height: 2px;
+    }
+  }
+
+  .zoom-content {
+    padding: 10px;
+    background: $background;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    .view-preview & {
+      min-width: calc(20px + var(--bindery-spread-width));
+    }
+    .view-flip & {
+      min-width: calc(1.1 * var(--bindery-spread-width));
+    }
+    .view-print & {
+      min-width: calc(20px + var(--bindery-sheet-width));
     }
   }
 
@@ -121,7 +135,7 @@
     margin: 0 auto;
   }
 
-  .zoom-wrap[style] {
+  .zoom-scaler[style] {
     transform: none !important;
   }
 }
@@ -130,13 +144,13 @@ body.viewing {
   margin: 0;
 }
 
-.zoom-wrap {
+.zoom-scaler {
   transform-origin: top left;
   transform-style: preserve-3d;
   height: calc(100vh - 120px); /* adjust scrollheight on scaled down */
 }
 
-[bindery-view-mode="interactive"] .zoom-wrap {
+.view-flip .zoom-scaler {
   transform-origin: center left;
 }
 
@@ -184,7 +198,7 @@ body.viewing {
   margin: auto;
   padding: 0 20px;
   box-sizing: content-box;
-  height: 100% !important;
+  height: 90vh !important;
 }
 
 .page3d {

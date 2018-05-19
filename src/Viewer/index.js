@@ -8,10 +8,10 @@ import { gridLayout, printLayout, flipLayout } from './Layouts';
 
 import { Mode, Paper, Layout, Marks } from '../Constants';
 
-const modeAttr = {};
-modeAttr[Mode.PREVIEW] = 'preview';
-modeAttr[Mode.PRINT] = 'print';
-modeAttr[Mode.FLIPBOOK] = 'flip';
+const modeClasses = {};
+modeClasses[Mode.PREVIEW] = c('view-preview');
+modeClasses[Mode.PRINT] = c('view-print');
+modeClasses[Mode.FLIPBOOK] = c('view-flip');
 
 const isCommandP = e => (e.ctrlKey || e.metaKey) && e.keyCode === 80;
 
@@ -21,15 +21,16 @@ class Viewer {
     this.pageSetup = pageSetup;
 
     this.progressBar = createEl('.progress-bar');
-    this.zoomBox = createEl('zoom-wrap');
-    this.element = createEl('root', [this.progressBar, this.zoomBox]);
+    this.content = createEl('zoom-content');
+    this.scaler = createEl('zoom-scaler', [this.content]);
+    this.element = createEl('root', [this.progressBar, this.scaler]);
 
     this.doubleSided = true;
     this.printArrange = layout;
 
     this.setMarks(marks);
     this.mode = mode;
-    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
+    this.element.classList.add(c('view-preview'));
     this.currentLeaf = 0;
 
     this.listenForPrint();
@@ -83,7 +84,7 @@ class Viewer {
       if (isCommandP(e)) {
         e.preventDefault();
         this.setPrint();
-        setTimeout(() => window.print(), 50);
+        setTimeout(() => window.print(), 200);
       }
     });
   }
@@ -191,7 +192,7 @@ class Viewer {
   clear() {
     this.book = null;
     this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
-    this.zoomBox.innerHTML = '';
+    this.content.innerHTML = '';
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
@@ -220,7 +221,8 @@ class Viewer {
     }
 
     body.classList.add(c('viewing'));
-    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
+    this.element.classList.remove(...Object.values(modeClasses));
+    this.element.classList.add(modeClasses[this.mode]);
 
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
@@ -236,8 +238,8 @@ class Viewer {
       else if (this.mode === Mode.PRINT) frag = this.renderPrint(pages);
       else frag = this.renderGrid(pages);
 
-      this.zoomBox.innerHTML = '';
-      this.zoomBox.appendChild(frag);
+      this.content.innerHTML = '';
+      this.content.appendChild(frag);
       body.scrollTop = scrollMax * scrollPct;
       this.updateZoom();
     });
@@ -263,7 +265,7 @@ class Viewer {
 
     this.book.pages.forEach((page, i) => {
       // If hasn't been added, or not in spread yet
-      if (!this.zoomBox.contains(page.element) || page.element.parentNode === this.zoomBox) {
+      if (!this.content.contains(page.element) || page.element.parentNode === this.content) {
         if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
           this.lastSpreadInProgress.appendChild(page.element);
         } else {
@@ -274,26 +276,26 @@ class Viewer {
           } else {
             this.lastSpreadInProgress = makeSpread(page.element);
           }
-          this.zoomBox.appendChild(this.lastSpreadInProgress);
+          this.content.appendChild(this.lastSpreadInProgress);
         }
       }
     });
 
     if (this.book.currentPage) {
-      this.zoomBox.appendChild(this.book.currentPage.element);
+      this.content.appendChild(this.book.currentPage.element);
     }
 
     this.updateZoom();
   }
 
   updateZoom() {
-    if (this.zoomBox.firstElementChild) {
+    if (this.content.firstElementChild) {
       const scrollPct = document.body.scrollTop / document.body.scrollHeight;
-      const viewerRect = this.zoomBox.getBoundingClientRect();
-      const contentW = this.zoomBox.firstElementChild.getBoundingClientRect().width;
+      const viewerRect = this.scaler.getBoundingClientRect();
+      const contentW = this.content.getBoundingClientRect().width;
       const scale = Math.min(1, viewerRect.width / (contentW));
 
-      this.zoomBox.style.transform = `scale(${scale})`;
+      this.scaler.style.transform = `scale(${scale})`;
       document.body.scrollTop = document.body.scrollHeight * scrollPct;
     }
   }

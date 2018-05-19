@@ -98,6 +98,7 @@ class PageSetup {
     stylesheet('pageSize').innerHTML = `@page { size: ${sheet.width} ${sheet.height}; }`;
 
     Object.entries({
+      'spread-width': this.spreadSize.width,
       'page-width': page.width,
       'page-height': page.height,
       'sheet-width': sheet.width,
