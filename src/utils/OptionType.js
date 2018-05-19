@@ -45,7 +45,7 @@ const OptionType = {
     enumCheck.name = `enum ( '${enumCases.join('\' | \'')}' )`;
     return enumCheck;
   },
-  any() { return true; },
+  any: () => true,
   string: isStr,
   length: isValidLength,
   bool: isBool,

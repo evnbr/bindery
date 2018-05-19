@@ -1,6 +1,6 @@
-import Page from '../Page';
-import { isValidSize, parseVal } from '../utils/convertUnits';
-import { Paper, Layout } from '../Constants';
+import Page from './Page';
+import { parseVal } from './utils/convertUnits';
+import { Paper, Layout } from './Constants';
 
 
 const letter = { width: '8.5in', height: '11in' };
@@ -21,28 +21,14 @@ const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
 class PageSetup {
 
   constructor(opts = {}) {
-    this.setSize(opts.size || defaultPageSetup.size);
-    this.setMargin(opts.margin || defaultPageSetup.margin);
-    this.setBleed(opts.bleed || defaultPageSetup.bleed);
+    this.size = opts.size || defaultPageSetup.size;
+    this.margin = opts.margin || defaultPageSetup.margin;
+    this.bleed = opts.bleed || defaultPageSetup.bleed;
   }
 
   setupPaper(opts = {}) {
     this.sheetSizeMode = supportsCustomPageSize ? (opts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
     this.printTwoUp = opts.layout && opts.layout !== Layout.PAGES;
-  }
-
-  setSize(size) {
-    isValidSize(size);
-    this.size = size;
-  }
-
-  setMargin(margin) {
-    isValidSize(margin);
-    this.margin = margin;
-  }
-
-  setBleed(newBleed) {
-    this.bleed = newBleed;
   }
 
   setPrintTwoUp(newVal) {
@@ -51,22 +37,16 @@ class PageSetup {
 
   get displaySize() {
     const width = this.printTwoUp
-      ? this.spreadSizeStyle().width
+      ? this.spreadSize.width
       : this.size.width;
     const height = this.size.height;
     const bleed = this.bleed;
 
-    return {
-      width,
-      height,
-      bleed,
-    };
+    return { width, height, bleed };
   }
 
   get sheetSize() {
-    const width = this.printTwoUp
-      ? this.spreadSizeStyle().width
-      : this.size.width;
+    const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
 
     switch (this.sheetSizeMode) {
@@ -78,7 +58,6 @@ class PageSetup {
         height: `calc(${height} + 2 * var(--bindery-bleed))`,
       };
     case Paper.AUTO_MARKS:
-      // TODO: 24pt marks is hardcoded
       return {
         width: `calc(${width} + 2 * var(--bindery-bleed) + 2 * var(--bindery-mark-length))`,
         height: `calc(${height} + 2 * var(--bindery-bleed) + 2 * var(--bindery-mark-length))`,
@@ -101,7 +80,7 @@ class PageSetup {
     return Page.isSizeValid();
   }
 
-  spreadSizeStyle() {
+  get spreadSize() {
     const w = parseVal(this.size.width);
     return {
       height: this.size.height,
@@ -109,30 +88,21 @@ class PageSetup {
     };
   }
 
-  get styleSheet() {
-    const existing = document.querySelector('#binderyPageSetup');
-    if (existing) {
-      return existing;
-    }
-    const styleSheet = document.createElement('style');
-    styleSheet.id = 'binderyPageSetup';
-    document.head.appendChild(styleSheet);
-    return styleSheet;
-  }
-
   updateStyleVars() {
-    this.styleSheet.innerHTML = `html {
-      --bindery-page-width: ${this.size.width};
-      --bindery-page-height: ${this.size.height};
-      --bindery-sheet-width: ${this.sheetSize.width};
-      --bindery-sheet-height: ${this.sheetSize.height};
-      --bindery-margin-inner: ${this.margin.inner};
-      --bindery-margin-outer: ${this.margin.outer};
-      --bindery-margin-top: ${this.margin.top};
-      --bindery-margin-bottom: ${this.margin.bottom};
-      --bindery-bleed: ${this.bleed};
-      --bindery-mark-length: 12pt;
-    }`;
+    Object.entries({
+      'page-width': this.size.width,
+      'page-height': this.size.height,
+      'sheet-width': this.sheetSize.width,
+      'sheet-height': this.sheetSize.height,
+      'margin-inner': this.margin.inner,
+      'margin-outer': this.margin.outer,
+      'margin-top': this.margin.top,
+      'margin-bottom': this.margin.bottom,
+      bleed: this.bleed,
+      'mark-length': '12pt',
+    }).forEach(([k, v]) => {
+      document.body.style.setProperty(`--bindery-${k}`, v);
+    });
   }
 }
 

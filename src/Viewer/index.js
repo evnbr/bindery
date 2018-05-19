@@ -14,9 +14,9 @@ modeAttr[Mode.PRINT] = 'print';
 modeAttr[Mode.FLIPBOOK] = 'flip';
 
 class Viewer {
-  constructor({ bindery, mode, layout, marks, ControlsComponent }) {
+  constructor({ pageSetup, mode, layout, marks, ControlsComponent }) {
     this.book = null;
-    this.pageSetup = bindery.pageSetup;
+    this.pageSetup = pageSetup;
 
     this.progressBar = createEl('.progress-bar');
     this.zoomBox = createEl('zoom-wrap');
@@ -219,7 +219,6 @@ class Viewer {
       body.appendChild(this.element);
     }
 
-    this.flaps = [];
     body.classList.add(c('viewing'));
     this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
 
@@ -230,11 +229,15 @@ class Viewer {
     this.progressBar.style.width = '100%';
 
     window.requestAnimationFrame(() => {
-      if (this.mode === Mode.PREVIEW) this.renderGrid();
-      else if (this.mode === Mode.FLIPBOOK) this.renderInteractive();
-      else if (this.mode === Mode.PRINT) this.renderPrint();
-      else this.renderGrid();
+      const pages = this.book.pages.slice();
 
+      let frag;
+      if (this.mode === Mode.FLIPBOOK) frag = this.renderInteractive(pages);
+      else if (this.mode === Mode.PRINT) frag = this.renderPrint(pages);
+      else frag = this.renderGrid(pages);
+
+      this.zoomBox.innerHTML = '';
+      this.zoomBox.appendChild(frag);
       body.scrollTop = scrollMax * scrollPct;
       this.updateZoom();
     });
@@ -255,7 +258,7 @@ class Viewer {
     const limit = sideBySide ? 2 : 1;
 
     const makeSpread = function (...arg) {
-      return createEl('.spread-wrapper', [...arg]);
+      return createEl('.spread-wrapper.spread-size', [...arg]);
     };
 
     this.book.pages.forEach((page, i) => {
@@ -295,47 +298,29 @@ class Viewer {
     }
   }
 
-  renderPrint() {
+  renderPrint(bookPages) {
+    let pages = bookPages;
     this.element.classList.add(c('show-bleed'));
-
-    this.zoomBox.innerHTML = '';
-
     const isBooklet = this.printArrange === Layout.BOOKLET;
-
-    let pages = this.book.pages.slice();
     if (this.printArrange === Layout.SPREADS) {
       pages = padPages(pages, () => new Page());
     } else if (isBooklet) {
       pages = orderPagesBooklet(pages, () => new Page());
     }
-
-    const fragment = printLayout(pages, this.isTwoUp, isBooklet);
-    this.zoomBox.appendChild(fragment);
+    return printLayout(pages, this.isTwoUp, isBooklet);
   }
 
-  renderGrid() {
-    this.zoomBox.innerHTML = '';
-
+  renderGrid(bookPages) {
+    let pages = bookPages;
     this.element.classList.remove(c('show-bleed'));
-
-    let pages = this.book.pages.slice();
-
     if (this.doubleSided) pages = padPages(pages, () => new Page());
-
-    const fragment = gridLayout(pages, this.doubleSided);
-    this.zoomBox.appendChild(fragment);
+    return gridLayout(pages, this.doubleSided);
   }
 
-  renderInteractive() {
-    this.zoomBox.innerHTML = '';
-    this.flaps = [];
-
+  renderInteractive(bookPages) {
     this.element.classList.remove(c('show-bleed'));
-
-    const pages = padPages(this.book.pages.slice(), () => new Page());
-
-    const fragment = flipLayout(pages, this.doubleSided);
-    this.zoomBox.appendChild(fragment);
+    const pages = padPages(bookPages, () => new Page());
+    return flipLayout(pages, this.doubleSided);
   }
 
 }

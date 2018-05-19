@@ -3,15 +3,25 @@ import { Mode, Layout, Marks } from '../../Constants';
 
 global.requestAnimationFrame = func => func();
 
+const Controls = function () {
+  return {
+    element: document.createElement('div'),
+    setDone: () => {},
+    updateProgress: () => {},
+  };
+};
+
 const pageSetup = {
   setPrintTwoUp: () => null,
   updateStyleVars: () => null,
 };
+
 const viewer = new Viewer({
-  bindery: { pageSetup },
+  pageSetup,
   mode: Mode.PREVIEW,
   layout: Layout.PAGES,
   marks: Marks.BOTH,
+  ControlsComponent: Controls,
 });
 
 const mockPage = () => {

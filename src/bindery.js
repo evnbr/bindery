@@ -1,7 +1,7 @@
 /* global BINDERY_VERSION */
 
 import paginate from './paginate';
-import PageSetup from './Page/PageSetup';
+import PageSetup from './PageSetup';
 
 import Viewer from './Viewer';
 import { Mode, Paper, Layout, Marks } from './Constants';
@@ -56,7 +56,7 @@ class Bindery {
     const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
     const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
     this.viewer = new Viewer({
-      bindery: this,
+      pageSetup: this.pageSetup,
       mode: opts.view || Mode.PREVIEW,
       marks: startMarks,
       layout: startLayout,
