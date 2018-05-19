@@ -2,6 +2,7 @@ import scheduler from '../Scheduler';
 import { ignoreOverflow } from './canSplit';
 import { isTextNode } from './nodeTypes';
 
+const createTextNode = (document.createTextNode).bind(document);
 
 // Try adding a text node in one go.
 // Returns true if all the text fits, false if none fits.
@@ -60,7 +61,7 @@ const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
   textNode.nodeValue = fittingText;
 
   // Create a new text node for the next page
-  const remainingTextNode = document.createTextNode(overflowingText);
+  const remainingTextNode = createTextNode(overflowingText);
   return remainingTextNode;
 };
 
