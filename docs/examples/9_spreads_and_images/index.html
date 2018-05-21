@@ -2,78 +2,78 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Spreads and Images</title>
-	<style>
-		p {
-		  text-indent: 1rem;
-		  margin: 0;
-		}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spreads and Images</title>
+  <style>
+    p {
+      text-indent: 1rem;
+      margin: 0;
+    }
 
-		figure {
-		  margin: 0;
-		  width: 100%;
-		  height: 100%;
-		  position: relative;
-			background: #eee;
-		}
+    figure {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #eee;
+    }
 
-		.tootall {
-			height: 550px;
-		}
-		.toowide {
-			width: 550px;
-		}
+    .tootall {
+      height: 550px;
+    }
+    .toowide {
+      width: 550px;
+    }
 
-		figure img {
-		  height: 100%;
-		  width: 100%;
-		}
+    figure img {
+      height: 100%;
+      width: 100%;
+    }
 
-		figcaption {
-		  font: 16pt sans-serif;
-			text-align: center;
-		  padding: 40pt;
-		  color: white;
-		  position: absolute;
-		  bottom: 0;
-		  left: 0;
-		  right: 0;
-		}
-	</style>
+    figcaption {
+      font: 16pt sans-serif;
+      text-align: center;
+      padding: 40pt;
+      color: white;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  </style>
 </head>
 
 <body>
 
-	<script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
-	<script>
-			Bindery.makeBook({
-			  content: {
-					url: './content.html',
-					selector: ".content",
-				},
-				pageSetup: {
-					bleed: '0.25in',
-				},
-			  rules: [
-					Bindery.RunningHeader(),
-					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+  <script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
+  <script>
+      Bindery.makeBook({
+        content: {
+          url: './content.html',
+          selector: ".content",
+        },
+        pageSetup: {
+          bleed: '0.25in',
+        },
+        rules: [
+          Bindery.RunningHeader(),
+          Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
 
-					Bindery.FullBleedPage({ selector: '.fullpage', continue: 'next' }),
-					Bindery.FullBleedPage({ selector: '.inward', continue: 'next', rotate: 'inward' }),
-					Bindery.FullBleedPage({ selector: '.outward', continue: 'next', rotate: 'outward' }),
-					Bindery.FullBleedPage({ selector: '.full-clockwise', continue: 'next', rotate: 'clockwise' }),
-					Bindery.FullBleedPage({ selector: '.full-counterclockwise', continue: 'next', rotate: 'counterclockwise' }),
+          Bindery.FullBleedPage({ selector: '.fullpage', continue: 'next' }),
+          Bindery.FullBleedPage({ selector: '.inward', continue: 'next', rotate: 'inward' }),
+          Bindery.FullBleedPage({ selector: '.outward', continue: 'next', rotate: 'outward' }),
+          Bindery.FullBleedPage({ selector: '.full-clockwise', continue: 'next', rotate: 'clockwise' }),
+          Bindery.FullBleedPage({ selector: '.full-counterclockwise', continue: 'next', rotate: 'counterclockwise' }),
 
-					Bindery.FullBleedSpread({ selector: '.spread', continue: 'same' }),
-					Bindery.FullBleedSpread({ selector: '.tall-clockwise', continue: 'same', rotate: 'clockwise' }),
-					Bindery.FullBleedSpread({ selector: '.tall-counterclockwise', continue: 'same', rotate: 'counterclockwise' }),
-			  ],
-			});
+          Bindery.FullBleedSpread({ selector: '.spread', continue: 'same' }),
+          Bindery.FullBleedSpread({ selector: '.tall-clockwise', continue: 'same', rotate: 'clockwise' }),
+          Bindery.FullBleedSpread({ selector: '.tall-counterclockwise', continue: 'same', rotate: 'counterclockwise' }),
+        ],
+      });
 
-	</script>
+  </script>
 
-	<script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
+  <script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
 </body>
 </html>
