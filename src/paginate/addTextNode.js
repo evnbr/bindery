@@ -1,4 +1,4 @@
-import scheduler from '../Scheduler';
+import scheduler from './Scheduler';
 import { ignoreOverflow } from './canSplit';
 import { isTextNode } from './nodeTypes';
 
