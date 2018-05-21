@@ -2,73 +2,73 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Bindery Ex 4 — Custom Rules</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bindery Ex 4 — Custom Rules</title>
   <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
-	<script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
-	<script>
+  <script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
+  <script>
 
-		let shrinkingRule = Bindery.createRule({
-			selector: "p",
-			enlargeBy: 16,
-			beforeAdd: function(element) {
-				element.style.fontSize = 16 + this.enlargeBy + "px";
-				this.enlargeBy = this.enlargeBy * 0.9;
-				return element;
-			},
-		});
+    let shrinkingRule = Bindery.createRule({
+      selector: "p",
+      enlargeBy: 16,
+      beforeAdd: function(element) {
+        element.style.fontSize = 16 + this.enlargeBy + "px";
+        this.enlargeBy = this.enlargeBy * 0.9;
+        return element;
+      },
+    });
 
-		let rainbowRule = Bindery.createRule({
-			eachPage: function(page, book) {
-				let pct = page.number / book.pageCount;
-				page.background.style.backgroundColor = "hsl(" + (pct * 360) + ", 80%, 80%)";
-			}
-		});
+    let rainbowRule = Bindery.createRule({
+      eachPage: function(page, book) {
+        let pct = page.number / book.pageCount;
+        page.background.style.backgroundColor = "hsl(" + (pct * 360) + ", 80%, 80%)";
+      }
+    });
 
-		let foreedgeRule = Bindery.createRule({
-			eachPage: function(page, book) {
-				let edgePaint = document.createElement("div");
-				if (page.isRight) {
-					edgePaint.style.background = "url('img/forward.svg') no-repeat";
-					edgePaint.style.right = "-10px";
-				}
-				else if (page.isLeft) {
-					edgePaint.style.background = "url('img/back.svg') no-repeat";
-					edgePaint.style.left = "-10px";
-				}
-				Object.assign(edgePaint.style, {
-					backgroundPosition: ((page.number / book.pageCount) * 100) + "% 0",
-					backgroundSize: "cover",
-					width: "12px",
-					position: "absolute",
-					top: 0,
-					bottom: 0,
-				});
-				page.element.appendChild(edgePaint);
-			}
-		});
+    let foreedgeRule = Bindery.createRule({
+      eachPage: function(page, book) {
+        let edgePaint = document.createElement("div");
+        if (page.isRight) {
+          edgePaint.style.background = "url('img/forward.svg') no-repeat";
+          edgePaint.style.right = "-10px";
+        }
+        else if (page.isLeft) {
+          edgePaint.style.background = "url('img/back.svg') no-repeat";
+          edgePaint.style.left = "-10px";
+        }
+        Object.assign(edgePaint.style, {
+          backgroundPosition: ((page.number / book.pageCount) * 100) + "% 0",
+          backgroundSize: "cover",
+          width: "12px",
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+        });
+        page.element.appendChild(edgePaint);
+      }
+    });
 
-		Bindery.makeBook({
-		  content: {
-				url: "content.html",
-				selector: ".content"
-			},
-			pageSetup: {
-				size: { height: '4in', width: '4in' },
-				margin: { top: '0.3in', inner: '0.3in', outer: '0.3in', bottom: '0.3in' },
-			},
-		  rules: [
-				rainbowRule,
-				shrinkingRule,
-				foreedgeRule,
-			],
-		});
-	</script>
+    Bindery.makeBook({
+      content: {
+        url: "content.html",
+        selector: ".content"
+      },
+      pageSetup: {
+        size: { height: '4in', width: '4in' },
+        margin: { top: '0.3in', inner: '0.3in', outer: '0.3in', bottom: '0.3in' },
+      },
+      rules: [
+        rainbowRule,
+        shrinkingRule,
+        foreedgeRule,
+      ],
+    });
+  </script>
 
-	<script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
+  <script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
 </body>
 </html>
