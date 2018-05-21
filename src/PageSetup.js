@@ -95,9 +95,7 @@ class PageSetup {
   updateStyleVars() {
     const page = this.size;
     const sheet = this.sheetSize;
-    stylesheet('pageSize').innerHTML = `@page { size: ${sheet.width} ${sheet.height}; }`;
-
-    Object.entries({
+    const vars = Object.entries({
       'spread-width': this.spreadSize.width,
       'page-width': page.width,
       'page-height': page.height,
@@ -109,9 +107,12 @@ class PageSetup {
       'margin-bottom': this.margin.bottom,
       bleed: this.bleed,
       'mark-length': this.markLength,
-    }).forEach(([k, v]) => {
-      document.documentElement.style.setProperty(`--bindery-${k}`, v);
-    });
+    }).map(([k, v]) => `--bindery-${k}: ${v};`);
+
+    const rootRule = `:root { ${vars.join('')}  }`;
+    const pageRule = `@page { size: ${sheet.width} ${sheet.height}; }`;
+
+    stylesheet('binderyPage').innerHTML = `${rootRule} ${pageRule}`;
   }
 }
 

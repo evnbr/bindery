@@ -1,6 +1,10 @@
-$accent: #0000c5;
-$background: #f4f4f4;
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+
+:root {
+  --bindery-ui-bg: #f4f4f4;
+  --bindery-ui-accent: black;
+  --bindery-ui-text: black;
+}
 
 @import './Page/page.scss';
 @import './Rules/fullBleed.scss';

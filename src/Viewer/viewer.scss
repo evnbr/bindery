@@ -2,7 +2,7 @@
   .root {
     transition: opacity 0.2s;
     opacity: 1;
-    background: $background;
+    background: var(--bindery-ui-bg);
     z-index: 99;
     position: relative;
     padding-top: 72px;
@@ -13,7 +13,7 @@
     position: fixed;
     left: 0;
     top: 0;
-    background: var(--bindery-ui-accent, $accent);
+    background: var(--bindery-ui-accent);
     width: 0%;
     transition: all 0.2s;
     opacity: 0;
@@ -27,7 +27,7 @@
 
   .zoom-content {
     padding: 10px;
-    background: $background;
+    background: var(--bindery-ui-bg);
     position: absolute;
     left: 0;
     right: 0;
@@ -45,7 +45,7 @@
 
   .measure-area {
     position: fixed;
-    background: $background;
+    background: var(--bindery-ui-bg);
     padding: 50px 20px;
     z-index: 99;
     visibility: hidden;
@@ -121,11 +121,6 @@
     color-adjust: exact;
   }
 
-  /* Don't print anything that hasn't been exported. This hides extra controls/ */
-  .viewing > :not(.root) {
-    display: none !important;
-  }
-
   .controls {
     display: none !important;
   }
@@ -152,12 +147,6 @@ body.viewing {
 
 .view-flip .zoom-scaler {
   transform-origin: center left;
-}
-
-/* Don't print anything that hasn't been exported. This hides extra controls */
-/* TODO: make selectors more reasonable */
-.viewing > :not(.root):not(.measure-area) {
-  display: none !important;
 }
 
 .print-page {
