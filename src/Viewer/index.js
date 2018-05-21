@@ -221,7 +221,7 @@ class Viewer {
     }
 
     body.classList.add(c('viewing'));
-    this.element.classList.remove(...Object.values(modeClasses));
+    this.element.classList.remove(...Object.keys(modeClasses).map(k => modeClasses[k]));
     this.element.classList.add(modeClasses[this.mode]);
 
     const scrollMax = body.scrollHeight - body.offsetHeight;
