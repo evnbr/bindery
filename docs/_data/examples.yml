@@ -11,6 +11,8 @@ simple:
     id: 7_custom_split
   - title: Use a Counter
     id: 10_counters
+  - title: Customize the viewer
+    id: 11_custom_controls
 
 advanced:
   - title: Create an index

@@ -24,6 +24,8 @@ function ___$insertStyle(css) {
   return css;
 }
 
+const MAXIMUM_PAGE_LIMIT = 2000;
+
 class Book {
   constructor() {
     this.pages = [];
@@ -60,6 +62,12 @@ class Book {
       func();
     });
     this.queued = [];
+  }
+
+  validate() {
+    if (this.pageCount > MAXIMUM_PAGE_LIMIT) {
+      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
+    }
   }
 }
 
@@ -100,17 +108,6 @@ const makeRanges = (arr) => {
 const cssNumberRegEx = /^([+-]?[0-9]+(.?[0-9]+)?)(px|in|cm|mm|pt|pc)$/;
 
 const isValidLength = str => cssNumberRegEx.test(str);
-const isValidSize = (size) => {
-  Object.keys(size).forEach((k) => {
-    if (!isValidLength(size[k])) {
-      if (typeof size[k] === 'number') {
-        throw Error(`Size is missing units { ${k}: ${size[k]} }`);
-      } else {
-        throw Error(`Invalid size { ${k}: ${size[k]} }`);
-      }
-    }
-  });
-};
 
 const parseVal = (str) => {
   const matches = str.match(cssNumberRegEx);
@@ -144,6 +141,20 @@ const isBool = val => typeof val === 'boolean';
 const isStr = val => typeof val === 'string';
 const isArr = val => Array.isArray(val);
 
+const isShape = validShape => userShape => isObj(userShape) && validate(userShape, validShape);
+const isMargin = val => isShape({
+  name: 'margin',
+  top: isValidLength,
+  inner: isValidLength,
+  outer: isValidLength,
+  bottom: isValidLength,
+})(val);
+const isSize = val => isShape({
+  name: 'size',
+  width: isValidLength,
+  height: isValidLength,
+})(val);
+
 const OptionType = {
   enum(...enumCases) {
     const enumCheck = function enumCheck(str) { return enumCases.includes(str); };
@@ -151,38 +162,37 @@ const OptionType = {
     enumCheck.name = `enum ( '${enumCases.join('\' | \'')}' )`;
     return enumCheck;
   },
-  any() {
-    return true;
-  },
+  any: () => true,
   string: isStr,
   length: isValidLength,
   bool: isBool,
   func: isFunc,
   obj: isObj,
   array: isArr,
-  shape(validShape) {
-    return userShape => isObj(userShape) && validate(userShape, validShape);
-  },
+  shape: isShape,
+  margin: isMargin,
+  size: isSize,
   validate,
 };
 
-// const p = 'bindery-';
+//
+// prefix classes
 const p = '📖-';
 
 const prefix = str => `${p}${str}`;
 const prefixClass = str => `.${prefix(str)}`;
 
-const c = (str) => {
+const prefixer$1 = (str) => {
   if (str[0] === '.') {
     return prefixClass(str.substr(1));
   }
   return prefix(str);
 };
 
-// Small utility to create div with namespaced classes
+// Create div with prefixed classes
 const createEl = (className, content = []) => {
   const div = document.createElement('div');
-  div.className = className.split('.').filter(txt => txt !== '').map(c).join(' ');
+  div.className = className.split('.').filter(txt => txt !== '').map(prefixer$1).join(' ');
 
   if (typeof content === 'string') {
     div.textContent = content;
@@ -192,14 +202,50 @@ const createEl = (className, content = []) => {
   return div;
 };
 
+// Create stylesheet with id
+const addStylesheet = (id) => {
+  const style = document.createElement('style');
+  style.id = id;
+  document.head.appendChild(style);
+  return style;
+};
+
+// Fetch or create stylesheet with id
+const stylesheet = id => document.querySelector(`#${id}`) || addStylesheet(id);
+
+const c = prefixer$1;
+
+const elementToString = (node) => {
+  const tag = node.tagName.toLowerCase();
+  const id = node.id ? `#${node.id}` : '';
+
+  let classes = '';
+  if (node.classList.length > 0) {
+    classes = `.${[...node.classList].join('.')}`;
+  }
+
+  let text = '';
+  if (id.length < 1 && classes.length < 2) {
+    text = `("${node.textContent.substr(0, 30).replace(/\s+/g, ' ')}...")`;
+  }
+  return tag + id + classes + text;
+};
+
 class Page {
   constructor() {
-    this.flowContent = createEl('content');
-    this.flowBox = createEl('flowbox', [this.flowContent]);
+    this.flowContent = createEl('flow-content');
+    this.flowBox = createEl('flow-box', [this.flowContent]);
     this.footer = createEl('footer');
-    this.background = createEl('background');
+    this.background = createEl('page-background');
     this.element = createEl('page', [this.background, this.flowBox, this.footer]);
+    this.path = null;
   }
+
+  get currentElement() {
+    if (this.path.length > 0) return last(this.path);
+    return this.flowContent;
+  }
+
   overflowAmount() {
     const contentH = this.flowContent.offsetHeight;
     const boxH = this.flowBox.offsetHeight;
@@ -212,6 +258,27 @@ class Page {
   }
   hasOverflowed() {
     return this.overflowAmount() > -5;
+  }
+
+  validate() {
+    if (this.hasOverflowed()) {
+      const suspect = this.currentElement;
+      if (suspect) {
+        console.warn(`Bindery: Content overflows, probably due to a style set on ${elementToString(suspect)}.`);
+        suspect.parentNode.removeChild(suspect);
+      } else {
+        console.warn('Bindery: Content overflows.');
+      }
+    }
+  }
+
+  validateEnd(allowOverflow) {
+    if (this.hasOverflowed()) {
+      console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
+      if (!this.suppressErrors && !allowOverflow) {
+        throw Error('Bindery: Moved to new page when last one is still overflowing');
+      }
+    }
   }
 
   static isSizeValid() {
@@ -279,13 +346,85 @@ class Page {
   }
 }
 
-// TODO: Combine isSplittable and shouldIgnoreOverflow
+const overflowAttr = 'data-ignore-overflow';
+const didMoveAttr = 'data-bindery-did-move';
+
 // Walk up the tree to see if we are within
 // an overflow-ignoring node
-const shouldIgnoreOverflow = (element) => {
-  if (element.hasAttribute('data-ignore-overflow')) return true;
-  if (element.parentElement) return shouldIgnoreOverflow(element.parentElement);
+const ignoreOverflow = (element) => {
+  if (element.hasAttribute(overflowAttr)) return true;
+  if (element.parentElement) return ignoreOverflow(element.parentElement);
   return false;
+};
+
+// Walk up the tree to see if we can safely
+// insert a split into this node.
+const isSplittable = (element, selectors) => {
+  if (selectors.some(sel => element.matches(sel))) {
+    if (element.hasAttribute(didMoveAttr)
+      || element.classList.contains(c('continuation'))) {
+      return true; // ignore rules and split it anyways.
+    }
+    return false;
+  }
+  if (element.parentElement) return isSplittable(element.parentElement, selectors);
+  return true;
+};
+
+// Shifts this element to the next page. If any of its
+// ancestors cannot be split across page, it will
+// step up the tree to find the first ancestor
+// that can be split, and move all of that descendants
+// to the next page.
+const shiftToNextPage = (page, continueOnNewPage, canSplitElement) => {
+  // So this node won't get cloned. TODO: this is unclear
+  const elementToMove = page.path.pop();
+
+  if (page.path.length < 1) {
+    throw Error('Bindery: Attempting to move the top-level element');
+  }
+
+  // find the nearest splittable parent
+  let nearestElementThatCanBeMoved = elementToMove;
+  const pathToRestore = [];
+  while (page.path.length > 1 && !canSplitElement(page.currentElement)) {
+    nearestElementThatCanBeMoved = page.path.pop();
+    pathToRestore.unshift(nearestElementThatCanBeMoved);
+  }
+
+  // Once a node is moved to a new page, it should no longer trigger another
+  // move. otherwise tall elements will endlessly get shifted to the next page
+  nearestElementThatCanBeMoved.setAttribute('data-bindery-did-move', true);
+
+  const parent = nearestElementThatCanBeMoved.parentNode;
+  parent.removeChild(nearestElementThatCanBeMoved);
+
+  // If the nearest ancestor would be empty without this node,
+  // move it to the next page too.
+  if (page.path.length > 1 && page.currentElement.textContent.trim() === '') {
+    parent.appendChild(nearestElementThatCanBeMoved);
+    nearestElementThatCanBeMoved = page.path.pop();
+    pathToRestore.unshift(nearestElementThatCanBeMoved);
+    nearestElementThatCanBeMoved.parentNode.removeChild(nearestElementThatCanBeMoved);
+  }
+
+  let newPage;
+  if (!page.isEmpty) {
+    if (page.hasOverflowed()) page.suppressErrors = true;
+    newPage = continueOnNewPage();
+  } else {
+    // If the page is empty when this node is removed,
+    // then it won't help to move it to the next page.
+    // Instead continue here until the node is done.
+    newPage = page;
+  }
+
+  // append moved node as first in new page
+  newPage.currentElement.appendChild(nearestElementThatCanBeMoved);
+
+  // restore subpath
+  pathToRestore.forEach(r => newPage.path.push(r));
+  newPage.path.push(elementToMove);
 };
 
 // When there is no debugDelay,
@@ -293,56 +432,59 @@ const shouldIgnoreOverflow = (element) => {
 // to prevent stack overflow
 // and browser lockup
 
-const MAX_CALLS = 800;
 const MAX_TIME = 50; // ms
 
-
-const delay1 = () => new Promise((resolve) => {
-  requestAnimationFrame((t) => {
-    resolve(t);
-  });
+const rAF = () => new Promise((resolve) => {
+  requestAnimationFrame(t => resolve(t));
 });
 
 class Scheduler {
   constructor() {
-    this.numberOfCalls = 0;
-    this.resumeLimit = Infinity;
-    this.callsSinceResume = 0;
-    this.delayTime = 100;
-
-    this.lastWaitedTime = 0;
+    this.lastYieldTime = 0;
   }
 
   shouldYield() {
-    const timeSinceYield = performance.now() - this.lastWaitedTime;
-    return this.isPaused || this.numberOfCalls > MAX_CALLS || timeSinceYield > MAX_TIME;
+    const timeSinceYield = performance.now() - this.lastYieldTime;
+    return timeSinceYield > MAX_TIME;
   }
 
   async yieldIfNecessary() {
-    if (this.shouldYield()) this.lastWaitedTime = await delay1();
+    if (this.shouldYield()) this.lastYieldTime = await rAF();
   }
 }
 
 var scheduler = new Scheduler();
 
-// Try adding a text node in one go
-const addTextNode = async (textNode, parent, page) => {
+const isTextNode = node => node.nodeType === Node.TEXT_NODE;
+const isElement = node => node.nodeType === Node.ELEMENT_NODE;
+const isScript = node => node.tagName === 'SCRIPT';
+const isImage = node => node.tagName === 'IMG';
+const isUnloadedImage = node => isImage(node) && !node.naturalWidth;
+const isContent = node => isElement(node) && !isScript(node);
+
+const createTextNode = (document.createTextNode).bind(document);
+
+// Try adding a text node in one go.
+// Returns true if all the text fits, false if none fits.
+const addTextNode = async (textNode, parent, hasOverflowed) => {
   parent.appendChild(textNode);
-  const success = !page.hasOverflowed();
+  const success = !hasOverflowed();
   if (!success) parent.removeChild(textNode);
   await scheduler.yieldIfNecessary();
   return success;
 };
 
+
 // Try adding a text node by incrementally adding words
 // until it just barely doesnt overflow.
-// Binary search would probably be better but its not currenty
-// the bottleneck.
-const addTextNodeIncremental = async (textNode, parent, page) => {
+//
+// Returns true if all the text fits, false if none fits,
+// or new textnode containing the remainder text.
+const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
   const originalText = textNode.nodeValue;
   parent.appendChild(textNode);
 
-  if (!page.hasOverflowed() || shouldIgnoreOverflow(parent)) {
+  if (!hasOverflowed() || ignoreOverflow(parent)) {
     return true;
   }
 
@@ -350,7 +492,7 @@ const addTextNodeIncremental = async (textNode, parent, page) => {
   let pos = 0;
   textNode.nodeValue = originalText.substr(0, pos);
 
-  while (!page.hasOverflowed() && pos < originalText.length) {
+  while (!hasOverflowed() && pos < originalText.length) {
     // advance to next non-space character
     pos += 1;
     while (pos < originalText.length && originalText.charAt(pos) !== ' ') pos += 1;
@@ -362,10 +504,6 @@ const addTextNodeIncremental = async (textNode, parent, page) => {
     }
   }
 
-  // Early return, we added the whole thing wastefully
-  if (pos > originalText.length - 1) {
-    return true;
-  }
   // Back out to word boundary
   if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
   while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
@@ -373,7 +511,7 @@ const addTextNodeIncremental = async (textNode, parent, page) => {
   if (pos < 1) {
     // We didn't even add a complete word, don't add node
     textNode.nodeValue = originalText;
-    textNode.parentNode.removeChild(textNode);
+    parent.removeChild(textNode);
     return false; // TODO
   }
 
@@ -383,8 +521,20 @@ const addTextNodeIncremental = async (textNode, parent, page) => {
   textNode.nodeValue = fittingText;
 
   // Create a new text node for the next page
-  const remainingTextNode = document.createTextNode(overflowingText);
+  const remainingTextNode = createTextNode(overflowingText);
   return remainingTextNode;
+};
+
+
+// Fills text across multiple elements by requesting a continuation
+// once the current element overflows
+const addTextNodeAcrossElements = async (textNode, parent, continuation, hasOverflowed) => {
+  const result = await addTextNodeUntilOverflow(textNode, parent, hasOverflowed);
+  if (isTextNode(result)) {
+    const nextElement = continuation();
+    return addTextNodeAcrossElements(result, nextElement, continuation, hasOverflowed);
+  }
+  return result;
 };
 
 class Rule {
@@ -414,10 +564,10 @@ class OutOfFlow extends Rule {
     this.createOutOfFlowPages(elmt, book, makeNewPage);
 
     // Catches cases when we didn't need to create a new page. but unclear
-    if (this.continue !== 'same' || book.pageInProgress.hasOutOfFlowContent) {
+    if (this.continue !== 'same' || book.currentPage.hasOutOfFlowContent) {
       continueOnNewPage(true);
       if (this.continue === 'left' || this.continue === 'right') {
-        book.pageInProgress.setPreference(this.continue);
+        book.currentPage.setPreference(this.continue);
       }
     }
 
@@ -445,8 +595,8 @@ class FullBleedPage extends OutOfFlow {
     elmt.parentNode.removeChild(elmt);
 
     let newPage;
-    if (book.pageInProgress.isEmpty) {
-      newPage = book.pageInProgress;
+    if (book.currentPage.isEmpty) {
+      newPage = book.currentPage;
     } else {
       newPage = makeNewPage();
       book.pages.push(newPage);
@@ -480,8 +630,8 @@ class FullBleedSpread extends OutOfFlow {
     elmt.parentNode.removeChild(elmt);
 
     let leftPage;
-    if (book.pageInProgress.isEmpty) {
-      leftPage = book.pageInProgress;
+    if (book.currentPage.isEmpty) {
+      leftPage = book.currentPage;
     } else {
       leftPage = makeNewPage();
       book.pages.push(leftPage);
@@ -530,11 +680,11 @@ class PageBreak extends Rule {
   }
   beforeAdd(elmt, book, continueOnNewPage) {
     if (this.position === 'before' || this.position === 'both') {
-      if (!book.pageInProgress.isEmpty) {
+      if (!book.currentPage.isEmpty) {
         continueOnNewPage();
       }
       if (this.continue !== 'next') {
-        book.pageInProgress.setPreference(this.continue);
+        book.currentPage.setPreference(this.continue);
       }
     }
     return elmt;
@@ -549,22 +699,6 @@ class PageBreak extends Rule {
     return elmt;
   }
 }
-
-const elementToString = (node) => {
-  const tag = node.tagName.toLowerCase();
-  const id = node.id ? `#${node.id}` : '';
-
-  let classes = '';
-  if (node.classList.length > 0) {
-    classes = `.${[...node.classList].join('.')}`;
-  }
-
-  let text = '';
-  if (id.length < 1 && classes.length < 2) {
-    text = `("${node.textContent.substr(0, 30).replace(/\s+/g, ' ')}...")`;
-  }
-  return tag + id + classes + text;
-};
 
 const isFullPageRule = rule => (
     rule instanceof FullBleedSpread
@@ -591,17 +725,15 @@ const dedupe = (inputRules) => {
 class RuleSet {
   constructor(rules) {
     this.rules = rules;
+    // separate by lifecycle
     this.pageRules = rules.filter(r => r.eachPage);
     this.beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
     this.afterAddRules = rules.filter(r => r.selector && r.afterAdd);
-    this.selectorsNotToSplit = rules.filter(rule => rule.avoidSplit).map(rule => rule.selector);
+    this.selectorsNotToSplit = rules.filter(r => r.avoidSplit).map(r => r.selector);
+    // setup
+    this.rules.filter(r => r.setup).forEach(r => r.setup());
   }
-  setup() {
-    this.rules.forEach((rule) => {
-      if (rule.setup) rule.setup();
-    });
-  }
-  startPage(pg, book) {
+  applyPageStartRules(pg, book) {
     this.rules.forEach((rule) => {
       if (rule.afterPageCreated) rule.afterPageCreated(pg, book);
     });
@@ -613,12 +745,12 @@ class RuleSet {
       });
     });
   }
-  finishPage(page, book) {
+  applyPageDoneRules(page, book) {
     this.pageRules.forEach((rule) => {
       rule.eachPage(page, book);
     });
   }
-  beforeAddElement(element, book, continueOnNewPage, makeNewPage) {
+  applyBeforeAddRules(element, book, continueOnNewPage, makeNewPage) {
     let addedElement = element;
 
     const matchingRules = this.beforeAddRules.filter(rule => addedElement.matches(rule.selector));
@@ -630,7 +762,7 @@ class RuleSet {
     return addedElement;
   }
 
-  afterAddElement(originalElement, book, continueOnNewPage, makeNewPage, moveToNext) {
+  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage) {
     let addedElement = originalElement;
 
     const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));
@@ -653,7 +785,9 @@ class RuleSet {
         continueOnNewPage,
         makeNewPage,
         (problemElement) => {
-          moveToNext(problemElement);
+          problemElement.parentNode.removeChild(problemElement);
+          const newPage = continueOnNewPage();
+          newPage.currentElement.appendChild(problemElement);
           return rule.afterAdd(
             problemElement,
             book,
@@ -672,27 +806,13 @@ class RuleSet {
 
 const indexOfNextInFlowPage = (pages, startIndex) => {
   for (let i = startIndex; i < pages.length; i += 1) {
-    if (!pages[i].isOutOfFlow) {
-      return i;
-    }
+    if (!pages[i].isOutOfFlow) return i;
   }
   return startIndex;
 };
 
 // Given an array of pages with alwaysLeft, alwaysRight, and isOutOfFlow
-// properties.
-//
-// Orders them so that alwaysLeft and alwaysRight are true.
-
-// If the page is 'in flow', order must be respected, so extra blank pages
-// are inserted.
-//
-// If the page is 'out of flow', we'd prefer not to add a blank page.
-// Instead it floats backwards in the book, pulling the next
-// in-flow page forward. If several 'out of flow' pages
-// are next to each other, they will remain in order, all being pushed
-// backward together.
-
+// properties, orders them so that alwaysLeft and alwaysRight are true.
 
 const orderPages = (pages, makeNewPage) => {
   const orderedPages = pages.slice();
@@ -703,11 +823,20 @@ const orderPages = (pages, makeNewPage) => {
 
     if ((isLeft && page.alwaysRight) || (!isLeft && page.alwaysLeft)) {
       if (page.isOutOfFlow) {
+        // If the page is 'out of flow', we'd prefer not to add a blank page.
+        // Instead it floats backwards in the book, pulling the next
+        // in-flow page forward. If several 'out of flow' pages
+        // are next to each other, they will remain in order, all being pushed
+        // backward together.
+
         const indexToSwap = indexOfNextInFlowPage(orderedPages, i + 1);
         const pageToMoveUp = orderedPages[indexToSwap];
         orderedPages.splice(indexToSwap, 1);
         orderedPages.splice(i, 0, pageToMoveUp);
       } else {
+        // If the page is 'in flow', order must be respected, so extra blank pages
+        // are inserted.
+
         orderedPages.splice(i, 0, makeNewPage());
       }
     }
@@ -760,9 +889,9 @@ const annotatePages = (pages) => {
 
 // @param rules: array of Bindery.Rules
 // @return: A new function that clones the given
-// breadcrumb according to those rules. (original : Array) => clone : Array
+// path according to those rules. (original : Array) => clone : Array
 //
-// The breadcrumb is an array of nested elments,
+// The path is an array of nested elments,
 // for example .content > article > p > a).
 //
 // It's shallowly cloned every time we move to the next page,
@@ -773,8 +902,8 @@ const annotatePages = (pages) => {
 // which lets you add classes to the original and cloned element
 // to customize styling.
 
-const breadcrumbClone = (origBreadcrumb, rules) => {
-  const newBreadcrumb = [];
+const clonePath = (oldPath, rules) => {
+  const newPath = [];
 
   // TODO check if element actually matches
   const toNextClasses = rules
@@ -794,8 +923,8 @@ const breadcrumbClone = (origBreadcrumb, rules) => {
     fromPrevClasses.forEach(cl => node.classList.add(cl));
   };
 
-  for (let i = origBreadcrumb.length - 1; i >= 0; i -= 1) {
-    const original = origBreadcrumb[i];
+  for (let i = oldPath.length - 1; i >= 0; i -= 1) {
+    const original = oldPath[i];
     const clone = original.cloneNode(false); // shallow
     clone.innerHTML = '';
 
@@ -810,7 +939,7 @@ const breadcrumbClone = (origBreadcrumb, rules) => {
         // the OL is also a continuation
         prevStart = parseInt(original.getAttribute('start'), 10);
       }
-      if (i < origBreadcrumb.length - 1 && origBreadcrumb[i + 1].tagName === 'LI') {
+      if (i < oldPath.length - 1 && oldPath[i + 1].tagName === 'LI') {
         // the first list item is a continuation
         prevStart -= 1;
       }
@@ -819,11 +948,11 @@ const breadcrumbClone = (origBreadcrumb, rules) => {
       clone.setAttribute('start', newStart);
     }
 
-    if (i < origBreadcrumb.length - 1) clone.appendChild(newBreadcrumb[i + 1]);
-    newBreadcrumb[i] = clone;
+    if (i < oldPath.length - 1) clone.appendChild(newPath[i + 1]);
+    newPath[i] = clone;
   }
 
-  return newBreadcrumb;
+  return newPath;
 };
 
 // Note: Doesn't ever reject, since missing images
@@ -846,289 +975,177 @@ const ensureImageLoaded = async (image) => {
   return performance.now() - imgStart;
 };
 
+const sec = ms => (ms / 1000).toFixed(2);
+class Estimator {
+  constructor() {
+    this.startLayoutTime = 0;
+    this.timeWaitingForImage = 0;
+    this.capacity = 0;
+    this.elementsProcessed = 0;
+  }
+  startWith(content) {
+    this.capacity = content.querySelectorAll('*').length;
+    this.startLayoutTime = window.performance.now();
+  }
+  increment() {
+    this.elementsProcessed += 1;
+  }
+  async ensureImageLoaded(img) {
+    const waitTime = await ensureImageLoaded(img);
+    this.timeWaitingForImage += waitTime;
+  }
+  end() {
+    const endLayoutTime = window.performance.now();
+    const totalTime = endLayoutTime - this.startLayoutTime;
+    const layoutTime = totalTime - this.timeWaitingForImage;
+
+    console.log(`📖 Book ready in ${sec(totalTime)}s (Layout: ${sec(layoutTime)}s, waiting for images: ${sec(this.timeWaitingForImage)}s)`);
+  }
+  get progress() {
+    return this.elementsProcessed / this.capacity;
+  }
+}
+
 // Bindery
 // paginate
 // Utils
-const MAXIMUM_PAGE_LIMIT = 2000;
-
-const isTextNode = node => node.nodeType === Node.TEXT_NODE;
-const isElement = node => node.nodeType === Node.ELEMENT_NODE;
-const isScript = node => node.tagName === 'SCRIPT';
-const isImage = node => node.tagName === 'IMG';
-const isUnloadedImage = node => isImage(node) && !node.naturalWidth;
-const isContent = node => isElement(node) && !isScript(node);
-
-const sec = ms => (ms / 1000).toFixed(2);
-
-// Walk up the tree to see if we can safely
-// insert a split into this node.
-const isSplittable = (element, selectorsNotToSplit) => {
-  if (selectorsNotToSplit.some(sel => element.matches(sel))) {
-    if (element.hasAttribute('data-bindery-did-move')
-      || element.classList.contains(c('continuation'))) {
-      return true; // ignore rules and split it anyways.
-    }
-    return false;
-  }
-  if (element.parentElement) {
-    return isSplittable(element.parentElement, selectorsNotToSplit);
-  }
-  return true;
-};
-
 const paginate$1 = (content, rules, progressCallback) => {
-  // SETUP
-  let layoutWaitingTime = 0;
-  let elementCount = 0;
-  let elementsProcessed = 0;
-
+  // Global state for a pagination run
+  const estimator = new Estimator();
   const ruleSet = new RuleSet(rules);
-
-  let breadcrumb = []; // Keep track of position in original tree
   const book = new Book();
+  const noSplit = ruleSet.selectorsNotToSplit;
 
-  const canSplit = () => !shouldIgnoreOverflow(last(breadcrumb));
+  const hasOverflowed = () => book.currentPage.hasOverflowed();
+  const ignoreCurrentOverflow = () => ignoreOverflow(book.currentPage.currentElement);
+  const canSplitElement = el => isSplittable(el, noSplit) && !ignoreOverflow(el);
+  const canSplitElementAlt = el => isSplittable(el, noSplit);
 
   const makeNewPage = () => {
     const newPage = new Page();
-    ruleSet.startPage(newPage, book);
+    ruleSet.applyPageStartRules(newPage, book);
     return newPage;
   };
 
-  const finishPage = (page, ignoreOverflow) => {
-    if (page && page.hasOverflowed()) {
-      console.warn(`Bindery: Page ~${book.pageCount} is overflowing`, book.pageInProgress.element);
-      if (!page.suppressErrors && !ignoreOverflow) {
-        throw Error('Bindery: Moved to new page when last one is still overflowing');
-      }
-    }
-
+  const finishPage = (page, allowOverflow) => {
     // finished with this page, can display
     book.pages = orderPages(book.pages, makeNewPage);
     annotatePages(book.pages);
-    if (page) ruleSet.finishPage(page, book);
+    ruleSet.applyPageDoneRules(page, book);
+    page.validateEnd(allowOverflow);
+    book.validate();
   };
 
   // Creates clones for ever level of tag
   // we were in when we overflowed the last page
-  const continueOnNewPage = (ignoreOverflow = false) => {
-    if (book.pages.length > MAXIMUM_PAGE_LIMIT) {
-      throw Error('Bindery: Maximum page count exceeded. Suspected runaway layout.');
-    }
+  const continueOnNewPage = (allowOverflow = false) => {
+    const oldPage = book.currentPage;
+    if (oldPage) finishPage(oldPage, allowOverflow);
 
-    finishPage(book.pageInProgress, ignoreOverflow);
-
-    breadcrumb = breadcrumbClone(breadcrumb, rules);
     const newPage = makeNewPage();
+    newPage.path = oldPage ? clonePath(oldPage.path, rules) : [];
 
-    book.pageInProgress = newPage;
-    progressCallback(book);
-
+    book.currentPage = newPage;
     book.pages.push(newPage);
 
-    if (breadcrumb[0]) {
-      newPage.flowContent.appendChild(breadcrumb[0]);
+    if (newPage.path[0]) {
+      newPage.flowContent.appendChild(newPage.path[0]);
     }
 
-    // make sure the cloned page is valid.
-    if (newPage.hasOverflowed()) {
-      const suspect = last(breadcrumb);
-      if (suspect) {
-        console.warn(`Bindery: Content overflows, probably due to a style set on ${elementToString(suspect)}.`);
-        suspect.parentNode.removeChild(suspect);
-      } else {
-        console.warn('Bindery: Content overflows.');
-      }
-    }
-
+    progressCallback(book); // assuming this will display new page
+    newPage.validate(); // TODO: element must be in dom before validating
     return newPage;
   };
 
-  // Shifts this element to the next page. If any of its
-  // ancestors cannot be split across page, it will
-  // step up the tree to find the first ancestor
-  // that can be split, and move all of that descendants
-  // to the next page.
-  const moveElementToNextPage = (nodeToMove) => {
-    // So this node won't get cloned. TODO: this is unclear
-    breadcrumb.pop();
-
-    if (breadcrumb.length < 1) {
-      throw Error('Bindery: Attempting to move the top-level element');
-    }
-
-    // find the nearest splittable parent
-    let willMove = nodeToMove;
-    const pathToRestore = [];
-    while (breadcrumb.length > 1 && !isSplittable(last(breadcrumb), ruleSet.selectorsNotToSplit)) {
-      // console.log('Not OK to split:', last(breadcrumb));
-      willMove = breadcrumb.pop();
-      pathToRestore.unshift(willMove);
-    }
-
-    // Once a node is moved to a new page, it should no longer trigger another
-    // move. otherwise tall elements will endlessly get shifted to the next page
-    willMove.setAttribute('data-bindery-did-move', true);
-
-    const parent = willMove.parentNode;
-    parent.removeChild(willMove);
-
-    if (breadcrumb.length > 1 && last(breadcrumb).textContent.trim() === '') {
-      parent.appendChild(willMove);
-      willMove = breadcrumb.pop();
-      pathToRestore.unshift(willMove);
-      willMove.parentNode.removeChild(willMove);
-    }
-
-    // If the page is empty when this node is removed,
-    // then it won't help to move it to the next page.
-    // Instead continue here until the node is done.
-    if (!book.pageInProgress.isEmpty) {
-      if (book.pageInProgress.hasOverflowed()) {
-        book.pageInProgress.suppressErrors = true;
-      }
-      continueOnNewPage();
-    }
-
-    // append node as first in new page
-    last(breadcrumb).appendChild(willMove);
-
-    // restore subpath
-    pathToRestore.forEach((restore) => { breadcrumb.push(restore); });
-
-    breadcrumb.push(nodeToMove);
-  };
-
-  const addTextWithoutChecks = (child, parent) => {
-    parent.appendChild(child);
-    if (canSplit()) {
-      book.pageInProgress.suppressErrors = true;
+  const addTextWithoutChecks = (textNode, parent) => {
+    parent.appendChild(textNode);
+    if (!ignoreCurrentOverflow()) {
+      book.currentPage.suppressErrors = true;
       continueOnNewPage();
     }
   };
 
-  const addSplittableText = async (text) => {
-    const result = await addTextNodeIncremental(text, last(breadcrumb), book.pageInProgress);
-    if (isTextNode(result)) {
-      continueOnNewPage();
-      return addSplittableText(result);
-    }
-    return result;
-  };
-
-  const canSplitParent = parent =>
-    isSplittable(parent, ruleSet.selectorsNotToSplit)
-    && !shouldIgnoreOverflow(parent);
-
-  // const addTextChild = (child, parent) => (canSplitParent(parent)
-  //   ? addSplittableText(child)
-  //       .catch(() => {
-  //         if (breadcrumb.length < 2) return addTextWithoutChecks(child, last(breadcrumb));
-  //         moveElementToNextPage(parent);
-  //         return addSplittableText(child);
-  //       })
-  //   : addTextNode(child, last(breadcrumb), book.pageInProgress)
-  //       .catch(() => {
-  //         if (canSplit()) moveElementToNextPage(parent);
-  //         return addTextNode(child, last(breadcrumb), book.pageInProgress);
-  //       })
-  //   ).catch(() => addTextWithoutChecks(child, last(breadcrumb)));
-
-  let addElementNode;
-
-  const addTextChild = async (textNode, parent) => {
-    let hasAdded = false;
-    if (canSplitParent(parent)) {
-      hasAdded = await addSplittableText(textNode);
-      if (!hasAdded) {
-        if (breadcrumb.length < 2) {
-          addTextWithoutChecks(textNode, last(breadcrumb));
-          return;
-        }
-        // try on next page
-        moveElementToNextPage(parent);
-        hasAdded = await addSplittableText(textNode);
-      }
-    } else {
-      hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
-      if (!hasAdded) {
-        // try on next page
-        if (canSplit()) {
-          moveElementToNextPage(parent);
-          hasAdded = await addTextNode(textNode, last(breadcrumb), book.pageInProgress);
-        }
-      }
+  const addWholeTextNode = async (textNode) => {
+    let hasAdded = await addTextNode(textNode, book.currentPage.currentElement, hasOverflowed);
+    if (!hasAdded && !ignoreCurrentOverflow()) {
+      // try on next page
+      shiftToNextPage(book.currentPage, continueOnNewPage, canSplitElementAlt);
+      hasAdded = await addTextNode(textNode, book.currentPage.currentElement, hasOverflowed);
     }
     if (!hasAdded) {
-      addTextWithoutChecks(textNode, last(breadcrumb));
+      addTextWithoutChecks(textNode, book.currentPage.currentElement);
     }
   };
 
-  const addChild = async (child, parent) => {
-    if (isTextNode(child)) {
-      await addTextChild(child, parent);
-    } else if (isUnloadedImage(child)) {
-      const waitTime = await ensureImageLoaded(child);
-      layoutWaitingTime += waitTime;
-      await addElementNode(child);
-    } else if (isContent(child)) {
-      await addElementNode(child);
-    } else {
-      // Skip comments and unknown nodes
+  const continuedElement = () => {
+    const newPage = continueOnNewPage();
+    return newPage.currentElement;
+  };
+
+  const addSplittableTextNode = async (textNode) => {
+    const el = book.currentPage.currentElement;
+    let hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
+    if (!hasAdded && book.currentPage.path.length > 1) {
+      // try on next page
+      shiftToNextPage(book.currentPage, continueOnNewPage, canSplitElementAlt);
+      hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
+    }
+    if (!hasAdded) {
+      addTextWithoutChecks(textNode, book.currentPage.currentElement);
     }
   };
+
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
-  addElementNode = async (elementToAdd) => {
-    if (book.pageInProgress.hasOverflowed() && canSplit()) {
-      book.pageInProgress.suppressErrors = true;
+  const addElementNode = async (elementToAdd) => {
+    if (hasOverflowed() && !ignoreCurrentOverflow()) {
+      book.currentPage.suppressErrors = true;
       continueOnNewPage();
     }
-    const element = ruleSet.beforeAddElement(elementToAdd, book, continueOnNewPage, makeNewPage);
 
-    if (!breadcrumb[0]) book.pageInProgress.flowContent.appendChild(element);
-    else last(breadcrumb).appendChild(element);
+    // Ensure images are loaded before measuring
+    if (isUnloadedImage(elementToAdd)) await estimator.ensureImageLoaded(elementToAdd);
 
-    breadcrumb.push(element);
+    // Transforms before adding
+    const element = ruleSet.applyBeforeAddRules(elementToAdd, book, continueOnNewPage, makeNewPage);
 
+    // Insert element
+    book.currentPage.currentElement.appendChild(element);
+    book.currentPage.path.push(element);
+
+    // Clear element
     const childNodes = [...element.childNodes];
     element.innerHTML = '';
 
     // Overflows when empty
-    if (book.pageInProgress.hasOverflowed() && canSplit()) {
-      moveElementToNextPage(element);
+    if (hasOverflowed() && !ignoreCurrentOverflow()) {
+      shiftToNextPage(book.currentPage, continueOnNewPage, canSplitElementAlt);
     }
 
-    for (let i = 0; i < childNodes.length; i += 1) {
-      const child = childNodes[i];
-      await addChild(child, element);
-    }
+    const shouldSplit = canSplitElement(element);
 
-    const addedChild = breadcrumb.pop();
-    ruleSet.afterAddElement(
-      addedChild,
-      book,
-      continueOnNewPage,
-      makeNewPage,
-      (el) => {
-        el.parentNode.removeChild(el);
-        continueOnNewPage();
-        last(breadcrumb).appendChild(el);
+    for (const child of childNodes) {
+      if (isTextNode(child)) {
+        await (shouldSplit ? addSplittableTextNode : addWholeTextNode)(child);
+      } else if (isContent(child)) {
+        await addElementNode(child);
+      } else {
+        // Skip comments and unknown nodes
       }
-    );
-    elementsProcessed += 1;
-    book.estimatedProgress = elementsProcessed / elementCount;
+    }
+
+    // Transforms after adding
+    const addedElement = book.currentPage.path.pop();
+    ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage);
+    estimator.increment();
+    book.estimatedProgress = estimator.progress;
   };
 
-
   const init = async () => {
-    const startLayoutTime = window.performance.now();
-
-    ruleSet.setup();
+    estimator.startWith(content);
     content.style.margin = 0;
     content.style.padding = 0;
-    elementCount = content.querySelectorAll('*').length;
     continueOnNewPage();
 
     await addElementNode(content);
@@ -1138,12 +1155,7 @@ const paginate$1 = (content, rules, progressCallback) => {
 
     book.setCompleted();
     ruleSet.finishEveryPage(book);
-
-    const endLayoutTime = window.performance.now();
-    const totalTime = endLayoutTime - startLayoutTime;
-    const layoutTime = totalTime - layoutWaitingTime;
-
-    console.log(`📖 Book ready in ${sec(totalTime)}s (Layout: ${sec(layoutTime)}s, Waiting for images: ${sec(layoutWaitingTime)}s)`);
+    estimator.end();
 
     return book;
   };
@@ -1175,13 +1187,14 @@ const Layout = Object.freeze({
 
 const Marks = Object.freeze({
   NONE: 'marks_none',
-  SPREADS: 'layout_spreads',
+  CROP: 'marks_crop',
+  BLEED: 'marks_bleed',
   BOTH: 'marks_both',
 });
 
 const letter = { width: '8.5in', height: '11in' };
 const a4 = { width: '210mm', height: '297mm' };
-const defaultPageSetup = {
+const defaultOpts = {
   bleed: '12pt',
   size: { width: '4in', height: '6in' },
   margin: {
@@ -1197,28 +1210,15 @@ const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
 class PageSetup {
 
   constructor(opts = {}) {
-    this.setSize(opts.size || defaultPageSetup.size);
-    this.setMargin(opts.margin || defaultPageSetup.margin);
-    this.setBleed(opts.bleed || defaultPageSetup.bleed);
+    this.size = opts.size || defaultOpts.size;
+    this.margin = opts.margin || defaultOpts.margin;
+    this.bleed = opts.bleed || defaultOpts.bleed;
+    this.markLength = '12pt';
   }
 
   setupPaper(opts = {}) {
     this.sheetSizeMode = supportsCustomPageSize ? (opts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
     this.printTwoUp = opts.layout && opts.layout !== Layout.PAGES;
-  }
-
-  setSize(size) {
-    isValidSize(size);
-    this.size = size;
-  }
-
-  setMargin(margin) {
-    isValidSize(margin);
-    this.margin = margin;
-  }
-
-  setBleed(newBleed) {
-    this.bleed = newBleed;
   }
 
   setPrintTwoUp(newVal) {
@@ -1227,37 +1227,32 @@ class PageSetup {
 
   get displaySize() {
     const width = this.printTwoUp
-      ? this.spreadSizeStyle().width
+      ? this.spreadSize.width
       : this.size.width;
     const height = this.size.height;
     const bleed = this.bleed;
 
-    return {
-      width,
-      height,
-      bleed,
-    };
+    return { width, height, bleed };
   }
 
   get sheetSize() {
-    const width = this.printTwoUp
-      ? this.spreadSizeStyle().width
-      : this.size.width;
+    const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
 
+    const bleedAmount = `2 * ${this.bleed}`;
+    const marksAmount = `2 * ${this.bleed} + 2 * ${this.markLength}`;
     switch (this.sheetSizeMode) {
     case Paper.AUTO:
       return { width, height };
     case Paper.AUTO_BLEED:
       return {
-        width: `calc(${width} + 2 * var(--bleed))`,
-        height: `calc(${height} + 2 * var(--bleed))`,
+        width: `calc(${width} + ${bleedAmount})`,
+        height: `calc(${height} + ${bleedAmount})`,
       };
     case Paper.AUTO_MARKS:
-      // TODO: 24pt marks is hardcoded
       return {
-        width: `calc(${width} + 2 * var(--bindery-bleed) + 2 * var(--bindery-mark-length))`,
-        height: `calc(${height} + 2 * var(--bindery-bleed) + 2 * var(--bindery-mark-length))`,
+        width: `calc(${width} + ${marksAmount})`,
+        height: `calc(${height} + ${marksAmount})`,
       };
     case Paper.LETTER_LANDSCAPE:
       return { width: letter.height, height: letter.width };
@@ -1277,7 +1272,7 @@ class PageSetup {
     return Page.isSizeValid();
   }
 
-  spreadSizeStyle() {
+  get spreadSize() {
     const w = parseVal(this.size.width);
     return {
       height: this.size.height,
@@ -1286,27 +1281,26 @@ class PageSetup {
   }
 
   updateStyleVars() {
-    let sheet;
-    const existing = document.querySelector('#binderyPageSetup');
-    if (existing) {
-      sheet = existing;
-    } else {
-      sheet = document.createElement('style');
-      sheet.id = 'binderyPageSetup';
-    }
-    sheet.innerHTML = `html {
-      --bindery-page-width: ${this.size.width};
-      --bindery-page-height: ${this.size.height};
-      --bindery-sheet-width: ${this.sheetSize.width};
-      --bindery-sheet-height: ${this.sheetSize.height};
-      --bindery-margin-inner: ${this.margin.inner};
-      --bindery-margin-outer: ${this.margin.outer};
-      --bindery-margin-top: ${this.margin.top};
-      --bindery-margin-bottom: ${this.margin.bottom};
-      --bindery-bleed: ${this.bleed};
-      --bindery-mark-length: 12pt;
-    }`;
-    document.head.appendChild(sheet);
+    const page = this.size;
+    const sheet = this.sheetSize;
+    const vars = Object.entries({
+      'spread-width': this.spreadSize.width,
+      'page-width': page.width,
+      'page-height': page.height,
+      'sheet-width': sheet.width,
+      'sheet-height': sheet.height,
+      'margin-inner': this.margin.inner,
+      'margin-outer': this.margin.outer,
+      'margin-top': this.margin.top,
+      'margin-bottom': this.margin.bottom,
+      bleed: this.bleed,
+      'mark-length': this.markLength,
+    }).map(([k, v]) => `--bindery-${k}: ${v};`);
+
+    const rootRule = `:root { ${vars.join('')}  }`;
+    const pageRule = `@page { size: ${sheet.width} ${sheet.height}; }`;
+
+    stylesheet('binderyPage').innerHTML = `${rootRule} ${pageRule}`;
   }
 }
 
@@ -1375,15 +1369,15 @@ const renderGridLayout = (pages, isTwoUp) => {
 };
 
 const directions = ['top', 'bottom', 'left', 'right'];
-const bleedMarks = () => directions.map(dir => createEl(`.bleed-${dir}`));
-const cropMarks = () => directions.map(dir => createEl(`.crop-${dir}`));
+const bleedMarks = () => directions.map(dir => createEl(`.mark-bleed-${dir}`));
+const cropMarks = () => directions.map(dir => createEl(`.mark-crop-${dir}`));
 
 const printMarksSingle = () => createEl('.print-mark-wrap', [
   ...cropMarks(), ...bleedMarks(),
 ]);
 
 const printMarksSpread = () => createEl('.print-mark-wrap', [
-  createEl('.crop-fold'), ...cropMarks(), ...bleedMarks(),
+  createEl('.mark-crop-fold'), ...cropMarks(), ...bleedMarks(),
 ]);
 
 const bookletMeta = (i, len) => {
@@ -1494,27 +1488,29 @@ const renderFlipLayout = (pages, doubleSided) => {
   return flipLayout;
 };
 
-// import Controls from './Controls';
-const modeAttr = {};
-modeAttr[Mode.PREVIEW] = 'preview';
-modeAttr[Mode.PRINT] = 'print';
-modeAttr[Mode.FLIPBOOK] = 'flip';
+const modeClasses = {};
+modeClasses[Mode.PREVIEW] = c('view-preview');
+modeClasses[Mode.PRINT] = c('view-print');
+modeClasses[Mode.FLIPBOOK] = c('view-flip');
+
+const isCommandP = e => (e.ctrlKey || e.metaKey) && e.keyCode === 80;
 
 class Viewer {
-  constructor({ bindery, mode, layout, marks, ControlsComponent }) {
+  constructor({ pageSetup, mode, layout, marks, ControlsComponent }) {
     this.book = null;
-    this.pageSetup = bindery.pageSetup;
+    this.pageSetup = pageSetup;
 
     this.progressBar = createEl('.progress-bar');
-    this.zoomBox = createEl('zoom-wrap');
-    this.element = createEl('root', [this.progressBar, this.zoomBox]);
+    this.content = createEl('zoom-content');
+    this.scaler = createEl('zoom-scaler', [this.content]);
+    this.element = createEl('root', [this.progressBar, this.scaler]);
 
     this.doubleSided = true;
     this.printArrange = layout;
 
     this.setMarks(marks);
     this.mode = mode;
-    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
+    this.element.classList.add(c('view-preview'));
     this.currentLeaf = 0;
 
     this.listenForPrint();
@@ -1565,12 +1561,10 @@ class Viewer {
       });
     }
     document.body.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.keyCode === 80) {
+      if (isCommandP(e)) {
         e.preventDefault();
         this.setPrint();
-        setTimeout(() => {
-          window.print();
-        }, 10);
+        setTimeout(() => window.print(), 200);
       }
     });
   }
@@ -1678,7 +1672,7 @@ class Viewer {
   clear() {
     this.book = null;
     this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
-    this.zoomBox.innerHTML = '';
+    this.content.innerHTML = '';
   }
   cancel() {
     // TODO this doesn't work if the target is an existing node
@@ -1706,9 +1700,9 @@ class Viewer {
       body.appendChild(this.element);
     }
 
-    this.flaps = [];
     body.classList.add(c('viewing'));
-    this.element.setAttribute('bindery-view-mode', modeAttr[this.mode]);
+    this.element.classList.remove(...Object.keys(modeClasses).map(k => modeClasses[k]));
+    this.element.classList.add(modeClasses[this.mode]);
 
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
@@ -1717,11 +1711,15 @@ class Viewer {
     this.progressBar.style.width = '100%';
 
     window.requestAnimationFrame(() => {
-      if (this.mode === Mode.PREVIEW) this.renderGrid();
-      else if (this.mode === Mode.FLIPBOOK) this.renderInteractive();
-      else if (this.mode === Mode.PRINT) this.renderPrint();
-      else this.renderGrid();
+      const pages = this.book.pages.slice();
 
+      let frag;
+      if (this.mode === Mode.FLIPBOOK) frag = this.renderInteractive(pages);
+      else if (this.mode === Mode.PRINT) frag = this.renderPrint(pages);
+      else frag = this.renderGrid(pages);
+
+      this.content.innerHTML = '';
+      this.content.appendChild(frag);
       body.scrollTop = scrollMax * scrollPct;
       this.updateZoom();
     });
@@ -1730,13 +1728,10 @@ class Viewer {
   renderProgress(book) {
     this.book = book;
 
-    this.progressBar.style.width = `${this.book.estimatedProgress * 100}%`;
+    this.progressBar.style.width = `${book.estimatedProgress * 100}%`;
 
     if (this.controls) {
-      this.controls.updateProgress(
-        this.book.pages.length,
-        this.book.estimatedProgress
-      );
+      this.controls.updateProgress(book.pageCount, book.estimatedProgress);
     }
 
     const sideBySide =
@@ -1745,12 +1740,12 @@ class Viewer {
     const limit = sideBySide ? 2 : 1;
 
     const makeSpread = function (...arg) {
-      return createEl('.spread-wrapper', [...arg]);
+      return createEl('.spread-wrapper.spread-size', [...arg]);
     };
 
     this.book.pages.forEach((page, i) => {
       // If hasn't been added, or not in spread yet
-      if (!this.zoomBox.contains(page.element) || page.element.parentNode === this.zoomBox) {
+      if (!this.content.contains(page.element) || page.element.parentNode === this.content) {
         if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
           this.lastSpreadInProgress.appendChild(page.element);
         } else {
@@ -1761,71 +1756,53 @@ class Viewer {
           } else {
             this.lastSpreadInProgress = makeSpread(page.element);
           }
-          this.zoomBox.appendChild(this.lastSpreadInProgress);
+          this.content.appendChild(this.lastSpreadInProgress);
         }
       }
     });
 
-    if (this.book.pageInProgress) {
-      this.zoomBox.appendChild(this.book.pageInProgress.element);
+    if (this.book.currentPage) {
+      this.content.appendChild(this.book.currentPage.element);
     }
 
     this.updateZoom();
   }
 
   updateZoom() {
-    if (this.zoomBox.firstElementChild) {
+    if (this.content.firstElementChild) {
       const scrollPct = document.body.scrollTop / document.body.scrollHeight;
-      const viewerRect = this.zoomBox.getBoundingClientRect();
-      const contentW = this.zoomBox.firstElementChild.getBoundingClientRect().width;
+      const viewerRect = this.scaler.getBoundingClientRect();
+      const contentW = this.content.getBoundingClientRect().width;
       const scale = Math.min(1, viewerRect.width / (contentW));
 
-      this.zoomBox.style.transform = `scale(${scale})`;
+      this.scaler.style.transform = `scale(${scale})`;
       document.body.scrollTop = document.body.scrollHeight * scrollPct;
     }
   }
 
-  renderPrint() {
+  renderPrint(bookPages) {
+    let pages = bookPages;
     this.element.classList.add(c('show-bleed'));
-
-    this.zoomBox.innerHTML = '';
-
     const isBooklet = this.printArrange === Layout.BOOKLET;
-
-    let pages = this.book.pages.slice();
     if (this.printArrange === Layout.SPREADS) {
       pages = padPages(pages, () => new Page());
     } else if (isBooklet) {
       pages = orderPagesBooklet(pages, () => new Page());
     }
-
-    const fragment = renderPrintLayout(pages, this.isTwoUp, isBooklet);
-    this.zoomBox.appendChild(fragment);
+    return renderPrintLayout(pages, this.isTwoUp, isBooklet);
   }
 
-  renderGrid() {
-    this.zoomBox.innerHTML = '';
-
+  renderGrid(bookPages) {
+    let pages = bookPages;
     this.element.classList.remove(c('show-bleed'));
-
-    let pages = this.book.pages.slice();
-
     if (this.doubleSided) pages = padPages(pages, () => new Page());
-
-    const fragment = renderGridLayout(pages, this.doubleSided);
-    this.zoomBox.appendChild(fragment);
+    return renderGridLayout(pages, this.doubleSided);
   }
 
-  renderInteractive() {
-    this.zoomBox.innerHTML = '';
-    this.flaps = [];
-
+  renderInteractive(bookPages) {
     this.element.classList.remove(c('show-bleed'));
-
-    const pages = padPages(this.book.pages.slice(), () => new Page());
-
-    const fragment = renderFlipLayout(pages, this.doubleSided);
-    this.zoomBox.appendChild(fragment);
+    const pages = padPages(bookPages, () => new Page());
+    return renderFlipLayout(pages, this.doubleSided);
   }
 
 }
@@ -1906,7 +1883,7 @@ class Replace extends Rule {
     const replacement = this.createReplacement(book, defensiveClone);
     parent.replaceChild(replacement, element);
 
-    if (book.pageInProgress.hasOverflowed()) {
+    if (book.currentPage.hasOverflowed()) {
       parent.replaceChild(element, replacement);
 
       return overflowCallback(element);
@@ -1939,22 +1916,22 @@ class Footnote extends Replace {
     });
   }
   afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
-    const number = book.pageInProgress.footer.children.length + 1;
+    const number = book.currentPage.footer.children.length + 1;
 
     const footnote = createEl('.footnote');
     const contents = this.render(element, number);
     if (contents instanceof HTMLElement) footnote.appendChild(contents);
     else footnote.innerHTML = contents;
 
-    book.pageInProgress.footer.appendChild(footnote);
+    book.currentPage.footer.appendChild(footnote);
 
     return super.afterAdd(element, book, continueOnNewPage, makeNewPage, (overflowEl) => {
-      book.pageInProgress.footer.removeChild(footnote);
+      book.currentPage.footer.removeChild(footnote);
       return overflowCallback(overflowEl);
     });
   }
   createReplacement(book, element) {
-    const number = book.pageInProgress.footer.children.length;
+    const number = book.currentPage.footer.children.length;
     return this.replace(element, number);
   }
   replace(element, number) {
@@ -1988,7 +1965,7 @@ class PageReference extends Replace {
       const tempClone = elmt.cloneNode(true);
       const tempNumbers = book.pagesForTest(test);
       const tempRanges = makeRanges(tempNumbers);
-      const temp = this.replace(tempClone, tempRanges || '###');
+      const temp = this.replace(tempClone, tempRanges || '000');
       temp.classList.add(c('placeholder-pulse'));
       parent.replaceChild(temp, elmt);
 
@@ -2145,7 +2122,7 @@ var defaultRules = [
   }),
 ];
 
-___$insertStyle("@charset \"UTF-8\";@media screen{.📖-page{background:#fff;outline:1px solid #ddd;box-shadow:0 2px 4px -1px rgba(0,0,0,.15);overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.📖-continuation,p.📖-continuation{text-indent:unset!important}li.📖-continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:var(--bindery-page-width);height:var(--bindery-page-height);position:relative;display:flex;flex-direction:column;flex-wrap:nowrap}.📖-flowbox{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-background{right:0}.📖-right>.📖-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-print-page{width:var(--bindery-sheet-width);height:var(--bindery-sheet-height)}.📖-page-size-rotated{height:var(--bindery-page-width);width:var(--bindery-page-height)}.📖-spread-size{height:var(--bindery-page-height);width:calc(var(--bindery-page-width) * 2)}.📖-spread-size-rotated{width:var(--bindery-page-height);height:calc(var(--bindery-page-width) * 2)}.📖-.show-bleed-marks .📖-.print-page .📖-.spread-wrapper,.📖-.show-crop .📖-.print-page .📖-.spread-wrapper{margin:calc(var(--bindery-bleed) + 12pt) auto}.📖-background{top:calc(-1 * var(--bindery-bleed));bottom:calc(-1 * var(--bindery-bleed));left:calc(-1 * var(--bindery-bleed));right:calc(-1 * var(--bindery-bleed))}.📖-flowbox,.📖-footer{margin-left:var(--bindery-margin-inner);margin-right:var(--bindery-margin-outer)}.📖-left .📖-flowbox,.📖-left .📖-footer{margin-left:var(--bindery-margin-outer);margin-right:var(--bindery-margin-inner)}.📖-left .📖-running-header{left:var(--bindery-margin-outer)}.📖-right .📖-running-header{right:var(--bindery-margin-outer)}.📖-flowbox{margin-top:var(--bindery-margin-top)}.📖-footer{margin-bottom:var(--bindery-margin-bottom)}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{top:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed));bottom:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed))}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{left:calc(-12pt - var(--bindery-bleed));right:calc(-12pt - var(--bindery-bleed))}.📖-bleed-left{left:-var(--bindery-bleed)}.📖-bleed-right{right:-var(--bindery-bleed)}.📖-bleed-top{top:-var(--bindery-bleed)}.📖-bleed-bottom{bottom:-var(--bindery-bleed)}.📖-spread.📖-right>.📖-background{left:calc(-100% - var(--bindery-bleed))}.📖-spread.📖-left>.📖-background{right:calc(-100% - var(--bindery-bleed))}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-background,.📖-rotate-container.📖-rotate-inward .📖-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}@media screen{.📖-viewing{background:#f4f4f4!important}.📖-root{transition:opacity .2s;opacity:1;background:#f4f4f4;padding:10px;z-index:2;position:relative;padding-top:60px;min-height:90vh}.📖-progress-bar{position:fixed;left:0;top:0;background:var(--bindery-ui-accent,#0000c5);width:0;transition:all .2s;opacity:0;height:0;z-index:2}.📖-in-progress .📖-progress-bar{opacity:1;height:2px}.📖-measure-area{position:fixed;background:#f4f4f4;padding:50px 20px;z-index:2;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:pulse 1s infinite}}@keyframes pulse{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0;size:var(--bindery-sheet-width) var(--bindery-sheet-height)}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls,.📖-viewing>:not(.📖-root){display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-wrap[style]{transform:none!important}}body.📖-viewing{margin:0}.📖-zoom-wrap{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}[bindery-view-mode=interactive] .📖-zoom-wrap{transform-origin:center left}.📖-viewing>:not(.📖-root):not(.📖-measure-area){display:none!important}.📖-print-page{page-break-after:always;overflow:hidden;align-items:center;transition:all .2s}.📖-print-page,.📖-spread-wrapper{position:relative;display:flex;justify-content:center}.📖-spread-wrapper{margin:0 auto 32px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:100%!important}.📖-page3d{margin:auto;width:var(--bindery-page-width);height:var(--bindery-page-height);transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-bleed-left,.📖-bleed-right,.📖-crop-fold,.📖-crop-left,.📖-crop-right{width:1px;margin:auto}.📖-bleed-left:after,.📖-bleed-left:before,.📖-bleed-right:after,.📖-bleed-right:before,.📖-crop-fold:after,.📖-crop-fold:before,.📖-crop-left:after,.📖-crop-left:before,.📖-crop-right:after,.📖-crop-right:before{width:1px;height:var(--bindery-mark-length);background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-bleed-bottom,.📖-bleed-top,.📖-crop-bottom,.📖-crop-top{height:1px}.📖-bleed-bottom:after,.📖-bleed-bottom:before,.📖-bleed-top:after,.📖-bleed-top:before,.📖-crop-bottom:after,.📖-crop-bottom:before,.📖-crop-top:after,.📖-crop-top:before{width:var(--bindery-mark-length);height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-crop-fold{right:0;left:0}.📖-crop-left{left:0}.📖-crop-right{right:0}.📖-crop-top{top:0}.📖-crop-bottom{bottom:0}.📖-print-meta{padding:var(--bindery-mark-length);text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}");
+___$insertStyle(":root{--bindery-ui-bg:#f4f4f4;--bindery-ui-accent:#000;--bindery-ui-text:#000}@media screen{.📖-page{background:#fff;outline:1px solid #ddd;overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-page:after{content:\"\";position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:3}}li.continuation,p.continuation{text-indent:unset!important}li.continuation{list-style:none!important}.📖-out-of-flow{display:none}.📖-page{width:var(--bindery-page-width);height:var(--bindery-page-height);position:relative;display:flex;flex-direction:column;flex-wrap:nowrap}.📖-flow-box{position:relative;margin:60px 40px;margin-bottom:0;flex:1 1 auto;min-height:0}.📖-flow-content{padding:.1px;position:relative}.📖-footer{margin:60px 40px;margin-top:8pt;flex:0 1 auto;z-index:1}.📖-page-background{position:absolute;z-index:0;overflow:hidden}.📖-left>.📖-page-background{right:0}.📖-right>.📖-page-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{left:18pt;text-align:left}.📖-right .📖-running-header{right:18pt;text-align:right}.📖-print-page{width:var(--bindery-sheet-width);height:var(--bindery-sheet-height)}.📖-page-size-rotated{height:var(--bindery-page-width);width:var(--bindery-page-height)}.📖-spread-size{height:var(--bindery-page-height);width:calc(var(--bindery-page-width) * 2)}.📖-spread-size-rotated{width:var(--bindery-page-height);height:calc(var(--bindery-page-width) * 2)}.📖-show-bleed-marks .📖-print-page .📖-spread-wrapper,.📖-show-crop .📖-print-page .📖-spread-wrapper{margin:calc(var(--bindery-bleed) + 12pt) auto}.📖-page-background{top:calc(-1 * var(--bindery-bleed));bottom:calc(-1 * var(--bindery-bleed));left:calc(-1 * var(--bindery-bleed));right:calc(-1 * var(--bindery-bleed))}.📖-flow-box,.📖-footer{margin-left:var(--bindery-margin-inner);margin-right:var(--bindery-margin-outer)}.📖-left .📖-flow-box,.📖-left .📖-footer{margin-left:var(--bindery-margin-outer);margin-right:var(--bindery-margin-inner)}.📖-left .📖-running-header{left:var(--bindery-margin-outer)}.📖-right .📖-running-header{right:var(--bindery-margin-outer)}.📖-flow-box{margin-top:var(--bindery-margin-top)}.📖-footer{margin-bottom:var(--bindery-margin-bottom)}.📖-spread.📖-right>.📖-page-background{left:calc(-100% - var(--bindery-bleed))}.📖-spread.📖-left>.📖-page-background{right:calc(-100% - var(--bindery-bleed))}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-page-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-rotate-container.📖-rotate-inward .📖-page-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}@media screen{.📖-root{transition:opacity .2s;opacity:1;background:var(--bindery-ui-bg);z-index:2;position:relative;padding-top:72px;min-height:100vh}.📖-progress-bar{position:fixed;left:0;top:0;background:var(--bindery-ui-accent);width:0;transition:all .2s;opacity:0;height:0;z-index:2}.📖-in-progress .📖-progress-bar{opacity:1;height:2px}.📖-zoom-content{padding:10px;background:var(--bindery-ui-bg);position:absolute;left:0;right:0;margin:auto}.📖-view-preview .📖-zoom-content{min-width:calc(20px + var(--bindery-spread-width))}.📖-view-flip .📖-zoom-content{min-width:calc(1.1 * var(--bindery-spread-width))}.📖-view-print .📖-zoom-content{min-width:calc(20px + var(--bindery-sheet-width))}.📖-measure-area{position:fixed;background:var(--bindery-ui-bg);padding:50px 20px;z-index:2;visibility:hidden;left:0;right:0;bottom:0}.📖-measure-area .📖-page{margin:0 auto 50px}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-page{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-page{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}.📖-placeholder-pulse{animation:pulse 1s infinite}}@keyframes pulse{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls{display:none!important}.📖-print-page{padding:1px;margin:0 auto}.📖-zoom-scaler[style]{transform:none!important}}body.viewing{margin:0}.📖-zoom-scaler{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}.📖-view-flip .📖-zoom-scaler{transform-origin:center left}.📖-print-page{page-break-after:always;overflow:hidden;align-items:center;transition:all .2s}.📖-print-page,.📖-spread-wrapper{position:relative;display:flex;justify-content:center}.📖-spread-wrapper{margin:0 auto 32px}.📖-print-page .📖-spread-wrapper{margin:0 auto}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:90vh!important}.📖-page3d{margin:auto;width:var(--bindery-page-width);height:var(--bindery-page-height);transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.📖-flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{width:1px;margin:auto}.📖-mark-bleed-left:after,.📖-mark-bleed-left:before,.📖-mark-bleed-right:after,.📖-mark-bleed-right:before,.📖-mark-crop-fold:after,.📖-mark-crop-fold:before,.📖-mark-crop-left:after,.📖-mark-crop-left:before,.📖-mark-crop-right:after,.📖-mark-crop-right:before{width:1px;height:var(--bindery-mark-length);background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{height:1px}.📖-mark-bleed-bottom:after,.📖-mark-bleed-bottom:before,.📖-mark-bleed-top:after,.📖-mark-bleed-top:before,.📖-mark-crop-bottom:after,.📖-mark-crop-bottom:before,.📖-mark-crop-top:after,.📖-mark-crop-top:before{width:var(--bindery-mark-length);height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-mark-crop-fold{right:0;left:0}.📖-mark-crop-left{left:0}.📖-mark-crop-right{right:0}.📖-mark-crop-top{top:0}.📖-mark-crop-bottom{bottom:0}.📖-print-meta{padding:var(--bindery-mark-length);text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{top:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed));bottom:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed))}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{left:calc(-12pt - var(--bindery-bleed));right:calc(-12pt - var(--bindery-bleed))}.📖-mark-bleed-left{left:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-right{right:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-top{top:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-bottom{bottom:calc(-1 * var(--bindery-bleed))}");
 
 /* global BINDERY_VERSION */
 
@@ -2155,42 +2132,35 @@ const parseHTML = (text, selector) => {
   return wrapper.querySelector(selector);
 };
 
+const T = OptionType;
+
 class Bindery {
   constructor(opts = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
+    if (!opts.content) {
+      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
+      console.error('Bindery: You must include a source element or selector');
+      return;
+    }
+
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
 
-    OptionType.validate(opts, {
+    T.validate(opts, {
       name: 'makeBook',
-      autorun: OptionType.bool,
-      content: OptionType.any,
-      ControlsComponent: OptionType.any,
-      pageSetup: OptionType.shape({
-        name: 'pageSetup',
-        bleed: OptionType.length,
-        margin: OptionType.shape({
-          name: 'margin',
-          top: OptionType.length,
-          inner: OptionType.length,
-          outer: OptionType.length,
-          bottom: OptionType.length,
-        }),
-        size: OptionType.shape({
-          name: 'size',
-          width: OptionType.length,
-          height: OptionType.length,
-        }),
-      }),
-      view: OptionType.enum(...Object.values(Mode)),
-      printSetup: OptionType.shape({
+      autorun: T.bool,
+      content: T.any,
+      ControlsComponent: T.any,
+      pageSetup: T.shape({ name: 'pageSetup', bleed: T.length, margin: T.margin, size: T.size }),
+      view: T.enum(...Object.values(Mode)),
+      printSetup: T.shape({
         name: 'printSetup',
-        layout: OptionType.enum(...Object.values(Layout)),
-        marks: OptionType.enum(...Object.values(Marks)),
-        paper: OptionType.enum(...Object.values(Paper)),
+        layout: T.enum(...Object.values(Layout)),
+        marks: T.enum(...Object.values(Marks)),
+        paper: T.enum(...Object.values(Paper)),
       }),
-      rules: OptionType.array,
+      rules: T.array,
     });
 
     this.pageSetup = new PageSetup(opts.pageSetup);
@@ -2199,7 +2169,7 @@ class Bindery {
     const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
     const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
     this.viewer = new Viewer({
-      bindery: this,
+      pageSetup: this.pageSetup,
       mode: opts.view || Mode.PREVIEW,
       marks: startMarks,
       layout: startLayout,
@@ -2209,32 +2179,10 @@ class Bindery {
     this.rules = defaultRules;
     if (opts.rules) this.addRules(opts.rules);
 
-
-    if (!opts.content) {
-      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
-      console.error('Bindery: You must include a source element or selector');
-    } else if (typeof opts.content === 'string') {
-      this.source = document.querySelector(opts.content);
-      if (!(this.source instanceof HTMLElement)) {
-        this.viewer.displayError('Content not specified', `Could not find element that matches selector "${opts.content}"`);
-        console.error(`Bindery: Could not find element that matches selector "${opts.content}"`);
-        return;
-      }
-      if (this.autorun) {
-        this.makeBook();
-      }
-    } else if (typeof opts.content === 'object' && opts.content.url) {
-      const url = opts.content.url;
-      const selector = opts.content.selector;
-      this.fetchSource(url, selector);
-    } else if (opts.content instanceof HTMLElement) {
-      this.source = opts.content;
-      if (this.autorun) {
-        this.makeBook();
-      }
-    } else {
-      console.error('Bindery: Source must be an element or selector');
-    }
+    this.getSource(opts.content).then((src) => {
+      this.source = src;
+      if (src && this.autorun) this.makeBook();
+    });
   }
 
   // Convenience constructor
@@ -2243,11 +2191,29 @@ class Bindery {
     return new Bindery(opts);
   }
 
-  async fetchSource(url, selector) {
+  async getSource(content) {
+    if (content instanceof HTMLElement) return content;
+    if (typeof content === 'string') {
+      const el = document.querySelector(content);
+      if (!(el instanceof HTMLElement)) {
+        this.viewer.displayError('Content not specified', `Could not find element that matches selector "${content}"`);
+        console.error(`Bindery: Could not find element that matches selector "${content}"`);
+      }
+      return el;
+    }
+    if (typeof content === 'object' && content.url) {
+      const url = content.url;
+      const selector = content.selector;
+      return this.fetchRemoteSource(url, selector);
+    }
+    throw Error('Bindery: Source must be an element or selector');
+  }
+
+  async fetchRemoteSource(url, selector) {
     const response = await fetch(url);
     if (response.status !== 200) {
       this.viewer.displayError(response.status, `Could not find file at "${url}"`);
-      return;
+      return null;
     }
     const fetchedContent = await response.text();
     const sourceNode = parseHTML(fetchedContent, selector);
@@ -2257,10 +2223,9 @@ class Bindery {
         `Could not find element that matches selector "${selector}"`
       );
       console.error(`Bindery: Could not find element that matches selector "${selector}"`);
-      return;
+      return null;
     }
-    this.source = sourceNode;
-    if (this.autorun) this.makeBook();
+    return sourceNode;
   }
 
   cancel() {
@@ -2279,40 +2244,11 @@ class Bindery {
     });
   }
 
-  updateBookSilent() {
-    this.layoutComplete = false;
-
-    this.source.style.display = '';
-    const content = this.source.cloneNode(true);
-    this.source.style.display = 'none';
-
-    document.body.classList.add(c('viewing'));
-
-    this.pageSetup.updateStyleVars();
-
-    paginate$1({
-      content,
-      rules: this.rules,
-      success: (book) => {
-        this.viewer.book = book;
-        this.viewer.render();
-        this.layoutComplete = true;
-      },
-      progress: () => { },
-      error: (error) => {
-        this.layoutComplete = true;
-        this.viewer.displayError('Layout failed', error);
-      },
-    });
-  }
-
   async makeBook(doneBinding) {
     if (!this.source) {
       document.body.classList.add(c('viewing'));
       return;
     }
-
-    this.layoutComplete = false;
 
     if (!this.pageSetup.isSizeValid()) {
       this.viewer.displayError(
@@ -2326,9 +2262,8 @@ class Bindery {
     const content = this.source.cloneNode(true);
     this.source.style.display = 'none';
 
-    // In case we're updating an existing layout
-    this.viewer.clear();
-
+    this.layoutInProgress = true;
+    this.viewer.clear(); // In case we're updating an existing layout
     document.body.classList.add(c('viewing'));
     this.pageSetup.updateStyleVars();
     this.viewer.setInProgress();
@@ -2340,11 +2275,11 @@ class Bindery {
         partialBook => this.viewer.renderProgress(partialBook)
       );
       this.viewer.render(book);
-      this.layoutComplete = true;
+      this.layoutInProgress = false;
       if (doneBinding) doneBinding();
       this.viewer.element.classList.remove(c('in-progress'));
     } catch (e) {
-      this.layoutComplete = true;
+      this.layoutInProgress = false;
       this.viewer.element.classList.remove(c('in-progress'));
       this.viewer.displayError('Layout couldn\'t complete', e);
       console.error(e);

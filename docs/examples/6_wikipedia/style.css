@@ -2,10 +2,9 @@ html {
   font: 10pt/1.4 Georgia, sans-serif;
 }
 
-/*.hlist dd, .hlist dt, .hlist li {
-    margin: 0;
-    display: inline;
-}*/
+body {
+  margin: 0;
+}
 
 .footnote {
   font-size: 8pt;
