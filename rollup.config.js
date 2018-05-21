@@ -6,9 +6,6 @@ import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
 import prefixer from 'postcss-class-prefix';
 import cssnano from 'cssnano';
-import inlinesvg from 'postcss-svg';
-
-import gzip from 'rollup-plugin-gzip';
 
 import pkg from './package.json';
 
@@ -24,14 +21,6 @@ const sassPlugin = () => sass({
   insert: true,
   processor: css => postcss([
     prefixer('📖-'),
-    inlinesvg({
-      func: 'url',
-      dirs: './src',
-      svgo: { plugins: [
-        { cleanupAttrs: true },
-        { removeTitle: true },
-      ] },
-    }),
     cssnano({
       reduceIdents: false,
     }),
@@ -65,7 +54,6 @@ export default [
       minify({
         comments: false,
       }),
-      gzip(),
     ],
   }),
 
