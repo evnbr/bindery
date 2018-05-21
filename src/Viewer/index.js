@@ -228,7 +228,7 @@ class Viewer {
     const scrollPct = body.scrollTop / scrollMax;
 
     if (this.controls) this.controls.setDone(this.book.pages.length);
-    this.progressBar.style.width = '100%';
+    this.progressBar.style.transform = '';
 
     window.requestAnimationFrame(() => {
       const pages = this.book.pages.slice();
@@ -245,10 +245,17 @@ class Viewer {
     });
   }
 
+  set progress(p) {
+    window.requestAnimationFrame(() => {
+      this.progressBar.style.transform = `scaleX(${p})`;
+    });
+  }
+
   renderProgress(book) {
     this.book = book;
+    const needsZoomUpdate = !this.content.firstElementChild;
 
-    this.progressBar.style.width = `${book.estimatedProgress * 100}%`;
+    this.progress = book.estimatedProgress;
 
     if (this.controls) {
       this.controls.updateProgress(book.pageCount, book.estimatedProgress);
@@ -285,7 +292,7 @@ class Viewer {
       this.content.appendChild(this.book.currentPage.element);
     }
 
-    this.updateZoom();
+    if (needsZoomUpdate) this.updateZoom();
   }
 
   updateZoom() {
