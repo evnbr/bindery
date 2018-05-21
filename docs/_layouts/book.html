@@ -7,16 +7,29 @@
     <script type="text/javascript" src='/bindery/js/bindery.umd.js'></script>
     <script type="text/javascript" src='/bindery/js/bindery-controls.min.js'></script>
     <script>
-      Bindery.makeBook({
+      const {
+        makeBook,
+        createRule,
+        PageBreak,
+        FullBleedPage,
+        FullBleedSpread,
+        RunningHeader,
+        Footnote,
+        Paper,
+        Layout,
+        Marks,
+      } = Bindery;
+
+      makeBook({
         content: {
           url: '/bindery/book-content/',
           selector: '.content',
         },
         ControlsComponent: BinderyControls,
         printSetup: {
-          paper: Bindery.Paper.AUTO_MARKS,
-          layout: Bindery.Layout.SPREADS,
-          marks: Bindery.Marks.BOTH,
+          paper: Paper.AUTO_MARKS,
+          layout: Layout.SPREADS,
+          marks: Marks.BOTH,
         },
         pageSetup: {
           size: { width: '4in', height: '6in' },
@@ -28,41 +41,41 @@
           },
         },
         rules: [
-          Bindery.createRule({
+          createRule({
             selector: '.colophon-wrap',
             beforeAdd: (el) => {
               updateColophon(el, { version: Bindery.version });
               return el;
             }
           }),
-          Bindery.PageBreak({
+          PageBreak({
             selector: 'h2',
             position: 'before',
             continue: 'right',
           }),
-          Bindery.PageBreak({
+          PageBreak({
             selector: 'h1',
             position: 'before',
             continue: 'right',
           }),
-          Bindery.FullBleedPage({
+          FullBleedPage({
             selector: 'h1',
             continue: 'right',
           }),
-          Bindery.PageBreak({
+          PageBreak({
             selector: '#colophon',
             position: 'before',
             continue: 'right',
           }),
-          Bindery.FullBleedPage({
+          FullBleedPage({
             selector: '.logo',
             continue: 'right',
           }),
-          Bindery.PageBreak({
+          PageBreak({
             selector: '.highlight',
             position: 'avoid',
           }),
-          Bindery.RunningHeader({
+          RunningHeader({
             render: (page) => {
               if (page.isEmpty) return '';
               if (page.isLeft) return `${page.number} · Bindery `;
@@ -73,7 +86,7 @@
               }
             },
           }),
-          Bindery.Footnote({
+          Footnote({
             selector: '.post-content a',
             render: (element, number) => {
               return '<i>' + number + '</i>: ' + element.href;

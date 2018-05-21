@@ -8,20 +8,29 @@
 </head>
 
 <body>
-
   <script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
   <script>
-    Bindery.makeBook({
+    const {
+      makeBook,
+      PageBreak,
+      FullBleedPage,
+      FullBleedSpread,
+      RunningHeader,
+      Counter,
+      PageReference
+    } = Bindery;
+
+    makeBook({
       content: {
         url: '../example_shared/content.html',
         selector: ".content",
       },
       rules: [
-        Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-        Bindery.FullBleedPage({ selector: '.med-figure' }),
-        Bindery.FullBleedSpread({ selector: '.big-figure', continue: 'same' }),
-        Bindery.RunningHeader(),
-        Bindery.Counter({
+        PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+        FullBleedPage({ selector: '.med-figure' }),
+        FullBleedSpread({ selector: '.big-figure', continue: 'same' }),
+        RunningHeader(),
+        Counter({
           incrementEl: 'h2',
           replaceEl: 'h2',
           replace: (el, counterValue) => {
@@ -29,7 +38,7 @@
             return el;
           }
         }),
-        Bindery.Counter({
+        Counter({
           incrementEl: 'p',
           replaceEl: 'p',
           resetEl: 'h2',
@@ -38,7 +47,7 @@
             return el;
           }
         }),
-        Bindery.Counter({
+        Counter({
           incrementEl: 'figure',
           replaceEl: 'figcaption',
           resetEl: 'h2',
@@ -47,7 +56,7 @@
             return el;
           }
         }),
-        Bindery.PageReference({
+        PageReference({
           selector: ".toc a",
           replace: (element, number) => {
             let row = document.createElement('div');
