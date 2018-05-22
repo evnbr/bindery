@@ -9,13 +9,11 @@ import defaultRules from './defaultRules';
 import paginate from '../paginate';
 import Viewer from '../viewer';
 import rules from '../rules';
-import { OptionType } from '../utils';
+import { validate, T } from '../option-checker';
 import { c, parseHTML } from '../dom';
 
 // style
 import './main.scss';
-
-const T = OptionType;
 
 class Bindery {
   constructor(opts = {}) {
@@ -30,7 +28,7 @@ class Bindery {
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
 
-    T.validate(opts, {
+    validate(opts, {
       name: 'makeBook',
       autorun: T.bool,
       content: T.any,

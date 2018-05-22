@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import { OptionType } from '../utils';
+import { validate, T } from '../option-checker';
 
 class Split extends Rule {
   constructor(options) {
@@ -7,11 +7,11 @@ class Split extends Rule {
     options.fromPrevious = options.fromPrevious || 'split-from-previous';
     super(options);
 
-    OptionType.validate(options, {
+    validate(options, {
       name: 'Split',
-      selector: OptionType.string,
-      toNext: OptionType.string,
-      fromPrevious: OptionType.string,
+      selector: T.string,
+      toNext: T.string,
+      fromPrevious: T.string,
     });
   }
   get customToNextClass() {

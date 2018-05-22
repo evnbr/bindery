@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import { OptionType } from '../utils';
+import { validate, T } from '../option-checker';
 import { createEl } from '../dom';
 
 // Options:
@@ -10,9 +10,9 @@ import { createEl } from '../dom';
 class RunningHeader extends Rule {
   constructor(options = {}) {
     super(options);
-    OptionType.validate(options, {
+    validate(options, {
       name: 'RunningHeader',
-      render: OptionType.func,
+      render: T.func,
     });
   }
   eachPage(page) {

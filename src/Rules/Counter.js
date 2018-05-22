@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import { OptionType } from '../utils';
+import { validate, T } from '../option-checker';
 
 
 class Counter extends Rule {
@@ -7,12 +7,12 @@ class Counter extends Rule {
     super(options);
     this.selector = '*';
     this.counterValue = 0;
-    OptionType.validate(options, {
+    validate(options, {
       name: 'Counter',
-      replaceEl: OptionType.string,
-      resetEl: OptionType.string,
-      incrementEl: OptionType.string,
-      replace: OptionType.func,
+      replaceEl: T.string,
+      resetEl: T.string,
+      incrementEl: T.string,
+      replace: T.func,
     });
   }
   setup() {

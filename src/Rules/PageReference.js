@@ -1,5 +1,6 @@
 import Replace from './Replace';
-import { OptionType, makeRanges } from '../utils';
+import { makeRanges } from '../utils';
+import { validate, T } from '../option-checker';
 import { c } from '../dom';
 
 // Options:
@@ -9,11 +10,11 @@ import { c } from '../dom';
 class PageReference extends Replace {
   constructor(options) {
     super(options);
-    OptionType.validate(options, {
+    validate(options, {
       name: 'PageReference',
-      selector: OptionType.string,
-      replace: OptionType.func,
-      createTest: OptionType.func,
+      selector: T.string,
+      replace: T.func,
+      createTest: T.func,
     });
   }
   afterAdd(elmt, book) {

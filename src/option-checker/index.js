@@ -1,4 +1,4 @@
-import { isValidLength } from './convertUnits';
+import { isValidLength } from '../utils';
 
 const validate = (opts, validOpts) => {
   let isValid = true;
@@ -38,7 +38,7 @@ const isSize = val => isShape({
   height: isValidLength,
 })(val);
 
-const OptionType = {
+const T = {
   enum(...enumCases) {
     const enumCheck = function enumCheck(str) { return enumCases.includes(str); };
     Object.defineProperty(enumCheck, 'name', { writable: true });
@@ -55,7 +55,6 @@ const OptionType = {
   shape: isShape,
   margin: isMargin,
   size: isSize,
-  validate,
 };
 
-export default OptionType;
+export { validate, T };

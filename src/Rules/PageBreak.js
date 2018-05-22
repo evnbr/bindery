@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import { OptionType } from '../utils';
+import { validate, T } from '../option-checker';
 
 class PageBreak extends Rule {
   constructor(options) {
@@ -7,11 +7,11 @@ class PageBreak extends Rule {
     options.continue = options.continue || 'next';
     super(options);
 
-    OptionType.validate(options, {
+    validate(options, {
       name: 'PageBreak',
-      selector: OptionType.string,
-      continue: OptionType.enum('next', 'left', 'right'),
-      position: OptionType.enum('before', 'after', 'both', 'avoid'),
+      selector: T.string,
+      continue: T.enum('next', 'left', 'right'),
+      position: T.enum('before', 'after', 'both', 'avoid'),
     });
   }
   get avoidSplit() {

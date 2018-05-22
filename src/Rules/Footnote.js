@@ -1,5 +1,5 @@
 import Replace from './Replace';
-import { OptionType } from '../utils';
+import { validate, T } from '../option-checker';
 import { createEl } from '../dom';
 
 // Options:
@@ -10,11 +10,11 @@ import { createEl } from '../dom';
 class Footnote extends Replace {
   constructor(options) {
     super(options);
-    OptionType.validate(options, {
+    validate(options, {
       name: 'Footnote',
-      selector: OptionType.string,
-      replace: OptionType.func,
-      render: OptionType.func,
+      selector: T.string,
+      replace: T.func,
+      render: T.func,
     });
   }
   afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {

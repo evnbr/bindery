@@ -1,5 +1,5 @@
 import error from '../error';
-import { c } from '../../utils';
+import { c } from '../../dom';
 
 global.BINDERY_VERSION = 'v0';
 const el = error('Title', 'Desc');

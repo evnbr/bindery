@@ -1,5 +1,5 @@
 import OutOfFlow from './OutOfFlow';
-import { OptionType } from '../utils';
+import { validate, T } from '../option-checker';
 import { createEl } from '../dom';
 
 // Options:
@@ -10,11 +10,11 @@ class FullBleedPage extends OutOfFlow {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';
     super(options);
-    OptionType.validate(options, {
+    validate(options, {
       name: 'FullBleedPage',
-      selector: OptionType.string,
-      continue: OptionType.enum('next', 'same', 'left', 'right'),
-      rotate: OptionType.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise'),
+      selector: T.string,
+      continue: T.enum('next', 'same', 'left', 'right'),
+      rotate: T.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise'),
     });
   }
 

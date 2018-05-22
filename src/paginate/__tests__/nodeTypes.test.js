@@ -1,4 +1,4 @@
-import { isTextNode, isUnloadedImage, isContent } from '../nodeTypes';
+import { isTextNode, isUnloadedImage, isContentElement } from '../nodeTypes';
 
 const textNode = document.createTextNode('sample');
 const div = document.createElement('div');
@@ -17,14 +17,14 @@ test('isUnloadedImage recognizes image', () => {
   expect(isUnloadedImage(img)).toBe(true);
 });
 
-test('isContent recognizes div', () => {
-  expect(isContent(div)).toBe(true);
+test('isContentElement recognizes div', () => {
+  expect(isContentElement(div)).toBe(true);
 });
 
-test('isContent rejects textNode', () => {
-  expect(isContent(textNode)).toBe(false);
+test('isContentElement rejects textNode', () => {
+  expect(isContentElement(textNode)).toBe(false);
 });
 
-test('isContent rejects script', () => {
-  expect(isContent(script)).toBe(false);
+test('isContentElement rejects script', () => {
+  expect(isContentElement(script)).toBe(false);
 });

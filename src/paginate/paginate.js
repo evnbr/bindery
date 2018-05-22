@@ -13,7 +13,7 @@ import clonePath from './clonePath';
 import Estimator from './Estimator';
 
 // Utils
-import { isTextNode, isUnloadedImage, isContent } from './nodeTypes';
+import { isTextNode, isUnloadedImage, isContentElement } from './nodeTypes';
 
 const paginate = (content, rules, progressCallback) => {
   // Global state for a pagination run
@@ -134,7 +134,7 @@ const paginate = (content, rules, progressCallback) => {
     for (const child of childNodes) {
       if (isTextNode(child)) {
         await (shouldSplit ? addSplittableTextNode : addWholeTextNode)(child);
-      } else if (isContent(child)) {
+      } else if (isContentElement(child)) {
         await addElementNode(child);
       } else {
         // Skip comments and unknown nodes
