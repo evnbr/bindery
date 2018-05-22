@@ -34,6 +34,15 @@ class RuleSet {
     this.selectorsNotToSplit = rules.filter(r => r.avoidSplit).map(r => r.selector);
     // setup
     this.rules.filter(r => r.setup).forEach(r => r.setup());
+
+    this.splitClasses = {
+      toNext: rules
+        .filter(rule => rule.customToNextClass)
+        .map(rule => rule.customToNextClass),
+      fromPrev: rules
+        .filter(rule => rule.customFromPreviousClass)
+        .map(rule => rule.customFromPreviousClass),
+    };
   }
   applyPageStartRules(pg, book) {
     this.rules.forEach((rule) => {
@@ -89,7 +98,7 @@ class RuleSet {
         (problemElement) => {
           problemElement.parentNode.removeChild(problemElement);
           const newPage = continueOnNewPage();
-          newPage.currentElement.appendChild(problemElement);
+          newPage.flow.currentElement.appendChild(problemElement);
           return rule.afterAdd(
             problemElement,
             book,

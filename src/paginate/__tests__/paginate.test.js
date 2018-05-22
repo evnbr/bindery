@@ -9,24 +9,22 @@ global.performance = { now: () => {
 const mockDoc = document;
 const mockEl = () => mockDoc.createElement('div');
 
-jest.mock('../../Page', () => function MockPage() {
-  const flowContent = mockEl();
-  const hasOverflowed = () => flowContent.textContent.length > 10;
+jest.mock('../../flow-box', () => function MockFlow() {
+  const content = mockEl();
+  const hasOverflowed = () => content.textContent.length > 10;
   const path = [];
   const getCurrent = () => {
-    return path.length < 1 ? flowContent : path[path.length - 1];
+    return path.length < 1 ? content : path[path.length - 1];
   };
   return {
     path,
     element: mockEl(),
-    flowContent,
+    content,
     get currentElement() {
       return getCurrent();
     },
+    continueFrom: () => {},
     hasOverflowed,
-    validate: () => true,
-    validateEnd: () => true,
-    setLeftRight: () => {},
   };
 });
 
@@ -46,7 +44,7 @@ test('Creates a book at all', () => {
     .then((book) => {
       expect(book.isComplete).toBe(true);
       const allText = book.pages
-        .map(pg => pg.flowContent.textContent)
+        .map(pg => pg.flow.content.textContent)
         .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
       expect(allText).toBe('SectionContentDivContentSpanContent');
     })

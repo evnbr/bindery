@@ -15,25 +15,18 @@ import { c } from '../dom';
 // which lets you add classes to the original and cloned element
 // to customize styling.
 
-const clonePath = (oldPath, rules) => {
+const clonePath = (oldPath, classes) => {
   const newPath = [];
 
-  // TODO check if element actually matches
-  const toNextClasses = rules
-    .filter(rule => rule.customToNextClass)
-    .map(rule => rule.customToNextClass);
-  const fromPrevClasses = rules
-    .filter(rule => rule.customFromPreviousClass)
-    .map(rule => rule.customFromPreviousClass);
-
+  const { toNext, fromPrev } = classes;
   const markAsToNext = (node) => {
     node.classList.add(c('continues'));
-    toNextClasses.forEach(cl => node.classList.add(cl));
+    toNext.forEach(cl => node.classList.add(cl));
   };
 
   const markAsFromPrev = (node) => {
     node.classList.add(c('continuation'));
-    fromPrevClasses.forEach(cl => node.classList.add(cl));
+    fromPrev.forEach(cl => node.classList.add(cl));
   };
 
   for (let i = oldPath.length - 1; i >= 0; i -= 1) {

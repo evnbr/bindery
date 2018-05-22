@@ -3,7 +3,7 @@
 // main
 import PageSetup from './PageSetup';
 import { Mode, Paper, Layout, Marks } from './Constants';
-import defaultRules from './defaultRules';
+import { defaultRules } from '../defaults';
 
 // components
 import paginate from '../paginate';

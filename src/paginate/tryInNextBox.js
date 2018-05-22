@@ -3,19 +3,19 @@
 // step up the tree to find the first ancestor
 // that can be split, and move all of that descendants
 // to the next page.
-const shiftToNextPage = (page, continueOnNewPage, canSplitElement) => {
+const tryInNextBox = (flow, makeNextFlow, canSplitElement) => {
   // So this node won't get cloned. TODO: this is unclear
-  const elementToMove = page.path.pop();
+  const elementToMove = flow.path.pop();
 
-  if (page.path.length < 1) {
+  if (flow.path.length < 1) {
     throw Error('Bindery: Attempting to move the top-level element');
   }
 
   // find the nearest splittable parent
   let nearestElementThatCanBeMoved = elementToMove;
   const pathToRestore = [];
-  while (page.path.length > 1 && !canSplitElement(page.currentElement)) {
-    nearestElementThatCanBeMoved = page.path.pop();
+  while (flow.path.length > 1 && !canSplitElement(flow.currentElement)) {
+    nearestElementThatCanBeMoved = flow.path.pop();
     pathToRestore.unshift(nearestElementThatCanBeMoved);
   }
 
@@ -28,30 +28,30 @@ const shiftToNextPage = (page, continueOnNewPage, canSplitElement) => {
 
   // If the nearest ancestor would be empty without this node,
   // move it to the next page too.
-  if (page.path.length > 1 && page.currentElement.textContent.trim() === '') {
+  if (flow.path.length > 1 && flow.currentElement.textContent.trim() === '') {
     parent.appendChild(nearestElementThatCanBeMoved);
-    nearestElementThatCanBeMoved = page.path.pop();
+    nearestElementThatCanBeMoved = flow.path.pop();
     pathToRestore.unshift(nearestElementThatCanBeMoved);
     nearestElementThatCanBeMoved.parentNode.removeChild(nearestElementThatCanBeMoved);
   }
 
-  let newPage;
-  if (!page.isEmpty) {
-    if (page.hasOverflowed()) page.suppressErrors = true;
-    newPage = continueOnNewPage();
+  let newFlow;
+  if (!flow.isEmpty) {
+    if (flow.hasOverflowed()) flow.suppressErrors = true;
+    newFlow = makeNextFlow();
   } else {
     // If the page is empty when this node is removed,
     // then it won't help to move it to the next page.
     // Instead continue here until the node is done.
-    newPage = page;
+    newFlow = flow;
   }
 
   // append moved node as first in new page
-  newPage.currentElement.appendChild(nearestElementThatCanBeMoved);
+  newFlow.currentElement.appendChild(nearestElementThatCanBeMoved);
 
   // restore subpath
-  pathToRestore.forEach(r => newPage.path.push(r));
-  newPage.path.push(elementToMove);
+  pathToRestore.forEach(r => newFlow.path.push(r));
+  newFlow.path.push(elementToMove);
 };
 
-export default shiftToNextPage;
+export default tryInNextBox;

@@ -1,3 +1,4 @@
+const doc = window.document;
 //
 // prefix classes
 const p = '📖-';
@@ -14,7 +15,7 @@ const prefixer = (str) => {
 
 // Create div with prefixed classes
 const createEl = (className, content = []) => {
-  const div = document.createElement('div');
+  const div = doc.createElement('div');
   div.className = className.split('.').filter(txt => txt !== '').map(prefixer).join(' ');
 
   if (typeof content === 'string') {
@@ -27,18 +28,18 @@ const createEl = (className, content = []) => {
 
 // Create stylesheet with id
 const addStylesheet = (id) => {
-  const style = document.createElement('style');
+  const style = doc.createElement('style');
   style.id = id;
-  document.head.appendChild(style);
+  doc.head.appendChild(style);
   return style;
 };
 
 // Fetch or create stylesheet with id
-const stylesheet = id => document.querySelector(`#${id}`) || addStylesheet(id);
+const stylesheet = id => doc.querySelector(`#${id}`) || addStylesheet(id);
 
 // Parse html from text
 const parseHTML = (text, selector) => {
-  const wrapper = document.createElement('div');
+  const wrapper = doc.createElement('div');
   wrapper.innerHTML = text;
   return wrapper.querySelector(selector);
 };

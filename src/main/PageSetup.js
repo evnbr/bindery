@@ -1,8 +1,9 @@
 import Page from '../Page';
 import { stylesheet } from '../dom';
 import { parseVal } from '../utils';
+
+import { defaultPageSetup } from '../defaults';
 import { Paper, Layout } from './Constants';
-import defaultPageSetup from './defaultPageSetup';
 
 const letter = { width: '8.5in', height: '11in' };
 const a4 = { width: '210mm', height: '297mm' };
