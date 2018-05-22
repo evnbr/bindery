@@ -39,7 +39,7 @@
   "scripts": {
     "build": "rollup -c && cp dist/bindery.umd.js docs/js && cp dist/bindery.umd.js.map docs/js",
     "dev": "rollup -c -w",
-    "test": "jest --clearCache && codecov",
+    "test": "jest && codecov",
     "coverage": "jest --coverage",
     "docs": "cd docs && jekyll serve",
     "lint": "eslint src/ webpack.*.js --cache"
