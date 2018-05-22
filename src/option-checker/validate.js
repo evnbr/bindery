@@ -5,15 +5,15 @@ const validate = (opts, validOpts) => {
   Object.keys(opts).forEach((k) => {
     if (!validOpts[k]) {
       const setName = validOpts.name ? `'${validOpts.name}'` : 'This option';
-      console.error(`Unknown Option: ${setName} doesn't expect a property '${k}'`);
       isValid = false;
+      throw Error(`Unknown option in ${setName}: '${k}'`);
     } else {
       const val = opts[k];
       const type = validOpts[k];
       if (!type.check(val)) {
         const optName = validOpts.name ? `${validOpts.name}.${k}` : k;
-        console.error(`Invalid Option: ${JSON.stringify(val)} is not a valid value for property '${optName}: ${type.name}'`);
         isValid = false;
+        throw Error(`Invalid value for '${optName}': ${JSON.stringify(val)} is not a ${type.name}.`);
       }
     }
   });

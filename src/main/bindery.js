@@ -32,9 +32,14 @@ class Bindery {
       name: 'makeBook',
       autorun: T.bool,
       content: T.any,
-      ControlsComponent: T.any,
-      pageSetup: T.shape({ name: 'pageSetup', bleed: T.length, margin: T.margin, size: T.size }),
+      ControlsComponent: T.func,
       view: T.enum(...Object.values(Mode)),
+      pageSetup: T.shape({
+        name: 'pageSetup',
+        bleed: T.length,
+        margin: T.margin,
+        size: T.size,
+      }),
       printSetup: T.shape({
         name: 'printSetup',
         layout: T.enum(...Object.values(Layout)),

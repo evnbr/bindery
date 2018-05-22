@@ -7,28 +7,39 @@ const isBool = val => typeof val === 'boolean';
 const isStr = val => typeof val === 'string';
 const isArr = val => Array.isArray(val);
 
-const hasProp = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
+const hasProp = (obj, k) => Object.prototype.hasOwnProperty.call(obj, k);
+
 const hasSameKeys = (opts, required) => {
   const keys = Object.keys(required).filter(k => k !== 'name');
   return !keys.some(k => !hasProp(opts, k));
 };
 
 const isShape = validShape => userShape => isObj(userShape)
+  && validate(userShape, validShape);
+
+const isShapeExact = validShape => userShape => isObj(userShape)
   && hasSameKeys(userShape, validShape)
   && validate(userShape, validShape);
 
 const isEnum = cases => str => cases.includes(str);
 
 const T = {
-  any: () => true,
+  any: {
+    name: 'any',
+    check: () => true,
+  },
   enum(...cases) {
     return {
-      name: `('${cases.join('\' or \'')}')`,
+      name: `("${cases.join('" | "')}")`,
       check: isEnum(cases),
     };
   },
+  shapeExact: template => ({
+    name: `exactly {${Object.keys(template).join(', ')}})`,
+    check: isShapeExact(template),
+  }),
   shape: template => ({
-    name: 'shape',
+    name: `shape ({${Object.keys(template).join(', ')}})`,
     check: isShape(template),
   }),
   string: {
@@ -36,7 +47,7 @@ const T = {
     check: isStr,
   },
   length: {
-    name: 'length (with absolute units)',
+    name: 'length (string with absolute units)',
     check: isValidLength,
   },
   bool: {
@@ -57,15 +68,9 @@ const T = {
   },
 };
 
-const isSize = val => isShape({
-  name: 'size',
-  width: T.length,
-  height: T.length,
-})(val);
-
 T.margin = {
-  name: 'margin',
-  check: isShape({
+  name: 'margin ({ top, inner, outer, bottom })',
+  check: isShapeExact({
     name: 'margin',
     top: T.length,
     inner: T.length,
@@ -75,8 +80,12 @@ T.margin = {
 };
 
 T.size = {
-  name: 'size',
-  check: isSize,
+  name: 'size ({ width, height })',
+  check: isShapeExact({
+    name: 'size',
+    width: T.length,
+    height: T.length,
+  }),
 };
 
 export { validate, T };
