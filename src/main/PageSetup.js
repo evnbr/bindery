@@ -1,4 +1,3 @@
-import Page from '../Page';
 import { stylesheet } from '../dom';
 import { parseVal } from '../utils';
 
@@ -11,7 +10,6 @@ const a4 = { width: '210mm', height: '297mm' };
 const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
 
 class PageSetup {
-
   constructor(opts = {}) {
     this.size = opts.size || defaultPageSetup.size;
     this.margin = opts.margin || defaultPageSetup.margin;
@@ -66,11 +64,6 @@ class PageSetup {
     default:
     }
     return { width, height };
-  }
-
-  isSizeValid() {
-    this.updateStyleVars();
-    return Page.isSizeValid();
   }
 
   get spreadSize() {

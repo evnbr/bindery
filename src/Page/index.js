@@ -16,11 +16,10 @@ class Page {
 
     measureArea.innerHTML = '';
     measureArea.appendChild(testPage.element);
-    const box = testPage.flow.element.getBoundingClientRect();
-
+    const isValid = testPage.flow.isReasonable;
     measureArea.parentNode.removeChild(measureArea);
 
-    return (box.height > 100) && (box.width > 100); // TODO: Number is arbitrary
+    return isValid;
   }
 
   setLeftRight(dir) {

@@ -129,14 +129,6 @@ class Bindery {
       return;
     }
 
-    if (!this.pageSetup.isSizeValid()) {
-      this.viewer.displayError(
-        'Page is too small', `Size: ${JSON.stringify(this.pageSize)} \n Margin: ${JSON.stringify(this.pageMargin)} \n Try adjusting the sizes or units.`
-      );
-      console.error('Bindery: Cancelled pagination. Page is too small.');
-      return;
-    }
-
     this.content.style.display = '';
     const content = this.content.cloneNode(true);
     this.content.style.display = 'none';

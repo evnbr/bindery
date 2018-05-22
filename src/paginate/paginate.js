@@ -149,6 +149,8 @@ const paginate = (content, rules, progressCallback) => {
   };
 
   const init = async () => {
+    if (!Page.isSizeValid()) throw Error('Page is too small');
+
     estimator.startWith(content);
     content.style.margin = 0;
     content.style.padding = 0;

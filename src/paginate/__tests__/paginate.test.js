@@ -13,9 +13,7 @@ jest.mock('../../flow-box', () => function MockFlow() {
   const content = mockEl();
   const hasOverflowed = () => content.textContent.length > 10;
   const path = [];
-  const getCurrent = () => {
-    return path.length < 1 ? content : path[path.length - 1];
-  };
+  const getCurrent = () => (path.length < 1 ? content : path[path.length - 1]);
   return {
     path,
     element: mockEl(),
@@ -25,28 +23,29 @@ jest.mock('../../flow-box', () => function MockFlow() {
     },
     continueFrom: () => {},
     hasOverflowed,
+    isReasonable: true,
   };
 });
 
 
-const content = document.createElement('section');
-const div = document.createElement('div');
-const span = document.createElement('span');
-content.textContent = 'Section Content';
-div.textContent = 'Div Content';
-span.textContent = 'Span Content';
-content.appendChild(div);
-div.appendChild(span);
+const a = mockEl();
+const b = mockEl();
+const c = mockEl();
+a.textContent = 'A content';
+b.textContent = 'B content';
+c.textContent = 'C content';
+a.appendChild(b);
+b.appendChild(c);
 
 
-test('Creates a book at all', () => {
-  paginate(content, [], () => {})
+test('Preserves content order', () => {
+  paginate(a, [], () => {})
     .then((book) => {
       expect(book.isComplete).toBe(true);
       const allText = book.pages
         .map(pg => pg.flow.content.textContent)
         .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
-      expect(allText).toBe('SectionContentDivContentSpanContent');
+      expect(allText).toBe('AcontentBcontentCcontent');
     })
     .catch(e => console.error(e));
 });
