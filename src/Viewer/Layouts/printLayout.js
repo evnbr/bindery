@@ -10,7 +10,7 @@ const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
   const marks = isTwoUp ? printMarksSpread : printMarksSingle;
   const spread = isTwoUp ? twoPageSpread : onePageSpread;
 
-  const printSheet = children => createEl('.print-page', [spread(children)]);
+  const printSheet = children => createEl('.print-sheet', [spread(children)]);
 
   if (isTwoUp) {
     for (let i = 0; i < pages.length; i += 2) {

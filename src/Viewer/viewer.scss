@@ -1,5 +1,10 @@
 @import './Layouts/printMarks.scss';
 @import './Layouts/flipLayout.scss';
+@import './print.scss';
+
+// This file should only include screen-only
+// styles for the viewer that do not persist when
+// printing, but does not yet
 
 :root {
   --bindery-ui-bg: #f4f4f4;
@@ -73,7 +78,7 @@
     border-bottom: 1px solid magenta;
   }
 
-   .print-page {
+   .print-sheet {
      margin: 0 auto;
    }
 
@@ -104,16 +109,30 @@
      }
    }
 
-   .show-bleed .print-page {
+   .show-bleed .print-sheet {
      background: white;
      outline: 1px solid rgba(0,0,0,0.1);
      box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
      margin: 20px auto;
    }
+}
 
-   .placeholder-pulse {
-     animation: pulse 1s infinite;
-   }
+@media screen {
+  .page {
+    background: white;
+    outline: 1px solid #ddd;
+    overflow: hidden;
+
+    .show-bleed & {
+      box-shadow: none;
+      outline: none;
+      overflow: visible;
+    }
+  }
+
+  .placeholder-pulse {
+    animation: pulse 1s infinite;
+  }
 }
 
 @keyframes pulse {
@@ -122,38 +141,14 @@
   100% { opacity: 0.2; }
 }
 
-@page {
-  margin: 0;
-}
-
-.print-page {
+.print-sheet {
   width: var(--bindery-sheet-width);
   height: var(--bindery-sheet-height);
 }
 
-.show-crop .print-page .spread-wrapper,
-.show-bleed-marks .print-page .spread-wrapper {
+.show-crop .print-sheet .spread-wrapper,
+.show-bleed-marks .print-sheet .spread-wrapper {
   margin: calc(var(--bindery-bleed) + 12pt) auto;
-}
-
-@media print {
-  .root * {
-    -webkit-print-color-adjust: exact;
-    color-adjust: exact;
-  }
-
-  .controls {
-    display: none !important;
-  }
-
-  .print-page {
-    padding: 1px;   /* prevent margin collapse */
-    margin: 0 auto;
-  }
-
-  .zoom-scaler[style] {
-    transform: none !important;
-  }
 }
 
 body.viewing {
@@ -166,12 +161,7 @@ body.viewing {
   height: calc(100vh - 120px); /* adjust scrollheight on scaled down */
 }
 
-.view-flip .zoom-scaler {
-  transform-origin: center left;
-}
-
-.print-page {
-  page-break-after: always;
+.print-sheet {
   position: relative;
   overflow: hidden;
   display: flex;
@@ -188,6 +178,6 @@ body.viewing {
   margin: 0 auto 32px;
 }
 
-.print-page .spread-wrapper {
+.print-sheet .spread-wrapper {
   margin: 0 auto;
 }
