@@ -10,9 +10,14 @@ import cssnano from 'cssnano';
 import pkg from './package.json';
 
 
+const extend = (a, b) => Object.assign({}, a, b);
+
 const baseConfig = {
-  entry: 'src/index.js',
-  moduleName: 'Bindery',
+  input: 'src/index.js',
+};
+
+const baseOutput = {
+  name: 'Bindery',
   intro: `const BINDERY_VERSION = 'v${pkg.version}'`,
   banner: `/* 📖 Bindery v${pkg.version} */`,
 };
@@ -21,20 +26,18 @@ const sassPlugin = () => sass({
   insert: true,
   processor: css => postcss([
     prefixer('📖-'),
-    cssnano({
-      reduceIdents: false,
-    }),
-  ])
-    .process(css)
-    .then(result => result.css),
+    cssnano({ reduceIdents: false }),
+  ]).process(css).then(result => result.css),
 });
 
 export default [
   // browser-friendly UMD build
-  Object.assign({}, baseConfig, {
-    dest: pkg.browser,
-    format: 'umd',
-    sourceMap: true,
+  extend(baseConfig, {
+    output: extend(baseOutput, {
+      file: pkg.browser,
+      format: 'umd',
+      sourcemap: true,
+    }),
     plugins: [
       resolve(),
       commonjs(),
@@ -43,10 +46,12 @@ export default [
   }),
 
   // minified browser-friendly build
-  Object.assign({}, baseConfig, {
-    dest: 'dist/bindery.min.js',
-    format: 'iife',
-    sourceMap: true,
+  extend(baseConfig, {
+    output: extend(baseOutput, {
+      file: 'dist/bindery.min.js',
+      format: 'iife',
+      sourcemap: true,
+    }),
     plugins: [
       resolve(),
       commonjs(),
@@ -58,11 +63,11 @@ export default [
   }),
 
   // CommonJS (for Node) and ES module (for bundlers) build.
-  Object.assign({}, baseConfig, {
+  extend(baseConfig, {
     external: ['hyperscript'],
-    targets: [
-      { dest: pkg.main, format: 'cjs' },
-      { dest: pkg.module, format: 'es' },
+    output: [
+      extend(baseOutput, { file: pkg.main, format: 'cjs' }),
+      extend(baseOutput, { file: pkg.module, format: 'es' }),
     ],
     plugins: [
       resolve(),
