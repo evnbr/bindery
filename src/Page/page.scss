@@ -20,8 +20,7 @@ li.continuation {
 
 .flow-box {
   position: relative;
-  margin: 60px 40px;
-  margin-bottom: 0;
+  margin-top: var(--bindery-margin-top);
   flex: 1 1 auto;
   min-height: 0;
 }
@@ -32,10 +31,22 @@ li.continuation {
 }
 
 .footer {
-  margin: 60px 40px;
   margin-top: 8pt;
+  margin-bottom: var(--bindery-margin-bottom);;
   flex: 0 1 auto;
   z-index: 2;
+}
+
+.flow-box,
+.footer {
+  margin-left: var(--bindery-margin-inner);
+  margin-right: var(--bindery-margin-outer);
+}
+
+.left .flow-box,
+.left .footer {
+  margin-left: var(--bindery-margin-outer);
+  margin-right: var(--bindery-margin-inner);
 }
 
 .page-background {
@@ -78,21 +89,6 @@ li.continuation {
     text-align: right;
   }
 }
-
-.flow-box,
-.footer {
-  margin-left: var(--bindery-margin-inner);
-  margin-right: var(--bindery-margin-outer);
-}
-.left .flow-box,
-.left .footer {
-  margin-left: var(--bindery-margin-outer);
-  margin-right: var(--bindery-margin-inner);
-}
-
-.flow-box { margin-top: var(--bindery-margin-top); }
-.footer { margin-bottom: var(--bindery-margin-bottom); }
-
 
 .page-size-rotated {
   height: var(--bindery-page-width);

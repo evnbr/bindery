@@ -1,30 +1,20 @@
 import Page from '../Page';
-import { stylesheet } from '../utils';
-import { parseVal } from '../utils/convertUnits';
+import { stylesheet } from '../dom';
+import { parseVal } from '../utils';
 import { Paper, Layout } from './Constants';
-
+import defaultPageSetup from './defaultPageSetup';
 
 const letter = { width: '8.5in', height: '11in' };
 const a4 = { width: '210mm', height: '297mm' };
-const defaultOpts = {
-  bleed: '12pt',
-  size: { width: '4in', height: '6in' },
-  margin: {
-    inner: '24pt',
-    outer: '24pt',
-    bottom: '40pt',
-    top: '48pt',
-  },
-};
 
 const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
 
 class PageSetup {
 
   constructor(opts = {}) {
-    this.size = opts.size || defaultOpts.size;
-    this.margin = opts.margin || defaultOpts.margin;
-    this.bleed = opts.bleed || defaultOpts.bleed;
+    this.size = opts.size || defaultPageSetup.size;
+    this.margin = opts.margin || defaultPageSetup.margin;
+    this.bleed = opts.bleed || defaultPageSetup.bleed;
     this.markLength = '12pt';
   }
 

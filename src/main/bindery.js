@@ -9,16 +9,11 @@ import defaultRules from './defaultRules';
 import paginate from '../paginate';
 import Viewer from '../viewer';
 import rules from '../rules';
-import { OptionType, c } from '../utils';
+import { OptionType } from '../utils';
+import { c, parseHTML } from '../dom';
 
 // style
 import './main.scss';
-
-const parseHTML = (text, selector) => {
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = text;
-  return wrapper.querySelector(selector);
-};
 
 const T = OptionType;
 

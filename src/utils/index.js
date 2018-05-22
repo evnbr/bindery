@@ -1,14 +1,11 @@
 import last from './arrayLast';
 import makeRanges from './makeRanges';
 import OptionType from './OptionType';
-import { prefixer, createEl, stylesheet } from './dom';
+import { parseVal } from './convertUnits';
 
-const c = prefixer;
 export {
   last,
   makeRanges,
   OptionType,
-  c,
-  createEl,
-  stylesheet,
+  parseVal,
 };

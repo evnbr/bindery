@@ -1,5 +1,6 @@
 import Rule from './Rule';
-import { OptionType, createEl } from '../utils';
+import { OptionType } from '../utils';
+import { createEl } from '../dom';
 
 // Options:
 // selector: String

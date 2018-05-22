@@ -1,6 +1,6 @@
 /* global BINDERY_VERSION */
 
-import { createEl } from '../utils';
+import { createEl } from '../dom';
 
 export default function (title, text) {
   return createEl('.error', [

@@ -1,4 +1,4 @@
-import { createEl } from '../../utils';
+import { createEl } from '../../dom';
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 
 const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);

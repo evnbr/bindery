@@ -1,8 +1,6 @@
 import FullBleedPage from '../rules/FullBleedPage';
 import FullBleedSpread from '../rules/FullBleedSpread';
 import PageBreak from '../rules/PageBreak';
-import elToStr from '../utils/elementToString';
-
 
 const isFullPageRule = rule => (
     rule instanceof FullBleedSpread
@@ -98,7 +96,7 @@ class RuleSet {
             continueOnNewPage,
             makeNewPage,
             () => {
-              console.log(`Couldn't apply ${rule.name} to ${elToStr(problemElement)}. Caused overflows twice.`);
+              console.log(`Couldn't apply ${rule.name} to the following element, Caused overflows twice:`, problemElement);
             }
           );
         }

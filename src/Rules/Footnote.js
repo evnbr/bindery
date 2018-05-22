@@ -1,5 +1,6 @@
 import Replace from './Replace';
-import { OptionType, createEl } from '../utils';
+import { OptionType } from '../utils';
+import { createEl } from '../dom';
 
 // Options:
 // selector: String

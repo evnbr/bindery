@@ -1,4 +1,4 @@
-import { c, createEl } from '../utils';
+import { c, createEl } from '../dom';
 import Page from '../Page';
 
 import errorView from './error';

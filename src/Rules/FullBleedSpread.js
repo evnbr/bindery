@@ -1,5 +1,6 @@
 import OutOfFlow from './OutOfFlow';
-import { OptionType, c, createEl } from '../utils';
+import { OptionType } from '../utils';
+import { c, createEl } from '../dom';
 
 // Options:
 // selector: String

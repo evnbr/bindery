@@ -1,4 +1,4 @@
-import { c, createEl } from '../../utils';
+import { c, createEl } from '../../dom';
 
 const renderFlipLayout = (pages, doubleSided) => {
   const flipLayout = document.createDocumentFragment();

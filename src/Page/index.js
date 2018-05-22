@@ -1,5 +1,5 @@
-import { c, createEl, last } from '../utils';
-import elToStr from '../utils/elementToString';
+import { c, createEl } from '../dom';
+import { last } from '../utils';
 
 class Page {
   constructor() {
@@ -34,7 +34,7 @@ class Page {
     if (this.hasOverflowed()) {
       const suspect = this.currentElement;
       if (suspect) {
-        console.warn(`Bindery: Content overflows, probably due to a style set on ${elToStr(suspect)}.`);
+        console.warn('Bindery: Content overflows, probably due to a style set on:', suspect);
         suspect.parentNode.removeChild(suspect);
       } else {
         console.warn('Bindery: Content overflows.');

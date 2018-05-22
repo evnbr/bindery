@@ -36,5 +36,12 @@ const addStylesheet = (id) => {
 // Fetch or create stylesheet with id
 const stylesheet = id => document.querySelector(`#${id}`) || addStylesheet(id);
 
+// Parse html from text
+const parseHTML = (text, selector) => {
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = text;
+  return wrapper.querySelector(selector);
+};
 
-export { prefixer, createEl, stylesheet };
+const c = prefixer;
+export { c, createEl, stylesheet, parseHTML };
