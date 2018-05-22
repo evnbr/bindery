@@ -1,8 +1,8 @@
-import Bindery from './bindery';
-import Rules from './Rules';
-import { Mode, Paper, Layout, Marks } from './Constants';
+import Bindery from './main/bindery';
+import rules from './rules';
+import { Mode, Paper, Layout, Marks } from './main/Constants';
 
-const BinderyWithRules = Object.assign(Bindery, Rules);
+const BinderyWithRules = Object.assign(Bindery, rules);
 BinderyWithRules.View = Mode;
 BinderyWithRules.Paper = Paper;
 BinderyWithRules.Layout = Layout;

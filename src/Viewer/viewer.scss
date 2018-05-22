@@ -1,3 +1,12 @@
+@import './Layouts/printMarks.scss';
+@import './Layouts/flipLayout.scss';
+
+:root {
+  --bindery-ui-bg: #f4f4f4;
+  --bindery-ui-accent: black;
+  --bindery-ui-text: black;
+}
+
 @media screen {
   .root {
     transition: opacity 0.2s;
@@ -117,6 +126,16 @@
   margin: 0;
 }
 
+.print-page {
+  width: var(--bindery-sheet-width);
+  height: var(--bindery-sheet-height);
+}
+
+.show-crop .print-page .spread-wrapper,
+.show-bleed-marks .print-page .spread-wrapper {
+  margin: calc(var(--bindery-bleed) + 12pt) auto;
+}
+
 @media print {
   .root * {
     -webkit-print-color-adjust: exact;
@@ -171,61 +190,4 @@ body.viewing {
 
 .print-page .spread-wrapper {
   margin: 0 auto;
-}
-
-.flap-holder {
-  perspective: 5000px;
-  transform-style: preserve-3d;
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  margin: auto;
-  transform-style: preserve-3d;
-}
-.flip-sizer {
-  position: relative;
-  margin: auto;
-  padding: 0 20px;
-  box-sizing: content-box;
-  height: 90vh !important;
-}
-
-.page3d {
-  margin: auto;
-  width: var(--bindery-page-width);
-  height: var(--bindery-page-height);
-  transform: rotateY(0);
-  transform-style: preserve-3d;
-  transform-origin: left;
-  transition: transform 0.5s, box-shadow 0.1s;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-
-  &:hover {
-    box-shadow: 2px 0 4px rgba(0,0,0,0.2);
-  }
-
-  &.flipped {
-    transform: rotateY(-180deg);
-  }
-
-  .page {
-    position: absolute;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    box-shadow: none;
-  }
-
-  .page3d-front {
-    transform: rotateY(0);
-  }
-
-  .page3d-back {
-    transform: rotateY(-180deg);
-  }
 }

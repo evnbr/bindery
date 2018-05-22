@@ -1,6 +1,6 @@
-import FullBleedPage from '../Rules/FullBleedPage';
-import FullBleedSpread from '../Rules/FullBleedSpread';
-import PageBreak from '../Rules/PageBreak';
+import FullBleedPage from '../rules/FullBleedPage';
+import FullBleedSpread from '../rules/FullBleedSpread';
+import PageBreak from '../rules/PageBreak';
 import elToStr from '../utils/elementToString';
 
 

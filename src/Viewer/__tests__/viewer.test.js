@@ -1,5 +1,5 @@
 import Viewer from '../index';
-import { Mode, Layout, Marks } from '../../Constants';
+import { Mode, Layout, Marks } from '../../main/Constants';
 
 global.requestAnimationFrame = func => func();
 

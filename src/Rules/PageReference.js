@@ -23,7 +23,7 @@ class PageReference extends Replace {
       const tempClone = elmt.cloneNode(true);
       const tempNumbers = book.pagesForTest(test);
       const tempRanges = makeRanges(tempNumbers);
-      const temp = this.replace(tempClone, tempRanges || '###');
+      const temp = this.replace(tempClone, tempRanges || '000');
       temp.classList.add(c('placeholder-pulse'));
       parent.replaceChild(temp, elmt);
 

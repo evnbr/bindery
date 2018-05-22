@@ -1,6 +1,12 @@
-import Rules from './index';
+import rules from '../rules';
 
-const { PageBreak, PageReference, Footnote, FullBleedPage, FullBleedSpread } = Rules;
+const {
+  PageBreak,
+  PageReference,
+  Footnote,
+  FullBleedPage,
+  FullBleedSpread,
+} = rules;
 
 const replacer = (element, number) => {
   element.textContent = `${number}`;

@@ -44,13 +44,8 @@
     }
   }
 
-  &.rotate-inward {
-    .page-background { bottom: 0; }
-  }
-
-  &.rotate-outward {
-    .page-background { top: 0; }
-  }
+  &.rotate-inward .page-background { bottom: 0; }
+  &.rotate-outward .page-background { top: 0; }
 
   &.rotate-spread-clockwise {
     .right & {

@@ -1,16 +1,17 @@
 /* global BINDERY_VERSION */
 
-import paginate from './paginate';
+// main
 import PageSetup from './PageSetup';
-
-import Viewer from './Viewer';
 import { Mode, Paper, Layout, Marks } from './Constants';
+import defaultRules from './defaultRules';
 
-import Rules from './Rules/';
-import defaultRules from './Rules/defaultRules';
+// components
+import paginate from '../paginate';
+import Viewer from '../viewer';
+import rules from '../rules';
+import { OptionType, c } from '../utils';
 
-import { OptionType, c } from './utils';
-
+// style
 import './main.scss';
 
 const parseHTML = (text, selector) => {
@@ -66,9 +67,9 @@ class Bindery {
     this.rules = defaultRules;
     if (opts.rules) this.addRules(opts.rules);
 
-    this.getSource(opts.content).then((src) => {
-      this.source = src;
-      if (src && this.autorun) this.makeBook();
+    this.getContentAsElement(opts.content).then((el) => {
+      this.content = el;
+      if (el && this.autorun) this.makeBook();
     });
   }
 
@@ -78,7 +79,7 @@ class Bindery {
     return new Bindery(opts);
   }
 
-  async getSource(content) {
+  async getContentAsElement(content) {
     if (content instanceof HTMLElement) return content;
     if (typeof content === 'string') {
       const el = document.querySelector(content);
@@ -89,41 +90,39 @@ class Bindery {
       return el;
     }
     if (typeof content === 'object' && content.url) {
-      const url = content.url;
-      const selector = content.selector;
-      return this.fetchRemoteSource(url, selector);
+      return this.fetchContent(content.url, content.selector);
     }
     throw Error('Bindery: Source must be an element or selector');
   }
 
-  async fetchRemoteSource(url, selector) {
+  async fetchContent(url, sel) {
     const response = await fetch(url);
     if (response.status !== 200) {
       this.viewer.displayError(response.status, `Could not find file at "${url}"`);
       return null;
     }
     const fetchedContent = await response.text();
-    const sourceNode = parseHTML(fetchedContent, selector);
-    if (!(sourceNode instanceof HTMLElement)) {
+    const el = parseHTML(fetchedContent, sel);
+    if (!(el instanceof HTMLElement)) {
       this.viewer.displayError(
         'Source not specified',
-        `Could not find element that matches selector "${selector}"`
+        `Could not find element that matches selector "${sel}"`
       );
-      console.error(`Bindery: Could not find element that matches selector "${selector}"`);
+      console.error(`Bindery: Could not find element that matches selector "${sel}"`);
       return null;
     }
-    return sourceNode;
+    return el;
   }
 
   cancel() {
     this.viewer.cancel();
     document.body.classList.remove(c('viewing'));
-    this.source.style.display = '';
+    this.content.style.display = '';
   }
 
   addRules(newRules) {
     newRules.forEach((rule) => {
-      if (rule instanceof Rules.Rule) {
+      if (rule instanceof rules.Rule) {
         this.rules.push(rule);
       } else {
         throw Error(`Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`);
@@ -131,8 +130,8 @@ class Bindery {
     });
   }
 
-  async makeBook(doneBinding) {
-    if (!this.source) {
+  async makeBook() {
+    if (!this.content) {
       document.body.classList.add(c('viewing'));
       return;
     }
@@ -145,9 +144,9 @@ class Bindery {
       return;
     }
 
-    this.source.style.display = '';
-    const content = this.source.cloneNode(true);
-    this.source.style.display = 'none';
+    this.content.style.display = '';
+    const content = this.content.cloneNode(true);
+    this.content.style.display = 'none';
 
     this.layoutInProgress = true;
     this.viewer.clear(); // In case we're updating an existing layout
@@ -163,7 +162,6 @@ class Bindery {
       );
       this.viewer.render(book);
       this.layoutInProgress = false;
-      if (doneBinding) doneBinding();
       this.viewer.element.classList.remove(c('in-progress'));
     } catch (e) {
       this.layoutInProgress = false;

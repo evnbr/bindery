@@ -9,17 +9,6 @@
       outline: none;
       overflow: visible;
     }
-
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      pointer-events: none;
-      z-index: 999;
-    }
   }
 }
 
@@ -102,11 +91,6 @@ li.continuation {
   }
 }
 
-.print-page {
-  width: var(--bindery-sheet-width);
-  height: var(--bindery-sheet-height);
-}
-
 .page-size-rotated {
   height: var(--bindery-page-width);
   width: var(--bindery-page-height);
@@ -120,11 +104,6 @@ li.continuation {
 .spread-size-rotated {
   width: var(--bindery-page-height);
   height: calc(var(--bindery-page-width) * 2);
-}
-
-.show-crop .print-page .spread-wrapper,
-.show-bleed-marks .print-page .spread-wrapper {
-  margin: calc(var(--bindery-bleed) + 12pt) auto;
 }
 
 .page-background {

@@ -1,6 +1,6 @@
-import Page from './Page';
-import { stylesheet } from './utils';
-import { parseVal } from './utils/convertUnits';
+import Page from '../Page';
+import { stylesheet } from '../utils';
+import { parseVal } from '../utils/convertUnits';
 import { Paper, Layout } from './Constants';
 
 
@@ -29,7 +29,7 @@ class PageSetup {
   }
 
   setupPaper(opts = {}) {
-    this.sheetSizeMode = supportsCustomPageSize ? (opts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
+    this.paper = supportsCustomPageSize ? (opts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
     this.printTwoUp = opts.layout && opts.layout !== Layout.PAGES;
   }
 
@@ -38,9 +38,7 @@ class PageSetup {
   }
 
   get displaySize() {
-    const width = this.printTwoUp
-      ? this.spreadSize.width
-      : this.size.width;
+    const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
     const bleed = this.bleed;
 
@@ -53,7 +51,7 @@ class PageSetup {
 
     const bleedAmount = `2 * ${this.bleed}`;
     const marksAmount = `2 * ${this.bleed} + 2 * ${this.markLength}`;
-    switch (this.sheetSizeMode) {
+    switch (this.paper) {
     case Paper.AUTO:
       return { width, height };
     case Paper.AUTO_BLEED:
@@ -107,9 +105,9 @@ class PageSetup {
       'margin-bottom': this.margin.bottom,
       bleed: this.bleed,
       'mark-length': this.markLength,
-    }).map(([k, v]) => `--bindery-${k}: ${v};`);
+    }).map(([k, v]) => `--bindery-${k}: ${v};`).join('');
 
-    const rootRule = `:root { ${vars.join('')}  }`;
+    const rootRule = `:root { ${vars}  }`;
     const pageRule = `@page { size: ${sheet.width} ${sheet.height}; }`;
 
     stylesheet('binderyPage').innerHTML = `${rootRule} ${pageRule}`;

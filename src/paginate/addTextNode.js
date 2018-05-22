@@ -1,4 +1,4 @@
-import scheduler from './Scheduler';
+import { yieldIfNecessary } from './schedule';
 import { ignoreOverflow } from './canSplit';
 import { isTextNode } from './nodeTypes';
 
@@ -10,7 +10,7 @@ const addTextNode = async (textNode, parent, hasOverflowed) => {
   parent.appendChild(textNode);
   const success = !hasOverflowed();
   if (!success) parent.removeChild(textNode);
-  await scheduler.yieldIfNecessary();
+  await yieldIfNecessary();
   return success;
 };
 
@@ -40,7 +40,7 @@ const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
     if (pos < originalText.length) {
       // reveal more text
       textNode.nodeValue = originalText.substr(0, pos);
-      await scheduler.yieldIfNecessary();
+      await yieldIfNecessary();
     }
   }
 

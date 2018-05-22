@@ -1,14 +1,13 @@
-import Split from './Split';
 import Counter from './Counter';
 import FullBleedSpread from './FullBleedSpread';
 import FullBleedPage from './FullBleedPage';
 import Footnote from './Footnote';
 import PageReference from './PageReference';
+import PageBreak from './PageBreak';
 import RunningHeader from './RunningHeader';
 import Replace from './Replace';
 import Rule from './Rule';
-import PageBreak from './PageBreak';
-
+import Split from './Split';
 
 export default {
   Rule,
