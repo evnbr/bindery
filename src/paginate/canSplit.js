@@ -13,7 +13,7 @@ const ignoreOverflow = (element) => {
 
 // Walk up the tree to see if we can safely
 // insert a split into this node.
-const isSplittable = (element, selectors) => {
+const canSplit = (element, selectors) => {
   if (selectors.some(sel => element.matches(sel))) {
     if (element.hasAttribute(didMoveAttr)
       || element.classList.contains(c('continuation'))) {
@@ -21,8 +21,8 @@ const isSplittable = (element, selectors) => {
     }
     return false;
   }
-  if (element.parentElement) return isSplittable(element.parentElement, selectors);
+  if (element.parentElement) return canSplit(element.parentElement, selectors);
   return true;
 };
 
-export { ignoreOverflow, isSplittable };
+export { ignoreOverflow, canSplit };

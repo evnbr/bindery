@@ -16,7 +16,7 @@ class Page {
 
     measureArea.innerHTML = '';
     measureArea.appendChild(testPage.element);
-    const isValid = testPage.flow.isReasonable;
+    const isValid = testPage.flow.isReasonablSize;
     measureArea.parentNode.removeChild(measureArea);
 
     return isValid;

@@ -3,7 +3,7 @@ import Book from './Book';
 import Page from '../Page';
 
 // paginate
-import { ignoreOverflow, isSplittable } from './canSplit';
+import { ignoreOverflow, canSplit } from './canSplit';
 import { addTextNode, addTextNodeAcrossElements } from './addTextNode';
 import tryInNextBox from './tryInNextBox';
 import RuleSet from './RuleSet';
@@ -21,11 +21,10 @@ const paginate = (content, rules, progressCallback) => {
 
   const book = new Book();
   const noSplit = ruleSet.selectorsNotToSplit;
+  const canSplitElement = el => canSplit(el, noSplit);
 
   const hasOverflowed = () => book.currentPage.hasOverflowed();
   const ignoreCurrentOverflow = () => ignoreOverflow(book.currentPage.flow.currentElement);
-  const canSplitElement = el => isSplittable(el, noSplit) && !ignoreOverflow(el);
-  const canSplitElementAlt = el => isSplittable(el, noSplit);
 
   const makeNewPage = () => {
     const newPage = new Page();
@@ -76,7 +75,7 @@ const paginate = (content, rules, progressCallback) => {
   const addWholeTextNode = async (textNode) => {
     let hasAdded = await addTextNode(textNode, book.currentPage.flow.currentElement, hasOverflowed);
     if (!hasAdded && !ignoreCurrentOverflow()) {
-      tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElementAlt);
+      tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
       hasAdded = await addTextNode(textNode, book.currentPage.flow.currentElement, hasOverflowed);
     }
     if (!hasAdded) {
@@ -93,7 +92,7 @@ const paginate = (content, rules, progressCallback) => {
     const el = book.currentPage.flow.currentElement;
     let hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
     if (!hasAdded && book.currentPage.flow.path.length > 1) {
-      tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElementAlt);
+      tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
       hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
     }
     if (!hasAdded) {
@@ -126,10 +125,10 @@ const paginate = (content, rules, progressCallback) => {
 
     // Overflows when empty
     if (hasOverflowed() && !ignoreCurrentOverflow()) {
-      tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElementAlt);
+      tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
     }
 
-    const shouldSplit = canSplitElement(element);
+    const shouldSplit = canSplitElement(element) && !ignoreOverflow(element);
 
     for (const child of childNodes) {
       if (isTextNode(child)) {

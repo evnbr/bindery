@@ -1,5 +1,5 @@
 import { c } from '../../dom';
-import { ignoreOverflow, isSplittable } from '../canSplit';
+import { ignoreOverflow, canSplit } from '../canSplit';
 
 let div;
 let span;
@@ -30,26 +30,26 @@ describe('isSplittable', () => {
   const selectors = [`.${noSplitClass}`];
 
   test('Allows by default', () => {
-    expect(isSplittable(span, selectors)).toBe(true);
+    expect(canSplit(span, selectors)).toBe(true);
   });
 
   test('Denies when matches selector', () => {
     span.classList.add(noSplitClass);
-    expect(isSplittable(span, selectors)).toBe(false);
+    expect(canSplit(span, selectors)).toBe(false);
   });
 
   test('Allows for matching elements that have already split', () => {
     span.classList.add(noSplitClass, c('continuation'));
-    expect(isSplittable(span, selectors)).toBe(true);
+    expect(canSplit(span, selectors)).toBe(true);
   });
 
   test('Allows for matching elements that have been moved', () => {
     span.setAttribute('data-bindery-did-move', true);
-    expect(isSplittable(span, selectors)).toBe(true);
+    expect(canSplit(span, selectors)).toBe(true);
   });
 
   test('Denies when parent matches selector', () => {
     div.classList.add(noSplitClass);
-    expect(isSplittable(span, selectors)).toBe(false);
+    expect(canSplit(span, selectors)).toBe(false);
   });
 });
