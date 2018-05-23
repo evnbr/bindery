@@ -1,4 +1,4 @@
-import { c } from '../dom';
+import { c } from '../dom-utils';
 
 const overflowAttr = 'data-ignore-overflow';
 const didMoveAttr = 'data-bindery-did-move';

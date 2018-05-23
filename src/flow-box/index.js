@@ -1,4 +1,4 @@
-import { createEl } from '../dom';
+import { createEl } from '../dom-utils';
 import { last } from '../utils';
 import clonePath from './clonePath';
 

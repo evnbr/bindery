@@ -1,4 +1,4 @@
-import { c } from '../dom';
+import { c } from '../dom-utils';
 
 // @param rules: array of Bindery.Rules
 // @return: A new function that clones the given

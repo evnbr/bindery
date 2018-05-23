@@ -10,7 +10,7 @@ import paginate from '../paginate';
 import Viewer from '../viewer';
 import rules from '../rules';
 import { validate, T } from '../option-checker';
-import { c, parseHTML } from '../dom';
+import { c, parseHTML } from '../dom-utils';
 
 // style
 import './main.scss';

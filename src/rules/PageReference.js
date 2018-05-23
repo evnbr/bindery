@@ -3,7 +3,7 @@ import { pageNumbersForTest } from './searchPages';
 
 import { makeRanges, shallowEqual, oncePerFrameLimiter } from '../utils';
 import { validate, T } from '../option-checker';
-import { c } from '../dom';
+import { c } from '../dom-utils';
 
 // Options:
 // selector: String

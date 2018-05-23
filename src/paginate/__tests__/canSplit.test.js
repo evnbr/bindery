@@ -1,4 +1,4 @@
-import { c } from '../../dom';
+import { c } from '../../dom-utils';
 import { ignoreOverflow, canSplit } from '../canSplit';
 
 let div;

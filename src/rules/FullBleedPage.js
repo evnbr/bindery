@@ -1,6 +1,6 @@
 import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
-import { createEl } from '../dom';
+import { createEl } from '../dom-utils';
 
 // Options:
 // selector: String

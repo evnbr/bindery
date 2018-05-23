@@ -1,4 +1,4 @@
-import { createEl } from '../../dom';
+import { createEl } from '../../dom-utils';
 
 const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
 const onePageSpread = children => createEl('.spread-wrapper.page-size', children);
