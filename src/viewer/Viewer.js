@@ -1,18 +1,16 @@
-import { c, createEl } from '../dom';
 import { Page, orderPagesBooklet } from '../book';
+import { Mode, Paper, Layout, Marks } from '../main/Constants';
+import { c, createEl } from '../dom';
 
 import errorView from './error';
 import padPages from './padPages';
 import { gridLayout, printLayout, flipLayout } from './Layouts';
-
-import { Mode, Paper, Layout, Marks } from '../main/Constants';
+import listenForPrint from './listenForPrint';
 
 const modeClasses = {};
 modeClasses[Mode.PREVIEW] = c('view-preview');
 modeClasses[Mode.PRINT] = c('view-print');
 modeClasses[Mode.FLIPBOOK] = c('view-flip');
-
-const isCommandP = e => (e.ctrlKey || e.metaKey) && e.keyCode === 80;
 
 class Viewer {
   constructor({ pageSetup, mode, layout, marks, ControlsComponent }) {
@@ -32,7 +30,7 @@ class Viewer {
     this.element.classList.add(c('view-preview'));
     this.currentLeaf = 0;
 
-    this.listenForPrint();
+    listenForPrint(() => this.setPrint());
     this.listenForResize();
 
     this.setPrint = this.setPrint.bind(this);
@@ -64,28 +62,6 @@ class Viewer {
     this.element.classList.add(c('in-progress'));
 
     document.body.appendChild(this.element);
-  }
-
-  // Automatically switch into print mode
-  listenForPrint() {
-    if (window.matchMedia) {
-      const mediaQueryList = window.matchMedia('print');
-      mediaQueryList.addListener((mql) => {
-        if (mql.matches) {
-          // before print
-          this.setPrint();
-        } else {
-          // after print
-        }
-      });
-    }
-    document.body.addEventListener('keydown', (e) => {
-      if (isCommandP(e)) {
-        e.preventDefault();
-        this.setPrint();
-        setTimeout(() => window.print(), 200);
-      }
-    });
   }
 
   listenForResize() {
