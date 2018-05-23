@@ -33,7 +33,7 @@ const paginate = (content, rules, progressCallback) => {
     annotatePages(book.pages);
     ruleSet.applyPageDoneRules(page, book);
     page.validateEnd(allowOverflow);
-    book.didAddPage();
+    book.validate();
   };
 
   // Creates clones for ever level of tag
@@ -49,7 +49,7 @@ const paginate = (content, rules, progressCallback) => {
     book.currentPage = newPage;
     book.pages.push(newPage);
 
-    progressCallback(book); // assuming this will display new page
+    progressCallback(book, estimator.progress()); // assuming this will display new page
     newPage.validate(); // TODO: element must be in dom before validating
     return newPage;
   };
@@ -139,7 +139,6 @@ const paginate = (content, rules, progressCallback) => {
     const addedElement = book.currentPage.flow.path.pop();
     ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage);
     estimator.increment();
-    book.estimatedProgress = estimator.progress();
   };
 
   const init = async () => {
@@ -153,7 +152,6 @@ const paginate = (content, rules, progressCallback) => {
     book.pages = orderPages(book.pages, makeNewPage);
     annotatePages(book.pages);
 
-    book.setCompleted();
     ruleSet.finishEveryPage(book);
     estimator.end();
 

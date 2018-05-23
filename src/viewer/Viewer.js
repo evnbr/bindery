@@ -197,14 +197,14 @@ class Viewer {
     });
   }
 
-  renderProgress(book) {
+  renderProgress(book, estimatedProgress) {
     this.book = book;
     const needsZoomUpdate = !this.content.firstElementChild;
 
-    this.progress = book.estimatedProgress;
+    this.progress = estimatedProgress;
 
     if (this.controls) {
-      this.controls.updateProgress(book.pageCount, book.estimatedProgress);
+      this.controls.updateProgress(book.pageCount, estimatedProgress);
     }
 
     const sideBySide =

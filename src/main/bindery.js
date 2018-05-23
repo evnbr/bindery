@@ -148,7 +148,7 @@ class Bindery {
       const book = await paginate(
         content,
         this.rules,
-        partialBook => this.viewer.renderProgress(partialBook)
+        (current, progress) => this.viewer.renderProgress(current, progress)
       );
       this.viewer.render(book);
       this.layoutInProgress = false;

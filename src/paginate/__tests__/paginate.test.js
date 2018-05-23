@@ -41,7 +41,7 @@ b.appendChild(c);
 test('Preserves content order', () => {
   paginate(a, [], () => {})
     .then((book) => {
-      expect(book.isComplete).toBe(true);
+      expect(book.pageCount).toBe(4);
       const allText = book.pages
         .map(pg => pg.flow.content.textContent)
         .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
