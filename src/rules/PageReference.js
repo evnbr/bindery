@@ -29,19 +29,23 @@ class PageReference extends Replace {
       temp.classList.add(c('placeholder-pulse'));
       parent.replaceChild(temp, elmt);
 
-      book.onComplete(() => {
-        const tempParent = temp.parentNode;
-        const finalClone = elmt.cloneNode(true);
-        const pageNumbers = book.pagesForTest(test);
-        const pageRanges = makeRanges(pageNumbers);
-        const newEl = this.replace(finalClone, pageRanges);
-        tempParent.replaceChild(newEl, temp);
+      let previousRender = temp;
+      book.registerPageReference(test, (pageNumbers) => {
+        const isResolved = pageNumbers.length > 0;
+        const tempParent = previousRender.parentNode;
+        const updatedEl = elmt.cloneNode(true);
+        const pageRanges = isResolved ? makeRanges(pageNumbers) : '?';
+        const newRender = this.replace(updatedEl, pageRanges);
+        if (!isResolved) newRender.classList.add(c('placeholder-pulse'));
+        tempParent.replaceChild(newRender, previousRender);
+        previousRender = newRender;
       });
 
       return temp;
     }
     return elmt;
   }
+
   createTest(element) {
     let selector = element.getAttribute('href');
     if (selector) {

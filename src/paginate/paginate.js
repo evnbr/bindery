@@ -39,7 +39,7 @@ const paginate = (content, rules, progressCallback) => {
     annotatePages(book.pages);
     ruleSet.applyPageDoneRules(page, book);
     page.validateEnd(allowOverflow);
-    book.validate();
+    book.didAddPage();
   };
 
   // Creates clones for ever level of tag
