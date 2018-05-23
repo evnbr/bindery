@@ -1,5 +1,4 @@
 import { createEl } from '../dom-utils';
-import { last } from '../utils';
 import clonePath from './clonePath';
 
 class FlowBox {
@@ -10,7 +9,8 @@ class FlowBox {
   }
 
   get currentElement() {
-    if (this.path.length > 0) return last(this.path);
+    const len = this.path.length;
+    if (len > 0) return this.path[len - 1];
     return this.content;
   }
 
