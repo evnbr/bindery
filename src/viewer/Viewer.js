@@ -1,6 +1,7 @@
 import { Page, orderPagesBooklet } from '../book';
 import { Mode, Paper, Layout, Marks } from '../main/Constants';
 import { c, createEl } from '../dom';
+import { oncePerFrameLimiter } from '../utils';
 
 import errorView from './error';
 import padPages from './padPages';
@@ -11,6 +12,8 @@ const modeClasses = {};
 modeClasses[Mode.PREVIEW] = c('view-preview');
 modeClasses[Mode.PRINT] = c('view-print');
 modeClasses[Mode.FLIPBOOK] = c('view-flip');
+
+const throttleProgress = oncePerFrameLimiter();
 
 class Viewer {
   constructor({ pageSetup, mode, layout, marks, ControlsComponent }) {
@@ -31,7 +34,11 @@ class Viewer {
     this.currentLeaf = 0;
 
     listenForPrint(() => this.setPrint());
-    this.listenForResize();
+
+    const throttleResize = oncePerFrameLimiter();
+    window.addEventListener('resize', () => {
+      throttleResize(() => this.updateZoom());
+    });
 
     this.setPrint = this.setPrint.bind(this);
 
@@ -62,17 +69,6 @@ class Viewer {
     this.element.classList.add(c('in-progress'));
 
     document.body.appendChild(this.element);
-  }
-
-  listenForResize() {
-    window.addEventListener('resize', () => {
-      if (!this.throttleResize) {
-        this.updateZoom();
-        this.throttleResize = setTimeout(() => {
-          this.throttleResize = null;
-        }, 20);
-      }
-    });
   }
 
   setInProgress() {
@@ -196,7 +192,7 @@ class Viewer {
   }
 
   set progress(p) {
-    window.requestAnimationFrame(() => {
+    throttleProgress(() => {
       this.progressBar.style.transform = `scaleX(${p})`;
     });
   }
