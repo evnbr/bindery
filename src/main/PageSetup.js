@@ -1,5 +1,5 @@
 import { stylesheet } from '../dom';
-import { parseVal } from '../utils';
+import { parseLength } from '../css-length';
 
 import { defaultPageSetup } from '../defaults';
 import { Paper, Layout } from './Constants';
@@ -67,7 +67,7 @@ class PageSetup {
   }
 
   get spreadSize() {
-    const w = parseVal(this.size.width);
+    const w = parseLength(this.size.width);
     return {
       height: this.size.height,
       width: `${w.val * 2}${w.unit}`,

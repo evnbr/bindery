@@ -1,4 +1,4 @@
-import { isValidLength } from '../utils';
+import { isLength } from '../css-length';
 import validate from './validate';
 
 const isObj = val => typeof val === 'object';
@@ -14,12 +14,12 @@ const hasSameKeys = (opts, required) => {
   return !keys.some(k => !hasProp(opts, k));
 };
 
-const isShape = validShape => userShape => isObj(userShape)
-  && validate(userShape, validShape);
+const isShape = template => userShape => isObj(userShape)
+  && validate(userShape, template);
 
-const isShapeExact = validShape => userShape => isObj(userShape)
-  && hasSameKeys(userShape, validShape)
-  && validate(userShape, validShape);
+const isShapeExact = template => userShape => isObj(userShape)
+  && hasSameKeys(userShape, template)
+  && validate(userShape, template);
 
 const isEnum = cases => str => cases.includes(str);
 
@@ -48,7 +48,7 @@ const T = {
   },
   length: {
     name: 'length (string with absolute units)',
-    check: isValidLength,
+    check: isLength,
   },
   bool: {
     name: 'bool',
