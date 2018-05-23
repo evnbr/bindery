@@ -1,28 +1,8 @@
-import FullBleedPage from '../rules/FullBleedPage';
-import FullBleedSpread from '../rules/FullBleedSpread';
-import PageBreak from '../rules/PageBreak';
+import dedupe from './dedupeRules';
 
-const isFullPageRule = rule => (
-    rule instanceof FullBleedSpread
-    || rule instanceof FullBleedPage
-    || rule instanceof PageBreak
-);
-
-const dedupe = (inputRules) => {
-  const conflictRules = inputRules.filter(isFullPageRule);
-  const uniqueRules = inputRules.filter(rule => !conflictRules.includes(rule));
-
-  const firstSpreadRule = conflictRules.find(rule => rule instanceof FullBleedSpread);
-  const firstPageRule = conflictRules.find(rule => rule instanceof FullBleedPage);
-
-  // Only apply one fullpage or fullspread
-  if (firstSpreadRule) uniqueRules.push(firstSpreadRule);
-  else if (firstPageRule) uniqueRules.push(firstPageRule);
-  else uniqueRules.push(...conflictRules); // multiple pagebreaks are ok
-
-  return uniqueRules;
+const warn = (rule, el) => {
+  console.warn(`Couldn't apply ${rule.name} to the following element, Caused overflows twice:`, el);
 };
-
 
 class RuleSet {
   constructor(rules) {
@@ -36,12 +16,8 @@ class RuleSet {
     this.rules.filter(r => r.setup).forEach(r => r.setup());
 
     this.splitClasses = {
-      toNext: rules
-        .filter(rule => rule.customToNextClass)
-        .map(rule => rule.customToNextClass),
-      fromPrev: rules
-        .filter(rule => rule.customFromPreviousClass)
-        .map(rule => rule.customFromPreviousClass),
+      toNext: rules.map(rule => rule.customToNextClass).filter(cl => cl && cl !== ''),
+      fromPrev: rules.map(rule => rule.customFromPreviousClass).filter(cl => cl && cl !== ''),
     };
   }
   applyPageStartRules(pg, book) {
@@ -88,28 +64,18 @@ class RuleSet {
     // - 3. if it is a large paragraph, it will leave a large gap. the
     // ideal approach would be to only need to invalidate
     // the last line of text.
+    const shiftToNext = (el) => {
+      el.parentNode.removeChild(el);
+      const newPage = continueOnNewPage();
+      newPage.flow.currentElement.appendChild(el);
+    };
 
     uniqueRules.forEach((rule) => {
-      addedElement = rule.afterAdd(
-        addedElement,
-        book,
-        continueOnNewPage,
-        makeNewPage,
-        (problemElement) => {
-          problemElement.parentNode.removeChild(problemElement);
-          const newPage = continueOnNewPage();
-          newPage.flow.currentElement.appendChild(problemElement);
-          return rule.afterAdd(
-            problemElement,
-            book,
-            continueOnNewPage,
-            makeNewPage,
-            () => {
-              console.log(`Couldn't apply ${rule.name} to the following element, Caused overflows twice:`, problemElement);
-            }
-          );
-        }
-      );
+      const retry = (el) => {
+        shiftToNext(el);
+        return rule.afterAdd(el, book, continueOnNewPage, makeNewPage, () => warn(rule, el));
+      };
+      addedElement = rule.afterAdd(addedElement, book, continueOnNewPage, makeNewPage, retry);
     });
     return addedElement;
   }
