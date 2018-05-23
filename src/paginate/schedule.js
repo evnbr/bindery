@@ -1,8 +1,3 @@
-// When there is no debugDelay,
-// the throttler will occassionally use rAF
-// to prevent stack overflow
-// and browser lockup
-
 const MAX_TIME = 50; // ms
 
 const rAF = () => new Promise((resolve) => {

@@ -2,18 +2,16 @@
 import { Book, Page, orderPages, annotatePages } from '../book';
 
 // paginate
+import { isTextNode, isUnloadedImage, isContentElement } from './nodeTypes';
 import { ignoreOverflow, canSplit } from './canSplit';
 import { addTextNode, addTextNodeAcrossElements } from './addTextNode';
 import tryInNextBox from './tryInNextBox';
 import RuleSet from './RuleSet';
-import Estimator from './Estimator';
-
-// Utils
-import { isTextNode, isUnloadedImage, isContentElement } from './nodeTypes';
+import estimate from './estimate';
 
 const paginate = (content, rules, progressCallback) => {
   // Global state for a pagination run
-  const estimator = new Estimator();
+  const estimator = estimate(content);
   const ruleSet = new RuleSet(rules);
 
   const book = new Book();
@@ -141,13 +139,11 @@ const paginate = (content, rules, progressCallback) => {
     const addedElement = book.currentPage.flow.path.pop();
     ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage);
     estimator.increment();
-    book.estimatedProgress = estimator.progress;
+    book.estimatedProgress = estimator.progress();
   };
 
   const init = async () => {
     if (!Page.isSizeValid()) throw Error('Page is too small');
-
-    estimator.startWith(content);
     content.style.margin = 0;
     content.style.padding = 0;
     continueOnNewPage();
