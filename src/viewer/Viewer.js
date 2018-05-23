@@ -33,14 +33,15 @@ class Viewer {
     this.element.classList.add(classes.viewPreview);
     this.currentLeaf = 0;
 
-    listenForPrint(() => this.setPrint());
+    listenForPrint(() => {
+      this.mode = Mode.PRINT;
+      this.render();
+    });
 
     const throttleResize = oncePerFrameLimiter();
     window.addEventListener('resize', () => {
       throttleResize(() => this.updateZoom());
     });
-
-    this.setPrint = this.setPrint.bind(this);
 
     if (ControlsComponent) {
       this.controls = new ControlsComponent(
@@ -68,7 +69,7 @@ class Viewer {
 
     this.inProgress = true;
 
-    document.body.appendChild(this.element);
+    this.show();
   }
 
   get inProgress() {
@@ -112,9 +113,9 @@ class Viewer {
     this.pageSetup.paper = newVal;
     this.pageSetup.updateStyleVars();
 
-    if (this.mode !== Mode.PRINT) {
-      this.setPrint();
-    }
+    this.mode = Mode.PRINT;
+    this.render();
+
     this.updateZoom();
     setTimeout(() => { this.updateZoom(); }, 300);
   }
@@ -123,14 +124,11 @@ class Viewer {
     if (newVal === this.printArrange) return;
     this.printArrange = newVal;
 
-    this.pageSetup.setPrintTwoUp(this.isTwoUp);
+    this.pageSetup.printTwoUp = this.isTwoUp;
     this.pageSetup.updateStyleVars();
 
-    if (this.mode === Mode.PRINT) {
-      this.render();
-    } else {
-      this.setPrint();
-    }
+    this.mode = Mode.PRINT;
+    this.render();
   }
 
   setMarks(newVal) {
@@ -139,9 +137,7 @@ class Viewer {
   }
 
   displayError(title, text) {
-    if (!this.element.parentNode) {
-      document.body.appendChild(this.element);
-    }
+    this.show();
     if (!this.error) {
       this.error = errorView(title, text);
       this.element.appendChild(this.error);
@@ -152,29 +148,26 @@ class Viewer {
     this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
     this.content.innerHTML = '';
   }
-  cancel() {
-    // TODO this doesn't work if the target is an existing node
-    if (this.element.parentNode) {
-      this.element.parentNode.removeChild(this.element);
-    }
+  show() {
+    if (this.element.parentNode) return;
+    document.body.appendChild(this.element);
+    this.isViewing = true;
   }
-  setPrint() {
-    if (this.mode === Mode.PRINT) return;
-    this.mode = Mode.PRINT;
-    this.render();
+  hide() {
+    // TODO this doesn't work if the target is an existing node
+    if (!this.element.parentNode) return;
+    this.element.parentNode.removeChild(this.element);
+    this.isViewing = false;
   }
   render(newBook) {
     if (newBook) this.book = newBook;
     if (!this.book) return;
-    const { body } = document;
-    if (!this.element.parentNode) {
-      body.appendChild(this.element);
-    }
+    this.show();
 
-    this.isViewing = true;
     this.element.classList.remove(...Object.keys(modeClasses).map(k => modeClasses[k]));
     this.element.classList.add(modeClasses[this.mode]);
 
+    const { body } = document;
     const scrollMax = body.scrollHeight - body.offsetHeight;
     const scrollPct = body.scrollTop / scrollMax;
 

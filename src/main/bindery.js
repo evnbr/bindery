@@ -36,12 +36,12 @@ class Bindery {
       view: T.enum(...Object.values(Mode)),
       pageSetup: T.shape({
         name: 'pageSetup',
-        bleed: T.length,
         margin: T.margin,
         size: T.size,
       }),
       printSetup: T.shape({
         name: 'printSetup',
+        bleed: T.length,
         layout: T.enum(...Object.values(Layout)),
         marks: T.enum(...Object.values(Marks)),
         paper: T.enum(...Object.values(Paper)),
@@ -49,8 +49,7 @@ class Bindery {
       rules: T.array,
     });
 
-    this.pageSetup = new PageSetup(opts.pageSetup);
-    this.pageSetup.setupPaper(opts.printSetup);
+    this.pageSetup = new PageSetup(opts.pageSetup, opts.printSetup);
 
     const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
     const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
@@ -113,8 +112,7 @@ class Bindery {
   }
 
   cancel() {
-    this.viewer.cancel();
-    this.viewer.isViewing = false;
+    this.viewer.hide();
     this.content.style.display = '';
   }
 
@@ -130,7 +128,7 @@ class Bindery {
 
   async makeBook() {
     if (!this.content) {
-      this.viewer.isViewing = true;
+      this.viewer.show();
       return;
     }
 
@@ -140,7 +138,7 @@ class Bindery {
 
     this.layoutInProgress = true;
     this.viewer.clear(); // In case we're updating an existing layout
-    this.viewer.isViewing = true;
+    this.viewer.show();
     this.pageSetup.updateStyleVars();
     this.viewer.inProgress = true;
 

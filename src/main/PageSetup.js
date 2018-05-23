@@ -10,20 +10,14 @@ const a4 = { width: '210mm', height: '297mm' };
 const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
 
 class PageSetup {
-  constructor(opts = {}) {
+  constructor(opts = {}, printOpts = {}) {
     this.size = opts.size || defaultPageSetup.size;
     this.margin = opts.margin || defaultPageSetup.margin;
-    this.bleed = opts.bleed || defaultPageSetup.bleed;
     this.markLength = '12pt';
-  }
 
-  setupPaper(opts = {}) {
-    this.paper = supportsCustomPageSize ? (opts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
-    this.printTwoUp = opts.layout && opts.layout !== Layout.PAGES;
-  }
-
-  setPrintTwoUp(newVal) {
-    this.printTwoUp = newVal;
+    this.paper = supportsCustomPageSize ? (printOpts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
+    this.bleed = printOpts.bleed || defaultPageSetup.bleed;
+    this.printTwoUp = printOpts.layout && printOpts.layout !== Layout.PAGES;
   }
 
   get displaySize() {

@@ -23,7 +23,6 @@ const paginate = (content, rules, progressCallback) => {
 
   const makeNewPage = () => {
     const newPage = new Page();
-    ruleSet.applyPageStartRules(newPage, book);
     return newPage;
   };
 

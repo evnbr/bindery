@@ -35,7 +35,7 @@ class Page {
 
   set suppressErrors(newVal) {
     this.suppress = newVal;
-    this.element.classList.toggle(classes.isOverlowing, newVal);
+    this.element.classList.toggle(classes.isOverflowing, newVal);
   }
 
   get isEmpty() {

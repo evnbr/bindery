@@ -13,7 +13,7 @@ const classes = {
 
   leftPage: 'left',
   rightPage: 'right',
-  isOverlowing: 'is-overflowing',
+  isOverflowing: 'is-overflowing',
 
   toNext: 'continues',
   fromPrev: 'continuation',

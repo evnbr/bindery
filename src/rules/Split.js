@@ -14,12 +14,6 @@ class Split extends Rule {
       fromPrevious: T.string,
     });
   }
-  get customToNextClass() {
-    return this.toNext;
-  }
-  get customFromPreviousClass() {
-    return this.fromPrevious;
-  }
 }
 
 export default Split;
