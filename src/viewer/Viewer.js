@@ -1,8 +1,7 @@
 import { c, createEl } from '../dom';
-import Page from '../Page';
+import { Page, orderPagesBooklet } from '../book';
 
 import errorView from './error';
-import orderPagesBooklet from './orderPagesBooklet';
 import padPages from './padPages';
 import { gridLayout, printLayout, flipLayout } from './Layouts';
 
@@ -331,7 +330,6 @@ class Viewer {
     const pages = padPages(bookPages, () => new Page());
     return flipLayout(pages, this.doubleSided);
   }
-
 }
 
 export default Viewer;

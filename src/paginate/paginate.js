@@ -1,14 +1,11 @@
 // Bindery
-import Book from './Book';
-import Page from '../Page';
+import { Book, Page, orderPages, annotatePages } from '../book';
 
 // paginate
 import { ignoreOverflow, canSplit } from './canSplit';
 import { addTextNode, addTextNodeAcrossElements } from './addTextNode';
 import tryInNextBox from './tryInNextBox';
 import RuleSet from './RuleSet';
-import orderPages from './orderPages';
-import annotatePages from './annotatePages';
 import Estimator from './Estimator';
 
 // Utils

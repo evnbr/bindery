@@ -1,23 +1,5 @@
 const MAXIMUM_PAGE_LIMIT = 2000;
 
-// https://github.com/moroshko/shallow-equal/blob/master/src/arrays.js
-const shallowEqual = (a, b) => {
-  if (a === b) return true;
-  if (!a || !b) return false;
-
-  const len = a.length;
-
-  if (b.length !== len) {
-    return false;
-  }
-
-  for (let i = 0; i < len; i += 1) {
-    if (a[i] !== b[i]) return false;
-  }
-
-  return true;
-};
-
 class Book {
   constructor() {
     this.pages = [];
@@ -55,18 +37,13 @@ class Book {
   }
 
   registerPageReference(test, renderUpdate) {
-    this.pageRefs.push({ test, renderUpdate, lastResult: null });
+    this.pageRefs.push({ test, renderUpdate });
   }
 
   updatePageReferences() {
-    this.pageRefs.forEach((ref) => {
-      const { test, renderUpdate } = ref;
-      const pages = this.pagesForTest(test);
-      if (!shallowEqual(pages, ref.lastResult)) {
-        renderUpdate(pages);
-        ref.lastResult = pages;
-      }
-    });
+    // querySelector first, then rerender
+    const results = this.pageRefs.map(ref => this.pagesForTest(ref.test));
+    this.pageRefs.forEach((ref, i) => ref.renderUpdate(results[i]));
   }
 
   setCompleted() {

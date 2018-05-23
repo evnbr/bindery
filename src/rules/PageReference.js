@@ -1,5 +1,5 @@
 import Replace from './Replace';
-import { makeRanges } from '../utils';
+import { makeRanges, shallowEqual } from '../utils';
 import { validate, T } from '../option-checker';
 import { c } from '../dom';
 
@@ -25,12 +25,14 @@ class PageReference extends Replace {
       const tempClone = elmt.cloneNode(true);
       const tempNumbers = book.pagesForTest(test);
       const tempRanges = makeRanges(tempNumbers);
-      const temp = this.replace(tempClone, tempRanges || '000');
+      const temp = this.replace(tempClone, tempRanges || '?');
       temp.classList.add(c('placeholder-pulse'));
       parent.replaceChild(temp, elmt);
 
+      let previousNumbers = tempNumbers;
       let previousRender = temp;
       book.registerPageReference(test, (pageNumbers) => {
+        if (shallowEqual(pageNumbers, previousNumbers)) return;
         const isResolved = pageNumbers.length > 0;
         const tempParent = previousRender.parentNode;
         const updatedEl = elmt.cloneNode(true);
@@ -39,6 +41,7 @@ class PageReference extends Replace {
         if (!isResolved) newRender.classList.add(c('placeholder-pulse'));
         tempParent.replaceChild(newRender, previousRender);
         previousRender = newRender;
+        previousNumbers = pageNumbers;
       });
 
       return temp;
