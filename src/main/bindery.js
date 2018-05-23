@@ -10,7 +10,7 @@ import paginate from '../paginate';
 import Viewer from '../viewer';
 import rules from '../rules';
 import { validate, T } from '../option-checker';
-import { c, parseHTML } from '../dom-utils';
+import { parseHTML } from '../dom-utils';
 
 // style
 import './main.scss';
@@ -114,7 +114,7 @@ class Bindery {
 
   cancel() {
     this.viewer.cancel();
-    document.body.classList.remove(c('viewing'));
+    this.viewer.isViewing = false;
     this.content.style.display = '';
   }
 
@@ -130,7 +130,7 @@ class Bindery {
 
   async makeBook() {
     if (!this.content) {
-      document.body.classList.add(c('viewing'));
+      this.viewer.isViewing = true;
       return;
     }
 
@@ -140,9 +140,9 @@ class Bindery {
 
     this.layoutInProgress = true;
     this.viewer.clear(); // In case we're updating an existing layout
-    document.body.classList.add(c('viewing'));
+    this.viewer.isViewing = true;
     this.pageSetup.updateStyleVars();
-    this.viewer.setInProgress();
+    this.viewer.inProgress = true;
 
     try {
       const book = await paginate(

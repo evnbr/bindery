@@ -1,5 +1,6 @@
 import FlowBox from '../flow-box';
 import { c, createEl } from '../dom-utils';
+import classes from '../classes';
 
 class Page {
   constructor() {
@@ -23,17 +24,10 @@ class Page {
   }
 
   setLeftRight(dir) {
-    if (dir === 'left') {
-      this.side = dir;
-      this.element.classList.remove(c('right'));
-      this.element.classList.add(c('left'));
-    } else if (dir === 'right') {
-      this.side = dir;
-      this.element.classList.remove(c('left'));
-      this.element.classList.add(c('right'));
-    } else {
-      throw Error(`Bindery: Setting page to invalid direction${dir}`);
-    }
+    const isLeft = dir === 'left';
+    this.side = dir;
+    this.element.classList.toggle(classes.leftPage, isLeft);
+    this.element.classList.toggle(classes.rightPage, !isLeft);
   }
 
   get suppressErrors() {
@@ -42,17 +36,11 @@ class Page {
 
   set suppressErrors(newVal) {
     this.suppress = newVal;
-    if (newVal) {
-      this.element.classList.add(c('is-overflowing'));
-    } else {
-      this.element.classList.remove(c('is-overflowing'));
-    }
+    this.element.classList.toggle(classes.isOverlowing, newVal);
   }
 
   get isEmpty() {
-    return (
-      !this.hasOutOfFlowContent && this.flow.isEmpty
-    );
+    return !this.hasOutOfFlowContent && this.flow.isEmpty;
   }
 
   get isLeft() {

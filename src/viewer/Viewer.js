@@ -1,7 +1,8 @@
 import { Page, orderPagesBooklet } from '../book';
 import { Mode, Paper, Layout, Marks } from '../main/Constants';
-import { c, createEl } from '../dom-utils';
+import { createEl } from '../dom-utils';
 import { oncePerFrameLimiter } from '../utils';
+import classes from '../classes';
 
 import errorView from './error';
 import padPages from './padPages';
@@ -9,9 +10,9 @@ import { gridLayout, printLayout, flipLayout } from './Layouts';
 import listenForPrint from './listenForPrint';
 
 const modeClasses = {};
-modeClasses[Mode.PREVIEW] = c('view-preview');
-modeClasses[Mode.PRINT] = c('view-print');
-modeClasses[Mode.FLIPBOOK] = c('view-flip');
+modeClasses[Mode.PREVIEW] = classes.viewPreview;
+modeClasses[Mode.PRINT] = classes.viewPrint;
+modeClasses[Mode.FLIPBOOK] = classes.viewFlip;
 
 const throttleProgress = oncePerFrameLimiter();
 
@@ -20,7 +21,7 @@ class Viewer {
     this.book = null;
     this.pageSetup = pageSetup;
 
-    this.progressBar = createEl('.progress-bar');
+    this.progressBar = createEl('progress-bar');
     this.content = createEl('zoom-content');
     this.scaler = createEl('zoom-scaler', [this.content]);
     this.element = createEl('root', [this.progressBar, this.scaler]);
@@ -30,7 +31,7 @@ class Viewer {
 
     this.setMarks(marks);
     this.mode = mode;
-    this.element.classList.add(c('view-preview'));
+    this.element.classList.add(classes.viewPreview);
     this.currentLeaf = 0;
 
     listenForPrint(() => this.setPrint());
@@ -66,7 +67,7 @@ class Viewer {
       this.element.appendChild(this.controls.element);
     }
 
-    this.element.classList.add(c('in-progress'));
+    this.inProgress = true;
 
     document.body.appendChild(this.element);
   }
@@ -84,19 +85,28 @@ class Viewer {
   }
 
   get isShowingCropMarks() {
-    return this.element.classList.contains(c('show-crop'));
+    return this.element.classList.contains(classes.showCrop);
   }
   set isShowingCropMarks(newVal) {
-    if (newVal) this.element.classList.add(c('show-crop'));
-    else this.element.classList.remove(c('show-crop'));
+    this.element.classList.toggle(classes.showCrop, newVal);
   }
 
   get isShowingBleedMarks() {
-    return this.element.classList.contains(c('show-bleed-marks'));
+    return this.element.classList.contains(classes.showBleedMarks);
   }
   set isShowingBleedMarks(newVal) {
-    if (newVal) this.element.classList.add(c('show-bleed-marks'));
-    else this.element.classList.remove(c('show-bleed-marks'));
+    this.element.classList.toggle(classes.showBleedMarks, newVal);
+  }
+
+  get isShowingBleed() {
+    return this.element.classList.contains(classes.showBleed);
+  }
+  set isShowingBleed(newVal) {
+    this.element.classList.toggle(classes.showBleed, newVal);
+  }
+
+  set isViewing(newVal) {
+    document.body.classList.toggle(classes.isViewing, newVal);
   }
 
   setSheetSize(newVal) {
@@ -149,13 +159,6 @@ class Viewer {
       this.element.parentNode.removeChild(this.element);
     }
   }
-  toggleBleed() {
-    this.element.classList.add(c('show-bleed'));
-  }
-  toggleDouble() {
-    this.doubleSided = !this.doubleSided;
-    this.render();
-  }
   setPrint() {
     if (this.mode === Mode.PRINT) return;
     this.mode = Mode.PRINT;
@@ -169,7 +172,7 @@ class Viewer {
       body.appendChild(this.element);
     }
 
-    body.classList.add(c('viewing'));
+    this.isViewing = true;
     this.element.classList.remove(...Object.keys(modeClasses).map(k => modeClasses[k]));
     this.element.classList.add(modeClasses[this.mode]);
 
@@ -258,7 +261,7 @@ class Viewer {
 
   renderPrint(bookPages) {
     let pages = bookPages;
-    this.element.classList.add(c('show-bleed'));
+    this.isShowingBleed = true;
     const isBooklet = this.printArrange === Layout.BOOKLET;
     if (this.printArrange === Layout.SPREADS) {
       pages = padPages(pages, () => new Page());
@@ -270,13 +273,13 @@ class Viewer {
 
   renderGrid(bookPages) {
     let pages = bookPages;
-    this.element.classList.remove(c('show-bleed'));
+    this.isShowingBleed = false;
     if (this.doubleSided) pages = padPages(pages, () => new Page());
     return gridLayout(pages, this.doubleSided);
   }
 
   renderInteractive(bookPages) {
-    this.element.classList.remove(c('show-bleed'));
+    this.isShowingBleed = false;
     const pages = padPages(bookPages, () => new Page());
     return flipLayout(pages, this.doubleSided);
   }

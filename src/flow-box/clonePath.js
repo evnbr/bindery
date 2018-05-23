@@ -1,4 +1,4 @@
-import { c } from '../dom-utils';
+import classes from '../classes';
 
 // @param rules: array of Bindery.Rules
 // @return: A new function that clones the given
@@ -15,17 +15,17 @@ import { c } from '../dom-utils';
 // which lets you add classes to the original and cloned element
 // to customize styling.
 
-const clonePath = (oldPath, classes) => {
+const clonePath = (oldPath, extraClasses) => {
   const newPath = [];
 
-  const { toNext, fromPrev } = classes;
+  const { toNext, fromPrev } = extraClasses;
   const markAsToNext = (node) => {
-    node.classList.add(c('continues'));
+    node.classList.add(classes.toNext);
     toNext.forEach(cl => node.classList.add(cl));
   };
 
   const markAsFromPrev = (node) => {
-    node.classList.add(c('continuation'));
+    node.classList.add(classes.fromPrev);
     fromPrev.forEach(cl => node.classList.add(cl));
   };
 
