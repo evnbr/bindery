@@ -2,6 +2,7 @@ import Viewer from '../Viewer';
 import { Mode, Layout, Marks } from '../../main/Constants';
 
 global.requestAnimationFrame = func => func();
+global.BINDERY_VERSION = 'Test Version';
 
 const ControlsStub = function () {
   return {
@@ -13,7 +14,6 @@ const ControlsStub = function () {
 };
 
 const pageSetup = {
-  setPrintTwoUp: () => null,
   updateStyleVars: () => null,
 };
 
@@ -46,11 +46,25 @@ test('crop mark getter/setters work', () => {
   expect(viewer.isShowingCropMarks).toBe(true);
 });
 
-test('renderProgress() adds all pages', () => {
+test('renderProgress() adds pages when called multiple times', () => {
   viewer.clear();
-  viewer.renderProgress(book);
-  const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
-  expect(didAdd).toEqual([true, true, true, true]);
+
+  const partialBook = {
+    pages: [mockPage(), currentPage],
+    currentPage,
+  };
+  viewer.renderProgress(partialBook);
+
+  const didAdd2 = partialBook.pages.map(pg => viewer.element.contains(pg.element));
+  expect(didAdd2).toEqual([true, true]);
+  expect(viewer.inProgress).toBe(true);
+
+  partialBook.pages.push(mockPage(), mockPage());
+  viewer.renderProgress(partialBook);
+
+  const didAdd4 = partialBook.pages.map(pg => viewer.element.contains(pg.element));
+  expect(didAdd4).toEqual([true, true, true, true]);
+  expect(viewer.inProgress).toBe(true);
 });
 
 test('viewer.clear() removes all pages', () => {
@@ -100,4 +114,17 @@ test('PRINT mode, BOOKLET layout adds all pages', () => {
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd).toEqual([true, true, true, true]);
+});
+
+test('Viewer removed from DOM on hide', () => {
+  viewer.hide();
+  expect(document.body.contains(viewer.element)).toBe(false);
+});
+
+test('Viewer re-added to DOM when displaying error', () => {
+  viewer.hide();
+  expect(document.body.contains(viewer.element)).toBe(false);
+  viewer.displayError('Yikes');
+  expect(document.body.contains(viewer.element)).toBe(true);
+  expect(viewer.element.contains(viewer.error)).toBe(true);
 });

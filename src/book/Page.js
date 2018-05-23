@@ -28,6 +28,19 @@ class Page {
     this.element.classList.toggle(classes.leftPage, isLeft);
     this.element.classList.toggle(classes.rightPage, !isLeft);
   }
+  get isLeft() {
+    return this.side === 'left';
+  }
+
+  get isRight() {
+    return this.side === 'right';
+  }
+
+  setPreference(dir) {
+    const isLeft = dir === 'left';
+    this.alwaysLeft = isLeft;
+    this.alwaysRight = !isLeft;
+  }
 
   get suppressErrors() {
     return this.suppress || false;
@@ -40,19 +53,6 @@ class Page {
 
   get isEmpty() {
     return !this.hasOutOfFlowContent && this.flow.isEmpty;
-  }
-
-  get isLeft() {
-    return this.side === 'left';
-  }
-
-  get isRight() {
-    return this.side === 'right';
-  }
-
-  setPreference(dir) {
-    if (dir === 'left') this.alwaysLeft = true;
-    if (dir === 'right') this.alwaysRight = true;
   }
 
   validate() {

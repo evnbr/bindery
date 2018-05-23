@@ -1,22 +1,20 @@
 import orderPagesBooklet from '../orderPagesBooklet';
 
-const makePage = function () {
-  return { element: document.createElement('div') };
-};
+const pageStub = () => ({ element: document.createElement('div') });
 
 test('Orders 8', () => {
   const pages = [
-    makePage(),
-    makePage(),
-    makePage(),
-    makePage(),
-    makePage(),
-    makePage(),
-    makePage(),
-    makePage(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
   ];
 
-  const ordered = orderPagesBooklet(pages, makePage);
+  const ordered = orderPagesBooklet(pages, pageStub);
 
   expect(ordered).toEqual([
     // cover
@@ -39,14 +37,14 @@ test('Orders 8', () => {
 
 test('Adds pages to end when not divisible by 4', () => {
   const pages = [
-    makePage(),
-    makePage(),
-    makePage(),
-    makePage(),
-    makePage(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
+    pageStub(),
   ];
 
-  const ordered = orderPagesBooklet(pages, makePage);
+  const ordered = orderPagesBooklet(pages, pageStub);
 
   expect(ordered.length).toBe(8);
   expect(ordered[1]).toBe(pages[0]);
