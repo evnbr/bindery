@@ -25,19 +25,17 @@
 
   .progress-bar {
     transform-origin: top left;
-    transform: scaleX(0);
+    transform: scaleY(0);
     position: fixed;
     left: 0;
     top: 0;
     right: 0;
     background: var(--bindery-ui-accent);
-    transition: all 0.2s;
-    opacity: 0;
-    height: 0;
+    transition: transform 0.2s;
+    height: 3px;
     z-index: 99;
     .in-progress & {
-      opacity: 1;
-      height: 3px;
+      transform: scaleX(0);
     }
   }
 

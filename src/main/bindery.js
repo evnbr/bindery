@@ -150,12 +150,15 @@ class Bindery {
         this.rules,
         (current, progress) => this.viewer.renderProgress(current, progress)
       );
-      this.viewer.render(book);
+      this.viewer.progress = 1;
       this.layoutInProgress = false;
-      this.viewer.element.classList.remove(c('in-progress'));
+      requestAnimationFrame(() => {
+        this.viewer.render(book);
+        this.viewer.inProgress = false;
+      });
     } catch (e) {
       this.layoutInProgress = false;
-      this.viewer.element.classList.remove(c('in-progress'));
+      this.viewer.inProgress = false;
       this.viewer.displayError('Layout couldn\'t complete', e);
       console.error(e);
     }

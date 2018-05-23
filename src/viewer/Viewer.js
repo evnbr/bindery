@@ -71,9 +71,12 @@ class Viewer {
     document.body.appendChild(this.element);
   }
 
-  setInProgress() {
-    this.element.classList.add(c('in-progress'));
-    if (this.controls) this.controls.setInProgress();
+  get inProgress() {
+    return this.element.classList.contains(classes.inProgress);
+  }
+  set inProgress(newVal) {
+    this.element.classList.toggle(classes.inProgress, newVal);
+    if (newVal && this.controls) this.controls.setInProgress();
   }
 
   get isTwoUp() {
