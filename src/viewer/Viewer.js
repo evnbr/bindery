@@ -87,25 +87,17 @@ class Viewer {
   get isShowingCropMarks() {
     return this.element.classList.contains(c('show-crop'));
   }
-
   set isShowingCropMarks(newVal) {
-    if (newVal) {
-      this.element.classList.add(c('show-crop'));
-      this.setPrint();
-    } else {
-      this.element.classList.remove(c('show-crop'));
-    }
+    if (newVal) this.element.classList.add(c('show-crop'));
+    else this.element.classList.remove(c('show-crop'));
   }
+
   get isShowingBleedMarks() {
     return this.element.classList.contains(c('show-bleed-marks'));
   }
   set isShowingBleedMarks(newVal) {
-    if (newVal) {
-      this.element.classList.add(c('show-bleed-marks'));
-      this.setPrint();
-    } else {
-      this.element.classList.remove(c('show-bleed-marks'));
-    }
+    if (newVal) this.element.classList.add(c('show-bleed-marks'));
+    else this.element.classList.remove(c('show-bleed-marks'));
   }
 
   setSheetSize(newVal) {
@@ -134,25 +126,8 @@ class Viewer {
   }
 
   setMarks(newVal) {
-    switch (newVal) {
-    case Marks.NONE:
-      this.isShowingCropMarks = false;
-      this.isShowingBleedMarks = false;
-      break;
-    case Marks.CROP:
-      this.isShowingCropMarks = true;
-      this.isShowingBleedMarks = false;
-      break;
-    case Marks.BLEED:
-      this.isShowingCropMarks = false;
-      this.isShowingBleedMarks = true;
-      break;
-    case Marks.BOTH:
-      this.isShowingCropMarks = true;
-      this.isShowingBleedMarks = true;
-      break;
-    default:
-    }
+    this.isShowingCropMarks = (newVal === Marks.CROP || newVal === Marks.BOTH);
+    this.isShowingBleedMarks = (newVal === Marks.BLEED || newVal === Marks.BOTH);
   }
 
   displayError(title, text) {
@@ -271,15 +246,15 @@ class Viewer {
   }
 
   updateZoom() {
-    if (this.content.firstElementChild) {
-      const scrollPct = document.body.scrollTop / document.body.scrollHeight;
-      const viewerRect = this.scaler.getBoundingClientRect();
-      const contentW = this.content.getBoundingClientRect().width;
-      const scale = Math.min(1, viewerRect.width / (contentW));
+    if (!this.content.firstElementChild) return;
 
-      this.scaler.style.transform = `scale(${scale})`;
-      document.body.scrollTop = document.body.scrollHeight * scrollPct;
-    }
+    const scrollPct = document.body.scrollTop / document.body.scrollHeight;
+    const viewerRect = this.scaler.getBoundingClientRect();
+    const contentW = this.content.getBoundingClientRect().width;
+    const scale = Math.min(1, viewerRect.width / (contentW));
+
+    this.scaler.style.transform = `scale(${scale})`;
+    document.body.scrollTop = document.body.scrollHeight * scrollPct;
   }
 
   renderPrint(bookPages) {
