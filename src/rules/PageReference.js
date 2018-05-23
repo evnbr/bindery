@@ -1,7 +1,7 @@
 import Replace from './Replace';
-import { pageNumbersForTest } from './searchPages';
+import { pageNumbersForTest, formatAsRanges } from './searchPages';
 
-import { makeRanges, shallowEqual, oncePerFrameLimiter } from '../utils';
+import { shallowEqual, oncePerFrameLimiter } from '../utils';
 import { validate, T } from '../option-checker';
 import { c } from '../dom-utils';
 
@@ -48,7 +48,7 @@ class PageReference extends Replace {
   render(ref, newValue) {
     if (shallowEqual(ref.value, newValue)) return;
     const isResolved = newValue.length > 0;
-    const pageRanges = isResolved ? makeRanges(newValue) : '?';
+    const pageRanges = isResolved ? formatAsRanges(newValue) : '?';
 
     const template = ref.template.cloneNode(true);
     const newRender = this.replace(template, pageRanges);
