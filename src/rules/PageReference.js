@@ -1,12 +1,13 @@
 import Replace from './Replace';
-import { makeRanges, shallowEqual } from '../utils';
+import { pageNumbersForTest } from './searchPages';
+
+import { makeRanges, shallowEqual, oncePerFrameLimiter } from '../utils';
 import { validate, T } from '../option-checker';
 import { c } from '../dom';
 
 // Options:
 // selector: String
 // replace: function (HTMLElement, number) => HTMLElement
-
 class PageReference extends Replace {
   constructor(options) {
     super(options);
@@ -16,7 +17,17 @@ class PageReference extends Replace {
       replace: T.func,
       createTest: T.func,
     });
+    this.references = [];
+    const throttle = oncePerFrameLimiter();
+    this.throttledUpdate = (book) => {
+      throttle(() => this.updatePageReferences(book.pages));
+    };
   }
+
+  eachPage(page, book) {
+    this.throttledUpdate(book);
+  }
+
   afterAdd(elmt, book) {
     const test = this.createTest(elmt);
     if (test) {
@@ -26,29 +37,25 @@ class PageReference extends Replace {
   }
 
   createReference(book, test, elmt) {
-    // Replace element immediately, to make sure it'll fit
-    const parent = elmt.parentNode;
-    const tempClone = elmt.cloneNode(true);
-    const temp = this.replace(tempClone, '?');
-    temp.classList.add(c('placeholder-pulse'));
-    parent.replaceChild(temp, elmt);
+    const ref = { test, template: elmt, element: elmt, value: null };
+    const render = newValue => this.render(ref, newValue);
+    ref.render = render;
+    this.references.push(ref);
+    render(ref, []); // Replace element immediately, to make sure it'll fit
+    return ref.element;
+  }
 
-    let previousNumbers = null;
-    let previousRender = temp;
-    book.registerPageReference(test, (pageNumbers) => {
-      if (shallowEqual(pageNumbers, previousNumbers)) return;
-      const isResolved = pageNumbers.length > 0;
-      const tempParent = previousRender.parentNode;
-      const updatedEl = elmt.cloneNode(true);
-      const pageRanges = isResolved ? makeRanges(pageNumbers) : '?';
-      const newRender = this.replace(updatedEl, pageRanges);
-      if (!isResolved) newRender.classList.add(c('placeholder-pulse'));
-      tempParent.replaceChild(newRender, previousRender);
-      previousRender = newRender;
-      previousNumbers = pageNumbers;
-    });
+  render(ref, newValue) {
+    if (shallowEqual(ref.value, newValue)) return;
+    const isResolved = newValue.length > 0;
+    const pageRanges = isResolved ? makeRanges(newValue) : '?';
 
-    return temp;
+    const template = ref.template.cloneNode(true);
+    const newRender = this.replace(template, pageRanges);
+    if (!isResolved) newRender.classList.add(c('placeholder-pulse'));
+    ref.element.parentNode.replaceChild(newRender, ref.element);
+    ref.element = newRender;
+    ref.value = newValue;
   }
 
   createTest(element) {
@@ -61,9 +68,16 @@ class PageReference extends Replace {
     }
     return null;
   }
-  replace(original, number) {
-    original.insertAdjacentHTML('beforeend', `, <span>${number}</span>`);
-    return original;
+
+  updatePageReferences(pages) {
+    // querySelector first, then rerender
+    const results = this.references.map(ref => pageNumbersForTest(pages, ref.test));
+    this.references.forEach((ref, i) => ref.render(results[i]));
+  }
+
+  replace(template, number) {
+    template.insertAdjacentHTML('beforeend', `, <span>${number}</span>`);
+    return template;
   }
 }
 
