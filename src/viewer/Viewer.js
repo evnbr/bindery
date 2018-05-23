@@ -1,8 +1,7 @@
 import { Page, orderPagesBooklet } from '../book';
 import { Mode, Paper, Layout, Marks } from '../main/Constants';
-import { createEl } from '../dom-utils';
+import { classes, createEl } from '../dom-utils';
 import { oncePerFrameLimiter } from '../utils';
-import classes from '../classes';
 
 import errorView from './error';
 import padPages from './padPages';

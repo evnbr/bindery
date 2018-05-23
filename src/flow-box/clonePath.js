@@ -1,4 +1,4 @@
-import classes from '../classes';
+import { classes } from '../dom-utils';
 
 // @param rules: array of Bindery.Rules
 // @return: A new function that clones the given

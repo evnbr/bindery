@@ -3,11 +3,12 @@ import { Mode, Layout, Marks } from '../../main/Constants';
 
 global.requestAnimationFrame = func => func();
 
-const Controls = function () {
+const ControlsStub = function () {
   return {
     element: document.createElement('div'),
     setDone: () => {},
     updateProgress: () => {},
+    setInProgress: () => {},
   };
 };
 
@@ -21,7 +22,7 @@ const viewer = new Viewer({
   mode: Mode.PREVIEW,
   layout: Layout.PAGES,
   marks: Marks.BOTH,
-  ControlsComponent: Controls,
+  ControlsComponent: ControlsStub,
 });
 
 const mockPage = () => {

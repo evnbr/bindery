@@ -1,6 +1,5 @@
 import FlowBox from '../flow-box';
-import { c, createEl } from '../dom-utils';
-import classes from '../classes';
+import { c, createEl, classes } from '../dom-utils';
 
 class Page {
   constructor() {
