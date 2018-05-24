@@ -1,13 +1,13 @@
 import { classes } from '../dom-utils';
 
-const preserveNumbering = (oldPath, i, originalList, newList) => {
+const preserveNumbering = (oldPath, nextChild, originalList, newList) => {
   // restart numbering
   let prevStart = 1;
   if (originalList.hasAttribute('start')) {
     // the OL is also a continuation
     prevStart = parseInt(originalList.getAttribute('start'), 10);
   }
-  if (i < oldPath.length - 1 && oldPath[i + 1].tagName === 'LI') {
+  if (nextChild && nextChild.tagName === 'LI') {
     // the first list item is a continuation
     prevStart -= 1;
   }
@@ -16,25 +16,19 @@ const preserveNumbering = (oldPath, i, originalList, newList) => {
   newList.setAttribute('start', newStart);
 };
 
-const preserveTableColumns = (oldPath, pathIndex, originalRow, newRow, markAsToNext, markAsFromPrev) => {
+const preserveTableColumns = (oldPath, nextChild, originalRow, newRow, mark) => {
   const columns = [...originalRow.children];
-  const nextChild = oldPath[pathIndex + 1];
   const currentIndex = columns.indexOf(nextChild);
   for (let i = 0; i < currentIndex; i += 1) {
     const clonedCol = columns[i].cloneNode(true); // deep clone, could be th > h3 > span;
     if (clonedCol.tagName === 'TH') {
-      markAsToNext(columns[i]);
-      markAsFromPrev(clonedCol);
+      mark(columns[i], clonedCol);
     }
     newRow.appendChild(clonedCol);
   }
 };
 
 
-// @param rules: array of Bindery.Rules
-// @return: A new function that clones the given
-// path according to those rules. (original : Array) => clone : Array
-//
 // The path is an array of nested elments,
 // for example .content > article > p > a).
 //
@@ -46,18 +40,24 @@ const preserveTableColumns = (oldPath, pathIndex, originalRow, newRow, markAsToN
 // which lets you add classes to the original and cloned element
 // to customize styling.
 
-const clonePath = (oldPath, extraClasses) => {
+const clonePath = (oldPath, applyRules) => {
   const newPath = [];
 
-  const { toNext, fromPrev } = extraClasses;
+  // const { toNext, fromPrev } = extraClasses;
   const markAsToNext = (node) => {
     node.classList.add(classes.toNext);
-    toNext.forEach(cl => node.classList.add(cl));
+    // toNext.forEach(cl => node.classList.add(cl));
   };
 
   const markAsFromPrev = (node) => {
     node.classList.add(classes.fromPrev);
-    fromPrev.forEach(cl => node.classList.add(cl));
+    // fromPrev.forEach(cl => node.classList.add(cl));
+  };
+
+  const mark = (original, clone) => {
+    markAsToNext(original);
+    markAsFromPrev(clone);
+    applyRules(original, clone);
   };
 
   for (let i = oldPath.length - 1; i >= 0; i -= 1) {
@@ -65,17 +65,16 @@ const clonePath = (oldPath, extraClasses) => {
     const clone = original.cloneNode(false); // shallow
     clone.innerHTML = '';
 
-    markAsToNext(original);
-    markAsFromPrev(clone);
+    mark(original, clone);
 
     // Special case for ordered lists
     if (clone.tagName === 'OL') {
-      preserveNumbering(oldPath, i, original, clone);
+      preserveNumbering(oldPath, oldPath[i + 1], original, clone);
     }
 
     // Special case to preserve columns of tables
     if (clone.tagName === 'TR') {
-      preserveTableColumns(oldPath, i, original, clone, markAsToNext, markAsFromPrev);
+      preserveTableColumns(oldPath, oldPath[i + 1], original, clone, mark);
     }
 
     if (i < oldPath.length - 1) clone.appendChild(newPath[i + 1]);

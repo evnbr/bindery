@@ -23,8 +23,8 @@ class FlowBox {
     return (box.height > 100) && (box.width > 100); // TODO: Number is arbitrary
   }
 
-  continueFrom(prevFlowBox, classes) {
-    this.path = clonePath(prevFlowBox.path, classes);
+  continueFrom(prevFlowBox, applyRules) {
+    this.path = clonePath(prevFlowBox.path, applyRules);
     if (this.path[0]) {
       this.content.appendChild(this.path[0]);
     }

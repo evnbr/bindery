@@ -3,8 +3,6 @@ import { validate, T } from '../option-checker';
 
 class Split extends Rule {
   constructor(options) {
-    options.toNext = options.toNext || 'split-to-next';
-    options.fromPrevious = options.fromPrevious || 'split-from-previous';
     super(options);
 
     validate(options, {
@@ -13,6 +11,11 @@ class Split extends Rule {
       toNext: T.string,
       fromPrevious: T.string,
     });
+  }
+
+  didSplit(original, clone) {
+    if (this.toNext) original.classList.add(this.toNext);
+    if (this.fromPrevious) clone.classList.add(this.fromPrevious);
   }
 }
 

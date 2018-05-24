@@ -15,13 +15,19 @@ class RuleSet {
 
     // Rules for layout
     this.selectorsNotToSplit = rules.filter(r => r.avoidSplit).map(r => r.selector);
-    this.splitClasses = {
-      toNext: rules.map(rule => rule.toNext).filter(cl => cl && cl !== ''),
-      fromPrev: rules.map(rule => rule.fromPrevious).filter(cl => cl && cl !== ''),
-    };
+    this.splitBehaviors = rules.filter(r => r.selector && r.didSplit);
 
     // setup
     rules.filter(r => r.setup).forEach(r => r.setup());
+
+    this.applySplitRules = this.applySplitRules.bind(this);
+  }
+
+  applySplitRules(original, clone) {
+    console.log(original, clone);
+    this.splitBehaviors.filter(r => original.matches(r.selector)).forEach((rule) => {
+      rule.didSplit(original, clone);
+    });
   }
 
   // Rules for pages

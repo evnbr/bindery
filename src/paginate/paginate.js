@@ -44,7 +44,7 @@ const paginate = (content, rules, progressCallback) => {
 
     const newPage = makeNewPage();
     if (oldPage) {
-      newPage.flow.continueFrom(oldPage.flow, ruleSet.splitClasses);
+      newPage.flow.continueFrom(oldPage.flow, ruleSet.applySplitRules);
     }
     book.currentPage = newPage;
     book.pages.push(newPage);
