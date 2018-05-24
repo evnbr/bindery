@@ -37,7 +37,12 @@ const tryInNextBox = (flow, makeNextFlow, canSplitElement) => {
 
   let newFlow;
   if (!flow.isEmpty) {
-    if (flow.hasOverflowed()) flow.suppressErrors = true;
+    if (flow.hasOverflowed()) {
+      console.warn('recovery failed');
+      // Recovery failed, maybe the box contains a large
+      // unsplittable element.
+      flow.suppressErrors = true;
+    }
     newFlow = makeNextFlow();
   } else {
     // If the page is empty when this node is removed,

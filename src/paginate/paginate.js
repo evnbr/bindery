@@ -17,6 +17,7 @@ const paginate = (content, rules, progressCallback) => {
   const book = new Book();
   const noSplit = ruleSet.selectorsNotToSplit;
   const canSplitElement = el => canSplit(el, noSplit);
+  const canSplitCurrent = () => canSplitElement(book.currentPage.flow.currentElement);
 
   const hasOverflowed = () => book.currentPage.hasOverflowed();
   const ignoreCurrentOverflow = () => ignoreOverflow(book.currentPage.flow.currentElement);
@@ -60,7 +61,7 @@ const paginate = (content, rules, progressCallback) => {
 
   const addTextWithoutChecks = (textNode, parent) => {
     parent.appendChild(textNode);
-    if (!ignoreCurrentOverflow()) {
+    if (!ignoreCurrentOverflow() && canSplitCurrent()) {
       book.currentPage.suppressErrors = true;
       continueOnNewPage();
     }
@@ -98,7 +99,7 @@ const paginate = (content, rules, progressCallback) => {
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
   const addElementNode = async (elementToAdd) => {
-    if (hasOverflowed() && !ignoreCurrentOverflow()) {
+    if (hasOverflowed() && !ignoreCurrentOverflow() && canSplitCurrent()) {
       book.currentPage.suppressErrors = true;
       continueOnNewPage();
     }
@@ -118,7 +119,7 @@ const paginate = (content, rules, progressCallback) => {
     element.innerHTML = '';
 
     // Overflows when empty
-    if (hasOverflowed() && !ignoreCurrentOverflow()) {
+    if (hasOverflowed() && !ignoreCurrentOverflow() && canSplitCurrent()) {
       tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
     }
 
@@ -131,6 +132,15 @@ const paginate = (content, rules, progressCallback) => {
         await addElementNode(child);
       } else {
         // Skip comments and unknown nodes
+      }
+    }
+
+    // Overflows when full
+    if (hasOverflowed()) {
+      if (!ignoreCurrentOverflow() && canSplitCurrent()) {
+        tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
+      } else {
+        // Its okay that this element overflows
       }
     }
 

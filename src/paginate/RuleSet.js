@@ -59,9 +59,25 @@ class RuleSet {
     const uniqueRules = dedupe(matchingRules);
 
     const shiftToNext = (el) => {
-      el.parentNode.removeChild(el);
+      let removed = el;
+      let parent = removed.parentNode;
+      parent.removeChild(removed);
+      let popped;
+      if (book.currentPage.hasOverflowed()) {
+        parent.appendChild(el);
+        removed = parent;
+        removed.parentNode.removeChild(removed);
+        popped = book.currentPage.flow.path.pop();
+        if (book.currentPage.hasOverflowed()) {
+          console.error('Trying again didnt fix it');
+        } else {
+          console.log('Trying again worked');
+          console.log(removed);
+        }
+      }
       const newPage = continueOnNewPage();
-      newPage.flow.currentElement.appendChild(el);
+      newPage.flow.currentElement.appendChild(removed);
+      if (popped) newPage.flow.path.push(popped);
     };
 
     uniqueRules.forEach((rule) => {
