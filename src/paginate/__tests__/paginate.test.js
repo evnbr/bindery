@@ -28,24 +28,44 @@ jest.mock('../../flow-box', () => function MockFlow() {
 });
 
 
-const a = mockEl();
-const b = mockEl();
-const c = mockEl();
-a.textContent = 'A content';
-b.textContent = 'B content';
-c.textContent = 'C content';
-a.appendChild(b);
-b.appendChild(c);
+test('Creates book, preserves content order', () => {
+  const a = mockEl();
+  const b = mockEl();
+  const c = mockEl();
+  a.textContent = 'A content.';
+  b.textContent = 'B content.';
+  c.textContent = 'C content.';
+  a.appendChild(b);
+  b.appendChild(c);
 
-
-test('Preserves content order', () => {
   paginate(a, [], () => {})
     .then((book) => {
       expect(book.pageCount).toBe(4);
+
       const allText = book.pages
         .map(pg => pg.flow.content.textContent)
         .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
-      expect(allText).toBe('AcontentBcontentCcontent');
+
+      expect(allText).toBe('Acontent.Bcontent.Ccontent.');
+    })
+    .catch(e => console.error(e));
+});
+
+test('Splits a single div over many pages', () => {
+  const content = mockEl();
+  content.textContent = 'A content. B content. C content.';
+
+  paginate(content, [], () => {})
+    .then((book) => {
+      expect(book.pageCount).toBe(4);
+
+      const allText = book.pages
+        .map(pg => pg.flow.content.textContent)
+        .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+      expect(allText).toBe('Acontent.Bcontent.Ccontent.');
+
+      expect(book.pages.map(pg => pg.isOverflowing()))
+        .toEqual([false, false, false, false]);
     })
     .catch(e => console.error(e));
 });
