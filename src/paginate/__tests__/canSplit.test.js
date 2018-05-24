@@ -1,4 +1,4 @@
-import { c } from '../../dom-utils';
+// import { c } from '../../dom-utils';
 import { ignoreOverflow, canSplit } from '../canSplit';
 
 let div;
@@ -38,15 +38,15 @@ describe('isSplittable', () => {
     expect(canSplit(span, selectors)).toBe(false);
   });
 
-  test('Allows for matching elements that have already split', () => {
-    span.classList.add(noSplitClass, c('continuation'));
-    expect(canSplit(span, selectors)).toBe(true);
-  });
-
-  test('Allows for matching elements that have been moved', () => {
-    span.setAttribute('data-bindery-did-move', true);
-    expect(canSplit(span, selectors)).toBe(true);
-  });
+  // test('Allows for matching elements that have already split', () => {
+  //   span.classList.add(noSplitClass, c('continuation'));
+  //   expect(canSplit(span, selectors)).toBe(true);
+  // });
+  //
+  // test('Allows for matching elements that have been moved', () => {
+  //   span.setAttribute('data-bindery-did-move', true);
+  //   expect(canSplit(span, selectors)).toBe(true);
+  // });
 
   test('Denies when parent matches selector', () => {
     div.classList.add(noSplitClass);

@@ -1,4 +1,4 @@
-import { c } from '../dom-utils';
+import { classes } from '../dom-utils';
 
 const overflowAttr = 'data-ignore-overflow';
 const didMoveAttr = 'data-bindery-did-move';
@@ -15,10 +15,9 @@ const ignoreOverflow = (element) => {
 // insert a split into this node.
 const canSplit = (element, selectors) => {
   if (selectors.some(sel => element.matches(sel))) {
-    if (element.hasAttribute(didMoveAttr)
-      || element.classList.contains(c('continuation'))) {
-      return true; // ignore rules and split it anyways.
-    }
+    // if (element.hasAttribute(didMoveAttr) || element.classList.contains(classes.fromPrev)) {
+    //   return true; // ignore rules and split it anyways.
+    // }
     return false;
   }
   if (element.parentElement) return canSplit(element.parentElement, selectors);
