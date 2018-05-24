@@ -1,6 +1,6 @@
 import dedupe from './dedupeRules';
 
-const warn = (rule, el) => {
+const giveUp = (rule, el) => {
   console.warn(`Couldn't apply ${rule.name}, caused overflows twice when adding: `, el);
 };
 
@@ -50,46 +50,16 @@ class RuleSet {
     return addedElement;
   }
 
-  // TODO:
-  // While this does catch overflows, it is pretty hacky to move the entire node to the next page.
-  // - 1. there is no guarentee it will fit on the new page
-  // - 2. if it had childNodes, those side effects will not be undone,
-  // which means footnotes will get left on previous page.
-  // - 3. if it is a large paragraph, it will leave a large gap. the
-  // ideal approach would be to only need to invalidate the last line of text.
-
-  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage) {
+  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage, attemptRecovery) {
     let addedElement = originalElement;
 
     const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));
     const uniqueRules = dedupe(matchingRules);
 
-    const shiftToNext = (el) => {
-      let removed = el;
-      let parent = removed.parentNode;
-      parent.removeChild(removed);
-      let popped;
-      if (book.currentPage.hasOverflowed()) {
-        parent.appendChild(el);
-        removed = parent;
-        removed.parentNode.removeChild(removed);
-        popped = book.currentPage.flow.path.pop();
-        if (book.currentPage.hasOverflowed()) {
-          console.error('Trying again didnt fix it');
-        } else {
-          console.log('Trying again worked');
-          console.log(removed);
-        }
-      }
-      const newPage = continueOnNewPage();
-      newPage.flow.currentElement.appendChild(removed);
-      if (popped) newPage.flow.path.push(popped);
-    };
-
     uniqueRules.forEach((rule) => {
       const retry = (el) => {
-        shiftToNext(el);
-        return rule.afterAdd(el, book, continueOnNewPage, makeNewPage, () => warn(rule, el));
+        attemptRecovery(el);
+        return rule.afterAdd(el, book, continueOnNewPage, makeNewPage, () => giveUp(rule, el));
       };
       addedElement = rule.afterAdd(addedElement, book, continueOnNewPage, makeNewPage, retry);
     });

@@ -95,6 +95,34 @@ const paginate = (content, rules, progressCallback) => {
     }
   };
 
+  // TODO:
+  // While this does catch overflows, it is pretty hacky to move the entire node to the next page.
+  // - 1. there is no guarentee it will fit on the new page
+  // - 2. if it had childNodes, those side effects will not be undone,
+  // which means footnotes will get left on previous page.
+  // - 3. if it is a large paragraph, it will leave a large gap. the
+  // ideal approach would be to only need to invalidate the last line of text.
+  const recoverFromRule = (el) => {
+    let removed = el;
+    const parent = el.parentNode;
+    parent.removeChild(removed);
+    let popped;
+    if (book.currentPage.hasOverflowed()) {
+      parent.appendChild(el);
+      removed = parent;
+      removed.parentNode.removeChild(removed);
+      popped = book.currentPage.flow.path.pop();
+      if (book.currentPage.hasOverflowed()) {
+        console.error('Trying again didnt fix it');
+      } else {
+        // Trying again worked
+      }
+    }
+    const newPage = continueOnNewPage();
+    newPage.flow.currentElement.appendChild(removed);
+    if (popped) newPage.flow.path.push(popped);
+  };
+
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
@@ -146,7 +174,7 @@ const paginate = (content, rules, progressCallback) => {
 
     // Transforms after adding
     const addedElement = book.currentPage.flow.path.pop();
-    ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage);
+    ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage, recoverFromRule);
     estimator.increment();
   };
 
