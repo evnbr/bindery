@@ -1,4 +1,4 @@
-import { pageNumbersForTest, pageNumbersForSelector, formatAsRanges } from '../searchPages';
+import { pageNumbersForTest, pageNumbersForSelector, formatAsRanges } from './searchPages';
 
 const pageStub = (num, str, child) => {
   const el = document.createElement('div');
