@@ -141,7 +141,14 @@ class Viewer {
     if (!this.error) {
       this.error = errorView(title, text);
       this.element.appendChild(this.error);
+      this.scrollToBottom();
+      this.book.currentPage.flow.currentElement.style.outline = '3px solid red';
     }
+  }
+  scrollToBottom() {
+    const scroll = document.scrollingElement;
+    const scrollMax = scroll.scrollHeight - scroll.offsetHeight;
+    scroll.scrollTop = scrollMax;
   }
   clear() {
     this.book = null;

@@ -12,7 +12,8 @@ class Replace extends Rule {
   afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
     const parent = element.parentNode;
     if (!parent) {
-      throw Error('Bindery: Rule assumes element has been added but it has no parent.', element);
+      console.error(element);
+      throw Error(`Bindery.Replace({ selector: '${this.selector}' }).afterAdd called on element that hasn't been added.`);
     }
     const defensiveClone = element.cloneNode(true);
     const replacement = this.createReplacement(book, defensiveClone);

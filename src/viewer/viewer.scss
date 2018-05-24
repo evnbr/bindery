@@ -28,7 +28,7 @@
     right: 0;
     background: var(--bindery-ui-accent);
     transition: transform 0.2s;
-    height: 3px;
+    height: 2px;
     z-index: 99;
     .in-progress & {
       transform: scaleX(0);
@@ -50,6 +50,9 @@
     }
     .view-print & {
       min-width: calc(20px + var(--bindery-sheet-width));
+    }
+    > .page {
+      margin: auto; // center pages not in a spread yet;
     }
   }
 
@@ -152,7 +155,8 @@ body.viewing {
 .zoom-scaler {
   transform-origin: top left;
   transform-style: preserve-3d;
-  height: calc(100vh - 120px); /* adjust scrollheight on scaled down */
+  height: calc(100vh - 120px); // adjust scrollheight on scaled down
+
 }
 
 .print-sheet {

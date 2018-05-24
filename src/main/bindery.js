@@ -157,7 +157,7 @@ class Bindery {
     } catch (e) {
       this.layoutInProgress = false;
       this.viewer.inProgress = false;
-      this.viewer.displayError('Layout couldn\'t complete', e);
+      this.viewer.displayError('Layout couldn\'t complete', e.message);
       console.error(e);
     }
   }
