@@ -1,4 +1,5 @@
-import { validate, T } from '../index';
+import validate from './validate';
+import T from './types';
 
 const kIsFunc = { k: T.func };
 test('Handles functions', () => {
