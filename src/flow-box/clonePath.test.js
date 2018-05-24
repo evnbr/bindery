@@ -30,38 +30,64 @@ test('Split elements get classes from custom rule', () => {
   expect(newCrumb[1].classList.contains('fromPrev')).toBe(true);
 });
 
-test('Ordered List numbering continues on next page', () => {
-  const ol = document.createElement('ol');
-  ol.appendChild(document.createElement('li'));
-  ol.appendChild(document.createElement('li'));
+describe('Ordered Lists', () => {
+  test('Numbering continues on next page', () => {
+    const ol = document.createElement('ol');
+    ol.appendChild(document.createElement('li'));
+    ol.appendChild(document.createElement('li'));
 
-  const crumb = [ol];
-  const newCrumb = clonePath(crumb, customClasses);
+    const crumb = [ol];
+    const newCrumb = clonePath(crumb, customClasses);
 
-  expect(newCrumb[0].getAttribute('start')).toBe('3');
+    expect(newCrumb[0].getAttribute('start')).toBe('3');
+  });
+
+  test('Numbering is one less if list element continues on next page', () => {
+    const ol = document.createElement('ol');
+    const li1 = document.createElement('li');
+    const li2 = document.createElement('li');
+    ol.appendChild(li1);
+    ol.appendChild(li2);
+
+    const crumb = [ol, li2];
+    const newCrumb = clonePath(crumb, customClasses);
+
+    expect(newCrumb[0].getAttribute('start')).toBe('2');
+  });
+
+  test('Numbering starts from previous start value', () => {
+    const ol = document.createElement('ol');
+    ol.setAttribute('start', 5);
+    ol.appendChild(document.createElement('li'));
+    ol.appendChild(document.createElement('li'));
+
+    const crumb = [ol];
+    const newCrumb = clonePath(crumb, customClasses);
+
+    expect(newCrumb[0].getAttribute('start')).toBe('7');
+  });
 });
 
-test('Ordered List numbering is one less if list element continues on next page', () => {
-  const ol = document.createElement('ol');
-  const li1 = document.createElement('li');
-  const li2 = document.createElement('li');
-  ol.appendChild(li1);
-  ol.appendChild(li2);
+describe('Tables', () => {
+  test('Cloned row copies first column', () => {
+    const tr = document.createElement('tr');
+    const th = document.createElement('th');
+    const h3 = document.createElement('h3');
+    const td = document.createElement('td');
+    h3.textContent = 'Row 1';
+    th.appendChild(h3);
+    tr.appendChild(th);
+    tr.appendChild(td);
 
-  const crumb = [ol, li2];
-  const newCrumb = clonePath(crumb, customClasses);
+    const crumb = [tr, td];
+    const newCrumb = clonePath(crumb, customClasses);
+    console.log(newCrumb);
 
-  expect(newCrumb[0].getAttribute('start')).toBe('2');
-});
-
-test('Ordered List numbering starts from previous start value', () => {
-  const ol = document.createElement('ol');
-  ol.setAttribute('start', 5);
-  ol.appendChild(document.createElement('li'));
-  ol.appendChild(document.createElement('li'));
-
-  const crumb = [ol];
-  const newCrumb = clonePath(crumb, customClasses);
-
-  expect(newCrumb[0].getAttribute('start')).toBe('7');
+    expect(newCrumb[0].childNodes.length).toBe(2);
+    expect(newCrumb[0].childNodes[0].tagName).toBe('TH');
+    expect(newCrumb[0].childNodes[0].firstElementChild.tagName).toBe('H3');
+    expect(newCrumb[0].childNodes[0].firstElementChild.textContent).toBe('Row 1');
+    expect(newCrumb[0].childNodes[1].tagName).toBe('TD');
+    expect(newCrumb[1].tagName).toBe('TD');
+  });
 });
