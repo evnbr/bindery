@@ -142,11 +142,13 @@ class Viewer {
       this.error = errorView(title, text);
       this.element.appendChild(this.error);
       this.scrollToBottom();
-      this.book.currentPage.flow.currentElement.style.outline = '3px solid red';
+      const flow = this.book.currentPage.flow;
+      if (flow) flow.currentElement.style.outline = '3px solid red';
     }
   }
   scrollToBottom() {
     const scroll = document.scrollingElement;
+    if (!scroll) return;
     const scrollMax = scroll.scrollHeight - scroll.offsetHeight;
     scroll.scrollTop = scrollMax;
   }
