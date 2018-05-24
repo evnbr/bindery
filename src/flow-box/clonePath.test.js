@@ -1,4 +1,4 @@
-import clonePath from '../clonePath';
+import clonePath from './clonePath';
 
 const noClasses = { toNext: [], fromPrev: [] };
 const customClasses = { toNext: ['toNext'], fromPrev: ['fromPrev'] };

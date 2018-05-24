@@ -1,4 +1,4 @@
-import orderPagesBooklet from '../orderPagesBooklet';
+import orderPagesBooklet from './orderPagesBooklet';
 
 const pageStub = () => ({ element: document.createElement('div') });
 

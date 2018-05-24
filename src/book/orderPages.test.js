@@ -1,4 +1,4 @@
-import orderPages from '../orderPages';
+import orderPages from './orderPages';
 
 const newPageMock = jest.fn();
 newPageMock.mockReturnValue({ newPage: true });

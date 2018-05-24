@@ -1,4 +1,4 @@
-import annotatePages from '../annotatePages';
+import annotatePages from './annotatePages';
 
 
 const create = (tag, txt) => {

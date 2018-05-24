@@ -1,4 +1,4 @@
-import { parseLength, isLength } from '../index';
+import { parseLength, isLength } from './index';
 
 test('Recognizes CSS lengths', () => {
   expect(isLength('12px')).toBe(true);
