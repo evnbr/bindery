@@ -1,4 +1,4 @@
-import { createEl } from '../../dom-utils';
+import { createEl } from '../dom-utils';
 
 const directions = ['top', 'bottom', 'left', 'right'];
 const bleedMarks = () => directions.map(dir => createEl(`.mark-bleed-${dir}`));

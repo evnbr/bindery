@@ -1,4 +1,5 @@
-import { flipLayout, gridLayout, printLayout } from '../Layouts';
+import { flipLayout, gridLayout, printLayout } from './index';
+import { Layout } from '../constants';
 
 const pages = [
   { element: document.createElement('div') },
@@ -23,16 +24,16 @@ test('creates flip layout', () => {
 });
 
 test('creates print single layout', () => {
-  const print = printLayout(pages, false, false);
+  const print = printLayout(pages, Layout.PAGES);
   expect(print instanceof DocumentFragment).toBe(true);
 });
 
 test('creates print spread layout', () => {
-  const print = printLayout(pages, true, false);
+  const print = printLayout(pages, Layout.SPREADS);
   expect(print instanceof DocumentFragment).toBe(true);
 });
 
 test('creates print booklet layout', () => {
-  const print = printLayout(pages, true, true);
+  const print = printLayout(pages, Layout.BOOKLET);
   expect(print instanceof DocumentFragment).toBe(true);
 });

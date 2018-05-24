@@ -1,11 +1,11 @@
-import { Page, orderPagesBooklet } from '../book';
+import { Page } from '../book';
 import { Mode, Paper, Layout, Marks } from '../constants';
 import { classes, createEl } from '../dom-utils';
 import { oncePerFrameLimiter } from '../utils';
 
+import { gridLayout, printLayout, flipLayout } from '../layouts';
+
 import errorView from './error';
-import padPages from './padPages';
-import { gridLayout, printLayout, flipLayout } from './Layouts';
 import listenForPrint from './listenForPrint';
 
 const modeClasses = {};
@@ -252,28 +252,18 @@ class Viewer {
   }
 
   renderPrint(bookPages) {
-    let pages = bookPages;
     this.isShowingBleed = true;
-    const isBooklet = this.printArrange === Layout.BOOKLET;
-    if (this.printArrange === Layout.SPREADS) {
-      pages = padPages(pages, () => new Page());
-    } else if (isBooklet) {
-      pages = orderPagesBooklet(pages, () => new Page());
-    }
-    return printLayout(pages, this.isTwoUp, isBooklet);
+    return printLayout(bookPages, this.printArrange);
   }
 
   renderGrid(bookPages) {
-    let pages = bookPages;
     this.isShowingBleed = false;
-    if (this.doubleSided) pages = padPages(pages, () => new Page());
-    return gridLayout(pages, this.doubleSided);
+    return gridLayout(bookPages, this.doubleSided);
   }
 
   renderInteractive(bookPages) {
     this.isShowingBleed = false;
-    const pages = padPages(bookPages, () => new Page());
-    return flipLayout(pages, this.doubleSided);
+    return flipLayout(bookPages, this.doubleSided);
   }
 }
 

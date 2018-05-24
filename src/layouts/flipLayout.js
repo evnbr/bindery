@@ -1,6 +1,10 @@
-import { c, createEl } from '../../dom-utils';
+import { Page } from '../book';
+import { c, createEl } from '../dom-utils';
+import padPages from './padPages';
 
-const renderFlipLayout = (pages, doubleSided) => {
+const renderFlipLayout = (bookPages, doubleSided) => {
+  const pages = padPages(bookPages, () => new Page());
+
   const flipLayout = document.createDocumentFragment();
   const sizer = createEl('.spread-size.flip-sizer');
   const flapHolder = createEl('.spread-size.flap-holder');
@@ -47,12 +51,12 @@ const renderFlipLayout = (pages, doubleSided) => {
     if (doubleSided) {
       flap.classList.add(c('doubleSided'));
       leftPage = pages[i + 1].element;
-      leftPage.classList.add(c('page3d-back'));
-      flap.appendChild(leftPage);
     } else {
-      leftPage = createEl('.page.page3d-back');
-      flap.appendChild(leftPage);
+      leftPage = createEl('.page');
     }
+    leftPage.classList.add(c('page3d-back'));
+    flap.appendChild(leftPage);
+
     // TODO: Dynamically add/remove pages.
     // Putting 1000s of elements onscreen
     // locks up the browser.

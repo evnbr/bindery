@@ -1,9 +1,13 @@
-import { createEl } from '../../dom-utils';
+import { Page } from '../book';
+import { createEl } from '../dom-utils';
+import padPages from './padPages';
 
 const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
 const onePageSpread = children => createEl('.spread-wrapper.page-size', children);
 
-const renderGridLayout = (pages, isTwoUp) => {
+const renderGridLayout = (bookPages, isTwoUp) => {
+  const pages = isTwoUp ? padPages(bookPages, () => new Page()) : bookPages;
+
   const gridLayout = document.createDocumentFragment();
   if (isTwoUp) {
     for (let i = 0; i < pages.length; i += 2) {

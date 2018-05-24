@@ -1,10 +1,21 @@
-import { createEl } from '../../dom-utils';
+import { createEl } from '../dom-utils';
+import { Page, orderPagesBooklet } from '../book';
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
+import padPages from './padPages';
+import { Layout } from '../constants';
 
 const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
 const onePageSpread = children => createEl('.spread-wrapper.page-size', children);
 
-const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
+const renderPrintLayout = (bookPages, layout) => {
+  const isTwoUp = layout !== Layout.PAGES;
+  const isSpreads = layout === Layout.SPREADS;
+  const isBooklet = layout === Layout.BOOKLET;
+
+  let pages = bookPages;
+  if (isSpreads) pages = padPages(pages, () => new Page());
+  else if (isBooklet) pages = orderPagesBooklet(pages, () => new Page());
+
   const printLayout = document.createDocumentFragment();
 
   const marks = isTwoUp ? printMarksSpread : printMarksSingle;
@@ -22,8 +33,7 @@ const renderPrintLayout = (pages, isTwoUp, isBooklet) => {
       const sheet = printSheet([
         pages[i].element,
         pages[i + 1].element,
-        spreadMarks]
-      );
+        spreadMarks]);
       printLayout.appendChild(sheet);
     }
   } else {
