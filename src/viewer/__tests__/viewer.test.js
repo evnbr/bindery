@@ -1,5 +1,5 @@
 import Viewer from '../Viewer';
-import { Mode, Layout, Marks } from '../../main/Constants';
+import { Mode, Layout, Marks } from '../../constants';
 
 global.requestAnimationFrame = func => func();
 global.BINDERY_VERSION = 'Test Version';

@@ -2,7 +2,7 @@ import { stylesheet } from '../dom-utils';
 import { parseLength } from '../css-length';
 
 import { defaultPageSetup } from '../defaults';
-import { Paper, Layout } from './Constants';
+import { Paper, Layout } from '../constants';
 
 const letter = { width: '8.5in', height: '11in' };
 const a4 = { width: '210mm', height: '297mm' };

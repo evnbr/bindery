@@ -1,8 +1,8 @@
 /* global BINDERY_VERSION */
 
 // main
-import PageSetup from './PageSetup';
-import { Mode, Paper, Layout, Marks } from './Constants';
+import PageSetup from '../page-setup';
+import { Mode, Paper, Layout, Marks } from '../constants';
 import { defaultRules } from '../defaults';
 
 // components

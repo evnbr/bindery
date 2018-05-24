@@ -1,5 +1,5 @@
 import { Page, orderPagesBooklet } from '../book';
-import { Mode, Paper, Layout, Marks } from '../main/Constants';
+import { Mode, Paper, Layout, Marks } from '../constants';
 import { classes, createEl } from '../dom-utils';
 import { oncePerFrameLimiter } from '../utils';
 
