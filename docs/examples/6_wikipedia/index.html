@@ -15,14 +15,25 @@
     getArticleWithTitle('Book', (article) => {
       let originalArticle = article;
 
-      Bindery.makeBook({
+      const {
+        makeBook,
+        PageBreak,
+        Split,
+        Replace,
+        Footnote,
+        RunningHeader,
+        PageReference
+      } = Bindery;
+
+      makeBook({
         content: originalArticle,
         rules: [
-          Bindery.PageBreak({ selector: '.vertical-navbox', position: 'before', continue: 'right' }),
-          Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-          Bindery.PageBreak({ selector: 'tr', position: 'avoid' }),
+          PageBreak({ selector: '.vertical-navbox', position: 'before', continue: 'right' }),
+          PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+          PageBreak({ selector: 'tr', position: 'avoid' }),
+          Split({ selector: 'th', fromPrevious: 'th-continued' }),
           // Bindery.FullBleedSpread({ selector: '.thumb', continue: 'same' }),
-          Bindery.Replace({
+          Replace({
             selector: '.navbox-list a[href]',
             replace: (element) => {
               let href = element.getAttribute('href');
@@ -36,7 +47,7 @@
               return span;
             },
           }),
-          Bindery.Footnote({
+          Footnote({
             selector: 'p a[title]:not(.internal)',
             render: (element, number) => {
               let href = element.getAttribute('href');
@@ -49,7 +60,7 @@
               return note;
             },
           }),
-          Bindery.Footnote({
+          Footnote({
             selector: 'sup.reference a',
             replace: (element, number) => {
               const span = document.createElement('span');
@@ -65,7 +76,7 @@
               return note;
             },
           }),
-          Bindery.RunningHeader({
+          RunningHeader({
             render: (page) => {
               if (page.isLeft) return `${page.number} · ${page.heading.h1} `;
               else if (page.isRight) {
@@ -75,14 +86,14 @@
               }
             },
           }),
-          Bindery.PageReference({
+          PageReference({
             selector: '#toc a',
             replace: (element, number) => {
               element.insertAdjacentHTML('beforeend', `<span class='num'>${number}</span>`);
               return element;
             }
           }),
-          Bindery.PageReference({
+          PageReference({
             selector: '.mw-cite-backlink a',
             replace: (element, number) => {
               const span = document.createElement('span');

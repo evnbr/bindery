@@ -75,6 +75,10 @@ a {
   word-break: break-word;
 }
 
+th a {
+  word-break: normal;
+}
+
 p {
   margin: 0;
 }
@@ -108,6 +112,15 @@ figcaption {
 th {
   vertical-align: top;
   text-align: left;
+}
+
+th.th-continued {
+  font-weight: normal;
+  font-style: italic;
+}
+th.th-continued::after {
+  content: ", Continued";
+  display: inline;
 }
 
 table {

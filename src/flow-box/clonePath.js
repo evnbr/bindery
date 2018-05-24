@@ -1,5 +1,36 @@
 import { classes } from '../dom-utils';
 
+const preserveNumbering = (oldPath, i, originalList, newList) => {
+  // restart numbering
+  let prevStart = 1;
+  if (originalList.hasAttribute('start')) {
+    // the OL is also a continuation
+    prevStart = parseInt(originalList.getAttribute('start'), 10);
+  }
+  if (i < oldPath.length - 1 && oldPath[i + 1].tagName === 'LI') {
+    // the first list item is a continuation
+    prevStart -= 1;
+  }
+  const prevCount = originalList.children.length;
+  const newStart = prevStart + prevCount;
+  newList.setAttribute('start', newStart);
+};
+
+const preserveTableColumns = (oldPath, pathIndex, originalRow, newRow, markAsToNext, markAsFromPrev) => {
+  const columns = [...originalRow.children];
+  const nextChild = oldPath[pathIndex + 1];
+  const currentIndex = columns.indexOf(nextChild);
+  for (let i = 0; i < currentIndex; i += 1) {
+    const clonedCol = columns[i].cloneNode(true); // deep clone, could be th > h3 > span;
+    if (clonedCol.tagName === 'TH') {
+      markAsToNext(columns[i]);
+      markAsFromPrev(clonedCol);
+    }
+    newRow.appendChild(clonedCol);
+  }
+};
+
+
 // @param rules: array of Bindery.Rules
 // @return: A new function that clones the given
 // path according to those rules. (original : Array) => clone : Array
@@ -39,19 +70,12 @@ const clonePath = (oldPath, extraClasses) => {
 
     // Special case for ordered lists
     if (clone.tagName === 'OL') {
-      // restart numbering
-      let prevStart = 1;
-      if (original.hasAttribute('start')) {
-        // the OL is also a continuation
-        prevStart = parseInt(original.getAttribute('start'), 10);
-      }
-      if (i < oldPath.length - 1 && oldPath[i + 1].tagName === 'LI') {
-        // the first list item is a continuation
-        prevStart -= 1;
-      }
-      const prevCount = original.children.length;
-      const newStart = prevStart + prevCount;
-      clone.setAttribute('start', newStart);
+      preserveNumbering(oldPath, i, original, clone);
+    }
+
+    // Special case to preserve columns of tables
+    if (clone.tagName === 'TR') {
+      preserveTableColumns(oldPath, i, original, clone, markAsToNext, markAsFromPrev);
     }
 
     if (i < oldPath.length - 1) clone.appendChild(newPath[i + 1]);
