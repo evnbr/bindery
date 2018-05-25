@@ -19,27 +19,37 @@ const book = {
   ],
 };
 
-const toc = createEl('a', 'Read more');
-toc.href = '#chapter1';
-book.pages[0].element.appendChild(toc);
+test('TOC placeholder gets created if target is not yet in the book', () => {
+  const toc = createEl('a', 'Read more');
+  toc.href = '#chapter1';
+  book.pages[0].element.appendChild(toc);
 
-const h2 = createEl('h2', 'Chapter 1');
-h2.id = 'chapter1';
-book.pages[2].element.appendChild(h2);
-
-test('blank pageRef gets created', () => {
   const newToc = pageRef.afterAdd(toc, book);
   expect(newToc.textContent).toBe('Read more, ?');
 });
 
-test('pageRef gets updated', () => {
+test('TOC gets rendered after result is in book', () => {
+  const h2 = createEl('h2', 'Chapter 1');
+  h2.id = 'chapter1';
+  book.pages[2].element.appendChild(h2);
+
   pageRef.eachPage(null, book);
   const newToc = book.pages[0].element.querySelector('a');
   expect(newToc.textContent).toBe('Read more, 2');
 });
 
-test('pageRef gets updated if page numbers change', () => {
+test('Indexes instantly fills if added after target', () => {
+  const index = createEl('a', 'Turn Back');
+  index.href = '#chapter1';
+  book.pages[3].element.appendChild(index);
+
+  const newIndex = pageRef.afterAdd(index, book);
+  expect(newIndex.textContent).toBe('Turn Back, 2');
+});
+
+test('TOC gets updated if page numbers change', () => {
   book.pages[2].number = 7;
+
   pageRef.eachPage(null, book);
   const newToc = book.pages[0].element.querySelector('a');
   expect(newToc.textContent).toBe('Read more, 7');
