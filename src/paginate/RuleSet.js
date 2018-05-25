@@ -15,7 +15,7 @@ class RuleSet {
 
     // Rules for layout
     this.selectorsNotToSplit = rules.filter(r => r.avoidSplit).map(r => r.selector);
-    this.splitBehaviors = rules.filter(r => r.selector && r.didSplit);
+    this.didSplitRules = rules.filter(r => r.selector && r.didSplit);
 
     // setup
     rules.filter(r => r.setup).forEach(r => r.setup());
@@ -23,10 +23,9 @@ class RuleSet {
     this.applySplitRules = this.applySplitRules.bind(this);
   }
 
-  applySplitRules(original, clone) {
-    console.log(original, clone);
-    this.splitBehaviors.filter(r => original.matches(r.selector)).forEach((rule) => {
-      rule.didSplit(original, clone);
+  applySplitRules(original, clone, nextChild, deepClone) {
+    this.didSplitRules.filter(r => original.matches(r.selector)).forEach((rule) => {
+      rule.didSplit(original, clone, nextChild, deepClone);
     });
   }
 

@@ -1,3 +1,5 @@
-import defaultRules from './defaultRules';
+import attributeRules from './attributeRules';
+import numberingRule from './numberingRule';
+import tableRule from './tableRule';
 
-export { defaultRules };
+export default [...attributeRules, numberingRule, tableRule];

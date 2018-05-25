@@ -10,6 +10,7 @@ class Split extends Rule {
       selector: T.string,
       toNext: T.string,
       fromPrevious: T.string,
+      didSplit: T.func,
     });
   }
 
