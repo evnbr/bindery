@@ -53,12 +53,13 @@
           url: './content.html',
           selector: ".content",
         },
-        pageSetup: {
+        printSetup: {
           bleed: '0.25in',
         },
         rules: [
           Bindery.RunningHeader(),
           Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+          Bindery.PageBreak({ selector: '.tootall', position: 'avoid' }),
 
           Bindery.FullBleedPage({ selector: '.fullpage', continue: 'next' }),
           Bindery.FullBleedPage({ selector: '.inward', continue: 'next', rotate: 'inward' }),

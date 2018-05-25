@@ -7,7 +7,7 @@ order: 0
 inBook: true
 ---
 
-### Getting Started
+## Getting Started
 
 Bindery is intended for web designers and developers of every skill level. Just download,
 include the script tag with your content, and you're ready to go.
@@ -25,10 +25,11 @@ include the script tag with your content, and you're ready to go.
 
 <div>
   <a href="https://unpkg.com/bindery/dist/bindery.min.js" class="btn" download>
-    ↓ Download bindery.min.js · 73k
+    ↓ Download bindery.min.js
   </a>
 </div>
 <br>
+
 Or use the hosted version from [unpkg](https://unpkg.com/) directly:
 
 ```html
@@ -41,7 +42,7 @@ You can also install bindery from [npm](https://www.npmjs.com/package/bindery):
 npm install --save bindery
 ```
 
-### Styling a Book
+## Styling
 
 Use your existing web CSS if you've got it—96 CSS pixels equals 1 CSS inch. That should be around 1 inch while printed, although some browsers might adjust the scale a little. CSS also supports points (`pt`), pica (`pc`), inches (`in`), and millimeters (`mm`).
 
@@ -50,21 +51,12 @@ these refer to the browser width, not width of a book page. Also, avoid
 changing sizes or layout when using `@media print`. Bindery won't be able
 to use that information when flowing content across pages, and you won't be able to see them in the preview.
 
-### Preparing Content
+## Preparing Content
 
 Your book content is probably pretty long, so you may want to keep it in a separate
-file. This also prevents the flash of unstyled content
-you might have seen before bindery runs.
-
-```
-my-site/
-├── index.html
-├── book-content.html
-└── js /
-    └── bindery.min.js
-```
-
-You can fetch content from a separate file by passing in the URL and selector, like this:
+file. This also prevents any flash of unstyled content
+you might have seen before bindery runs.You can fetch content by
+passing in the URL and selector, like this:
 
 ```js
 Bindery.makeBook({
@@ -75,7 +67,7 @@ Bindery.makeBook({
 });
 ```
 
-Keep in mind—your browser won't fetch content from a different web server, since that wouldn't be secure. Make sure you're loading both your current file and your content from the same server. If your browser says `file://` in the URL bar, you aren't using a server.
+(Keep in mind—your browser won't fetch content from a different web server, since that wouldn't be secure. Make sure you're loading both your current file and your content from the same server. If your browser says `file://` in the URL bar, you aren't using a server.)
 
 You don't need to do anything special with your HTML content, as long
 as it all ends up in a single file. For example, you could use the Wikipedia
@@ -98,7 +90,7 @@ it might look something like this.
 ```
 
 
-### Using Rules
+## Rules
 
 You've now got content flowing across your pages. Next, you'll probably want
 to add page breaks, spreads, running headers, and the other elements of a usable book.
@@ -147,7 +139,7 @@ that apply to selectors, like you would with CSS.
 </script>
 ```
 
-### Creating Book Components
+## Book Components
 
 For rules that create new elements on the page, you can
 pass in your own function. You can use whatever other tools or
@@ -190,11 +182,6 @@ let myCustomFootnote = Bindery.Footnote({
   }
 });
 ```
-
-
-### Printing
-
-Print early and often.
 
 
 ### Next Steps

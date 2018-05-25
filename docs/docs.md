@@ -7,7 +7,7 @@ order: 2
 inBook: true
 ---
 
-## Create a Book
+## Setup
 
 Use `Bindery.makeBook({ options })` to create a book and display it
 immediately on page load. It takes an object of options as described below.
@@ -100,7 +100,7 @@ Bindery.makeBook({
 });
 ```
 
-## Previewing
+## Preview
 
 - `view:`
   - `Bindery.View.PREVIEW` shows the spreads of the book as they will appear when
@@ -153,7 +153,7 @@ npm install --save bindery-controls
 
 
 
-## Book Flow
+## Flowing Content
 
 Book content runs within the margins on the front and back of every
 page. You can set a series of rules that change the book flow.
@@ -305,54 +305,6 @@ Bindery.Split({
 ```
 </div>
 
-## Page Elements
-
-### RunningHeader
-An element added to each page. By default it will add a page number
-at the top right of each page, but you can use `render` to generate running
-headers using your section titles.
-
-Keep in mind you can also use multiple
-`RunningHeaders` to create multiple elements— for example, to add both a page number
-at the bottom and a chapter title at the top.
-```js
-Bindery.RunningHeader({
-  render: (page) => {
-    if (page.isEmpty) {
-      return '';
-    } else if (page.isLeft) {
-      return page.number + '·' + page.heading.h1;
-    } else {
-      return page.heading.h2 + '·' + page.number;
-    }
-  },
-})
-```
-- `render:` A function that takes a `Page` and returns a string of HTML. You'll
-probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
-of the `Page` — see [`Page`](#page) for details. `Optional`
-
-### Footnote
-Add a footnote to the bottom of the flow area. Footnotes cut into the area for
-text, so note that very large footnotes may bump the entire element to the
-next page.
-
-- `selector:` Which elements the rule should be applied to.
-- `render:` A function that takes an element and number, and returns the
-footnote for that element. This footnote will be inserted at the bottom of the flow
-area.
-- `replace:` A function that takes the selected element and number, and returns
-an new element with a footnote indicator. By default, Bindery will simply insert
-the number as a superscript after the original element. `Optional`
-
-```js
-Bindery.Footnote({
-  selector: 'p > a',
-  render: (element, number) => {
-    return '<i>' + number + '</i>: Link to ' + element.href;
-  }
-}),
-```
 
 ### Counter
 Increment a counter as the book flows. This is useful for numbering figures or sections.
@@ -413,6 +365,7 @@ Bindery.Counter({
   }
 }),
 ```
+
 <div class='code-compare' markdown='1'>
 ```html
 <!-- Before -->
@@ -442,6 +395,56 @@ eBooks are different
 altogether.</p>
 ```
 </div>
+
+
+## Page Elements
+
+### RunningHeader
+An element added to each page. By default it will add a page number
+at the top right of each page, but you can use `render` to generate running
+headers using your section titles.
+
+Keep in mind you can also use multiple
+`RunningHeaders` to create multiple elements— for example, to add both a page number
+at the bottom and a chapter title at the top.
+```js
+Bindery.RunningHeader({
+  render: (page) => {
+    if (page.isEmpty) {
+      return '';
+    } else if (page.isLeft) {
+      return page.number + '·' + page.heading.h1;
+    } else {
+      return page.heading.h2 + '·' + page.number;
+    }
+  },
+})
+```
+- `render:` A function that takes a `Page` and returns a string of HTML. You'll
+probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
+of the `Page` — see [`Page`](#page) for details. `Optional`
+
+### Footnote
+Add a footnote to the bottom of the flow area. Footnotes cut into the area for
+text, so note that very large footnotes may bump the entire element to the
+next page.
+
+- `selector:` Which elements the rule should be applied to.
+- `render:` A function that takes an element and number, and returns the
+footnote for that element. This footnote will be inserted at the bottom of the flow
+area.
+- `replace:` A function that takes the selected element and number, and returns
+an new element with a footnote indicator. By default, Bindery will simply insert
+the number as a superscript after the original element. `Optional`
+
+```js
+Bindery.Footnote({
+  selector: 'p > a',
+  render: (element, number) => {
+    return '<i>' + number + '</i>: Link to ' + element.href;
+  }
+}),
+```
 
 
 ## Referencing Pages
