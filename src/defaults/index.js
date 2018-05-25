@@ -1,5 +1,5 @@
 import attributeRules from './attributeRules';
-import numberingRule from './numberingRule';
-import tableRule from './tableRule';
+import orderedListRule from './orderedListRule';
+import tableRowRule from './tableRowRule';
 
-export default [...attributeRules, numberingRule, tableRule];
+export default [...attributeRules, orderedListRule, tableRowRule];

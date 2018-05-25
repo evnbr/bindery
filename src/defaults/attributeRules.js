@@ -41,10 +41,7 @@ export default [
     replace: replacer,
     createTest: (element) => {
       const term = element.getAttribute('book-pages-with-text').toLowerCase().trim();
-      return (page) => {
-        const txt = page.textContent.toLowerCase();
-        return txt.includes(term);
-      };
+      return page => page.textContent.toLowerCase().includes(term);
     },
   }),
 
