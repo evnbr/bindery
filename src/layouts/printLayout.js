@@ -1,8 +1,10 @@
 import { createEl } from '../dom-utils';
-import { Page, orderPagesBooklet } from '../book';
+import { Page } from '../book';
+import { Layout } from '../constants';
+
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 import padPages from './padPages';
-import { Layout } from '../constants';
+import orderPagesBooklet from './orderPagesBooklet';
 
 const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
 const onePageSpread = children => createEl('.spread-wrapper.page-size', children);

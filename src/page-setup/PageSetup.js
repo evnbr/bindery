@@ -1,7 +1,7 @@
 import { stylesheet } from '../dom-utils';
 import { parseLength } from '../css-length';
 
-import { defaultPageSetup } from '../defaults';
+import defaultPageSetup from './defaultPageSetup';
 import { Paper, Layout } from '../constants';
 
 const letter = Object.freeze({ width: '8.5in', height: '11in' });
