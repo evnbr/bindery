@@ -1,7 +1,9 @@
 import clonePath from './clonePath';
 
-const noClasses = { toNext: [], fromPrev: [] };
-const customClasses = { toNext: ['toNext'], fromPrev: ['fromPrev'] };
+const applyRulesStub = (a, b) => {
+  a.classList.add('toNext');
+  b.classList.add('fromPrev');
+};
 
 test('Clone has same tagNames', () => {
   const crumb = [
@@ -10,7 +12,7 @@ test('Clone has same tagNames', () => {
     document.createElement('span'),
   ];
 
-  const newCrumb = clonePath(crumb, noClasses);
+  const newCrumb = clonePath(crumb, applyRulesStub);
 
   expect(newCrumb.length).toBe(crumb.length);
   expect(newCrumb[0].tagName).toBe('SECTION');
@@ -22,7 +24,7 @@ test('Split elements get classes from custom rule', () => {
   const div = document.createElement('div');
   const span = document.createElement('span');
   const crumb = [div, span];
-  const newCrumb = clonePath(crumb, customClasses);
+  const newCrumb = clonePath(crumb, applyRulesStub);
 
   expect(div.classList.contains('toNext')).toBe(true);
   expect(span.classList.contains('toNext')).toBe(true);
@@ -37,7 +39,7 @@ describe('Ordered Lists', () => {
     ol.appendChild(document.createElement('li'));
 
     const crumb = [ol];
-    const newCrumb = clonePath(crumb, customClasses);
+    const newCrumb = clonePath(crumb, applyRulesStub);
 
     expect(newCrumb[0].getAttribute('start')).toBe('3');
   });
@@ -50,7 +52,7 @@ describe('Ordered Lists', () => {
     ol.appendChild(li2);
 
     const crumb = [ol, li2];
-    const newCrumb = clonePath(crumb, customClasses);
+    const newCrumb = clonePath(crumb, applyRulesStub);
 
     expect(newCrumb[0].getAttribute('start')).toBe('2');
   });
@@ -62,7 +64,7 @@ describe('Ordered Lists', () => {
     ol.appendChild(document.createElement('li'));
 
     const crumb = [ol];
-    const newCrumb = clonePath(crumb, customClasses);
+    const newCrumb = clonePath(crumb, applyRulesStub);
 
     expect(newCrumb[0].getAttribute('start')).toBe('7');
   });
@@ -80,7 +82,7 @@ describe('Tables', () => {
     tr.appendChild(td);
 
     const crumb = [tr, td];
-    const newCrumb = clonePath(crumb, customClasses);
+    const newCrumb = clonePath(crumb, applyRulesStub);
     console.log(newCrumb);
 
     expect(newCrumb[0].childNodes.length).toBe(2);

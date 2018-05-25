@@ -1,30 +1,27 @@
 import { classes } from '../dom-utils';
 
-const preserveNumbering = (oldPath, nextChild, originalList, newList) => {
+const preserveNumbering = (original, clone, nextChild) => {
   // restart numbering
   let prevStart = 1;
-  if (originalList.hasAttribute('start')) {
+  if (original.hasAttribute('start')) {
     // the OL is also a continuation
-    prevStart = parseInt(originalList.getAttribute('start'), 10);
+    prevStart = parseInt(original.getAttribute('start'), 10);
   }
   if (nextChild && nextChild.tagName === 'LI') {
     // the first list item is a continuation
     prevStart -= 1;
   }
-  const prevCount = originalList.children.length;
+  const prevCount = original.children.length;
   const newStart = prevStart + prevCount;
-  newList.setAttribute('start', newStart);
+  clone.setAttribute('start', newStart);
 };
 
-const preserveTableColumns = (oldPath, nextChild, originalRow, newRow, mark) => {
-  const columns = [...originalRow.children];
+const preserveTableColumns = (original, clone, nextChild, deepClone) => {
+  const columns = [...original.children];
   const currentIndex = columns.indexOf(nextChild);
   for (let i = 0; i < currentIndex; i += 1) {
-    const clonedCol = columns[i].cloneNode(true); // deep clone, could be th > h3 > span;
-    if (clonedCol.tagName === 'TH') {
-      mark(columns[i], clonedCol);
-    }
-    newRow.appendChild(clonedCol);
+    const clonedCol = deepClone(columns[i]);
+    clone.appendChild(clonedCol);
   }
 };
 
@@ -54,10 +51,16 @@ const clonePath = (oldPath, applyRules) => {
     // fromPrev.forEach(cl => node.classList.add(cl));
   };
 
-  const mark = (original, clone) => {
+  const finishSplitting = (original, clone) => {
     markAsToNext(original);
     markAsFromPrev(clone);
     applyRules(original, clone);
+  };
+
+  const deepClone = (el) => {
+    const clone = el.cloneNode(true); // deep clone, could be th > h3 > span;
+    finishSplitting(el, clone);
+    return clone;
   };
 
   for (let i = oldPath.length - 1; i >= 0; i -= 1) {
@@ -65,16 +68,16 @@ const clonePath = (oldPath, applyRules) => {
     const clone = original.cloneNode(false); // shallow
     clone.innerHTML = '';
 
-    mark(original, clone);
+    finishSplitting(original, clone);
 
     // Special case for ordered lists
     if (clone.tagName === 'OL') {
-      preserveNumbering(oldPath, oldPath[i + 1], original, clone);
+      preserveNumbering(original, clone, oldPath[i + 1]);
     }
 
     // Special case to preserve columns of tables
     if (clone.tagName === 'TR') {
-      preserveTableColumns(oldPath, oldPath[i + 1], original, clone, mark);
+      preserveTableColumns(original, clone, oldPath[i + 1], deepClone);
     }
 
     if (i < oldPath.length - 1) clone.appendChild(newPath[i + 1]);
