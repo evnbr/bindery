@@ -18,7 +18,7 @@ class FlowBox {
     return this.content.textContent.trim() === '' && this.content.offsetHeight < 1;
   }
 
-  get isReasonablSize() {
+  get isReasonableSize() {
     const box = this.element.getBoundingClientRect();
     return (box.height > 100) && (box.width > 100); // TODO: Number is arbitrary
   }

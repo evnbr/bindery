@@ -1,4 +1,4 @@
 import shallowEqual from './shallowEqual';
-import oncePerFrameLimiter from './oncePerFrameLimiter';
+import { oncePerFrameLimiter, oncePerTimeLimiter } from './oncePerFrameLimiter';
 
-export { shallowEqual, oncePerFrameLimiter };
+export { shallowEqual, oncePerFrameLimiter, oncePerTimeLimiter };

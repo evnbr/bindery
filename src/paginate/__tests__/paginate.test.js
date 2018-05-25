@@ -23,7 +23,7 @@ jest.mock('../../flow-box', () => function MockFlow() {
     },
     continueFrom: () => {},
     hasOverflowed,
-    isReasonablSize: true,
+    isReasonableSize: true,
   };
 });
 

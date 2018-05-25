@@ -1,4 +1,5 @@
 import prefix from './prefixer';
+import { Mode } from '../constants';
 
 const classes = {
   showBleed: 'show-bleed',
@@ -23,5 +24,10 @@ Object.keys(classes).forEach((k) => {
   const val = classes[k];
   classes[k] = prefix(val);
 });
+
+classes.allModes = [classes.viewPreview, classes.viewPrint, classes.viewFlip];
+classes[Mode.PREVIEW] = classes.viewPreview;
+classes[Mode.PRINT] = classes.viewPrint;
+classes[Mode.FLIPBOOK] = classes.viewFlip;
 
 export default classes;

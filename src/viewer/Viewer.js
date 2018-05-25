@@ -1,19 +1,15 @@
 import { Page } from '../book';
 import { Mode, Paper, Layout, Marks } from '../constants';
 import { classes, createEl } from '../dom-utils';
-import { oncePerFrameLimiter } from '../utils';
+import { oncePerFrameLimiter, oncePerTimeLimiter } from '../utils';
 
 import { gridLayout, printLayout, flipLayout } from '../layouts';
 
 import errorView from './error';
 import listenForPrint from './listenForPrint';
 
-const modeClasses = {};
-modeClasses[Mode.PREVIEW] = classes.viewPreview;
-modeClasses[Mode.PRINT] = classes.viewPrint;
-modeClasses[Mode.FLIPBOOK] = classes.viewFlip;
-
 const throttleProgress = oncePerFrameLimiter();
+const throttleRender = oncePerTimeLimiter(100);
 
 class Viewer {
   constructor({ pageSetup, mode, layout, marks, ControlsComponent }) {
@@ -26,7 +22,7 @@ class Viewer {
     this.element = createEl('root', [this.progressBar, this.scaler]);
 
     this.doubleSided = true;
-    this.printArrange = layout;
+    this.layout = layout;
 
     this.setMarks(marks);
     this.mode = mode;
@@ -38,9 +34,9 @@ class Viewer {
       this.render();
     });
 
-    const throttleResize = oncePerFrameLimiter();
+    const throttleResize = oncePerTimeLimiter(50);
     window.addEventListener('resize', () => {
-      throttleResize(() => this.updateZoom());
+      throttleResize(() => this.scaleToFit());
     });
 
     if (ControlsComponent) {
@@ -48,7 +44,7 @@ class Viewer {
         { Mode, Paper, Layout, Marks }, // Available options
         { // Initial props
           paper: this.pageSetup.paper,
-          layout: this.printArrange,
+          layout: this.layout,
           mode: this.mode,
           marks,
         },
@@ -59,7 +55,7 @@ class Viewer {
             this.render();
           },
           setPaper: this.setSheetSize.bind(this),
-          setLayout: this.setPrintArrange.bind(this),
+          setLayout: this.setLayout.bind(this),
           setMarks: this.setMarks.bind(this),
           getPageSize: () => this.pageSetup.displaySize,
         }
@@ -81,7 +77,7 @@ class Viewer {
   }
 
   get isTwoUp() {
-    return this.printArrange !== Layout.PAGES;
+    return this.layout !== Layout.PAGES;
   }
 
   get isShowingCropMarks() {
@@ -116,13 +112,13 @@ class Viewer {
     this.mode = Mode.PRINT;
     this.render();
 
-    this.updateZoom();
-    setTimeout(() => { this.updateZoom(); }, 300);
+    this.scaleToFit();
+    setTimeout(() => { this.scaleToFit(); }, 300);
   }
 
-  setPrintArrange(newVal) {
-    if (newVal === this.printArrange) return;
-    this.printArrange = newVal;
+  setLayout(newVal) {
+    if (newVal === this.layout) return;
+    this.layout = newVal;
 
     this.pageSetup.printTwoUp = this.isTwoUp;
     this.pageSetup.updateStyleVars();
@@ -173,42 +169,55 @@ class Viewer {
     if (!this.book) return;
     this.show();
 
-    this.element.classList.remove(...Object.keys(modeClasses).map(k => modeClasses[k]));
-    this.element.classList.add(modeClasses[this.mode]);
+    this.element.classList.remove(...classes.allModes);
+    this.element.classList.add(classes[this.mode]);
+    this.isShowingBleed = this.mode === Mode.PRINT;
 
-    const { body } = document;
-    const scrollMax = body.scrollHeight - body.offsetHeight;
-    const scrollPct = body.scrollTop / scrollMax;
+    const prevScroll = this.scrollPercent;
 
     if (this.controls) this.controls.setDone(this.book.pages.length);
-    this.progressBar.style.transform = '';
+    this.progress = 1;
 
     window.requestAnimationFrame(() => {
       const pages = this.book.pages.slice();
 
       let frag;
-      if (this.mode === Mode.FLIPBOOK) frag = this.renderInteractive(pages);
-      else if (this.mode === Mode.PRINT) frag = this.renderPrint(pages);
-      else frag = this.renderGrid(pages);
+      if (this.mode === Mode.PREVIEW) frag = gridLayout(pages, this.doubleSided);
+      else if (this.mode === Mode.FLIPBOOK) frag = flipLayout(pages, this.doubleSided);
+      else if (this.mode === Mode.PRINT) frag = printLayout(pages, this.layout);
 
       this.content.innerHTML = '';
       this.content.appendChild(frag);
-      body.scrollTop = scrollMax * scrollPct;
-      this.updateZoom();
+      this.scrollPercent = prevScroll;
+      this.scaleToFit();
     });
   }
 
   set progress(p) {
-    throttleProgress(() => {
-      this.progressBar.style.transform = `scaleX(${p})`;
-    });
+    if (p < 1) {
+      throttleProgress(() => {
+        this.progressBar.style.transform = `scaleX(${p})`;
+      });
+    } else {
+      this.progressBar.style.transform = '';
+    }
+  }
+  updateProgress(book, estimatedProgress) {
+    this.progress = estimatedProgress;
+
+    // don't rerender if preview is out of view
+    const scrollTop = document.scrollingElement.scrollTop;
+    const scrollH = document.scrollingElement.scrollHeight;
+    const h = document.scrollingElement.offsetHeight;
+    if (scrollH > h * 3 && scrollTop < h) return;
+
+    // don't rerender too often
+    throttleRender(() => this.renderProgress(book, estimatedProgress));
   }
 
   renderProgress(book, estimatedProgress) {
     this.book = book;
     const needsZoomUpdate = !this.content.firstElementChild;
-
-    this.progress = estimatedProgress;
 
     if (this.controls) {
       this.controls.updateProgress(book.pageCount, estimatedProgress);
@@ -216,7 +225,7 @@ class Viewer {
 
     const sideBySide =
       this.mode === Mode.PREVIEW
-      || (this.mode === Mode.PRINT && this.printArrange !== Layout.PAGES);
+      || (this.mode === Mode.PRINT && this.layout !== Layout.PAGES);
     const limit = sideBySide ? 2 : 1;
 
     const makeSpread = function (...arg) {
@@ -245,34 +254,27 @@ class Viewer {
       this.content.appendChild(this.book.currentPage.element);
     }
 
-    if (needsZoomUpdate) this.updateZoom();
+    if (needsZoomUpdate) this.scaleToFit();
   }
 
-  updateZoom() {
+  scaleToFit() {
     if (!this.content.firstElementChild) return;
 
-    const scrollPct = document.body.scrollTop / document.body.scrollHeight;
-    const viewerRect = this.scaler.getBoundingClientRect();
+    const prevScroll = this.scrollPercent;
+    const viewerW = this.scaler.getBoundingClientRect().width;
     const contentW = this.content.getBoundingClientRect().width;
-    const scale = Math.min(1, viewerRect.width / (contentW));
+    const scale = Math.min(1, viewerW / contentW);
 
     this.scaler.style.transform = `scale(${scale})`;
-    document.body.scrollTop = document.body.scrollHeight * scrollPct;
+    this.scrollPercent = prevScroll;
   }
 
-  renderPrint(bookPages) {
-    this.isShowingBleed = true;
-    return printLayout(bookPages, this.printArrange);
+  get scrollPercent() {
+    return document.scrollingElement.scrollTop / document.scrollingElement.scrollHeight;
   }
 
-  renderGrid(bookPages) {
-    this.isShowingBleed = false;
-    return gridLayout(bookPages, this.doubleSided);
-  }
-
-  renderInteractive(bookPages) {
-    this.isShowingBleed = false;
-    return flipLayout(bookPages, this.doubleSided);
+  set scrollPercent(newVal) {
+    document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight * newVal;
   }
 }
 

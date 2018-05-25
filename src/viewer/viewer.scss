@@ -15,8 +15,11 @@
     background: var(--bindery-ui-bg);
     z-index: 99;
     position: relative;
-    padding-top: 72px;
+    padding-top: 40px;
     min-height: 100vh;
+    .view-flip & {
+      padding-top: 0;
+    }
   }
 
   .progress-bar {
@@ -58,17 +61,14 @@
 
   .measure-area {
     position: fixed;
-    background: var(--bindery-ui-bg);
     padding: 50px 20px;
     z-index: 99;
     visibility: hidden;
+    top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-
-    .page {
-      margin: 0 auto 50px;
-    }
+    width: 0;
+    height: 0;
+    overflow: hidden;
   }
 
   .is-overflowing {

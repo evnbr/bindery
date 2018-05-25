@@ -1,5 +1,5 @@
 import FlowBox from '../flow-box';
-import { c, createEl, classes } from '../dom-utils';
+import { safeMeasure, createEl, classes } from '../dom-utils';
 
 class Page {
   constructor() {
@@ -11,15 +11,7 @@ class Page {
 
   static isSizeValid() {
     const testPage = new Page();
-    let measureArea = document.querySelector(c('.measure-area'));
-    if (!measureArea) measureArea = document.body.appendChild(createEl('measure-area'));
-
-    measureArea.innerHTML = '';
-    measureArea.appendChild(testPage.element);
-    const isValid = testPage.flow.isReasonablSize;
-    measureArea.parentNode.removeChild(measureArea);
-
-    return isValid;
+    return safeMeasure(testPage.element, () => testPage.flow.isReasonableSize);
   }
 
   setLeftRight(dir) {
@@ -77,7 +69,8 @@ class Page {
   }
 
   hasOverflowed() {
-    return this.flow.hasOverflowed();
+    return safeMeasure(this.element, () => this.flow.hasOverflowed());
+    // return this.flow.hasOverflowed();
   }
 }
 

@@ -1,20 +1,9 @@
 import classes from './classes';
 import prefixer from './prefixer';
+import safeMeasure from './safeMeasure';
+import createEl from './createEl';
 
 const doc = window.document;
-
-// Create div with prefixed classes
-const createEl = (className, content = []) => {
-  const div = doc.createElement('div');
-  div.className = className.split('.').filter(txt => txt !== '').map(prefixer).join(' ');
-
-  if (typeof content === 'string') {
-    div.textContent = content;
-  } else if (Array.isArray(content)) {
-    content.forEach(child => div.appendChild(child));
-  }
-  return div;
-};
 
 // Create stylesheet with id
 const addStylesheet = (id) => {
@@ -35,4 +24,4 @@ const parseHTML = (text, selector) => {
 };
 
 const c = prefixer;
-export { c, classes, createEl, stylesheet, parseHTML };
+export { c, classes, createEl, stylesheet, safeMeasure, parseHTML };
