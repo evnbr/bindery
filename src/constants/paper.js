@@ -1,0 +1,17 @@
+const AUTO = 0;
+const AUTO_BLEED = 1;
+const AUTO_MARKS = 2;
+const LETTER_PORTRAIT = 3;
+const LETTER_LANDSCAPE = 4;
+const A4_PORTRAIT = 5;
+const A4_LANDSCAPE = 6;
+
+export {
+  AUTO,
+  AUTO_BLEED,
+  AUTO_MARKS,
+  LETTER_PORTRAIT,
+  LETTER_LANDSCAPE,
+  A4_PORTRAIT,
+  A4_LANDSCAPE,
+};

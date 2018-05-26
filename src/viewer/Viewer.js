@@ -49,11 +49,7 @@ class Viewer {
           marks,
         },
         { // Actions
-          setMode: (newMode) => {
-            if (newMode === this.mode) return;
-            this.mode = newMode;
-            this.render();
-          },
+          setMode: this.setMode.bind(this),
           setPaper: this.setSheetSize.bind(this),
           setLayout: this.setLayout.bind(this),
           setMarks: this.setMarks.bind(this),
@@ -66,6 +62,13 @@ class Viewer {
     this.inProgress = true;
 
     this.show();
+  }
+
+  setMode(newVal) {
+    const newMode = parseInt(newVal, 10);
+    if (newMode === this.mode) return;
+    this.mode = newMode;
+    this.render();
   }
 
   get inProgress() {
@@ -185,6 +188,10 @@ class Viewer {
       if (this.mode === Mode.PREVIEW) frag = gridLayout(pages, this.doubleSided);
       else if (this.mode === Mode.FLIPBOOK) frag = flipLayout(pages, this.doubleSided);
       else if (this.mode === Mode.PRINT) frag = printLayout(pages, this.layout);
+      else {
+        this.displayError('Invalid layout mode', `${this.mode} (${typeof this.mode})`);
+        return;
+      }
 
       this.content.innerHTML = '';
       this.content.appendChild(frag);
