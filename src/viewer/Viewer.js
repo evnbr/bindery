@@ -277,10 +277,12 @@ class Viewer {
   }
 
   get scrollPercent() {
+    if (!document || !document.scrollingElement) return 0;
     return document.scrollingElement.scrollTop / document.scrollingElement.scrollHeight;
   }
 
   set scrollPercent(newVal) {
+    if (!document || !document.scrollingElement) return;
     document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight * newVal;
   }
 }

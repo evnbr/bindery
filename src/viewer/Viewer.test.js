@@ -92,7 +92,7 @@ test('FLIPBOOK mode adds all pages', () => {
 test('PRINT mode, PAGE layout adds all pages', () => {
   viewer.clear();
   viewer.mode = Mode.PRINT;
-  viewer.setPrintArrange(Layout.PAGES);
+  viewer.layout = Layout.PAGES;
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd).toEqual([true, true, true, true]);
@@ -101,7 +101,7 @@ test('PRINT mode, PAGE layout adds all pages', () => {
 test('PRINT mode, SPREAD layout adds all pages', () => {
   viewer.clear();
   viewer.mode = Mode.PRINT;
-  viewer.setPrintArrange(Layout.SPREADS);
+  viewer.layout = Layout.SPREADS;
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd).toEqual([true, true, true, true]);
@@ -110,7 +110,7 @@ test('PRINT mode, SPREAD layout adds all pages', () => {
 test('PRINT mode, BOOKLET layout adds all pages', () => {
   viewer.clear();
   viewer.mode = Mode.PRINT;
-  viewer.setPrintArrange(Layout.BOOKLET);
+  viewer.layout = Layout.BOOKLET;
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd).toEqual([true, true, true, true]);
