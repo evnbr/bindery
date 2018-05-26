@@ -30,10 +30,10 @@ class PageReference extends Replace {
 
   afterAdd(elmt, book) {
     const test = this.createTest(elmt);
-    if (test) {
-      return this.createReference(book, test, elmt);
-    }
-    return elmt;
+    if (!test) return elmt;
+
+    const ref = this.createReference(book, test, elmt);
+    return ref.element;
   }
 
   createReference(book, test, elmt) {
@@ -43,7 +43,7 @@ class PageReference extends Replace {
     this.references.push(ref);
     const currentResults = pageNumbersForTest(book.pages, test);
     ref.render(currentResults); // Replace element immediately, to make sure it'll fit
-    return ref.element;
+    return ref;
   }
 
   render(ref, newValue) {
@@ -63,14 +63,10 @@ class PageReference extends Replace {
   }
 
   createTest(element) {
-    let selector = element.getAttribute('href');
-    if (selector) {
-      selector = selector.replace('#', '');
-      // extra resilient in case it starts with a number ie wikipedia
-      selector = `[id="${selector}"]`;
-      return el => el.querySelector(selector);
-    }
-    return null;
+    const href = element.getAttribute('href');
+    if (!href) return null;
+    const selector = `[id="${href.replace('#', '')}"]`;
+    return el => el.querySelector(selector);
   }
 
   updatePageReferences(pages) {

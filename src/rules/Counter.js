@@ -19,15 +19,9 @@ class Counter extends Rule {
     this.counterValue = 0;
   }
   beforeAdd(el) {
-    if (el.matches(this.incrementEl)) {
-      this.counterValue += 1;
-    }
-    if (el.matches(this.resetEl)) {
-      this.counterValue = 0;
-    }
-    if (el.matches(this.replaceEl)) {
-      return this.createReplacement(el);
-    }
+    if (el.matches(this.incrementEl)) this.counterValue += 1;
+    if (el.matches(this.resetEl)) this.counterValue = 0;
+    if (el.matches(this.replaceEl)) return this.createReplacement(el);
     return el;
   }
   createReplacement(element) {

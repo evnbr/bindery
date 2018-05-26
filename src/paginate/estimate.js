@@ -19,7 +19,7 @@ const estimate = (content) => {
       const end = window.performance.now();
       const total = end - start;
       const layout = total - timeWaiting;
-      console.log(`📖 Book ready in ${sec(total)}s (Layout: ${sec(layout)}s, waiting for images: ${sec(timeWaiting)}s)`);
+      console.log(`📖 Layout ready in ${sec(layout)}s (Waiting for images: ${sec(timeWaiting)}s)`);
     },
   };
 };

@@ -164,13 +164,13 @@ const paginate = (content, rules, progressCallback) => {
     }
 
     // Overflows when full
-    if (hasOverflowed()) {
-      if (!ignoreCurrentOverflow() && canSplitCurrent()) {
-        tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
-      } else {
-        // Its okay that this element overflows
-      }
-    }
+    // if (hasOverflowed()) {
+    //   if (!ignoreCurrentOverflow() && canSplitCurrent()) {
+    //     tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
+    //   } else {
+    //     console.log('ok..');
+    //   }
+    // }
 
     // Transforms after adding
     const addedElement = book.currentPage.flow.path.pop();
