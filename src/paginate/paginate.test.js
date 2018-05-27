@@ -1,4 +1,4 @@
-import paginate from '../paginate';
+import paginate from './paginate';
 
 let time = 0;
 global.performance = { now: () => {
@@ -9,7 +9,7 @@ global.performance = { now: () => {
 const mockDoc = document;
 const mockEl = () => mockDoc.createElement('div');
 
-jest.mock('../../flow-box', () => function MockFlow() {
+jest.mock('../flow-box', () => function MockFlow() {
   const content = mockEl();
   const hasOverflowed = () => content.textContent.length > 10;
   const path = [];

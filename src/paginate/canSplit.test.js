@@ -1,5 +1,5 @@
 // import { c } from '../../dom-utils';
-import { ignoreOverflow, canSplit } from '../canSplit';
+import { ignoreOverflow, canSplit } from './canSplit';
 
 let div;
 let span;

@@ -1,4 +1,4 @@
-import { addTextNode, addTextNodeUntilOverflow, addTextNodeAcrossElements } from '../addTextNode';
+import { addTextNode, addTextNodeUntilOverflow, addTextNodeAcrossElements } from './addTextNode';
 
 global.performance = { now: jest.fn() };
 
