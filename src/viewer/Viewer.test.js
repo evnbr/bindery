@@ -46,21 +46,23 @@ test('crop mark getter/setters work', () => {
   expect(viewer.isShowingCropMarks).toBe(true);
 });
 
-test('renderProgress() adds pages when called multiple times', () => {
+test('updateProgress() adds pages when called multiple times', () => {
   viewer.clear();
 
   const partialBook = {
     pages: [mockPage(), currentPage],
     currentPage,
   };
-  viewer.renderProgress(partialBook);
+  viewer.updateProgress(partialBook, 0.1);
+  viewer.renderProgress(partialBook, 0.5);
 
   const didAdd2 = partialBook.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd2).toEqual([true, true]);
   expect(viewer.inProgress).toBe(true);
 
   partialBook.pages.push(mockPage(), mockPage());
-  viewer.renderProgress(partialBook);
+  viewer.updateProgress(partialBook, 0.5);
+  viewer.renderProgress(partialBook, 0.5);
 
   const didAdd4 = partialBook.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd4).toEqual([true, true, true, true]);

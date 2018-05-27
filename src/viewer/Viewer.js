@@ -10,6 +10,7 @@ import listenForPrint from './listenForPrint';
 
 const throttleProgress = oncePerFrameLimiter();
 const throttleRender = oncePerTimeLimiter(100);
+const document = window.document;
 
 class Viewer {
   constructor({ pageSetup, mode, layout, marks, ControlsComponent }) {
@@ -210,8 +211,10 @@ class Viewer {
     }
   }
   updateProgress(book, estimatedProgress) {
+    this.book = book;
     this.progress = estimatedProgress;
 
+    if (!document || !document.scrollingElement) return;
     // don't rerender if preview is out of view
     const scrollTop = document.scrollingElement.scrollTop;
     const scrollH = document.scrollingElement.scrollHeight;
@@ -223,7 +226,6 @@ class Viewer {
   }
 
   renderProgress(book, estimatedProgress) {
-    this.book = book;
     const needsZoomUpdate = !this.content.firstElementChild;
 
     if (this.controls) {
