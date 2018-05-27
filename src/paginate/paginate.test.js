@@ -28,7 +28,7 @@ jest.mock('../flow-box', () => function MockFlow() {
 });
 
 
-test('Creates book, preserves content order', () => {
+test('Creates book, preserves content order', async () => {
   const a = mockEl();
   const b = mockEl();
   const c = mockEl();
@@ -38,34 +38,28 @@ test('Creates book, preserves content order', () => {
   a.appendChild(b);
   b.appendChild(c);
 
-  paginate(a, [], () => {})
-    .then((book) => {
-      expect(book.pageCount).toBe(4);
+  const book = await paginate(a, [], () => {});
+  expect(book.pageCount).toBe(3);
 
-      const allText = book.pages
-        .map(pg => pg.flow.content.textContent)
-        .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+  const allText = book.pages
+    .map(pg => pg.flow.content.textContent)
+    .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
 
-      expect(allText).toBe('Acontent.Bcontent.Ccontent.');
-    })
-    .catch(e => console.error(e));
+  expect(allText).toBe('Acontent.Bcontent.Ccontent.');
 });
 
-test('Splits a single div over many pages', () => {
+test('Splits a single div over many pages', async () => {
   const content = mockEl();
   content.textContent = 'A content. B content. C content.';
 
-  paginate(content, [], () => {})
-    .then((book) => {
-      expect(book.pageCount).toBe(4);
+  const book = await paginate(content, [], () => {});
+  expect(book.pageCount).toBe(5);
 
-      const allText = book.pages
-        .map(pg => pg.flow.content.textContent)
-        .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
-      expect(allText).toBe('Acontent.Bcontent.Ccontent.');
+  const allText = book.pages
+    .map(pg => pg.flow.content.textContent)
+    .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+  expect(allText).toBe('Acontent.Bcontent.Ccontent.');
 
-      expect(book.pages.map(pg => pg.isOverflowing()))
-        .toEqual([false, false, false, false]);
-    })
-    .catch(e => console.error(e));
+  expect(book.pages.map(pg => pg.hasOverflowed()))
+    .toEqual([false, false, false, false, false]);
 });
