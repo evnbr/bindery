@@ -48,29 +48,26 @@ class Page {
   }
 
   validate() {
-    if (this.hasOverflowed()) {
-      const suspect = this.currentElement;
-      if (suspect) {
-        console.warn('Bindery: Content overflows, probably due to a style set on:', suspect);
-        suspect.parentNode.removeChild(suspect);
-      } else {
-        console.warn('Bindery: Content overflows.');
-      }
+    if (!this.hasOverflowed()) return;
+    const suspect = this.currentElement;
+    if (suspect) {
+      console.warn('Bindery: Content overflows, probably due to a style set on:', suspect);
+      suspect.parentNode.removeChild(suspect);
+    } else {
+      console.warn('Bindery: Content overflows.');
     }
   }
 
   validateEnd(allowOverflow) {
-    if (this.hasOverflowed()) {
-      console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
-      if (!this.suppressErrors && !allowOverflow) {
-        throw Error('Bindery: Moved to new page when last one is still overflowing');
-      }
+    if (!this.hasOverflowed()) return;
+    console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
+    if (!this.suppressErrors && !allowOverflow) {
+      throw Error('Bindery: Moved to new page when last one is still overflowing');
     }
   }
 
   hasOverflowed() {
     return safeMeasure(this.element, () => this.flow.hasOverflowed());
-    // return this.flow.hasOverflowed();
   }
 }
 
