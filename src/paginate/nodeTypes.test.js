@@ -1,4 +1,4 @@
-import { isTextNode, isUnloadedImage, isContentElement } from '../nodeTypes';
+import { isTextNode, isUnloadedImage, isContentElement } from './nodeTypes';
 
 const textNode = document.createTextNode('sample');
 const div = document.createElement('div');

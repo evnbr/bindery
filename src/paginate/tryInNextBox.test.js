@@ -1,5 +1,5 @@
-import FlowBox from '../../flow-box';
-import tryInNextBox from '../tryInNextBox';
+import FlowBox from '../flow-box';
+import tryInNextBox from './tryInNextBox';
 
 const el = () => {
   const div = document.createElement('div');

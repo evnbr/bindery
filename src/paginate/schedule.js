@@ -1,4 +1,4 @@
-const MAX_TIME = 50; // ms
+const MAX_TIME = 30; // ms
 
 const rAF = () => new Promise((resolve) => {
   requestAnimationFrame(t => resolve(t));
