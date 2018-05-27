@@ -77,7 +77,7 @@ test('viewer.clear() removes all pages', () => {
 
 test('PREVIEW mode adds all pages', () => {
   viewer.clear();
-  viewer.mode = Mode.PREVIEW;
+  viewer.setMode(Mode.PREVIEW);
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd).toEqual([true, true, true, true]);
@@ -85,7 +85,7 @@ test('PREVIEW mode adds all pages', () => {
 
 test('FLIPBOOK mode adds all pages', () => {
   viewer.clear();
-  viewer.mode = Mode.FLIPBOOK;
+  viewer.setMode(Mode.FLIPBOOK);
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd).toEqual([true, true, true, true]);
@@ -93,7 +93,7 @@ test('FLIPBOOK mode adds all pages', () => {
 
 test('PRINT mode, PAGE layout adds all pages', () => {
   viewer.clear();
-  viewer.mode = Mode.PRINT;
+  viewer.setMode(Mode.PRINT);
   viewer.layout = Layout.PAGES;
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
@@ -102,7 +102,7 @@ test('PRINT mode, PAGE layout adds all pages', () => {
 
 test('PRINT mode, SPREAD layout adds all pages', () => {
   viewer.clear();
-  viewer.mode = Mode.PRINT;
+  viewer.setMode(Mode.PRINT);
   viewer.layout = Layout.SPREADS;
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));
@@ -111,7 +111,7 @@ test('PRINT mode, SPREAD layout adds all pages', () => {
 
 test('PRINT mode, BOOKLET layout adds all pages', () => {
   viewer.clear();
-  viewer.mode = Mode.PRINT;
+  viewer.setMode(Mode.PRINT);
   viewer.layout = Layout.BOOKLET;
   viewer.render(book);
   const didAdd = book.pages.map(pg => viewer.element.contains(pg.element));

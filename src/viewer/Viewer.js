@@ -2,7 +2,6 @@ import { Page } from '../book';
 import { Mode, Paper, Layout, Marks } from '../constants';
 import { classes, createEl } from '../dom-utils';
 import { oncePerFrameLimiter, oncePerTimeLimiter } from '../utils';
-
 import { gridLayout, printLayout, flipLayout } from '../layouts';
 
 import errorView from './error';
