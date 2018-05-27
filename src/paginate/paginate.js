@@ -7,11 +7,11 @@ import { ignoreOverflow, canSplit } from './canSplit';
 import { addTextNode, addTextNodeAcrossElements } from './addTextNode';
 import tryInNextBox from './tryInNextBox';
 import RuleSet from './RuleSet';
-import estimate from './estimate';
+import estimateFor from './estimateProgress';
 
 const paginate = (content, rules, progressCallback) => {
   // Global state for a pagination run
-  const estimator = estimate(content);
+  const estimator = estimateFor(content);
   const ruleSet = new RuleSet(rules);
 
   const book = new Book();

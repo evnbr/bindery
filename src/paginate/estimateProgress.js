@@ -2,7 +2,7 @@ import ensureImageLoaded from './ensureImageLoaded';
 
 const sec = ms => (ms / 1000).toFixed(2);
 
-const estimate = (content) => {
+const estimateFor = (content) => {
   const start = window.performance.now();
   const capacity = content.querySelectorAll('*').length;
   let timeWaiting = 0;
@@ -24,4 +24,4 @@ const estimate = (content) => {
   };
 };
 
-export default estimate;
+export default estimateFor;
