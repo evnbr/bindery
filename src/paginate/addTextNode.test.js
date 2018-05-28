@@ -61,7 +61,7 @@ describe('addTextUntilOverflow', () => {
     });
   });
 
-  test('cancels if page overflows when not empty (ie inline block that collapses without content)', () => {
+  test('cancels if page overflows when not length > 0 (ie, inline elements that collapses without content)', () => {
     const mockParent = document.createElement('div');
     const textNode = document.createTextNode(testContent);
     const page = () => textNode.nodeValue !== '';
