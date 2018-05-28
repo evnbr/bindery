@@ -195,7 +195,9 @@ class Viewer {
 
       this.content.innerHTML = '';
       this.content.appendChild(frag);
-      this.scrollPercent = prevScroll;
+      if (!this.hasRendered) this.hasRendered = true;
+      else this.scrollPercent = prevScroll;
+
       this.scaleToFit();
     });
   }
@@ -257,10 +259,6 @@ class Viewer {
         }
       }
     });
-
-    if (this.book.currentPage) {
-      this.content.appendChild(this.book.currentPage.element);
-    }
 
     if (needsZoomUpdate) this.scaleToFit();
   }
