@@ -9,7 +9,7 @@ import orderPagesBooklet from './orderPagesBooklet';
 const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
 const onePageSpread = children => createEl('.spread-wrapper.page-size', children);
 
-const renderPrintLayout = (bookPages, layout) => {
+const renderPrintLayout = (bookPages, doubleSided, layout) => {
   const isTwoUp = layout !== Layout.PAGES;
   const isSpreads = layout === Layout.SPREADS;
   const isBooklet = layout === Layout.BOOKLET;

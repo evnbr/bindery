@@ -183,23 +183,21 @@ class Viewer {
 
     window.requestAnimationFrame(() => {
       const pages = this.book.pages.slice();
-
-      let frag;
-      if (this.mode === Mode.PREVIEW) frag = gridLayout(pages, this.doubleSided);
-      else if (this.mode === Mode.FLIPBOOK) frag = flipLayout(pages, this.doubleSided);
-      else if (this.mode === Mode.PRINT) frag = printLayout(pages, this.layout);
-      else {
-        this.displayError('Invalid layout mode', `${this.mode} (${typeof this.mode})`);
-        return;
-      }
-
+      const fragment = this.viewFor(this.mode)(pages, this.doubleSided, this.layout);
       this.content.innerHTML = '';
-      this.content.appendChild(frag);
+      this.content.appendChild(fragment);
       if (!this.hasRendered) this.hasRendered = true;
       else this.scrollPercent = prevScroll;
 
       this.scaleToFit();
     });
+  }
+
+  viewFor(mode) {
+    if (mode === Mode.PREVIEW) return gridLayout;
+    else if (mode === Mode.FLIPBOOK) return flipLayout;
+    else if (mode === Mode.PRINT) return printLayout;
+    throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
   }
 
   set progress(p) {
@@ -238,26 +236,24 @@ class Viewer {
       || (this.mode === Mode.PRINT && this.layout !== Layout.PAGES);
     const limit = sideBySide ? 2 : 1;
 
-    const makeSpread = function (...arg) {
-      return createEl('.spread-wrapper.spread-size', [...arg]);
-    };
+    const makeSpread = pgs => createEl('.spread-wrapper.spread-size', pgs);
 
     this.book.pages.forEach((page, i) => {
-      // If hasn't been added, or not in spread yet
-      if (!this.content.contains(page.element) || page.element.parentNode === this.content) {
-        if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
-          this.lastSpreadInProgress.appendChild(page.element);
-        } else {
-          if (i === 0 && sideBySide) {
-            const spacer = new Page();
-            spacer.element.style.visibility = 'hidden';
-            this.lastSpreadInProgress = makeSpread(spacer.element, page.element);
-          } else {
-            this.lastSpreadInProgress = makeSpread(page.element);
-          }
-          this.content.appendChild(this.lastSpreadInProgress);
-        }
+      if (this.content.contains(page.element) && page.element.parentNode !== this.content) return;
+      if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
+        this.lastSpreadInProgress.appendChild(page.element);
+        return;
       }
+      this.lastSpreadInProgress = makeSpread([page.element]);
+      if (i === 0 && sideBySide) {
+        const spacer = new Page();
+        spacer.element.style.visibility = 'hidden';
+        this.lastSpreadInProgress.insertBefore(
+          spacer.element,
+          this.lastSpreadInProgress.firstElementChild
+        );
+      }
+      this.content.appendChild(this.lastSpreadInProgress);
     });
 
     if (needsZoomUpdate) this.scaleToFit();
@@ -265,24 +261,27 @@ class Viewer {
 
   scaleToFit() {
     if (!this.content.firstElementChild) return;
-
     const prevScroll = this.scrollPercent;
+    this.scaler.style.transform = `scale(${this.scaleThatFits})`;
+    this.scrollPercent = prevScroll;
+  }
+
+  get scaleThatFits() {
     const viewerW = this.scaler.getBoundingClientRect().width;
     const contentW = this.content.getBoundingClientRect().width;
-    const scale = Math.min(1, viewerW / contentW);
-
-    this.scaler.style.transform = `scale(${scale})`;
-    this.scrollPercent = prevScroll;
+    return Math.min(1, viewerW / contentW);
   }
 
   get scrollPercent() {
     if (!document || !document.scrollingElement) return 0;
-    return document.scrollingElement.scrollTop / document.scrollingElement.scrollHeight;
+    const el = document.scrollingElement;
+    return el.scrollTop / el.scrollHeight;
   }
 
   set scrollPercent(newVal) {
     if (!document || !document.scrollingElement) return;
-    document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight * newVal;
+    const el = document.scrollingElement;
+    el.scrollTop = el.scrollHeight * newVal;
   }
 }
 
