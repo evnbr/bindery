@@ -14,12 +14,11 @@ const hasSameKeys = (opts, required) => {
   return !keys.some(k => !hasProp(opts, k));
 };
 
-const isShape = template => userShape => isObj(userShape)
-  && validate(userShape, template);
+const isShape = template => input => isObj(input) && validate(input, template);
 
-const isShapeExact = template => userShape => isObj(userShape)
-  && hasSameKeys(userShape, template)
-  && validate(userShape, template);
+const isShapeExact = template => input => isObj(input)
+  && hasSameKeys(input, template)
+  && validate(input, template);
 
 const isEnum = cases => str => cases.includes(str);
 
@@ -30,12 +29,12 @@ const T = {
   },
   enum(...cases) {
     return {
-      name: `("${cases.join('" | "')}")`,
+      name: `(${cases.map(c => `"${c}"`).join(' | ')})`,
       check: isEnum(cases),
     };
   },
   shapeExact: template => ({
-    name: `exactly {${Object.keys(template).join(', ')}})`,
+    name: `exactly ({${Object.keys(template).join(', ')}})`,
     check: isShapeExact(template),
   }),
   shape: template => ({
