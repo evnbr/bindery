@@ -15,6 +15,7 @@ const pageStub = n => ({
   setPreference: () => {},
 });
 
+const nextPage = () => pageStub();
 
 const spread = new FullBleedSpread({ selector: 'figure' });
 
@@ -58,24 +59,8 @@ test('Pages get placed in rotate container', () => {
 
   rotatedSpread.createOutOfFlowPages(el, book, pageStub);
 
-  expect(book.currentPage.flow.element.contains(el)).toBe(false);
-  expect(book.currentPage.background.contains(el)).toBe(true);
-  expect(book.pages.length).toBe(3);
-  expect(book.currentPage.background.parentNode.parentNode).toBe(book.currentPage.element);
-});
-
-test('Pages are created out of flow', () => {
-  const book = { pages: [pageStub(0), pageStub(1)] };
-  book.currentPage = book.pages[1];
-  book.currentPage.isEmpty = true;
-
-  const el = createEl('figure');
-  book.currentPage.flow.element.appendChild(el);
-
-  spread.afterAdd(el, book, null, pageStub);
-
-  expect(book.currentPage.flow.element.contains(el)).toBe(false);
-  expect(book.currentPage.background.contains(el)).toBe(true);
-  expect(book.pages.length).toBe(3);
-  expect(book.currentPage.background.parentNode.parentNode).toBe(book.currentPage.element);
+  expect(book.pages.length).toBe(4);
+  expect(book.pages[2].flow.element.contains(el)).toBe(false);
+  expect(book.pages[2].background.contains(el)).toBe(true);
+  expect(book.pages[2].background.parentNode.parentNode).toBe(book.pages[2].element);
 });
