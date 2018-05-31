@@ -15,8 +15,6 @@ const pageStub = n => ({
   setPreference: () => {},
 });
 
-const nextPage = () => pageStub();
-
 const spread = new FullBleedSpread({ selector: 'figure' });
 
 test('Spread gets created', () => {

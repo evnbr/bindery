@@ -76,7 +76,7 @@ test('Splits a single div over many pages (10char overflow)', async () => {
     .toEqual([false, false, false, false, false]);
 });
 
-test('Splits many divs over many pages (100char overflow)', async () => {
+test('Split elements over many pages (100char overflow)', async () => {
   const content = mockEl('section');
   let expectedText = '';
   for (let i = 0; i < 20; i += 1) {
@@ -99,7 +99,7 @@ test('Splits many divs over many pages (100char overflow)', async () => {
     .toEqual([false, false, false]);
 });
 
-test('Splits many divs over many pages (5children overflow)', async () => {
+test('Split elements over many pages (5children overflow)', async () => {
   const content = mockEl('div');
   let expectedText = '';
   for (let i = 0; i < 20; i += 1) {
@@ -121,4 +121,34 @@ test('Splits many divs over many pages (5children overflow)', async () => {
     .map(pg => pg.flow.content.textContent)
     .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
   expect(actualText).toBe(expectedText);
+});
+
+test('Spreads elements over many pages without splitting any (100char overflow)', async () => {
+  const content = mockEl('section');
+  let expectedText = '';
+  for (let i = 0; i < 20; i += 1) {
+    const e = mockEl('p');
+    const txt = `Paragraph ${i}`;
+    e.textContent = txt;
+    expectedText += txt.replace(/\s+/g, '');
+    content.appendChild(e);
+  }
+
+  const rule = { selector: 'p', avoidSplit: true };
+
+  mockOverflow = el => el.textContent.length > 100;
+  const book = await paginate(content, [rule], () => {});
+  expect(book.pageCount).toBe(3);
+
+  const endParagraphCount = book.pages
+    .map(pg => pg.flow.content.querySelectorAll('p').length)
+    .reduce((a, b) => a + b);
+  expect(endParagraphCount).toBe(20);
+
+  const actualText = book.pages
+    .map(pg => pg.flow.content.textContent)
+    .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+  expect(actualText).toBe(expectedText);
+  expect(book.pages.map(pg => pg.element.textContent.length > 100))
+    .toEqual([false, false, false]);
 });
