@@ -1,4 +1,4 @@
-import paginate from './paginate';
+import makeBook from './makeBook';
 import mockClonePath from '../flow-box/clonePath';
 
 let time = 0;
@@ -49,7 +49,7 @@ test('Creates book, preserves content order (10char overflow)', async () => {
   b.appendChild(c);
 
   mockOverflow = el => el.textContent.length > 10;
-  const book = await paginate(a, [], () => {});
+  const book = await makeBook(a, [], () => {});
   expect(book.pageCount).toBe(3);
 
   const allText = book.pages
@@ -64,7 +64,7 @@ test('Splits a single div over many pages (10char overflow)', async () => {
   content.textContent = 'A content. B content. C content.';
 
   mockOverflow = el => el.textContent.length > 10;
-  const book = await paginate(content, [], () => {});
+  const book = await makeBook(content, [], () => {});
   expect(book.pageCount).toBe(5);
 
   const allText = book.pages
@@ -88,7 +88,7 @@ test('Split elements over many pages (100char overflow)', async () => {
   }
 
   mockOverflow = el => el.textContent.length > 100;
-  const book = await paginate(content, [], () => {});
+  const book = await makeBook(content, [], () => {});
   expect(book.pageCount).toBe(3);
 
   const actualText = book.pages
@@ -114,7 +114,7 @@ test('Split elements over many pages (5children overflow)', async () => {
     const count = (el.querySelectorAll('*') || []).length;
     return count > 5;
   };
-  const book = await paginate(content, [], () => {});
+  const book = await makeBook(content, [], () => {});
   expect(book.pageCount).toBe(5);
 
   const actualText = book.pages
@@ -137,7 +137,7 @@ test('Spreads elements over many pages without splitting any (100char overflow)'
   const rule = { selector: 'p', avoidSplit: true };
 
   mockOverflow = el => el.textContent.length > 100;
-  const book = await paginate(content, [rule], () => {});
+  const book = await makeBook(content, [rule], () => {});
   expect(book.pageCount).toBe(3);
 
   const endParagraphCount = book.pages

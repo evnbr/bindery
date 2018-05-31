@@ -1,3 +1,3 @@
-import paginate from './paginate';
+import makeBook from './makeBook';
 
-export default paginate;
+export default makeBook;
