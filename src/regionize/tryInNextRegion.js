@@ -3,7 +3,7 @@
 // step up the tree to find the first ancestor
 // that can be split, and move all of that descendants
 // to the next page.
-const tryInNextRegion = (region, makeNextRegion, canSplitElement) => {
+const tryInNextRegion = (region, makeNextRegion, canSplit) => {
   if (region.path.length <= 1) {
     throw Error('Bindery: Attempting to move the top-level element');
   }
@@ -15,7 +15,7 @@ const tryInNextRegion = (region, makeNextRegion, canSplitElement) => {
   // find the nearest splittable parent
   let nearestElementThatCanBeMoved = elementToMove;
   const pathToRestore = [];
-  while (region.path.length > 1 && !canSplitElement(region.currentElement)) {
+  while (region.path.length > 1 && !canSplit(region.currentElement)) {
     nearestElementThatCanBeMoved = region.path.pop();
     pathToRestore.unshift(nearestElementThatCanBeMoved);
   }

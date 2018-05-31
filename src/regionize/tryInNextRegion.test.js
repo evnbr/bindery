@@ -10,7 +10,7 @@ const el = () => {
 
 const noop = () => {};
 const mockRegion = (path) => {
-  const flow = new Region();
+  const flow = new Region(document.createElement('div'));
   if (path) {
     flow.content.appendChild(path[0]);
     for (let i = 0; i < path.length - 1; i += 1) {

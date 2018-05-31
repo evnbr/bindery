@@ -1,3 +1,4 @@
+import { classes } from '../dom-utils';
 import dedupe from './dedupeRules';
 import recoverFromRule from './recoverFromRule';
 
@@ -25,6 +26,9 @@ class RuleSet {
   }
 
   applySplitRules(original, clone, nextChild, deepClone) {
+    original.classList.add(classes.toNext);
+    clone.classList.add(classes.fromPrev);
+
     this.didSplitRules.filter(r => original.matches(r.selector)).forEach((rule) => {
       rule.didSplit(original, clone, nextChild, deepClone);
     });

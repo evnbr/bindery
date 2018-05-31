@@ -13,10 +13,7 @@ const makeBook = async (content, rules, updateProgress) => {
   const ruleSet = new RuleSet(rules);
   const book = new Book();
 
-  const makeNewPage = () => {
-    const newPage = new Page();
-    return newPage;
-  };
+  const makeNewPage = () => new Page();
 
   const finishPage = (page, allowOverflow) => {
     // finished with this page, can display
@@ -27,9 +24,7 @@ const makeBook = async (content, rules, updateProgress) => {
     book.validate();
   };
 
-  // Creates clones for ever level of tag
-  // we were in when we overflowed the last page
-  const continueOnNewPage = (allowOverflow = false) => {
+  const addPageToBook = (allowOverflow = false) => {
     const oldPage = book.currentPage;
     if (oldPage) finishPage(oldPage, allowOverflow);
 
@@ -43,7 +38,7 @@ const makeBook = async (content, rules, updateProgress) => {
   };
 
   const makeNextRegion = () => {
-    const newPage = continueOnNewPage();
+    const newPage = addPageToBook();
     return newPage.flow;
   };
 

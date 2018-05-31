@@ -1,5 +1,3 @@
-import { classes } from '../dom-utils';
-
 // The path is an array of nested elments,
 // for example .content > article > p > a).
 //
@@ -14,18 +12,9 @@ import { classes } from '../dom-utils';
 const clonePath = (oldPath, applyRules) => {
   const newPath = [];
 
-  const markAsToNext = node => node.classList.add(classes.toNext);
-  const markAsFromPrev = node => node.classList.add(classes.fromPrev);
-
-  const finishSplitting = (original, clone, nextChild, cloneEl) => {
-    markAsToNext(original);
-    markAsFromPrev(clone);
-    applyRules(original, clone, nextChild, cloneEl);
-  };
-
   const deepClone = (el) => {
     const clone = el.cloneNode(true); // deep clone, could be th > h3 > span;
-    finishSplitting(el, clone);
+    applyRules(el, clone);
     return clone;
   };
 
@@ -35,7 +24,7 @@ const clonePath = (oldPath, applyRules) => {
     const nextChild = oldPath[i + 1];
     clone.innerHTML = '';
 
-    finishSplitting(original, clone, nextChild, deepClone);
+    applyRules(original, clone, nextChild, deepClone);
 
     if (i < oldPath.length - 1) clone.appendChild(newPath[i + 1]);
     newPath[i] = clone;

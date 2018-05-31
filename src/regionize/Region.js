@@ -1,9 +1,16 @@
-import { createEl } from '../dom-utils';
+const div = (cls) => {
+  const el = document.createElement('div');
+  el.classList.add(cls);
+  return el;
+};
 
 class Region {
-  constructor() {
-    this.content = createEl('flow-content');
-    this.element = createEl('flow-box', [this.content]);
+  constructor(elmt) {
+    this.element = elmt;
+    this.content = div('region-content');
+    this.content.style.padding = '0.1px';
+    this.content.style.position = 'relative';
+    this.element.appendChild(this.content);
     this.path = [];
   }
 

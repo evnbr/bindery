@@ -25,11 +25,6 @@ li.continuation {
   min-height: 0;
 }
 
-.flow-content {
-  padding: 0.1px;   /* prevent margin collapse */
-  position: relative;
-}
-
 .footer {
   margin-top: 8pt;
   margin-bottom: var(--bindery-margin-bottom);;
