@@ -662,9 +662,8 @@ html.book {
     @include sideBySide;
   }
 
-  .📖-running-header {
-    bottom: 24pt;
-    top: unset;
+  .📖-running-header, .📖-footer {
+    font: 0.6rem / 1.5 $mono;
   }
   .site-header {
     position: relative;

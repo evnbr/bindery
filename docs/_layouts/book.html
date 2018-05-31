@@ -34,8 +34,8 @@
         pageSetup: {
           size: { width: '4in', height: '6in' },
           margin: {
-            top: '0.3in',
-            bottom: '1in',
+            top: '0.6in',
+            bottom: '0.5in',
             inner: '0.3in',
             outer: '0.3in',
           },
@@ -78,9 +78,9 @@
           RunningHeader({
             render: (page) => {
               if (page.isEmpty) return '';
-              if (page.isLeft) return `${page.number} · Bindery `;
+              if (page.isLeft) return `${page.number} · https://evanbrooks.info/bindery `;
               else if (page.isRight) {
-                let section = Object.values(page.heading).join(' ‣ ');
+                let section = Object.values(page.heading).join(' · ');
                 if (section !== '') return `${section} · ${page.number}`;
                 else return `${page.number}`;
               }
