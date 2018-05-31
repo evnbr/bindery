@@ -6,7 +6,6 @@ import { isTextNode, isUnloadedImage, isContentElement } from './nodeTypes';
 import { ignoreOverflow, canSplit } from './canSplit';
 import { addTextNode, addTextNodeAcrossElements } from './addTextNode';
 import tryInNextBox from './tryInNextBox';
-import recoverFromRule from './recoverFromRule';
 import RuleSet from './RuleSet';
 import estimateFor from './estimateProgress';
 
@@ -150,8 +149,7 @@ const paginate = (content, rules, progressCallback) => {
 
     // Transforms after adding
     const addedElement = book.currentPage.flow.path.pop();
-    const recover = el => recoverFromRule(el, book, continueOnNewPage);
-    ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage, recover);
+    ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage);
     estimator.increment();
   };
 

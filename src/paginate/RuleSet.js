@@ -1,4 +1,5 @@
 import dedupe from './dedupeRules';
+import recoverFromRule from './recoverFromRule';
 
 const giveUp = (rule, el) => {
   console.warn(`Couldn't apply ${rule.name}, caused overflows twice when adding: `, el);
@@ -49,9 +50,10 @@ class RuleSet {
     return addedElement;
   }
 
-  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage, attemptRecovery) {
+  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage) {
     let addedElement = originalElement;
 
+    const attemptRecovery = el => recoverFromRule(el, book, continueOnNewPage);
     const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));
     const uniqueRules = dedupe(matchingRules);
 
