@@ -14,18 +14,21 @@ describe('Split rules are called as expected', () => {
 
   test('div detected', () => {
     const el = document.createElement('div');
-    ruleSet.applySplitRules(el, null, null, null);
-    expect(didSplit1).toBeCalledWith(el, null, null, null);
+    const clone = document.createElement('div');
+
+    ruleSet.applySplitRules(el, clone, null, null);
+    expect(didSplit1).toBeCalledWith(el, clone, null, null);
     expect(didSplit2).not.toBeCalled();
     expect(didSplit3).not.toBeCalled();
   });
 
   test('two rules detected', () => {
     const el = document.createElement('div');
+    const clone = document.createElement('div');
     el.classList.add('test');
-    ruleSet.applySplitRules(el, null, null, null);
-    expect(didSplit1).toBeCalledWith(el, null, null, null);
-    expect(didSplit2).toBeCalledWith(el, null, null, null);
+    ruleSet.applySplitRules(el, clone, null, null);
+    expect(didSplit1).toBeCalledWith(el, clone, null, null);
+    expect(didSplit2).toBeCalledWith(el, clone, null, null);
     expect(didSplit3).not.toBeCalled();
   });
 });
