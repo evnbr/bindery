@@ -1,5 +1,5 @@
 import { isTextNode, isUnloadedImage, isContentElement } from './nodeTypes';
-import { ignoreOverflow } from './canSplit';
+import { ignoreOverflow } from '../makeBook/canSplit';
 import { addTextNode, addTextNodeAcrossElements } from './addTextNode';
 import tryInNextBox from './tryInNextBox';
 
@@ -69,12 +69,12 @@ const flowIntoBoxes = async (
 
   // Adds an element node by clearing its childNodes, then inserting them
   // one by one recursively until thet overflow the page
-  const addElementNode = async (elementToAdd) => {
+  const addElementNode = async (element) => {
     // Ensure images are loaded before measuring
-    if (isUnloadedImage(elementToAdd)) await estimator.ensureImageLoaded(elementToAdd);
+    if (isUnloadedImage(element)) await estimator.ensureImageLoaded(element);
 
     // Transforms before adding
-    const element = transformsBeforeAdd(elementToAdd, continueInNextBox);
+    transformsBeforeAdd(element, continueInNextBox);
 
     // Insert element
     currentBox.currentElement.appendChild(element);

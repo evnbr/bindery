@@ -1,4 +1,4 @@
-import FlowBox from '../flow-box';
+import { FlowBox } from '../flow-box';
 import { safeMeasure, createEl, classes } from '../dom-utils';
 
 class Page {

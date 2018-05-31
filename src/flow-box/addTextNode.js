@@ -1,5 +1,5 @@
 import { yieldIfNecessary } from './schedule';
-import { ignoreOverflow } from './canSplit';
+import { ignoreOverflow } from '../makeBook/canSplit';
 import { isTextNode } from './nodeTypes';
 
 const createTextNode = (document.createTextNode).bind(document);

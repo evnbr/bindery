@@ -1,12 +1,11 @@
 // Bindery
 import { Book, Page, orderPages, annotatePages } from '../book';
+import { flowIntoBoxes } from '../flow-box';
 
 // paginate
 import RuleSet from './RuleSet';
 import estimateFor from './estimateProgress';
 import { canSplit } from './canSplit';
-import flowIntoBoxes from './flowIntoBoxes';
-
 
 const makeBook = async (content, rules, updateProgress) => {
   if (!Page.isSizeValid()) throw Error('Page is too small');
@@ -53,7 +52,7 @@ const makeBook = async (content, rules, updateProgress) => {
   const canSplitEl = el => canSplit(el, ruleSet.selectorsNotToSplit);
 
   const beforeAdd = (elementToAdd, continueInNextBox) => {
-    return ruleSet.applyBeforeAddRules(elementToAdd, book, continueInNextBox, makeNewPage);
+    ruleSet.applyBeforeAddRules(elementToAdd, book, continueInNextBox, makeNewPage);
   };
 
   const afterAdd = (addedElement, continueInNextBox) => {

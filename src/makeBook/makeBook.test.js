@@ -11,7 +11,7 @@ const mockDoc = document;
 const mockEl = (name = 'div') => mockDoc.createElement(name);
 let mockOverflow = el => el.textContent.length > 10;
 
-jest.mock('../flow-box', () => function MockFlow() {
+jest.mock('../flow-box/FlowBox', () => function MockFlow() {
   const box = mockEl();
   const content = mockEl();
   box.classList.add('box');

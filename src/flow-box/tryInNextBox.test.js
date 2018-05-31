@@ -1,4 +1,4 @@
-import FlowBox from '../flow-box';
+import FlowBox from './FlowBox';
 import tryInNextBox from './tryInNextBox';
 
 const el = () => {

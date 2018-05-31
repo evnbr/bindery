@@ -6,7 +6,7 @@ import { Mode, Paper, Layout, Marks } from './constants';
 import defaultRules from './defaults';
 
 // components
-import paginate from './paginate';
+import makeBook from './makeBook';
 import Viewer from './viewer';
 import rules from './rules';
 import { validate, T } from './option-checker';
@@ -145,11 +145,8 @@ class Bindery {
     this.viewer.inProgress = true;
 
     try {
-      const book = await paginate(
-        content,
-        this.rules,
-        (current, progress) => this.viewer.updateProgress(current, progress)
-      );
+      const onProgress = (current, progress) => this.viewer.updateProgress(current, progress);
+      const book = await makeBook(content, this.rules, onProgress);
       this.viewer.progress = 1;
       this.layoutInProgress = false;
       await rAF();

@@ -5,7 +5,7 @@
 // which means footnotes will get left on previous page.
 // - 3. if it is a large paragraph, it will leave a large gap. the
 // ideal approach would be to only need to invalidate the last line of text.
-const recoverFromRule = (el, book, continueOnNewPage) => {
+const recoverFromRule = (el, book, nextBox) => {
   let removed = el;
   const parent = el.parentNode;
   parent.removeChild(removed);
@@ -21,9 +21,9 @@ const recoverFromRule = (el, book, continueOnNewPage) => {
       // Trying again worked
     }
   }
-  const newPage = continueOnNewPage();
-  newPage.flow.currentElement.appendChild(removed);
-  if (popped) newPage.flow.path.push(popped);
+  const newBox = nextBox();
+  newBox.currentElement.appendChild(removed);
+  if (popped) newBox.path.push(popped);
 };
 
 
