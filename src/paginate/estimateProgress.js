@@ -10,7 +10,7 @@ const estimateFor = (content) => {
 
   return {
     increment: () => { completed += 1; },
-    progress: () => completed / capacity,
+    get progress() { return completed / capacity; },
     ensureImageLoaded: async (img) => {
       const imgWait = await ensureImageLoaded(img);
       timeWaiting += imgWait;

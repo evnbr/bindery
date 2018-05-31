@@ -49,8 +49,8 @@ const paginate = (content, rules, progressCallback) => {
     book.currentPage = newPage;
     book.pages.push(newPage);
 
-    progressCallback(book, estimator.progress()); // assuming this will display new page
-    newPage.validate(); // TODO: element must be in dom before validating
+    progressCallback(book, estimator.progress);
+    newPage.validate();
     return newPage;
   };
 

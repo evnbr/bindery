@@ -1,6 +1,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import minify from 'rollup-plugin-babel-minify';
+// import sizes from 'rollup-plugin-sizes';
 
 import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
@@ -26,7 +27,7 @@ const sassPlugin = () => sass({
   insert: true,
   processor: css => postcss([
     prefixer('📖-'),
-    cssnano({ reduceIdents: false }),
+    cssnano(),
   ]).process(css).then(result => result.css),
 });
 
@@ -64,7 +65,6 @@ export default [
 
   // CommonJS (for Node) and ES module (for bundlers) build.
   extend(baseConfig, {
-    external: ['hyperscript'],
     output: [
       extend(baseOutput, { file: pkg.main, format: 'cjs' }),
       extend(baseOutput, { file: pkg.module, format: 'es' }),
