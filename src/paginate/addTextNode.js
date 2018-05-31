@@ -60,7 +60,7 @@ const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
   const overflowingText = originalText.substr(pos);
   textNode.nodeValue = fittingText;
 
-  // Create a new text node for the next page
+  // Create a new text node for the next flow box
   const remainingTextNode = createTextNode(overflowingText);
   return remainingTextNode;
 };

@@ -14,16 +14,8 @@ import { classes } from '../dom-utils';
 const clonePath = (oldPath, applyRules) => {
   const newPath = [];
 
-  // const { toNext, fromPrev } = extraClasses;
-  const markAsToNext = (node) => {
-    node.classList.add(classes.toNext);
-    // toNext.forEach(cl => node.classList.add(cl));
-  };
-
-  const markAsFromPrev = (node) => {
-    node.classList.add(classes.fromPrev);
-    // fromPrev.forEach(cl => node.classList.add(cl));
-  };
+  const markAsToNext = node => node.classList.add(classes.toNext);
+  const markAsFromPrev = node => node.classList.add(classes.fromPrev);
 
   const finishSplitting = (original, clone, nextChild, cloneEl) => {
     markAsToNext(original);

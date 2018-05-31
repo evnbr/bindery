@@ -4,12 +4,13 @@
 // that can be split, and move all of that descendants
 // to the next page.
 const tryInNextBox = (flow, makeNextFlow, canSplitElement) => {
-  // So this node won't get cloned. TODO: this is unclear
-  const elementToMove = flow.path.pop();
-
-  if (flow.path.length < 1) {
+  if (flow.path.length <= 1) {
     throw Error('Bindery: Attempting to move the top-level element');
   }
+  const startLength = flow.path.length;
+
+  // So this node won't get cloned. TODO: this is unclear
+  const elementToMove = flow.path.pop();
 
   // find the nearest splittable parent
   let nearestElementThatCanBeMoved = elementToMove;
@@ -38,7 +39,6 @@ const tryInNextBox = (flow, makeNextFlow, canSplitElement) => {
   let newFlow;
   if (!flow.isEmpty) {
     if (flow.hasOverflowed()) {
-      console.warn('recovery failed');
       // Recovery failed, maybe the box contains a large
       // unsplittable element.
       flow.suppressErrors = true;
@@ -57,6 +57,10 @@ const tryInNextBox = (flow, makeNextFlow, canSplitElement) => {
   // restore subpath
   pathToRestore.forEach(r => newFlow.path.push(r));
   newFlow.path.push(elementToMove);
+
+  if (startLength !== newFlow.path.length) {
+    throw Error('Restored flowpath depth does not match original depth');
+  }
 };
 
 export default tryInNextBox;

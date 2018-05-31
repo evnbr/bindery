@@ -7,6 +7,7 @@ const el = () => {
   return div;
 };
 
+const noop = () => {};
 const mockFlow = (path) => {
   const flow = new FlowBox();
   if (path) {
@@ -36,53 +37,79 @@ beforeEach(() => {
 test('Shifts one element when none of its parents complain', () => {
   const page = mockFlow([a, b, c, d]);
   const nextFlow = mockFlow();
-  const next = () => nextFlow;
+  const next = () => {
+    nextFlow.continueFrom(page, noop);
+    return nextFlow;
+  };
   const canSplit = () => true;
 
   tryInNextBox(page, next, canSplit);
   expect(page.path).toEqual([a, b, c]);
-  expect(nextFlow.path).toEqual([d]);
+  expect(nextFlow.path[0].tagName).toBe(a.tagName);
+  expect(nextFlow.path[1].tagName).toBe(b.tagName);
+  expect(nextFlow.path[2].tagName).toBe(c.tagName);
+  expect(nextFlow.path[3]).toBe(d);
 });
 
 test('Shifts two elements when parent would be empty', () => {
   c.textContent = '';
   const page = mockFlow([a, b, c, d]);
   const nextFlow = mockFlow();
-  const next = () => nextFlow;
+  const next = () => {
+    nextFlow.continueFrom(page, noop);
+    return nextFlow;
+  };
   const canSplit = () => true;
 
   tryInNextBox(page, next, canSplit);
   expect(page.path).toEqual([a, b]);
-  expect(nextFlow.path).toEqual([c, d]);
+  expect(nextFlow.path[0].tagName).toBe(a.tagName);
+  expect(nextFlow.path[1].tagName).toBe(b.tagName);
+  expect(nextFlow.path[2]).toBe(c);
+  expect(nextFlow.path[3]).toBe(d);
 });
 
 test('Shifts two elements when parent can\t split', () => {
   const page = mockFlow([a, b, c, d]);
   const nextFlow = mockFlow();
-  const next = () => nextFlow;
+  const next = () => {
+    nextFlow.continueFrom(page, noop);
+    return nextFlow;
+  };
   const canSplit = elmt => elmt !== c;
 
   tryInNextBox(page, next, canSplit);
   expect(page.path).toEqual([a, b]);
-  expect(nextFlow.path).toEqual([c, d]);
+  expect(nextFlow.path[1].tagName).toBe(b.tagName);
+  expect(nextFlow.path[2]).toBe(c);
+  expect(nextFlow.path[3]).toBe(d);
 });
 
 test('Shifts three elements when grandparent can\t split', () => {
   const page = mockFlow([a, b, c, d]);
   const nextFlow = mockFlow();
-  const next = () => nextFlow;
+  const next = () => {
+    nextFlow.continueFrom(page, noop);
+    return nextFlow;
+  };
   const canSplit = elmt => elmt !== c && elmt !== b;
 
   tryInNextBox(page, next, canSplit);
   expect(page.path).toEqual([a]);
-  expect(nextFlow.path).toEqual([b, c, d]);
+  expect(nextFlow.path[0].tagName).toBe(a.tagName);
+  expect(nextFlow.path[1]).toBe(b);
+  expect(nextFlow.path[2]).toBe(c);
+  expect(nextFlow.path[3]).toBe(d);
 });
 
 test('Does not shift elements if whole page would be empty', () => {
   a.textContent = '';
   const page = mockFlow([a, b, c, d]);
   const nextFlow = mockFlow();
-  const next = () => false;
+  const next = () => {
+    nextFlow.continueFrom(page, noop);
+    return nextFlow;
+  };
   const canSplit = () => false;
 
   tryInNextBox(page, next, canSplit);

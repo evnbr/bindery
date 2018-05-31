@@ -238,7 +238,7 @@ class Viewer {
 
     const makeSpread = pgs => createEl('.spread-wrapper.spread-size', pgs);
 
-    this.book.pages.forEach((page, i) => {
+    book.pages.forEach((page, i) => {
       if (this.content.contains(page.element) && page.element.parentNode !== this.content) return;
       if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
         this.lastSpreadInProgress.appendChild(page.element);
