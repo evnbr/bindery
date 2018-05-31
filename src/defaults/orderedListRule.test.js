@@ -1,4 +1,4 @@
-import clonePath from '../flow-box/clonePath';
+import clonePath from '../regionize/clonePath';
 import orderedListRule from './orderedListRule';
 
 const applyRulesStub = (orig, clone, next, deepClone) => {

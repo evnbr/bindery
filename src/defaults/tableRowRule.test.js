@@ -1,4 +1,4 @@
-import clonePath from '../flow-box/clonePath';
+import clonePath from '../regionize/clonePath';
 import tableRowRule from './tableRowRule';
 
 const applyRulesStub = (orig, clone, next, deepClone) => {

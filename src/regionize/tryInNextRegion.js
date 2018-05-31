@@ -3,20 +3,20 @@
 // step up the tree to find the first ancestor
 // that can be split, and move all of that descendants
 // to the next page.
-const tryInNextBox = (flow, makeNextFlow, canSplitElement) => {
-  if (flow.path.length <= 1) {
+const tryInNextRegion = (region, makeNextRegion, canSplitElement) => {
+  if (region.path.length <= 1) {
     throw Error('Bindery: Attempting to move the top-level element');
   }
-  const startLength = flow.path.length;
+  const startLength = region.path.length;
 
   // So this node won't get cloned. TODO: this is unclear
-  const elementToMove = flow.path.pop();
+  const elementToMove = region.path.pop();
 
   // find the nearest splittable parent
   let nearestElementThatCanBeMoved = elementToMove;
   const pathToRestore = [];
-  while (flow.path.length > 1 && !canSplitElement(flow.currentElement)) {
-    nearestElementThatCanBeMoved = flow.path.pop();
+  while (region.path.length > 1 && !canSplitElement(region.currentElement)) {
+    nearestElementThatCanBeMoved = region.path.pop();
     pathToRestore.unshift(nearestElementThatCanBeMoved);
   }
 
@@ -29,38 +29,38 @@ const tryInNextBox = (flow, makeNextFlow, canSplitElement) => {
 
   // If the nearest ancestor would be empty without this node,
   // move it to the next page too.
-  if (flow.path.length > 1 && flow.currentElement.textContent.trim() === '') {
+  if (region.path.length > 1 && region.currentElement.textContent.trim() === '') {
     parent.appendChild(nearestElementThatCanBeMoved);
-    nearestElementThatCanBeMoved = flow.path.pop();
+    nearestElementThatCanBeMoved = region.path.pop();
     pathToRestore.unshift(nearestElementThatCanBeMoved);
     nearestElementThatCanBeMoved.parentNode.removeChild(nearestElementThatCanBeMoved);
   }
 
-  let newFlow;
-  if (!flow.isEmpty) {
-    if (flow.hasOverflowed()) {
+  let nextRegion;
+  if (!region.isEmpty) {
+    if (region.hasOverflowed()) {
       // Recovery failed, maybe the box contains a large
       // unsplittable element.
-      flow.suppressErrors = true;
+      region.suppressErrors = true;
     }
-    newFlow = makeNextFlow();
+    nextRegion = makeNextRegion();
   } else {
     // If the page is empty when this node is removed,
     // then it won't help to move it to the next page.
     // Instead continue here until the node is done.
-    newFlow = flow;
+    nextRegion = region;
   }
 
   // append moved node as first in new page
-  newFlow.currentElement.appendChild(nearestElementThatCanBeMoved);
+  nextRegion.currentElement.appendChild(nearestElementThatCanBeMoved);
 
   // restore subpath
-  pathToRestore.forEach(r => newFlow.path.push(r));
-  newFlow.path.push(elementToMove);
+  pathToRestore.forEach(r => nextRegion.path.push(r));
+  nextRegion.path.push(elementToMove);
 
-  if (startLength !== newFlow.path.length) {
+  if (startLength !== nextRegion.path.length) {
     throw Error('Restored flowpath depth does not match original depth');
   }
 };
 
-export default tryInNextBox;
+export default tryInNextRegion;

@@ -1,9 +1,9 @@
-import { FlowBox } from '../flow-box';
+import { Region } from '../regionize';
 import { safeMeasure, createEl, classes } from '../dom-utils';
 
 class Page {
   constructor() {
-    this.flow = new FlowBox();
+    this.flow = new Region();
     this.footer = createEl('footer');
     this.background = createEl('page-background');
     this.element = createEl('page', [this.background, this.flow.element, this.footer]);

@@ -1,5 +1,4 @@
 import makeBook from './makeBook';
-import mockClonePath from '../flow-box/clonePath';
 
 let time = 0;
 global.performance = { now: () => {
@@ -11,7 +10,7 @@ const mockDoc = document;
 const mockEl = (name = 'div') => mockDoc.createElement(name);
 let mockOverflow = el => el.textContent.length > 10;
 
-jest.mock('../flow-box/FlowBox', () => function MockFlow() {
+jest.mock('../regionize/Region', () => function MockFlow() {
   const box = mockEl();
   const content = mockEl();
   box.classList.add('box');
@@ -25,11 +24,9 @@ jest.mock('../flow-box/FlowBox', () => function MockFlow() {
     get currentElement() {
       return instance.path.length < 1 ? content : instance.path[instance.path.length - 1];
     },
-    continueFrom: (prevFlowBox) => {
-      instance.path = mockClonePath(prevFlowBox.path, () => {});
-      if (instance.path[0]) {
-        content.appendChild(instance.path[0]);
-      }
+    setPath: (newPath) => {
+      instance.path = newPath;
+      if (newPath.length > 0) content.appendChild(newPath[0]);
     },
     hasOverflowed,
     isReasonableSize: true,

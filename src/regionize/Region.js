@@ -1,11 +1,15 @@
 import { createEl } from '../dom-utils';
-import clonePath from './clonePath';
 
-class FlowBox {
+class Region {
   constructor() {
     this.content = createEl('flow-content');
     this.element = createEl('flow-box', [this.content]);
     this.path = [];
+  }
+
+  setPath(newPath) {
+    this.path = newPath;
+    if (newPath.length > 0) this.content.appendChild(newPath[0]);
   }
 
   get currentElement() {
@@ -23,13 +27,6 @@ class FlowBox {
     return (box.height > 100) && (box.width > 100); // TODO: Number is arbitrary
   }
 
-  continueFrom(prevFlowBox, applyRules) {
-    this.path = clonePath(prevFlowBox.path, applyRules);
-    if (this.path[0]) {
-      this.content.appendChild(this.path[0]);
-    }
-  }
-
   overflowAmount() {
     const contentH = this.content.offsetHeight;
     const boxH = this.element.offsetHeight;
@@ -42,4 +39,4 @@ class FlowBox {
   }
 }
 
-export default FlowBox;
+export default Region;

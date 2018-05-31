@@ -1,4 +1,4 @@
-import { addTextNode, addTextNodeUntilOverflow, addTextNodeAcrossElements } from './addTextNode';
+import { addTextNode, addTextNodeUntilOverflow, addTextNodeAcrossParents } from './addTextNode';
 
 global.performance = { now: jest.fn() };
 
@@ -116,15 +116,15 @@ describe('addTextUntilOverflow', () => {
 
 // ----
 //
-// addTextNodeAcrossElements
-describe('addTextNodeAcrossElements', () => {
+// addTextNodeAcrossParents
+describe('addTextNodeAcrossParents', () => {
   test('doesn\'t fit', () => {
     const textNode = document.createTextNode(testContent);
     const p1 = document.createElement('div');
     const next = () => false;
     const hasOverflowed = () => true;
 
-    return addTextNodeAcrossElements(textNode, p1, next, hasOverflowed).then((result) => {
+    return addTextNodeAcrossParents(textNode, p1, next, hasOverflowed).then((result) => {
       expect(result).toBe(false);
       expect(p1.textContent).toBe('');
     });
@@ -137,7 +137,7 @@ describe('addTextNodeAcrossElements', () => {
     const next = () => p2;
     const hasOverflowed = () => false;
 
-    return addTextNodeAcrossElements(textNode, p1, next, hasOverflowed).then((result) => {
+    return addTextNodeAcrossParents(textNode, p1, next, hasOverflowed).then((result) => {
       expect(result).toBe(true);
       expect(p1.textContent).toBe(testContent);
       expect(p2.textContent).toBe('');
@@ -151,7 +151,7 @@ describe('addTextNodeAcrossElements', () => {
     const next = () => p2;
     const hasOverflowed = () => p1.textContent.length > 4;
 
-    return addTextNodeAcrossElements(textNode, p1, next, hasOverflowed).then((result) => {
+    return addTextNodeAcrossParents(textNode, p1, next, hasOverflowed).then((result) => {
       expect(result).toBe(true);
       expect(p1.textContent).toBe('Test');
       expect(p2.textContent).toBe(' text content');
@@ -167,7 +167,7 @@ describe('addTextNodeAcrossElements', () => {
     const next = () => nextPages.pop();
     const hasOverflowed = () => p1.textContent.length > 4 || p2.textContent.length > 6;
 
-    return addTextNodeAcrossElements(textNode, p1, next, hasOverflowed).then((result) => {
+    return addTextNodeAcrossParents(textNode, p1, next, hasOverflowed).then((result) => {
       expect(result).toBe(true);
       // expect(nextPages.length).toBe(0);
       expect(p1.textContent).toBe('Test');

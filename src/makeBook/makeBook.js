@@ -1,11 +1,10 @@
 // Bindery
 import { Book, Page, orderPages, annotatePages } from '../book';
-import { flowIntoBoxes } from '../flow-box';
+import { flowIntoRegions } from '../regionize';
 
 // paginate
 import RuleSet from './RuleSet';
 import estimateFor from './estimateProgress';
-import { canSplit } from './canSplit';
 
 const makeBook = async (content, rules, updateProgress) => {
   if (!Page.isSizeValid()) throw Error('Page is too small');
@@ -43,28 +42,35 @@ const makeBook = async (content, rules, updateProgress) => {
     return newPage;
   };
 
-  const nextBox = () => {
+  const makeNextRegion = () => {
     const newPage = continueOnNewPage();
     return newPage.flow;
   };
 
   const applySplit = ruleSet.applySplitRules;
-  const canSplitEl = el => canSplit(el, ruleSet.selectorsNotToSplit);
-
-  const beforeAdd = (elementToAdd, continueInNextBox) => {
-    ruleSet.applyBeforeAddRules(elementToAdd, book, continueInNextBox, makeNewPage);
+  const dontSplitSel = ruleSet.selectorsNotToSplit;
+  const canSplit = (element) => {
+    if (dontSplitSel.some(sel => element.matches(sel))) {
+      return false;
+    }
+    if (element.parentElement) return canSplit(element.parentElement, dontSplitSel);
+    return true;
   };
 
-  const afterAdd = (addedElement, continueInNextBox) => {
+  const beforeAdd = (elementToAdd, continueInNextRegion) => {
+    ruleSet.applyBeforeAddRules(elementToAdd, book, continueInNextRegion, makeNewPage);
+  };
+
+  const afterAdd = (addedElement, continueInNextRegion) => {
     estimator.increment();
-    return ruleSet.applyAfterAddRules(addedElement, book, continueInNextBox, makeNewPage);
+    return ruleSet.applyAfterAddRules(addedElement, book, continueInNextRegion, makeNewPage);
   };
 
   // init
   content.style.margin = 0;
   content.style.padding = 0;
 
-  await flowIntoBoxes(content, nextBox, applySplit, canSplitEl, beforeAdd, afterAdd);
+  await flowIntoRegions(content, makeNextRegion, applySplit, canSplit, beforeAdd, afterAdd);
 
   book.pages = orderPages(book.pages, makeNewPage);
   annotatePages(book.pages);

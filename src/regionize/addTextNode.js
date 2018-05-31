@@ -1,5 +1,5 @@
 import { yieldIfNecessary } from './schedule';
-import { ignoreOverflow } from '../makeBook/canSplit';
+import ignoreOverflow from './ignoreOverflow';
 import { isTextNode } from './nodeTypes';
 
 const createTextNode = (document.createTextNode).bind(document);
@@ -68,13 +68,13 @@ const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
 
 // Fills text across multiple elements by requesting a continuation
 // once the current element overflows
-const addTextNodeAcrossElements = async (textNode, parent, continuation, hasOverflowed) => {
+const addTextNodeAcrossParents = async (textNode, parent, nextParent, hasOverflowed) => {
   const result = await addTextNodeUntilOverflow(textNode, parent, hasOverflowed);
   if (isTextNode(result)) {
-    const nextElement = continuation();
-    return addTextNodeAcrossElements(result, nextElement, continuation, hasOverflowed);
+    const nextElement = nextParent();
+    return addTextNodeAcrossParents(result, nextElement, nextParent, hasOverflowed);
   }
   return result;
 };
 
-export { addTextNode, addTextNodeUntilOverflow, addTextNodeAcrossElements };
+export { addTextNode, addTextNodeUntilOverflow, addTextNodeAcrossParents };
