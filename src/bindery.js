@@ -1,19 +1,21 @@
 /* global BINDERY_VERSION */
 
 // main
-import PageSetup from '../page-setup';
-import { Mode, Paper, Layout, Marks } from '../constants';
-import defaultRules from '../defaults';
+import PageSetup from './page-setup';
+import { Mode, Paper, Layout, Marks } from './constants';
+import defaultRules from './defaults';
 
 // components
-import paginate from '../paginate';
-import Viewer from '../viewer';
-import rules from '../rules';
-import { validate, T } from '../option-checker';
-import { parseHTML } from '../dom-utils';
+import paginate from './paginate';
+import Viewer from './viewer';
+import rules from './rules';
+import { validate, T } from './option-checker';
+import { parseHTML } from './dom-utils';
 
-// style
-import './main.scss';
+const vals = obj => Object.keys(obj).map(k => obj[k]);
+const rAF = () => new Promise((resolve) => {
+  requestAnimationFrame(t => resolve(t));
+});
 
 class Bindery {
   constructor(opts = {}) {
@@ -21,8 +23,7 @@ class Bindery {
 
     if (!opts.content) {
       this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
-      console.error('Bindery: You must include a source element or selector');
-      return;
+      throw Error('Bindery: You must include a source element or selector');
     }
 
     this.autorun = opts.autorun || true;
@@ -33,7 +34,7 @@ class Bindery {
       autorun: T.bool,
       content: T.any,
       ControlsComponent: T.func,
-      view: T.enum(...Object.values(Mode)),
+      view: T.enum(...vals(Mode)),
       pageSetup: T.shape({
         name: 'pageSetup',
         margin: T.margin,
@@ -42,9 +43,9 @@ class Bindery {
       printSetup: T.shape({
         name: 'printSetup',
         bleed: T.length,
-        layout: T.enum(...Object.values(Layout)),
-        marks: T.enum(...Object.values(Marks)),
-        paper: T.enum(...Object.values(Paper)),
+        layout: T.enum(...vals(Layout)),
+        marks: T.enum(...vals(Marks)),
+        paper: T.enum(...vals(Paper)),
       }),
       rules: T.array,
     });
@@ -129,7 +130,8 @@ class Bindery {
   async makeBook() {
     if (!this.content) {
       this.viewer.show();
-      return;
+      console.error('noc');
+      return null;
     }
 
     this.content.style.display = '';
@@ -150,19 +152,18 @@ class Bindery {
       );
       this.viewer.progress = 1;
       this.layoutInProgress = false;
-      requestAnimationFrame(() => {
-        this.viewer.render(book);
-        this.viewer.inProgress = false;
-      });
+      await rAF();
+      this.viewer.render(book);
+      this.viewer.inProgress = false;
+      return book;
     } catch (e) {
       this.layoutInProgress = false;
       this.viewer.inProgress = false;
       this.viewer.displayError('Layout couldn\'t complete', e.message);
       console.error(e);
+      return null;
     }
   }
 }
-Bindery.version = BINDERY_VERSION;
-
 
 export default Bindery;
