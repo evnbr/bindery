@@ -1,87 +1,78 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
+import minify from 'rollup-plugin-babel-minify';
+// import sizes from 'rollup-plugin-sizes';
 
 import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
+import prefixer from 'postcss-class-prefix';
 import cssnano from 'cssnano';
-import inlinesvg from 'postcss-svg';
 
 import pkg from './package.json';
 
 
+const extend = (a, b) => Object.assign({}, a, b);
+
 const baseConfig = {
-  entry: 'src/index.js',
-  moduleName: 'Bindery',
-  intro: `var BINDERY_VERSION = 'v${pkg.version}'`,
+  input: 'src/index.js',
+};
+
+const baseOutput = {
+  name: 'Bindery',
+  intro: `const BINDERY_VERSION = 'v${pkg.version}'`,
   banner: `/* 📖 Bindery v${pkg.version} */`,
 };
 
 const sassPlugin = () => sass({
   insert: true,
   processor: css => postcss([
-    inlinesvg({
-      func: 'url',
-      dirs: './src',
-      svgo: { plugins: [
-        { cleanupAttrs: true },
-        { removeTitle: true },
-      ] },
-    }),
-    cssnano({
-      reduceIdents: false,
-    }),
-  ])
-    .process(css)
-    .then(result => result.css),
+    prefixer('📖-'),
+    cssnano(),
+  ]).process(css).then(result => result.css),
 });
 
 export default [
   // browser-friendly UMD build
-  Object.assign({}, baseConfig, {
-    dest: pkg.browser,
-    format: 'umd',
-    sourceMap: true,
+  extend(baseConfig, {
+    output: extend(baseOutput, {
+      file: pkg.browser,
+      format: 'umd',
+      sourcemap: true,
+    }),
     plugins: [
       resolve(),
       commonjs(),
       sassPlugin(),
-      babel({
-        exclude: ['node_modules/**'],
-      }),
     ],
   }),
 
   // minified browser-friendly build
-  Object.assign({}, baseConfig, {
-    dest: 'dist/bindery.min.js',
-    format: 'iife',
-    sourceMap: true,
+  extend(baseConfig, {
+    output: extend(baseOutput, {
+      file: 'dist/bindery.min.js',
+      format: 'iife',
+      sourcemap: true,
+    }),
     plugins: [
       resolve(),
       commonjs(),
       sassPlugin(),
-      uglify(),
-      babel({
-        exclude: ['node_modules/**'],
+      minify({
+        comments: false,
       }),
     ],
   }),
 
   // CommonJS (for Node) and ES module (for bundlers) build.
-  Object.assign({}, baseConfig, {
-    external: ['hyperscript'],
-    targets: [
-      { dest: pkg.main, format: 'cjs' },
-      { dest: pkg.module, format: 'es' },
+  extend(baseConfig, {
+    output: [
+      extend(baseOutput, { file: pkg.main, format: 'cjs' }),
+      extend(baseOutput, { file: pkg.module, format: 'es' }),
     ],
+    external: ['regionize'],
     plugins: [
       resolve(),
       sassPlugin(),
-      babel({
-        exclude: ['node_modules/**'],
-      }),
     ],
   }),
 ];

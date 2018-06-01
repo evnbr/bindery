@@ -1,10 +1,8 @@
-$pre: "📖";
-
-$accent: #0000c5;
-$background: #f4f4f4;
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
 
-@import './Page/page.scss';
-@import './Rules/fullBleed.scss';
-@import './Viewer/viewer.scss';
-@import './Viewer/Layouts/printMarks.scss';
+@import './book/book.scss';
+@import './rules/fullBleed.scss';
+@import './viewer/viewer.scss';
+@import './viewer/print.scss';
+@import './layouts/printMarks.scss';
+@import './layouts/flipLayout.scss';

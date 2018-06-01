@@ -1,0 +1,63 @@
+
+@mixin rotate-face-right {
+  transform: rotate(-90deg) translate3d(-100%, 0, 0);
+  transform-origin: top left;
+}
+
+@mixin rotate-face-left {
+  transform: rotate(90deg) translate3d(0, -100%, 0);
+  transform-origin: top left;
+}
+
+.rotate-container.rotate-clockwise,
+.left .rotate-container.rotate-spread-clockwise,
+.right .rotate-container.rotate-inward,
+.left .rotate-container.rotate-outward {
+  @include rotate-face-left
+}
+
+.rotate-container.rotate-counterclockwise,
+.left .rotate-container.rotate-spread-counterclockwise,
+.left .rotate-container.rotate-inward,
+.right .rotate-container.rotate-outward {
+  @include rotate-face-right
+}
+
+.rotate-container {
+  position: absolute;
+
+  &.rotate-clockwise {
+    .left & {
+      .page-background { bottom: 0; }
+    }
+    .right & {
+      .page-background { top: 0; }
+    }
+  }
+
+  &.rotate-counterclockwise {
+    .left & {
+      .page-background { top: 0; }
+    }
+    .right & {
+      .page-background { bottom: 0; }
+    }
+  }
+
+  &.rotate-inward .page-background { bottom: 0; }
+  &.rotate-outward .page-background { top: 0; }
+
+  &.rotate-spread-clockwise {
+    .right & {
+      transform: rotate(90deg) translate3d(0, -50%, 0);
+      transform-origin: top left;
+    }
+  }
+
+  &.rotate-spread-counterclockwise {
+    .right & {
+      transform: rotate(-90deg) translate3d(-100%, -50%, 0);
+      transform-origin: top left;
+    }
+  }
+}

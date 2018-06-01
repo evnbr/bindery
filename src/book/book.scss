@@ -1,0 +1,108 @@
+// Default styling for pages, including when printing
+
+.page {
+  width: var(--bindery-page-width);
+  height: var(--bindery-page-height);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+p.continuation {
+  text-indent: unset !important;
+}
+
+li.continuation {
+  list-style: none !important;
+  text-indent: unset !important;
+}
+
+.flow-box {
+  position: relative;
+  margin-top: var(--bindery-margin-top);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.footer {
+  margin-top: 8pt;
+  margin-bottom: var(--bindery-margin-bottom);;
+  flex: 0 1 auto;
+  z-index: 2;
+}
+
+.flow-box,
+.footer {
+  margin-left: var(--bindery-margin-inner);
+  margin-right: var(--bindery-margin-outer);
+}
+
+.left .flow-box,
+.left .footer {
+  margin-left: var(--bindery-margin-outer);
+  margin-right: var(--bindery-margin-inner);
+}
+
+.page-background {
+  position: absolute;
+  z-index: 0;
+  overflow: hidden;
+  top: calc(-1 * var(--bindery-bleed));
+  bottom: calc(-1 * var(--bindery-bleed));
+  left: calc(-1 * var(--bindery-bleed));
+  right: calc(-1 * var(--bindery-bleed));
+
+  // '>' So this doesn't apply to rotated pages
+  .left > & {
+    right: 0;
+  }
+  .right > & {
+    left: 0;
+  }
+}
+
+.sup {
+  font-size: 0.667em;
+}
+
+.running-header, .footer {
+  font-size: 10pt;
+}
+
+.running-header {
+  position: absolute;
+  text-align: center;
+  top: 0.25in;
+
+  .left & {
+    text-align: left;
+    left: var(--bindery-margin-outer);
+  }
+  .right & {
+    right: var(--bindery-margin-outer);
+    text-align: right;
+  }
+}
+
+.page-size-rotated {
+  height: var(--bindery-page-width);
+  width: var(--bindery-page-height);
+}
+
+.spread-size {
+  height: var(--bindery-page-height);
+  width: calc(var(--bindery-page-width) * 2);
+}
+
+.spread-size-rotated {
+  width: var(--bindery-page-height);
+  height: calc(var(--bindery-page-width) * 2);
+}
+
+.spread.right > .page-background {
+  left: calc(-100% - var(--bindery-bleed));
+}
+.spread.left > .page-background {
+  right: calc(-100% - var(--bindery-bleed));
+}

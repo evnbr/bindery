@@ -14,23 +14,21 @@
   <link rel="stylesheet" href="{{ "/assets/fonts.css" | relative_url }}">
 
   <script>
-  let starCount;
-  let url = 'https://api.github.com/repos/evnbr/bindery';
-  fetch(url).then((response) => {
-    return response.json();
-  }).then((json) => {
-    console.log(json);
-    starCount = json.stargazers_count;
-    setStars();
-  });
-
-  setStars = function() {
-    let el = document.querySelector("#stars");
-    if (el && starCount) {
-      el.textContent = starCount;
-    }
-  }
-
+  // let starCount;
+  // let url = 'https://api.github.com/repos/evnbr/bindery';
+  // fetch(url).then((response) => {
+  //   return response.json();
+  // }).then((json) => {
+  //   starCount = json.stargazers_count;
+  //   setStars();
+  // });
+  //
+  // setStars = function() {
+  //   let el = document.querySelector("#stars");
+  //   if (el && starCount) {
+  //     el.textContent = starCount;
+  //   }
+  // }
   </script>
 
   {% if jekyll.environment == 'production' and site.google_analytics %}

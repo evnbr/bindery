@@ -1,0 +1,181 @@
+// This file should only include screen-only
+// styles for the viewer that do not persist when
+// printing, but does not yet
+
+:root {
+  --bindery-ui-bg: #f4f4f4;
+  --bindery-ui-accent: black;
+  --bindery-ui-text: black;
+}
+
+@media screen {
+  .root {
+    transition: opacity 0.2s;
+    opacity: 1;
+    background: var(--bindery-ui-bg);
+    z-index: 99;
+    position: relative;
+    padding-top: 40px;
+    min-height: 100vh;
+    .view-flip & {
+      padding-top: 0;
+    }
+  }
+
+  .progress-bar {
+    transform-origin: top left;
+    transform: scaleY(0);
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    background: var(--bindery-ui-accent);
+    transition: transform 0.2s;
+    height: 2px;
+    z-index: 99;
+    .in-progress & {
+      transform: scaleX(0);
+    }
+  }
+
+  .zoom-content {
+    padding: 10px;
+    background: var(--bindery-ui-bg);
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    .view-preview & {
+      min-width: calc(20px + var(--bindery-spread-width));
+    }
+    .view-flip & {
+      min-width: calc(1.1 * var(--bindery-spread-width));
+    }
+    .view-print & {
+      min-width: calc(20px + var(--bindery-sheet-width));
+    }
+    > .page {
+      margin: auto; // center pages not in a spread yet;
+    }
+  }
+
+  .measure-area {
+    position: fixed;
+    padding: 50px 20px;
+    z-index: 99;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .is-overflowing {
+    border-bottom: 1px solid magenta;
+  }
+
+   .print-sheet {
+     margin: 0 auto;
+   }
+
+   .error {
+     font: 16px / 1.4 $system;
+     padding: 15vh 15vw;
+     z-index: 999;
+     position: fixed;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background: rgba(244, 244, 244, 0.7);
+
+     &-title {
+       font-size: 1.5em;
+       margin-bottom: 16px;
+     }
+     &-text {
+       margin-bottom: 16px;
+       white-space: pre-line;
+     }
+     &-footer {
+       opacity: 0.5;
+       font-size: 0.66em;
+       text-transform: uppercase;
+       letter-spacing: 0.02em;
+     }
+   }
+
+   .show-bleed .print-sheet {
+     background: white;
+     outline: 1px solid rgba(0,0,0,0.1);
+     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
+     margin: 20px auto;
+   }
+}
+
+@media screen {
+  .page {
+    background: white;
+    outline: 1px solid #ddd;
+    overflow: hidden;
+
+    .show-bleed & {
+      box-shadow: none;
+      outline: none;
+      overflow: visible;
+    }
+  }
+
+  .placeholder-pulse {
+    animation: pulse 1s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%   { opacity: 0.2; }
+  50%  { opacity: 0.5; }
+  100% { opacity: 0.2; }
+}
+
+.print-sheet {
+  width: var(--bindery-sheet-width);
+  height: var(--bindery-sheet-height);
+}
+
+.show-crop .print-sheet .spread-wrapper,
+.show-bleed-marks .print-sheet .spread-wrapper {
+  margin: calc(var(--bindery-bleed) + 12pt) auto;
+}
+
+body.viewing {
+  margin: 0;
+}
+
+.zoom-scaler {
+  transform-origin: top left;
+  transform-style: preserve-3d;
+  height: calc(100vh - 120px); // adjust scrollheight on scaled down
+
+}
+
+.print-sheet {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.2s;
+}
+
+.spread-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 32px;
+}
+
+.print-sheet .spread-wrapper {
+  margin: 0 auto;
+}

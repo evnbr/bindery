@@ -1,0 +1,26 @@
+// Print-only styles that can never be seen in the preview
+
+@page {
+  margin: 0;
+}
+
+@media print {
+  .root * {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  .controls {
+    display: none !important;
+  }
+
+  .print-sheet {
+    padding: 1px;   /* prevent margin collapse */
+    margin: 0 auto;
+    page-break-after: always;
+  }
+
+  .zoom-scaler[style] {
+    transform: none !important;
+  }
+}

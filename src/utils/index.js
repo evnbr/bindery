@@ -1,15 +1,4 @@
-import last from './arrayLast';
-import makeRanges from './makeRanges';
-import OptionType from './OptionType';
-import urlQuery from './urlQuery';
-import c from './prefixClass';
-import el from './dom';
+import shallowEqual from './shallowEqual';
+import { oncePerFrameLimiter, oncePerTimeLimiter } from './oncePerFrameLimiter';
 
-export {
-  last,
-  makeRanges,
-  OptionType,
-  urlQuery,
-  c,
-  el,
-};
+export { shallowEqual, oncePerFrameLimiter, oncePerTimeLimiter };

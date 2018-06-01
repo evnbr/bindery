@@ -26,7 +26,7 @@ If you're designing a website, think about books as an extension of the responsi
 ```
 
 <a href="https://unpkg.com/bindery/dist/bindery.min.js" class="btn" download>
-  ↓ Download bindery.min.js · 73k
+  ↓ Download bindery.min.js
 </a>
 
 Or use the hosted version from [unpkg](https://unpkg.com/) directly:
@@ -70,10 +70,7 @@ For more, see the [Guide](https://evanbrooks.info/bindery/guide) and [Docs](http
 
 ### Developing
 
-Bundled with rollup. The only runtime dependency
-is [Hyperscript](https://github.com/hyperhype/hyperscript), for templating the UI, which is included in the bundle by default.
-
-When contributing, keep the following in mind: The goal of bindery.js is to provide an approachable jumping-off point for HTML-to-Print exploration. Because of this, it is intended to work out of the box as a script tag (without needing to run a dev server, set up a development environment, use preprocessors, or really know javascript at all).
+When contributing, keep in mind that bindery.js is intended to provide an approachable jumping-off point for HTML-to-Print exploration. Because of this, it is intended to work out of the box as a script tag (without needing to run a dev server, set up a development environment, use preprocessors, or know javascript at all).
 
 - `npm run-script build` - Updates dist/
 - `npm run-script test` - Runs Jest

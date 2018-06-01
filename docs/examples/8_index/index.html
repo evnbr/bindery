@@ -2,89 +2,89 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Bindery Ex 8 — Creating an Index</title>
-		<style>
-		html {
-			font: 12pt / 1.3 Georgia, serif;
-		}
-		.content, .intro {
-		  margin: 20px auto;
-		  max-width: 900px;
-		  padding: 20px;
-		}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bindery Ex 8 — Creating an Index</title>
+    <style>
+    html {
+      font: 12pt / 1.3 Georgia, serif;
+    }
+    .content, .intro {
+      margin: 20px auto;
+      max-width: 900px;
+      padding: 20px;
+    }
 
-		h2 {
-			margin: 0 0 1.3rem
-		}
+    h2 {
+      margin: 0 0 1.3rem
+    }
 
-		p {
-		  margin: 0;
-		}
+    p {
+      margin: 0;
+    }
 
-		p + p {
-			text-indent: 1.3rem;
-		}
+    p + p {
+      text-indent: 1.3rem;
+    }
 
-		.index-content {
-			columns: 3;
-			font-size: 10pt;
-		}
+    .index-content {
+      columns: 3;
+      font-size: 10pt;
+    }
 
-		.index-content h4 {
-			margin: 0;
-		}
+    .index-content h4 {
+      margin: 0;
+    }
 
-		.index-content ul, li {
-		  margin: 0;
-		  padding: 0;
-		  list-style: none;
-		}
+    .index-content ul, li {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
 
-		.index-content ul {
-			margin-bottom: 1.3em;
-		}
+    .index-content ul {
+      margin-bottom: 1.3em;
+    }
 
-		.index-content li {
-		  text-indent: -1.3em;
-		  padding-left: 1.3em;
-		}
+    .index-content li {
+      text-indent: -1.3em;
+      padding-left: 1.3em;
+    }
 
-		.index-content li span {
-			font-style: italic;
-		}
-	</style>
+    .index-content li span {
+      font-style: italic;
+    }
+  </style>
 </head>
 
 <body>
 
-	<script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
-	<script>
-			Bindery.makeBook({
-			  content: {
-					url: 'content.html',
-					selector: ".content",
-				},
-			  rules: [
-					Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-					Bindery.RunningHeader(),
-					Bindery.PageReference({
-						selector: '.index-content li',
-						createTest: (element) => {
-							let term = element.textContent.toLowerCase().trim();
-							return (page) => {
-								let txt = page.querySelector('.book-content');
-								if (txt) return txt.textContent.toLowerCase().includes(term);
-								return false;
-							}
-						},
-					})
-			  ],
-			});
+  <script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
+  <script>
+      Bindery.makeBook({
+        content: {
+          url: 'content.html',
+          selector: ".content",
+        },
+        rules: [
+          Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+          Bindery.RunningHeader(),
+          Bindery.PageReference({
+            selector: '.index-content li',
+            createTest: (element) => {
+              let term = element.textContent.toLowerCase().trim();
+              return (page) => {
+                let txt = page.querySelector('.book-content');
+                if (txt) return txt.textContent.toLowerCase().includes(term);
+                return false;
+              }
+            },
+          })
+        ],
+      });
 
-	</script>
+  </script>
 
-	<script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
+  <script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
 </body>
 </html>
