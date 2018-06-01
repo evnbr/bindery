@@ -69,6 +69,7 @@ export default [
       extend(baseOutput, { file: pkg.main, format: 'cjs' }),
       extend(baseOutput, { file: pkg.module, format: 'es' }),
     ],
+    external: ['regionize'],
     plugins: [
       resolve(),
       sassPlugin(),

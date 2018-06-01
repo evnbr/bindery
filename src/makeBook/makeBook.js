@@ -1,6 +1,5 @@
-// Bindery
+import { flowIntoRegions } from 'regionize';
 import { Book, Page, orderPages, annotatePages } from '../book';
-import { flowIntoRegions } from '../regionize';
 
 // paginate
 import RuleSet from './RuleSet';

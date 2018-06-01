@@ -1,4 +1,4 @@
-import { Region } from '../regionize';
+import { Region } from 'regionize';
 import { safeMeasure, createEl, classes } from '../dom-utils';
 
 class Page {

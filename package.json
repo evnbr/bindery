@@ -13,6 +13,9 @@
     "type": "git",
     "url": "git://github.com/evnbr/bindery.git"
   },
+  "dependencies": {
+    "regionize": "^0.1.0"
+  },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-jest": "^22.4.4",

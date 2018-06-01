@@ -10,7 +10,7 @@ const mockDoc = document;
 const mockEl = (name = 'div') => mockDoc.createElement(name);
 let mockOverflow = el => el.textContent.length > 10;
 
-jest.mock('../regionize/Region', () => function MockFlow() {
+const mockRegion = function () {
   const box = mockEl();
   const content = mockEl();
   box.classList.add('box');
@@ -32,7 +32,20 @@ jest.mock('../regionize/Region', () => function MockFlow() {
     isReasonableSize: true,
   };
   return instance;
-});
+};
+
+
+jest.unmock('regionize');
+const regionize = require('regionize');
+regionize.Region = mockRegion;
+
+
+// jest.mock('regionize', function MockRegionize() {
+//   return {
+//     flowIntoRegions: mockFlowIntoRegions,
+//     Region: mockRegion,
+//   };
+// });
 
 
 test('Creates book, preserves content order (10char overflow)', async () => {
