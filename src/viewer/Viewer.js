@@ -104,6 +104,9 @@ class Viewer {
     this.element.classList.toggle(classes.showBleed, newVal);
   }
 
+  get isViewing() {
+    return document.body.classList.contains(classes.isViewing);
+  }
   set isViewing(newVal) {
     document.body.classList.toggle(classes.isViewing, newVal);
   }
@@ -141,8 +144,10 @@ class Viewer {
       this.error = errorView(title, text);
       this.element.appendChild(this.error);
       this.scrollToBottom();
-      const flow = this.book.currentPage.flow;
-      if (flow) flow.currentElement.style.outline = '3px solid red';
+      if (this.book) {
+        const flow = this.book.currentPage.flow;
+        if (flow) flow.currentElement.style.outline = '3px solid red';
+      }
     }
   }
   scrollToBottom() {

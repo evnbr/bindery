@@ -97,7 +97,7 @@ class Bindery {
     const response = await fetch(url);
     if (response.status !== 200) {
       this.viewer.displayError(response.status, `Could not find file at "${url}"`);
-      return null;
+      throw Error(`Bindery: Could not find file at "${url}"`);
     }
     const fetchedContent = await response.text();
     const el = parseHTML(fetchedContent, sel);
@@ -106,15 +106,14 @@ class Bindery {
         'Source not specified',
         `Could not find element that matches selector "${sel}"`
       );
-      console.error(`Bindery: Could not find element that matches selector "${sel}"`);
-      return null;
+      throw Error(`Bindery: Could not find element that matches selector "${sel}"`);
     }
     return el;
   }
 
   cancel() {
     this.viewer.hide();
-    this.content.style.display = '';
+    if (this.content) this.content.style.display = '';
   }
 
   addRules(newRules) {
@@ -130,7 +129,7 @@ class Bindery {
   async makeBook() {
     if (!this.content) {
       this.viewer.show();
-      console.error('noc');
+      console.error('No content');
       return null;
     }
 
