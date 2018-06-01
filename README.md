@@ -1,4 +1,7 @@
-## [Bindery.js](https://evanbrooks.info/bindery/)
+# Bindery.js
+
+[![Build Status](https://travis-ci.org/evnbr/bindery.svg?branch=master)](https://travis-ci.org/evnbr/bindery)
+[![codecov](https://codecov.io/gh/evnbr/bindery/branch/master/graph/badge.svg)](https://codecov.io/gh/evnbr/bindery)
 
 [Intro](https://evanbrooks.info/bindery/) ·
 [Guide](https://evanbrooks.info/bindery/guide) ·
@@ -50,16 +53,14 @@ npm install --save bindery
 
 <script src="./bindery.min.js"></script>
 <script>
-  Bindery.makeBook({
+  const { makeBook, PageBreak, Footnote } = Bindery;
+  makeBook({
     content: '#content',
     rules: [
-      Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
-      Bindery.Footnote({
+      PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+      Footnote({
         selector: 'p > a',
-        render: (element, number) => {
-          let href = element.getAttribute('href');
-          return `<sup>${number}</sup> Link to ${href}`;
-        },
+        render: (el, num) => `${num}: Link to ${el.getAttribute('href')}`;
       }),
     ],
   });
@@ -72,18 +73,17 @@ For more, see the [Guide](https://evanbrooks.info/bindery/guide) and [Docs](http
 
 When contributing, keep in mind that bindery.js is intended to provide an approachable jumping-off point for HTML-to-Print exploration. Because of this, it is intended to work out of the box as a script tag (without needing to run a dev server, set up a development environment, use preprocessors, or know javascript at all).
 
-- `npm run-script build` - Updates dist/
-- `npm run-script test` - Runs Jest
+- `npm run build` - Updates dist/
+- `npm run test` - Runs Jest
 
 Note that the pagination code in Bindery is inherently fairly slow. Each step of pagination involves
 making a change, letting the browser recompute layout, measuring the
 new layout, and then making another change.
 This is the very definition of ['layout thrashing'](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing),
-which normally would be avoided. However, it's the only option that allows Bindery
-to work without reinventing the wheel — it lets you use any CSS your browser supports.
+which normally would be avoided. However, it lets you use any CSS your browser supports without reinventing the wheel.
 
 Ideally, much of what bindery does would be handled natively with CSS,
-and the [W3C is working on it](https://drafts.csswg.org/css-page-3/). However, [bindery is not a CSS Polyfill](https://evanbrooks.info/bindery/about#what-bindery-is-not).
+and the [W3C is working on it](https://drafts.csswg.org/css-page-3/).
 
 
 #### To Do
