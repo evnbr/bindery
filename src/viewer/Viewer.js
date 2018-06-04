@@ -111,7 +111,9 @@ class Viewer {
     document.body.classList.toggle(classes.isViewing, newVal);
   }
 
-  setSheetSize(newVal) {
+  setSheetSize(str) {
+    const newVal = parseInt(str, 10);
+
     this.pageSetup.paper = newVal;
     this.pageSetup.updateStyleVars();
 
@@ -122,7 +124,9 @@ class Viewer {
     setTimeout(() => { this.scaleToFit(); }, 300);
   }
 
-  setLayout(newVal) {
+  setLayout(str) {
+    const newVal = parseInt(str, 10);
+
     if (newVal === this.layout) return;
     this.layout = newVal;
 
@@ -133,7 +137,8 @@ class Viewer {
     this.render();
   }
 
-  setMarks(newVal) {
+  setMarks(str) {
+    const newVal = parseInt(str, 10);
     this.isShowingCropMarks = (newVal === Marks.CROP || newVal === Marks.BOTH);
     this.isShowingBleedMarks = (newVal === Marks.BLEED || newVal === Marks.BOTH);
   }
