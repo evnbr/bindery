@@ -961,48 +961,397 @@
     }),
   ];
 
-  const { Split: Split$1 } = rules;
-
-
-  const preserveNumbering = (original, clone, nextChild) => {
-    // restart numbering
-    let prevStart = 1;
-    if (original.hasAttribute('start')) {
-      // the OL is also a continuation
-      prevStart = parseInt(original.getAttribute('start'), 10);
-    }
-    if (nextChild && nextChild.tagName === 'LI') {
-      // the first list item is a continuation
-      prevStart -= 1;
-    }
-    const prevCount = original.children.length;
-    const newStart = prevStart + prevCount;
-    clone.setAttribute('start', newStart);
+  /* 📖 Regionize v0.1.0 */
+  const div = (cls) => {
+    const el = document.createElement('div');
+    el.classList.add(cls);
+    return el;
   };
 
-  var orderedListRule = Split$1({
-    selector: 'ol',
-    didSplit: preserveNumbering,
+  class Region {
+    constructor(elmt) {
+      this.element = elmt;
+      this.content = div('region-content');
+      this.content.style.padding = '0.1px';
+      this.content.style.position = 'relative';
+      this.element.appendChild(this.content);
+      this.path = [];
+    }
+
+    setPath(newPath) {
+      this.path = newPath;
+      if (newPath.length > 0) this.content.appendChild(newPath[0]);
+    }
+
+    get currentElement() {
+      const len = this.path.length;
+      if (len > 0) return this.path[len - 1];
+      return this.content;
+    }
+
+    get isEmpty() {
+      return this.content.textContent.trim() === '' && this.content.offsetHeight < 1;
+    }
+
+    get isReasonableSize() {
+      const box = this.element.getBoundingClientRect();
+      return (box.height > 100) && (box.width > 100); // TODO: Number is arbitrary
+    }
+
+    overflowAmount() {
+      const contentH = this.content.offsetHeight;
+      const boxH = this.element.offsetHeight;
+      if (boxH === 0) throw Error('Regionizer: Trying to flow into an element with zero height.');
+      return contentH - boxH;
+    }
+
+    hasOverflowed() {
+      return this.overflowAmount() > -5;
+    }
+  }
+
+  const isTextNode = node => node.nodeType === Node.TEXT_NODE;
+  const isElement = node => node.nodeType === Node.ELEMENT_NODE;
+  const isScript = node => node.tagName === 'SCRIPT';
+  const isImage = node => node.tagName === 'IMG';
+  const isUnloadedImage = node => isImage(node) && !node.naturalWidth;
+  const isContentElement = node => isElement(node) && !isScript(node);
+
+  const MAX_TIME = 30; // ms
+
+  const rAF = () => new Promise((resolve) => {
+    requestAnimationFrame(t => resolve(t));
   });
 
-  const { Split: Split$2 } = rules;
+  let lastYieldTime = 0;
 
-  const preserveTableColumns = (original, clone, nextChild, deepClone) => {
-    const columns = [...original.children];
+  const shouldYield = () => {
+    const timeSinceYield = performance.now() - lastYieldTime;
+    return timeSinceYield > MAX_TIME;
+  };
 
-    const currentIndex = columns.indexOf(nextChild);
-    for (let i = 0; i < currentIndex; i += 1) {
-      const clonedCol = deepClone(columns[i]);
-      clone.appendChild(clonedCol);
+  const yieldIfNecessary = async () => {
+    if (shouldYield()) lastYieldTime = await rAF();
+  };
+
+  const overflowAttr = 'data-ignore-overflow';
+  // Walk up the tree to see if we are within
+  // an overflow-ignoring node
+  const ignoreOverflow = (element) => {
+    if (element.hasAttribute(overflowAttr)) return true;
+    if (element.parentElement) return ignoreOverflow(element.parentElement);
+    return false;
+  };
+
+  const createTextNode = (document.createTextNode).bind(document);
+
+  // Try adding a text node in one go.
+  // Returns true if all the text fits, false if none fits.
+  const addTextNode = async (textNode, parent, hasOverflowed) => {
+    parent.appendChild(textNode);
+    const success = !hasOverflowed();
+    if (!success) parent.removeChild(textNode);
+    await yieldIfNecessary();
+    return success;
+  };
+
+
+  // Try adding a text node by incrementally adding words
+  // until it just barely doesnt overflow.
+  //
+  // Returns true if all the text fits, false if none fits,
+  // or new textnode containing the remainder text.
+  const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
+    const originalText = textNode.nodeValue;
+    parent.appendChild(textNode);
+
+    if (!hasOverflowed() || ignoreOverflow(parent)) {
+      return true;
+    }
+
+    // Add letter by letter until overflow
+    let pos = 0;
+    textNode.nodeValue = originalText.substr(0, pos);
+
+    while (!hasOverflowed() && pos < originalText.length) {
+      // advance to next non-space character
+      pos += 1;
+      while (pos < originalText.length && originalText.charAt(pos) !== ' ') pos += 1;
+
+      if (pos < originalText.length) {
+        // reveal more text
+        textNode.nodeValue = originalText.substr(0, pos);
+        await yieldIfNecessary();
+      }
+    }
+
+    // Back out to word boundary
+    if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
+    while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
+
+    if (pos < 1) {
+      // We didn't even add a complete word, don't add node
+      textNode.nodeValue = originalText;
+      parent.removeChild(textNode);
+      return false; // TODO
+    }
+
+    // trim text to word
+    const fittingText = originalText.substr(0, pos);
+    const overflowingText = originalText.substr(pos);
+    textNode.nodeValue = fittingText;
+
+    // Create a new text node for the next flow box
+    const remainingTextNode = createTextNode(overflowingText);
+    return remainingTextNode;
+  };
+
+
+  // Fills text across multiple elements by requesting a continuation
+  // once the current element overflows
+  const addTextNodeAcrossParents = async (textNode, parent, nextParent, hasOverflowed) => {
+    const result = await addTextNodeUntilOverflow(textNode, parent, hasOverflowed);
+    if (isTextNode(result)) {
+      const nextElement = nextParent();
+      return addTextNodeAcrossParents(result, nextElement, nextParent, hasOverflowed);
+    }
+    return result;
+  };
+
+  // Shifts this element to the next page. If any of its
+  // ancestors cannot be split across page, it will
+  // step up the tree to find the first ancestor
+  // that can be split, and move all of that descendants
+  // to the next page.
+  const tryInNextRegion = (region, makeNextRegion, canSplit) => {
+    if (region.path.length <= 1) {
+      throw Error('Bindery: Attempting to move the top-level element');
+    }
+    const startLength = region.path.length;
+
+    // So this node won't get cloned. TODO: this is unclear
+    const elementToMove = region.path.pop();
+
+    // find the nearest splittable parent
+    let nearestElementThatCanBeMoved = elementToMove;
+    const pathToRestore = [];
+    while (region.path.length > 1 && !canSplit(region.currentElement)) {
+      nearestElementThatCanBeMoved = region.path.pop();
+      pathToRestore.unshift(nearestElementThatCanBeMoved);
+    }
+
+    // Once a node is moved to a new page, it should no longer trigger another
+    // move. otherwise tall elements will endlessly get shifted to the next page
+    nearestElementThatCanBeMoved.setAttribute('data-bindery-did-move', true);
+
+    const parent = nearestElementThatCanBeMoved.parentNode;
+    parent.removeChild(nearestElementThatCanBeMoved);
+
+    // If the nearest ancestor would be empty without this node,
+    // move it to the next page too.
+    if (region.path.length > 1 && region.currentElement.textContent.trim() === '') {
+      parent.appendChild(nearestElementThatCanBeMoved);
+      nearestElementThatCanBeMoved = region.path.pop();
+      pathToRestore.unshift(nearestElementThatCanBeMoved);
+      nearestElementThatCanBeMoved.parentNode.removeChild(nearestElementThatCanBeMoved);
+    }
+
+    let nextRegion;
+    if (!region.isEmpty) {
+      if (region.hasOverflowed()) {
+        // Recovery failed, maybe the box contains a large
+        // unsplittable element.
+        region.suppressErrors = true;
+      }
+      nextRegion = makeNextRegion();
+    } else {
+      // If the page is empty when this node is removed,
+      // then it won't help to move it to the next page.
+      // Instead continue here until the node is done.
+      nextRegion = region;
+    }
+
+    // append moved node as first in new page
+    nextRegion.currentElement.appendChild(nearestElementThatCanBeMoved);
+
+    // restore subpath
+    pathToRestore.forEach(r => nextRegion.path.push(r));
+    nextRegion.path.push(elementToMove);
+
+    if (startLength !== nextRegion.path.length) {
+      throw Error('Restored flowpath depth does not match original depth');
     }
   };
 
-  var tableRowRule = Split$2({
-    selector: 'tr',
-    didSplit: preserveTableColumns,
+  // The path is an array of nested elments,
+  // for example .content > article > p > a).
+  //
+  // It's shallowly cloned every time we move to the next page,
+  // to create the illusion that nodes are continuing from page
+  // to page.
+  //
+  // The transition can be customized by setting a Split rule,
+  // which lets you add classes to the original and cloned element
+  // to customize styling.
+
+  const clonePath = (oldPath, applyRules) => {
+    const newPath = [];
+
+    const deepClone = (el) => {
+      const clone = el.cloneNode(true); // deep clone, could be th > h3 > span;
+      applyRules(el, clone);
+      return clone;
+    };
+
+    for (let i = oldPath.length - 1; i >= 0; i -= 1) {
+      const original = oldPath[i];
+      const clone = original.cloneNode(false); // shallow
+      const nextChild = oldPath[i + 1];
+      clone.innerHTML = '';
+
+      applyRules(original, clone, nextChild, deepClone);
+
+      if (i < oldPath.length - 1) clone.appendChild(newPath[i + 1]);
+      newPath[i] = clone;
+    }
+
+    return newPath;
+  };
+
+  // Polls every 10ms for image.naturalWidth
+  // or an error event.
+  //
+  // Note: Doesn't ever reject, since missing images
+  // shouldn't prevent layout from resolving
+
+  const wait10 = () => new Promise((resolve) => {
+    setTimeout(() => { resolve(); }, 10);
   });
 
-  var defaultRules = [...attributeRules, orderedListRule, tableRowRule];
+  const ensureImageLoaded = async (image) => {
+    const imgStart = performance.now();
+    let failed = false;
+    image.addEventListener('error', () => { failed = true; });
+    image.src = image.src; // re-trigger error if already failed
+
+    while (!image.naturalWidth && !failed) {
+      await wait10();
+    }
+
+    return performance.now() - imgStart;
+  };
+
+  // flow content through FlowBoxes.
+  // This function is not book-specific,
+  // the caller is responsible for managing
+  // and creating boxes.
+  const flowIntoRegions = async (
+    content,
+    createRegion,
+    applySplit,
+    canSplit,
+    beforeAdd,
+    afterAdd
+  ) => {
+    let currentRegion = createRegion();
+    const hasOverflowed = () => currentRegion.hasOverflowed();
+    const canSplitCurrent = () => canSplit(currentRegion.currentElement);
+    const ignoreCurrentOverflow = () => ignoreOverflow(currentRegion.currentElement);
+
+    const continueInNextRegion = () => {
+      const oldBox = currentRegion;
+      currentRegion = createRegion();
+
+      const newPath = clonePath(oldBox.path, applySplit);
+      currentRegion.setPath(newPath);
+      return currentRegion;
+    };
+
+    const continuedElement = () => {
+      continueInNextRegion();
+      return currentRegion.currentElement;
+    };
+
+    const addTextWithoutChecks = (textNode, parent) => {
+      parent.appendChild(textNode);
+      if (!ignoreCurrentOverflow() && canSplitCurrent()) {
+        currentRegion.suppressErrors = true;
+        continueInNextRegion();
+      }
+    };
+
+    const addSplittableTextNode = async (textNode) => {
+      const el = currentRegion.currentElement;
+      let hasAdded = await addTextNodeAcrossParents(textNode, el, continuedElement, hasOverflowed);
+      if (!hasAdded && currentRegion.path.length > 1) {
+        // retry 1
+        tryInNextRegion(currentRegion, continueInNextRegion, canSplit);
+        hasAdded = await addTextNodeAcrossParents(textNode, el, continuedElement, hasOverflowed);
+      }
+      if (!hasAdded) {
+        // retry 2
+        addTextWithoutChecks(textNode, currentRegion.currentElement);
+      }
+    };
+
+    const addWholeTextNode = async (textNode) => {
+      let hasAdded = await addTextNode(textNode, currentRegion.currentElement, hasOverflowed);
+      if (!hasAdded && !ignoreCurrentOverflow()) {
+        // retry 1
+        tryInNextRegion(currentRegion, continueInNextRegion, canSplit);
+        hasAdded = await addTextNode(textNode, currentRegion.currentElement, hasOverflowed);
+      }
+      if (!hasAdded) {
+        // retry 2
+        addTextWithoutChecks(textNode, currentRegion.currentElement);
+      }
+    };
+
+    let safeAddElementNode;
+
+    // Adds an element node by clearing its childNodes, then inserting them
+    // one by one recursively until they overflow the region
+    const addElementNode = async (element) => {
+      // Insert element
+      currentRegion.currentElement.appendChild(element);
+      currentRegion.path.push(element);
+
+      // Clear element
+      const childNodes = [...element.childNodes];
+      element.innerHTML = '';
+
+      // Overflows when empty
+      if (hasOverflowed() && !ignoreCurrentOverflow() && canSplitCurrent()) {
+        tryInNextRegion(currentRegion, continueInNextRegion, canSplit);
+      }
+
+      const shouldSplit = canSplit(element) && !ignoreOverflow(element);
+
+      for (const child of childNodes) {
+        if (isTextNode(child)) {
+          await (shouldSplit ? addSplittableTextNode : addWholeTextNode)(child);
+        } else if (isContentElement(child)) {
+          await safeAddElementNode(child);
+        }
+      }
+      return currentRegion.path.pop();
+    };
+
+    safeAddElementNode = async (element) => {
+      // Ensure images are loaded before measuring
+      if (isUnloadedImage(element)) await ensureImageLoaded(element);
+
+      // Transforms before adding
+      beforeAdd(element, continueInNextRegion);
+
+      const addedElement = await addElementNode(element);
+
+      // Transforms after adding
+      afterAdd(addedElement, continueInNextRegion);
+    };
+
+    return safeAddElementNode(content);
+  };
 
   const MAXIMUM_PAGE_LIMIT = 2000;
 
@@ -1022,94 +1371,9 @@
     }
   }
 
-  // The path is an array of nested elments,
-  // for example .content > article > p > a).
-  //
-  // It's shallowly cloned every time we move to the next page,
-  // to create the illusion that nodes are continuing from page
-  // to page.
-  //
-  // The transition can be customized by setting a Split rule,
-  // which lets you add classes to the original and cloned element
-  // to customize styling.
-
-  const clonePath = (oldPath, applyRules) => {
-    const newPath = [];
-
-    const markAsToNext = node => node.classList.add(classes.toNext);
-    const markAsFromPrev = node => node.classList.add(classes.fromPrev);
-
-    const finishSplitting = (original, clone, nextChild, cloneEl) => {
-      markAsToNext(original);
-      markAsFromPrev(clone);
-      applyRules(original, clone, nextChild, cloneEl);
-    };
-
-    const deepClone = (el) => {
-      const clone = el.cloneNode(true); // deep clone, could be th > h3 > span;
-      finishSplitting(el, clone);
-      return clone;
-    };
-
-    for (let i = oldPath.length - 1; i >= 0; i -= 1) {
-      const original = oldPath[i];
-      const clone = original.cloneNode(false); // shallow
-      const nextChild = oldPath[i + 1];
-      clone.innerHTML = '';
-
-      finishSplitting(original, clone, nextChild, deepClone);
-
-      if (i < oldPath.length - 1) clone.appendChild(newPath[i + 1]);
-      newPath[i] = clone;
-    }
-
-    return newPath;
-  };
-
-  class FlowBox {
-    constructor() {
-      this.content = createEl('flow-content');
-      this.element = createEl('flow-box', [this.content]);
-      this.path = [];
-    }
-
-    get currentElement() {
-      const len = this.path.length;
-      if (len > 0) return this.path[len - 1];
-      return this.content;
-    }
-
-    get isEmpty() {
-      return this.content.textContent.trim() === '' && this.content.offsetHeight < 1;
-    }
-
-    get isReasonableSize() {
-      const box = this.element.getBoundingClientRect();
-      return (box.height > 100) && (box.width > 100); // TODO: Number is arbitrary
-    }
-
-    continueFrom(prevFlowBox, applyRules) {
-      this.path = clonePath(prevFlowBox.path, applyRules);
-      if (this.path[0]) {
-        this.content.appendChild(this.path[0]);
-      }
-    }
-
-    overflowAmount() {
-      const contentH = this.content.offsetHeight;
-      const boxH = this.element.offsetHeight;
-      if (boxH === 0) throw Error('Bindery: Trying to flow into a box of zero height.');
-      return contentH - boxH;
-    }
-
-    hasOverflowed() {
-      return this.overflowAmount() > -5;
-    }
-  }
-
   class Page {
     constructor() {
-      this.flow = new FlowBox();
+      this.flow = new Region(createEl('flow-box'));
       this.footer = createEl('footer');
       this.background = createEl('page-background');
       this.element = createEl('page', [this.background, this.flow.element, this.footer]);
@@ -1253,193 +1517,6 @@
     });
   };
 
-  const isTextNode = node => node.nodeType === Node.TEXT_NODE;
-  const isElement = node => node.nodeType === Node.ELEMENT_NODE;
-  const isScript = node => node.tagName === 'SCRIPT';
-  const isImage = node => node.tagName === 'IMG';
-  const isUnloadedImage = node => isImage(node) && !node.naturalWidth;
-  const isContentElement = node => isElement(node) && !isScript(node);
-
-  const overflowAttr = 'data-ignore-overflow';
-
-  // Walk up the tree to see if we are within
-  // an overflow-ignoring node
-  const ignoreOverflow = (element) => {
-    if (element.hasAttribute(overflowAttr)) return true;
-    if (element.parentElement) return ignoreOverflow(element.parentElement);
-    return false;
-  };
-
-  // Walk up the tree to see if we can safely
-  // insert a split into this node.
-  const canSplit = (element, selectors) => {
-    if (selectors.some(sel => element.matches(sel))) {
-      // if (element.hasAttribute(didMoveAttr) || element.classList.contains(classes.fromPrev)) {
-      //   return true; // ignore rules and split it anyways.
-      // }
-      return false;
-    }
-    if (element.parentElement) return canSplit(element.parentElement, selectors);
-    return true;
-  };
-
-  const MAX_TIME = 30; // ms
-
-  const rAF = () => new Promise((resolve) => {
-    requestAnimationFrame(t => resolve(t));
-  });
-
-  let lastYieldTime = 0;
-
-  const shouldYield = () => {
-    const timeSinceYield = performance.now() - lastYieldTime;
-    return timeSinceYield > MAX_TIME;
-  };
-
-  const yieldIfNecessary = async () => {
-    if (shouldYield()) lastYieldTime = await rAF();
-  };
-
-  const createTextNode = (document.createTextNode).bind(document);
-
-  // Try adding a text node in one go.
-  // Returns true if all the text fits, false if none fits.
-  const addTextNode = async (textNode, parent, hasOverflowed) => {
-    parent.appendChild(textNode);
-    const success = !hasOverflowed();
-    if (!success) parent.removeChild(textNode);
-    await yieldIfNecessary();
-    return success;
-  };
-
-
-  // Try adding a text node by incrementally adding words
-  // until it just barely doesnt overflow.
-  //
-  // Returns true if all the text fits, false if none fits,
-  // or new textnode containing the remainder text.
-  const addTextNodeUntilOverflow = async (textNode, parent, hasOverflowed) => {
-    const originalText = textNode.nodeValue;
-    parent.appendChild(textNode);
-
-    if (!hasOverflowed() || ignoreOverflow(parent)) {
-      return true;
-    }
-
-    // Add letter by letter until overflow
-    let pos = 0;
-    textNode.nodeValue = originalText.substr(0, pos);
-
-    while (!hasOverflowed() && pos < originalText.length) {
-      // advance to next non-space character
-      pos += 1;
-      while (pos < originalText.length && originalText.charAt(pos) !== ' ') pos += 1;
-
-      if (pos < originalText.length) {
-        // reveal more text
-        textNode.nodeValue = originalText.substr(0, pos);
-        await yieldIfNecessary();
-      }
-    }
-
-    // Back out to word boundary
-    if (originalText.charAt(pos) === ' ') pos -= 1; // TODO: redundant
-    while (originalText.charAt(pos) !== ' ' && pos > 0) pos -= 1;
-
-    if (pos < 1) {
-      // We didn't even add a complete word, don't add node
-      textNode.nodeValue = originalText;
-      parent.removeChild(textNode);
-      return false; // TODO
-    }
-
-    // trim text to word
-    const fittingText = originalText.substr(0, pos);
-    const overflowingText = originalText.substr(pos);
-    textNode.nodeValue = fittingText;
-
-    // Create a new text node for the next flow box
-    const remainingTextNode = createTextNode(overflowingText);
-    return remainingTextNode;
-  };
-
-
-  // Fills text across multiple elements by requesting a continuation
-  // once the current element overflows
-  const addTextNodeAcrossElements = async (textNode, parent, continuation, hasOverflowed) => {
-    const result = await addTextNodeUntilOverflow(textNode, parent, hasOverflowed);
-    if (isTextNode(result)) {
-      const nextElement = continuation();
-      return addTextNodeAcrossElements(result, nextElement, continuation, hasOverflowed);
-    }
-    return result;
-  };
-
-  // Shifts this element to the next page. If any of its
-  // ancestors cannot be split across page, it will
-  // step up the tree to find the first ancestor
-  // that can be split, and move all of that descendants
-  // to the next page.
-  const tryInNextBox = (flow, makeNextFlow, canSplitElement) => {
-    if (flow.path.length <= 1) {
-      throw Error('Bindery: Attempting to move the top-level element');
-    }
-    const startLength = flow.path.length;
-
-    // So this node won't get cloned. TODO: this is unclear
-    const elementToMove = flow.path.pop();
-
-    // find the nearest splittable parent
-    let nearestElementThatCanBeMoved = elementToMove;
-    const pathToRestore = [];
-    while (flow.path.length > 1 && !canSplitElement(flow.currentElement)) {
-      nearestElementThatCanBeMoved = flow.path.pop();
-      pathToRestore.unshift(nearestElementThatCanBeMoved);
-    }
-
-    // Once a node is moved to a new page, it should no longer trigger another
-    // move. otherwise tall elements will endlessly get shifted to the next page
-    nearestElementThatCanBeMoved.setAttribute('data-bindery-did-move', true);
-
-    const parent = nearestElementThatCanBeMoved.parentNode;
-    parent.removeChild(nearestElementThatCanBeMoved);
-
-    // If the nearest ancestor would be empty without this node,
-    // move it to the next page too.
-    if (flow.path.length > 1 && flow.currentElement.textContent.trim() === '') {
-      parent.appendChild(nearestElementThatCanBeMoved);
-      nearestElementThatCanBeMoved = flow.path.pop();
-      pathToRestore.unshift(nearestElementThatCanBeMoved);
-      nearestElementThatCanBeMoved.parentNode.removeChild(nearestElementThatCanBeMoved);
-    }
-
-    let newFlow;
-    if (!flow.isEmpty) {
-      if (flow.hasOverflowed()) {
-        // Recovery failed, maybe the box contains a large
-        // unsplittable element.
-        flow.suppressErrors = true;
-      }
-      newFlow = makeNextFlow();
-    } else {
-      // If the page is empty when this node is removed,
-      // then it won't help to move it to the next page.
-      // Instead continue here until the node is done.
-      newFlow = flow;
-    }
-
-    // append moved node as first in new page
-    newFlow.currentElement.appendChild(nearestElementThatCanBeMoved);
-
-    // restore subpath
-    pathToRestore.forEach(r => newFlow.path.push(r));
-    newFlow.path.push(elementToMove);
-
-    if (startLength !== newFlow.path.length) {
-      throw Error('Restored flowpath depth does not match original depth');
-    }
-  };
-
   const isSpread = rule => rule instanceof FullBleedSpread;
   const isPage = rule => rule instanceof FullBleedPage;
   const isBreak = rule => rule instanceof PageBreak;
@@ -1468,7 +1545,7 @@
   // which means footnotes will get left on previous page.
   // - 3. if it is a large paragraph, it will leave a large gap. the
   // ideal approach would be to only need to invalidate the last line of text.
-  const recoverFromRule = (el, book, continueOnNewPage) => {
+  const recoverFromRule = (el, book, nextBox) => {
     let removed = el;
     const parent = el.parentNode;
     parent.removeChild(removed);
@@ -1482,9 +1559,9 @@
         console.error('Trying again didnt fix it');
       }
     }
-    const newPage = continueOnNewPage();
-    newPage.flow.currentElement.appendChild(removed);
-    if (popped) newPage.flow.path.push(popped);
+    const newBox = nextBox();
+    newBox.currentElement.appendChild(removed);
+    if (popped) newBox.path.push(popped);
   };
 
   const giveUp = (rule, el) => {
@@ -1511,6 +1588,9 @@
     }
 
     applySplitRules(original, clone, nextChild, deepClone) {
+      original.classList.add(classes.toNext);
+      clone.classList.add(classes.fromPrev);
+
       this.didSplitRules.filter(r => original.matches(r.selector)).forEach((rule) => {
         rule.didSplit(original, clone, nextChild, deepClone);
       });
@@ -1554,44 +1634,17 @@
     }
   }
 
-  // Polls every 10ms for image.naturalWidth
-  // or an error event.
-  //
-  // Note: Doesn't ever reject, since missing images
-  // shouldn't prevent layout from resolving
-
-  const wait10 = () => new Promise((resolve) => {
-    setTimeout(() => { resolve(); }, 10);
-  });
-
-  const ensureImageLoaded = async (image) => {
-    const imgStart = performance.now();
-    let failed = false;
-    image.addEventListener('error', () => { failed = true; });
-    image.src = image.src; // re-trigger error if already failed
-
-    while (!image.naturalWidth && !failed) {
-      await wait10();
-    }
-
-    return performance.now() - imgStart;
-  };
-
   const sec = ms => (ms / 1000).toFixed(2);
 
   const estimateFor = (content) => {
     const start = window.performance.now();
     const capacity = content.querySelectorAll('*').length;
-    let timeWaiting = 0;
+    const timeWaiting = 0;
     let completed = 0;
 
     return {
       increment: () => { completed += 1; },
       get progress() { return completed / capacity; },
-      ensureImageLoaded: async (img) => {
-        const imgWait = await ensureImageLoaded(img);
-        timeWaiting += imgWait;
-      },
       end: () => {
         const end = window.performance.now();
         const total = end - start;
@@ -1601,25 +1654,14 @@
     };
   };
 
-  // Bindery
+  const makeBook = async (content, rules, updateProgress) => {
+    if (!Page.isSizeValid()) throw Error('Page is too small');
 
-  const paginate = (content, rules, progressCallback) => {
-    // Global state for a pagination run
     const estimator = estimateFor(content);
     const ruleSet = new RuleSet(rules);
-
     const book = new Book();
-    const noSplit = ruleSet.selectorsNotToSplit;
-    const canSplitElement = el => canSplit(el, noSplit);
-    const canSplitCurrent = () => canSplitElement(book.currentPage.flow.currentElement);
 
-    const hasOverflowed = () => book.currentPage.hasOverflowed();
-    const ignoreCurrentOverflow = () => ignoreOverflow(book.currentPage.flow.currentElement);
-
-    const makeNewPage = () => {
-      const newPage = new Page();
-      return newPage;
-    };
+    const makeNewPage = () => new Page();
 
     const finishPage = (page, allowOverflow) => {
       // finished with this page, can display
@@ -1630,139 +1672,55 @@
       book.validate();
     };
 
-    // Creates clones for ever level of tag
-    // we were in when we overflowed the last page
-    const continueOnNewPage = (allowOverflow = false) => {
+    const addPageToBook = (allowOverflow = false) => {
       const oldPage = book.currentPage;
       if (oldPage) finishPage(oldPage, allowOverflow);
 
       const newPage = makeNewPage();
-      if (oldPage) {
-        newPage.flow.continueFrom(oldPage.flow, ruleSet.applySplitRules);
-      }
       book.currentPage = newPage;
       book.pages.push(newPage);
 
-      progressCallback(book, estimator.progress);
+      updateProgress(book, estimator.progress);
       newPage.validate();
       return newPage;
     };
 
-    const continuedFlow = () => {
-      const newPage = continueOnNewPage();
+    const makeNextRegion = () => {
+      const newPage = addPageToBook();
       return newPage.flow;
     };
 
-    const addTextWithoutChecks = (textNode, parent) => {
-      parent.appendChild(textNode);
-      if (!ignoreCurrentOverflow() && canSplitCurrent()) {
-        book.currentPage.suppressErrors = true;
-        continueOnNewPage();
+    const applySplit = ruleSet.applySplitRules;
+    const dontSplitSel = ruleSet.selectorsNotToSplit;
+    const canSplit = (element) => {
+      if (dontSplitSel.some(sel => element.matches(sel))) {
+        return false;
       }
+      if (element.parentElement) return canSplit(element.parentElement, dontSplitSel);
+      return true;
     };
 
-    const addWholeTextNode = async (textNode) => {
-      let hasAdded = await addTextNode(textNode, book.currentPage.flow.currentElement, hasOverflowed);
-      if (!hasAdded && !ignoreCurrentOverflow()) {
-        // retry 1
-        tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
-        hasAdded = await addTextNode(textNode, book.currentPage.flow.currentElement, hasOverflowed);
-      }
-      if (!hasAdded) {
-        // retry 2
-        addTextWithoutChecks(textNode, book.currentPage.flow.currentElement);
-      }
+    const beforeAdd = (elementToAdd, continueInNextRegion) => {
+      ruleSet.applyBeforeAddRules(elementToAdd, book, continueInNextRegion, makeNewPage);
     };
 
-    const continuedElement = () => {
-      const newPage = continueOnNewPage();
-      return newPage.flow.currentElement;
-    };
-
-    const addSplittableTextNode = async (textNode) => {
-      const el = book.currentPage.flow.currentElement;
-      let hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
-      if (!hasAdded && book.currentPage.flow.path.length > 1) {
-        // retry 1
-        tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
-        hasAdded = await addTextNodeAcrossElements(textNode, el, continuedElement, hasOverflowed);
-      }
-      if (!hasAdded) {
-        // retry 2
-        addTextWithoutChecks(textNode, book.currentPage.flow.currentElement);
-      }
-    };
-
-    // Adds an element node by clearing its childNodes, then inserting them
-    // one by one recursively until thet overflow the page
-    const addElementNode = async (elementToAdd) => {
-      // if (hasOverflowed() && !ignoreCurrentOverflow() && canSplitCurrent()) {
-      //   book.currentPage.suppressErrors = true;
-      //   continueOnNewPage();
-      // }
-
-      // Ensure images are loaded before measuring
-      if (isUnloadedImage(elementToAdd)) await estimator.ensureImageLoaded(elementToAdd);
-
-      // Transforms before adding
-      const element = ruleSet.applyBeforeAddRules(elementToAdd, book, continueOnNewPage, makeNewPage);
-
-      // Insert element
-      book.currentPage.flow.currentElement.appendChild(element);
-      book.currentPage.flow.path.push(element);
-
-      // Clear element
-      const childNodes = [...element.childNodes];
-      element.innerHTML = '';
-
-      // Overflows when empty
-      if (hasOverflowed() && !ignoreCurrentOverflow() && canSplitCurrent()) {
-        tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
-      }
-
-      const shouldSplit = canSplitElement(element) && !ignoreOverflow(element);
-
-      for (const child of childNodes) {
-        if (isTextNode(child)) {
-          await (shouldSplit ? addSplittableTextNode : addWholeTextNode)(child);
-        } else if (isContentElement(child)) {
-          await addElementNode(child);
-        }
-      }
-
-      // Overflows when full
-      // if (hasOverflowed()) {
-      //   if (!ignoreCurrentOverflow() && canSplitCurrent()) {
-      //     tryInNextBox(book.currentPage.flow, continuedFlow, canSplitElement);
-      //   } else {
-      //     console.log('ok..');
-      //   }
-      // }
-
-      // Transforms after adding
-      const addedElement = book.currentPage.flow.path.pop();
-      ruleSet.applyAfterAddRules(addedElement, book, continueOnNewPage, makeNewPage);
+    const afterAdd = (addedElement, continueInNextRegion) => {
       estimator.increment();
+      return ruleSet.applyAfterAddRules(addedElement, book, continueInNextRegion, makeNewPage);
     };
 
-    const init = async () => {
-      if (!Page.isSizeValid()) throw Error('Page is too small');
-      content.style.margin = 0;
-      content.style.padding = 0;
-      continueOnNewPage();
+    // init
+    content.style.margin = 0;
+    content.style.padding = 0;
 
-      await addElementNode(content);
+    await flowIntoRegions(content, makeNextRegion, applySplit, canSplit, beforeAdd, afterAdd);
 
-      book.pages = orderPages(book.pages, makeNewPage);
-      annotatePages(book.pages);
+    book.pages = orderPages(book.pages, makeNewPage);
+    annotatePages(book.pages);
 
-      ruleSet.finishEveryPage(book);
-      estimator.end();
-
-      return book;
-    };
-
-    return init();
+    ruleSet.finishEveryPage(book);
+    estimator.end();
+    return book;
   };
 
   const padPages = (pages, makePage) => {
@@ -2079,11 +2037,16 @@
       this.element.classList.toggle(classes.showBleed, newVal);
     }
 
+    get isViewing() {
+      return document$1.body.classList.contains(classes.isViewing);
+    }
     set isViewing(newVal) {
       document$1.body.classList.toggle(classes.isViewing, newVal);
     }
 
-    setSheetSize(newVal) {
+    setSheetSize(str) {
+      const newVal = parseInt(str, 10);
+
       this.pageSetup.paper = newVal;
       this.pageSetup.updateStyleVars();
 
@@ -2094,7 +2057,9 @@
       setTimeout(() => { this.scaleToFit(); }, 300);
     }
 
-    setLayout(newVal) {
+    setLayout(str) {
+      const newVal = parseInt(str, 10);
+
       if (newVal === this.layout) return;
       this.layout = newVal;
 
@@ -2105,7 +2070,8 @@
       this.render();
     }
 
-    setMarks(newVal) {
+    setMarks(str) {
+      const newVal = parseInt(str, 10);
       this.isShowingCropMarks = (newVal === CROP || newVal === BOTH);
       this.isShowingBleedMarks = (newVal === BLEED || newVal === BOTH);
     }
@@ -2116,8 +2082,10 @@
         this.error = errorView(title, text);
         this.element.appendChild(this.error);
         this.scrollToBottom();
-        const flow = this.book.currentPage.flow;
-        if (flow) flow.currentElement.style.outline = '3px solid red';
+        if (this.book) {
+          const flow = this.book.currentPage.flow;
+          if (flow) flow.currentElement.style.outline = '3px solid red';
+        }
       }
     }
     scrollToBottom() {
@@ -2312,7 +2280,7 @@
         ControlsComponent: opts.ControlsComponent,
       });
 
-      this.rules = defaultRules;
+      this.rules = attributeRules;
       if (opts.rules) this.addRules(opts.rules);
 
       this.getContentAsElement(opts.content).then((el) => {
@@ -2347,7 +2315,7 @@
       const response = await fetch(url);
       if (response.status !== 200) {
         this.viewer.displayError(response.status, `Could not find file at "${url}"`);
-        return null;
+        throw Error(`Bindery: Could not find file at "${url}"`);
       }
       const fetchedContent = await response.text();
       const el = parseHTML(fetchedContent, sel);
@@ -2356,15 +2324,14 @@
           'Source not specified',
           `Could not find element that matches selector "${sel}"`
         );
-        console.error(`Bindery: Could not find element that matches selector "${sel}"`);
-        return null;
+        throw Error(`Bindery: Could not find element that matches selector "${sel}"`);
       }
       return el;
     }
 
     cancel() {
       this.viewer.hide();
-      this.content.style.display = '';
+      if (this.content) this.content.style.display = '';
     }
 
     addRules(newRules) {
@@ -2380,7 +2347,7 @@
     async makeBook() {
       if (!this.content) {
         this.viewer.show();
-        console.error('noc');
+        console.error('No content');
         return null;
       }
 
@@ -2395,11 +2362,8 @@
       this.viewer.inProgress = true;
 
       try {
-        const book = await paginate(
-          content,
-          this.rules,
-          (current, progress) => this.viewer.updateProgress(current, progress)
-        );
+        const onProgress = (current, progress) => this.viewer.updateProgress(current, progress);
+        const book = await makeBook(content, this.rules, onProgress);
         this.viewer.progress = 1;
         this.layoutInProgress = false;
         await rAF$1();
@@ -2416,7 +2380,7 @@
     }
   }
 
-  ___$insertStyle(".📖-page{width:var(--bindery-page-width);height:var(--bindery-page-height);position:relative;display:flex;flex-direction:column;flex-wrap:nowrap}li.continuation,p.continuation{text-indent:unset!important}li.continuation{list-style:none!important}.📖-flow-box{position:relative;margin-top:var(--bindery-margin-top);flex:1 1 auto;min-height:0}.📖-flow-content{padding:.1px;position:relative}.📖-footer{margin-top:8pt;margin-bottom:var(--bindery-margin-bottom);flex:0 1 auto;z-index:1}.📖-flow-box,.📖-footer{margin-left:var(--bindery-margin-inner);margin-right:var(--bindery-margin-outer)}.📖-left .📖-flow-box,.📖-left .📖-footer{margin-left:var(--bindery-margin-outer);margin-right:var(--bindery-margin-inner)}.📖-page-background{position:absolute;z-index:0;overflow:hidden;top:calc(-1 * var(--bindery-bleed));bottom:calc(-1 * var(--bindery-bleed));left:calc(-1 * var(--bindery-bleed));right:calc(-1 * var(--bindery-bleed))}.📖-left>.📖-page-background{right:0}.📖-right>.📖-page-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{text-align:left;left:var(--bindery-margin-outer)}.📖-right .📖-running-header{right:var(--bindery-margin-outer);text-align:right}.📖-page-size-rotated{height:var(--bindery-page-width);width:var(--bindery-page-height)}.📖-spread-size{height:var(--bindery-page-height);width:calc(var(--bindery-page-width) * 2)}.📖-spread-size-rotated{width:var(--bindery-page-height);height:calc(var(--bindery-page-width) * 2)}.📖-spread.📖-right>.📖-page-background{left:calc(-100% - var(--bindery-bleed))}.📖-spread.📖-left>.📖-page-background{right:calc(-100% - var(--bindery-bleed))}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-page-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-rotate-container.📖-rotate-inward .📖-page-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}:root{--bindery-ui-bg:#f4f4f4;--bindery-ui-accent:#000;--bindery-ui-text:#000}@media screen{.📖-root{transition:opacity .2s;opacity:1;background:var(--bindery-ui-bg);z-index:2;position:relative;padding-top:40px;min-height:100vh}.📖-view-flip .📖-root{padding-top:0}.📖-progress-bar{transform-origin:top left;transform:scaleY(0);position:fixed;left:0;top:0;right:0;background:var(--bindery-ui-accent);transition:transform .2s;height:2px;z-index:2}.📖-in-progress .📖-progress-bar{transform:scaleX(0)}.📖-zoom-content{padding:10px;background:var(--bindery-ui-bg);position:absolute;left:0;right:0;margin:auto}.📖-view-preview .📖-zoom-content{min-width:calc(20px + var(--bindery-spread-width))}.📖-view-flip .📖-zoom-content{min-width:calc(1.1 * var(--bindery-spread-width))}.📖-view-print .📖-zoom-content{min-width:calc(20px + var(--bindery-sheet-width))}.📖-zoom-content>.📖-page{margin:auto}.📖-measure-area{position:fixed;padding:50px 20px;z-index:2;visibility:hidden;top:0;left:0;width:0;height:0;overflow:hidden}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-sheet{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-sheet{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}}@media screen{.📖-page{background:#fff;outline:1px solid #ddd;overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}.📖-print-sheet{width:var(--bindery-sheet-width);height:var(--bindery-sheet-height)}.📖-show-bleed-marks .📖-print-sheet .📖-spread-wrapper,.📖-show-crop .📖-print-sheet .📖-spread-wrapper{margin:calc(var(--bindery-bleed) + 12pt) auto}body.viewing{margin:0}.📖-zoom-scaler{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}.📖-print-sheet{overflow:hidden;align-items:center;transition:all .2s}.📖-print-sheet,.📖-spread-wrapper{position:relative;display:flex;justify-content:center}.📖-spread-wrapper{margin:0 auto 32px}.📖-print-sheet .📖-spread-wrapper{margin:0 auto}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls{display:none!important}.📖-print-sheet{padding:1px;margin:0 auto;page-break-after:always}.📖-zoom-scaler[style]{transform:none!important}}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{width:1px;margin:auto}.📖-mark-bleed-left:after,.📖-mark-bleed-left:before,.📖-mark-bleed-right:after,.📖-mark-bleed-right:before,.📖-mark-crop-fold:after,.📖-mark-crop-fold:before,.📖-mark-crop-left:after,.📖-mark-crop-left:before,.📖-mark-crop-right:after,.📖-mark-crop-right:before{width:1px;height:var(--bindery-mark-length);background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{height:1px}.📖-mark-bleed-bottom:after,.📖-mark-bleed-bottom:before,.📖-mark-bleed-top:after,.📖-mark-bleed-top:before,.📖-mark-crop-bottom:after,.📖-mark-crop-bottom:before,.📖-mark-crop-top:after,.📖-mark-crop-top:before{width:var(--bindery-mark-length);height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-mark-crop-fold{right:0;left:0}.📖-mark-crop-left{left:0}.📖-mark-crop-right{right:0}.📖-mark-crop-top{top:0}.📖-mark-crop-bottom{bottom:0}.📖-print-meta{padding:var(--bindery-mark-length);text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{top:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed));bottom:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed))}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{left:calc(-12pt - var(--bindery-bleed));right:calc(-12pt - var(--bindery-bleed))}.📖-mark-bleed-left{left:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-right{right:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-top{top:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-bottom{bottom:calc(-1 * var(--bindery-bleed))}.📖-view-flip .📖-zoom-scaler{transform-origin:center left}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:90vh!important}.📖-page3d{margin:auto;width:var(--bindery-page-width);height:var(--bindery-page-height);transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.📖-flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}");
+  ___$insertStyle(".📖-page{width:var(--bindery-page-width);height:var(--bindery-page-height);position:relative;display:flex;flex-direction:column;flex-wrap:nowrap}li.continuation,p.continuation{text-indent:unset!important}li.continuation{list-style:none!important}.📖-flow-box{position:relative;margin-top:var(--bindery-margin-top);flex:1 1 auto;min-height:0}.📖-footer{margin-top:8pt;margin-bottom:var(--bindery-margin-bottom);flex:0 1 auto;z-index:1}.📖-flow-box,.📖-footer{margin-left:var(--bindery-margin-inner);margin-right:var(--bindery-margin-outer)}.📖-left .📖-flow-box,.📖-left .📖-footer{margin-left:var(--bindery-margin-outer);margin-right:var(--bindery-margin-inner)}.📖-page-background{position:absolute;z-index:0;overflow:hidden;top:calc(-1 * var(--bindery-bleed));bottom:calc(-1 * var(--bindery-bleed));left:calc(-1 * var(--bindery-bleed));right:calc(-1 * var(--bindery-bleed))}.📖-left>.📖-page-background{right:0}.📖-right>.📖-page-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{text-align:left;left:var(--bindery-margin-outer)}.📖-right .📖-running-header{right:var(--bindery-margin-outer);text-align:right}.📖-page-size-rotated{height:var(--bindery-page-width);width:var(--bindery-page-height)}.📖-spread-size{height:var(--bindery-page-height);width:calc(var(--bindery-page-width) * 2)}.📖-spread-size-rotated{width:var(--bindery-page-height);height:calc(var(--bindery-page-width) * 2)}.📖-spread.📖-right>.📖-page-background{left:calc(-100% - var(--bindery-bleed))}.📖-spread.📖-left>.📖-page-background{right:calc(-100% - var(--bindery-bleed))}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-page-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-rotate-container.📖-rotate-inward .📖-page-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}:root{--bindery-ui-bg:#f4f4f4;--bindery-ui-accent:#000;--bindery-ui-text:#000}@media screen{.📖-root{transition:opacity .2s;opacity:1;background:var(--bindery-ui-bg);z-index:2;position:relative;padding-top:40px;min-height:100vh}.📖-view-flip .📖-root{padding-top:0}.📖-progress-bar{transform-origin:top left;transform:scaleY(0);position:fixed;left:0;top:0;right:0;background:var(--bindery-ui-accent);transition:transform .2s;height:2px;z-index:2}.📖-in-progress .📖-progress-bar{transform:scaleX(0)}.📖-zoom-content{padding:10px;background:var(--bindery-ui-bg);position:absolute;left:0;right:0;margin:auto}.📖-view-preview .📖-zoom-content{min-width:calc(20px + var(--bindery-spread-width))}.📖-view-flip .📖-zoom-content{min-width:calc(1.1 * var(--bindery-spread-width))}.📖-view-print .📖-zoom-content{min-width:calc(20px + var(--bindery-sheet-width))}.📖-zoom-content>.📖-page{margin:auto}.📖-measure-area{position:fixed;padding:50px 20px;z-index:2;visibility:hidden;top:0;left:0;width:0;height:0;overflow:hidden}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-sheet{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-sheet{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}}@media screen{.📖-page{background:#fff;outline:1px solid #ddd;overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}.📖-print-sheet{width:var(--bindery-sheet-width);height:var(--bindery-sheet-height)}.📖-show-bleed-marks .📖-print-sheet .📖-spread-wrapper,.📖-show-crop .📖-print-sheet .📖-spread-wrapper{margin:calc(var(--bindery-bleed) + 12pt) auto}body.viewing{margin:0}.📖-zoom-scaler{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}.📖-print-sheet{overflow:hidden;align-items:center;transition:all .2s}.📖-print-sheet,.📖-spread-wrapper{position:relative;display:flex;justify-content:center}.📖-spread-wrapper{margin:0 auto 32px}.📖-print-sheet .📖-spread-wrapper{margin:0 auto}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls{display:none!important}.📖-print-sheet{padding:1px;margin:0 auto;page-break-after:always}.📖-zoom-scaler[style]{transform:none!important}}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{width:1px;margin:auto}.📖-mark-bleed-left:after,.📖-mark-bleed-left:before,.📖-mark-bleed-right:after,.📖-mark-bleed-right:before,.📖-mark-crop-fold:after,.📖-mark-crop-fold:before,.📖-mark-crop-left:after,.📖-mark-crop-left:before,.📖-mark-crop-right:after,.📖-mark-crop-right:before{width:1px;height:var(--bindery-mark-length);background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{height:1px}.📖-mark-bleed-bottom:after,.📖-mark-bleed-bottom:before,.📖-mark-bleed-top:after,.📖-mark-bleed-top:before,.📖-mark-crop-bottom:after,.📖-mark-crop-bottom:before,.📖-mark-crop-top:after,.📖-mark-crop-top:before{width:var(--bindery-mark-length);height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-mark-crop-fold{right:0;left:0}.📖-mark-crop-left{left:0}.📖-mark-crop-right{right:0}.📖-mark-crop-top{top:0}.📖-mark-crop-bottom{bottom:0}.📖-print-meta{padding:var(--bindery-mark-length);text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{top:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed));bottom:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed))}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{left:calc(-12pt - var(--bindery-bleed));right:calc(-12pt - var(--bindery-bleed))}.📖-mark-bleed-left{left:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-right{right:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-top{top:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-bottom{bottom:calc(-1 * var(--bindery-bleed))}.📖-view-flip .📖-zoom-scaler{transform-origin:center left}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:90vh!important}.📖-page3d{margin:auto;width:var(--bindery-page-width);height:var(--bindery-page-height);transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.📖-flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}");
 
   /* global BINDERY_VERSION */
 
