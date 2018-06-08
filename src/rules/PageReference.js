@@ -1,9 +1,13 @@
 import Replace from './Replace';
 import { pageNumbersForTest, formatAsRanges } from './searchPages';
 
-import { shallowEqual, oncePerFrameLimiter } from '../utils';
+import { shallowEqual, oncePerTimeLimiter } from '../utils';
 import { validate, T } from '../option-checker';
 import { c } from '../dom-utils';
+
+// Compatible with ids that start with numbers
+const startsNum = sel => sel.length > 2 && sel[0] === '#' && /^\d+$/.test(sel[1]);
+const safeIDSel = sel => (startsNum(sel) ? `[id="${sel.replace('#', '')}"]` : sel);
 
 // Options:
 // selector: String
@@ -18,7 +22,7 @@ class PageReference extends Replace {
       createTest: T.func,
     });
     this.references = [];
-    const throttle = oncePerFrameLimiter();
+    const throttle = oncePerTimeLimiter(10);
     this.throttledUpdate = (book) => {
       throttle(() => this.updatePageReferences(book.pages));
     };
@@ -65,14 +69,15 @@ class PageReference extends Replace {
   createTest(element) {
     const href = element.getAttribute('href');
     if (!href) return null;
-    const selector = `[id="${href.replace('#', '')}"]`;
+    const selector = safeIDSel(href);
     return el => el.querySelector(selector);
   }
 
   updatePageReferences(pages) {
     // querySelector first, then rerender
-    const results = this.references.map(ref => pageNumbersForTest(pages, ref.test));
-    this.references.forEach((ref, i) => this.render(ref, results[i]));
+    const results = this.references.map(ref =>
+      ({ ref, data: pageNumbersForTest(pages, ref.test) }));
+    results.forEach(({ ref, data }) => this.render(ref, data));
   }
 
   replace(template, number) {
