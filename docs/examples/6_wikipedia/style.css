@@ -31,7 +31,7 @@ h4 {
   font-weight: 400;
 }
 
-.thumb, .thumbinner, .thumbinner a {
+.thumb, .thumbinner {
   display: block;
   width: unset !important;
   height: 100%;
