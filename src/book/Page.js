@@ -61,7 +61,7 @@ class Page {
   validateEnd(allowOverflow) {
     if (!this.hasOverflowed()) return;
     console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
-    if (!this.suppressErrors && !allowOverflow) {
+    if (!this.suppressErrors && !this.flow.suppressErrors && !allowOverflow) {
       throw Error('Bindery: Moved to new page when last one is still overflowing');
     }
   }
