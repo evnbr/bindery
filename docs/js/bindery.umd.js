@@ -1,11 +1,11 @@
-/* 📖 Bindery v2.2.0 */
+/* 📖 Bindery v2.2.1 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global.Bindery = factory());
 }(this, (function () { 'use strict';
 
-  const BINDERY_VERSION = 'v2.2.0'
+  const BINDERY_VERSION = 'v2.2.1'
 
   function ___$insertStyle(css) {
     if (!css) {
@@ -701,6 +701,10 @@
     };
   };
 
+  // Compatible with ids that start with numbers
+  const startsNum = sel => sel.length > 2 && sel[0] === '#' && /^\d+$/.test(sel[1]);
+  const safeIDSel = sel => (startsNum(sel) ? `[id="${sel.replace('#', '')}"]` : sel);
+
   // Options:
   // selector: String
   // replace: function (HTMLElement, number) => HTMLElement
@@ -714,7 +718,7 @@
         createTest: T.func,
       });
       this.references = [];
-      const throttle = oncePerFrameLimiter();
+      const throttle = oncePerTimeLimiter(10);
       this.throttledUpdate = (book) => {
         throttle(() => this.updatePageReferences(book.pages));
       };
@@ -761,14 +765,15 @@
     createTest(element) {
       const href = element.getAttribute('href');
       if (!href) return null;
-      const selector = `[id="${href.replace('#', '')}"]`;
+      const selector = safeIDSel(href);
       return el => el.querySelector(selector);
     }
 
     updatePageReferences(pages) {
       // querySelector first, then rerender
-      const results = this.references.map(ref => pageNumbersForTest(pages, ref.test));
-      this.references.forEach((ref, i) => this.render(ref, results[i]));
+      const results = this.references.map(ref =>
+        ({ ref, data: pageNumbersForTest(pages, ref.test) }));
+      results.forEach(({ ref, data }) => this.render(ref, data));
     }
 
     replace(template, number) {
@@ -961,7 +966,7 @@
     }),
   ];
 
-  /* 📖 Regionize v0.1.0 */
+  /* 📖 Regionize v0.1.1 */
   const div = (cls) => {
     const el = document.createElement('div');
     el.classList.add(cls);
@@ -1125,7 +1130,7 @@
   // to the next page.
   const tryInNextRegion = (region, makeNextRegion, canSplit) => {
     if (region.path.length <= 1) {
-      throw Error('Bindery: Attempting to move the top-level element');
+      throw Error('Regionize: Attempting to move the top-level element');
     }
     const startLength = region.path.length;
 
@@ -1179,7 +1184,7 @@
     nextRegion.path.push(elementToMove);
 
     if (startLength !== nextRegion.path.length) {
-      throw Error('Restored flowpath depth does not match original depth');
+      throw Error('Regionize: Restored path depth does not match original path depth');
     }
   };
 
@@ -1241,33 +1246,75 @@
     return performance.now() - imgStart;
   };
 
+  const preserveNumbering = (original, clone, nextChild) => {
+    // restart numbering
+    let prevStart = 1;
+    if (original.hasAttribute('start')) {
+      // the OL is also a continuation
+      prevStart = parseInt(original.getAttribute('start'), 10);
+    }
+    if (nextChild && nextChild.tagName === 'LI') {
+      // the first list item is a continuation
+      prevStart -= 1;
+    }
+    const prevCount = original.children.length;
+    const newStart = prevStart + prevCount;
+    clone.setAttribute('start', newStart);
+  };
+
+  const preserveTableColumns = (original, clone, nextChild, deepClone) => {
+    const columns = [...original.children];
+
+    const currentIndex = columns.indexOf(nextChild);
+    for (let i = 0; i < currentIndex; i += 1) {
+      const clonedCol = deepClone(columns[i]);
+      clone.appendChild(clonedCol);
+    }
+  };
+
+  const noop = () => {};
+
   // flow content through FlowBoxes.
   // This function is not book-specific,
   // the caller is responsible for managing
   // and creating boxes.
-  const flowIntoRegions = async (
-    content,
-    createRegion,
-    applySplit,
-    canSplit,
-    beforeAdd,
-    afterAdd
-  ) => {
+  const flowIntoRegions = async (opts) => {
+    // required options
+    const content = opts.content;
+    const createRegion = opts.createRegion;
+    if (!content) throw Error('content not specified');
+    if (!createRegion) throw Error('createRegion not specified');
+
+    // optional
+    const applySplit = opts.applySplit || noop;
+    const canSplit = opts.canSplit || (() => true);
+    const beforeAdd = opts.beforeAdd || noop;
+    const afterAdd = opts.afterAdd || noop;
+    const shouldTraverse = opts.shouldTraverse || (() => false);
+
+    // ____
+    // Begin
     let currentRegion = createRegion();
     const hasOverflowed = () => currentRegion.hasOverflowed();
     const canSplitCurrent = () => canSplit(currentRegion.currentElement);
     const ignoreCurrentOverflow = () => ignoreOverflow(currentRegion.currentElement);
 
+    const splitRules = (prev, clone, next, deepClone) => {
+      if (prev.tagName === 'OL') preserveNumbering(prev, clone, next, deepClone);
+      if (prev.tagName === 'TR') preserveTableColumns(prev, clone, next, deepClone);
+      applySplit(prev, clone, next, deepClone);
+    };
+
     const continueInNextRegion = () => {
       const oldBox = currentRegion;
       currentRegion = createRegion();
 
-      const newPath = clonePath(oldBox.path, applySplit);
+      const newPath = clonePath(oldBox.path, splitRules);
       currentRegion.setPath(newPath);
       return currentRegion;
     };
 
-    const continuedElement = () => {
+    const continuedParent = () => {
       continueInNextRegion();
       return currentRegion.currentElement;
     };
@@ -1282,11 +1329,11 @@
 
     const addSplittableTextNode = async (textNode) => {
       const el = currentRegion.currentElement;
-      let hasAdded = await addTextNodeAcrossParents(textNode, el, continuedElement, hasOverflowed);
+      let hasAdded = await addTextNodeAcrossParents(textNode, el, continuedParent, hasOverflowed);
       if (!hasAdded && currentRegion.path.length > 1) {
         // retry 1
         tryInNextRegion(currentRegion, continueInNextRegion, canSplit);
-        hasAdded = await addTextNodeAcrossParents(textNode, el, continuedElement, hasOverflowed);
+        hasAdded = await addTextNodeAcrossParents(textNode, el, continuedParent, hasOverflowed);
       }
       if (!hasAdded) {
         // retry 2
@@ -1307,6 +1354,14 @@
       }
     };
 
+    // No need to traverse every node if fifts AND
+    // none of the contents could change size.
+    // Images and custom rules could cause the size to change
+    const canSkipTraversal = (element) => {
+      const containsImage = element.querySelector('img');
+      return !containsImage && !shouldTraverse(element);
+    };
+
     let safeAddElementNode;
 
     // Adds an element node by clearing its childNodes, then inserting them
@@ -1315,6 +1370,14 @@
       // Insert element
       currentRegion.currentElement.appendChild(element);
       currentRegion.path.push(element);
+
+      if (canSkipTraversal(element)) {
+        // console.log('maybe short circuit');
+        if (!hasOverflowed()) {
+          // console.log('did short circuit');
+          return currentRegion.path.pop();
+        }
+      }
 
       // Clear element
       const childNodes = [...element.childNodes];
@@ -1431,7 +1494,7 @@
     validateEnd(allowOverflow) {
       if (!this.hasOverflowed()) return;
       console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
-      if (!this.suppressErrors && !allowOverflow) {
+      if (!this.suppressErrors && !this.flow.suppressErrors && !allowOverflow) {
         throw Error('Bindery: Moved to new page when last one is still overflowing');
       }
     }
@@ -1585,6 +1648,14 @@
       rules.filter(r => r.setup).forEach(r => r.setup());
 
       this.applySplitRules = this.applySplitRules.bind(this);
+
+      const allSelectors = rules.map(r => r.selector).filter(sel => !!sel).join(', ');
+      if (allSelectors) {
+        const shouldTraverse = el => el.querySelector(allSelectors);
+        this.shouldTraverse = shouldTraverse.bind(this);
+      } else {
+        this.shouldTraverse = () => false;
+      }
     }
 
     applySplitRules(original, clone, nextChild, deepClone) {
@@ -1713,7 +1784,15 @@
     content.style.margin = 0;
     content.style.padding = 0;
 
-    await flowIntoRegions(content, makeNextRegion, applySplit, canSplit, beforeAdd, afterAdd);
+    await flowIntoRegions({
+      content,
+      createRegion: makeNextRegion,
+      applySplit,
+      canSplit,
+      beforeAdd,
+      afterAdd,
+      shouldTraverse: ruleSet.shouldTraverse,
+    });
 
     book.pages = orderPages(book.pages, makeNewPage);
     annotatePages(book.pages);
@@ -2380,7 +2459,7 @@
     }
   }
 
-  ___$insertStyle(".📖-page{width:var(--bindery-page-width);height:var(--bindery-page-height);position:relative;display:flex;flex-direction:column;flex-wrap:nowrap}li.continuation,p.continuation{text-indent:unset!important}li.continuation{list-style:none!important}.📖-flow-box{position:relative;margin-top:var(--bindery-margin-top);flex:1 1 auto;min-height:0}.📖-footer{margin-top:8pt;margin-bottom:var(--bindery-margin-bottom);flex:0 1 auto;z-index:1}.📖-flow-box,.📖-footer{margin-left:var(--bindery-margin-inner);margin-right:var(--bindery-margin-outer)}.📖-left .📖-flow-box,.📖-left .📖-footer{margin-left:var(--bindery-margin-outer);margin-right:var(--bindery-margin-inner)}.📖-page-background{position:absolute;z-index:0;overflow:hidden;top:calc(-1 * var(--bindery-bleed));bottom:calc(-1 * var(--bindery-bleed));left:calc(-1 * var(--bindery-bleed));right:calc(-1 * var(--bindery-bleed))}.📖-left>.📖-page-background{right:0}.📖-right>.📖-page-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{text-align:left;left:var(--bindery-margin-outer)}.📖-right .📖-running-header{right:var(--bindery-margin-outer);text-align:right}.📖-page-size-rotated{height:var(--bindery-page-width);width:var(--bindery-page-height)}.📖-spread-size{height:var(--bindery-page-height);width:calc(var(--bindery-page-width) * 2)}.📖-spread-size-rotated{width:var(--bindery-page-height);height:calc(var(--bindery-page-width) * 2)}.📖-spread.📖-right>.📖-page-background{left:calc(-100% - var(--bindery-bleed))}.📖-spread.📖-left>.📖-page-background{right:calc(-100% - var(--bindery-bleed))}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-page-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-rotate-container.📖-rotate-inward .📖-page-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}:root{--bindery-ui-bg:#f4f4f4;--bindery-ui-accent:#000;--bindery-ui-text:#000}@media screen{.📖-root{transition:opacity .2s;opacity:1;background:var(--bindery-ui-bg);z-index:2;position:relative;padding-top:40px;min-height:100vh}.📖-view-flip .📖-root{padding-top:0}.📖-progress-bar{transform-origin:top left;transform:scaleY(0);position:fixed;left:0;top:0;right:0;background:var(--bindery-ui-accent);transition:transform .2s;height:2px;z-index:2}.📖-in-progress .📖-progress-bar{transform:scaleX(0)}.📖-zoom-content{padding:10px;background:var(--bindery-ui-bg);position:absolute;left:0;right:0;margin:auto}.📖-view-preview .📖-zoom-content{min-width:calc(20px + var(--bindery-spread-width))}.📖-view-flip .📖-zoom-content{min-width:calc(1.1 * var(--bindery-spread-width))}.📖-view-print .📖-zoom-content{min-width:calc(20px + var(--bindery-sheet-width))}.📖-zoom-content>.📖-page{margin:auto}.📖-measure-area{position:fixed;padding:50px 20px;z-index:2;visibility:hidden;top:0;left:0;width:0;height:0;overflow:hidden}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-sheet{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-sheet{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}}@media screen{.📖-page{background:#fff;outline:1px solid #ddd;overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}.📖-print-sheet{width:var(--bindery-sheet-width);height:var(--bindery-sheet-height)}.📖-show-bleed-marks .📖-print-sheet .📖-spread-wrapper,.📖-show-crop .📖-print-sheet .📖-spread-wrapper{margin:calc(var(--bindery-bleed) + 12pt) auto}body.viewing{margin:0}.📖-zoom-scaler{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}.📖-print-sheet{overflow:hidden;align-items:center;transition:all .2s}.📖-print-sheet,.📖-spread-wrapper{position:relative;display:flex;justify-content:center}.📖-spread-wrapper{margin:0 auto 32px}.📖-print-sheet .📖-spread-wrapper{margin:0 auto}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls{display:none!important}.📖-print-sheet{padding:1px;margin:0 auto;page-break-after:always}.📖-zoom-scaler[style]{transform:none!important}}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{width:1px;margin:auto}.📖-mark-bleed-left:after,.📖-mark-bleed-left:before,.📖-mark-bleed-right:after,.📖-mark-bleed-right:before,.📖-mark-crop-fold:after,.📖-mark-crop-fold:before,.📖-mark-crop-left:after,.📖-mark-crop-left:before,.📖-mark-crop-right:after,.📖-mark-crop-right:before{width:1px;height:var(--bindery-mark-length);background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{height:1px}.📖-mark-bleed-bottom:after,.📖-mark-bleed-bottom:before,.📖-mark-bleed-top:after,.📖-mark-bleed-top:before,.📖-mark-crop-bottom:after,.📖-mark-crop-bottom:before,.📖-mark-crop-top:after,.📖-mark-crop-top:before{width:var(--bindery-mark-length);height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-mark-crop-fold{right:0;left:0}.📖-mark-crop-left{left:0}.📖-mark-crop-right{right:0}.📖-mark-crop-top{top:0}.📖-mark-crop-bottom{bottom:0}.📖-print-meta{padding:var(--bindery-mark-length);text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{top:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed));bottom:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed))}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{left:calc(-12pt - var(--bindery-bleed));right:calc(-12pt - var(--bindery-bleed))}.📖-mark-bleed-left{left:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-right{right:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-top{top:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-bottom{bottom:calc(-1 * var(--bindery-bleed))}.📖-view-flip .📖-zoom-scaler{transform-origin:center left}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:90vh!important}.📖-page3d{margin:auto;width:var(--bindery-page-width);height:var(--bindery-page-height);transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.📖-flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}");
+  ___$insertStyle(".📖-page{width:var(--bindery-page-width);height:var(--bindery-page-height);position:relative;display:flex;flex-direction:column;flex-wrap:nowrap}li.continuation,p.continuation{text-indent:unset!important}li.continuation{list-style:none!important}.📖-flow-box{position:relative;margin-top:var(--bindery-margin-top);flex:1 1 auto;min-height:0}.📖-footer{margin-top:8pt;margin-bottom:var(--bindery-margin-bottom);flex:0 1 auto;z-index:1}.📖-flow-box,.📖-footer{margin-left:var(--bindery-margin-inner);margin-right:var(--bindery-margin-outer)}.📖-left .📖-flow-box,.📖-left .📖-footer{margin-left:var(--bindery-margin-outer);margin-right:var(--bindery-margin-inner)}.📖-page-background{position:absolute;z-index:0;overflow:hidden;top:calc(-1 * var(--bindery-bleed));bottom:calc(-1 * var(--bindery-bleed));left:calc(-1 * var(--bindery-bleed));right:calc(-1 * var(--bindery-bleed))}.📖-left>.📖-page-background{right:0}.📖-right>.📖-page-background{left:0}.📖-sup{font-size:.667em}.📖-footer,.📖-running-header{font-size:10pt}.📖-running-header{position:absolute;text-align:center;top:.25in}.📖-left .📖-running-header{text-align:left;left:var(--bindery-margin-outer)}.📖-right .📖-running-header{right:var(--bindery-margin-outer);text-align:right}.📖-page-size-rotated{height:var(--bindery-page-width);width:var(--bindery-page-height)}.📖-spread-size{height:var(--bindery-page-height);width:calc(var(--bindery-page-width) * 2)}.📖-spread-size-rotated{width:var(--bindery-page-height);height:calc(var(--bindery-page-width) * 2)}.📖-spread.📖-right>.📖-page-background{left:calc(-100% - var(--bindery-bleed))}.📖-spread.📖-left>.📖-page-background{right:calc(-100% - var(--bindery-bleed))}.📖-left .📖-rotate-container.📖-rotate-outward,.📖-left .📖-rotate-container.📖-rotate-spread-clockwise,.📖-right .📖-rotate-container.📖-rotate-inward,.📖-rotate-container.📖-rotate-clockwise{transform:rotate(90deg) translate3d(0,-100%,0);transform-origin:top left}.📖-left .📖-rotate-container.📖-rotate-inward,.📖-left .📖-rotate-container.📖-rotate-spread-counterclockwise,.📖-right .📖-rotate-container.📖-rotate-outward,.📖-rotate-container.📖-rotate-counterclockwise{transform:rotate(-90deg) translate3d(-100%,0,0);transform-origin:top left}.📖-rotate-container{position:absolute}.📖-left .📖-rotate-container.📖-rotate-clockwise .📖-page-background{bottom:0}.📖-left .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-right .📖-rotate-container.📖-rotate-clockwise .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-counterclockwise .📖-page-background,.📖-rotate-container.📖-rotate-inward .📖-page-background{bottom:0}.📖-rotate-container.📖-rotate-outward .📖-page-background{top:0}.📖-right .📖-rotate-container.📖-rotate-spread-clockwise{transform:rotate(90deg) translate3d(0,-50%,0);transform-origin:top left}.📖-right .📖-rotate-container.📖-rotate-spread-counterclockwise{transform:rotate(-90deg) translate3d(-100%,-50%,0);transform-origin:top left}:root{--bindery-ui-bg:#f4f4f4;--bindery-ui-accent:#000;--bindery-ui-text:#000}@media screen{.📖-root{transition:opacity .2s;opacity:1;background:var(--bindery-ui-bg);z-index:2;position:relative;padding-top:40px;min-height:100vh}.📖-view-flip .📖-root{padding-top:0}.📖-progress-bar{transform-origin:top left;transform:scaleY(0);position:fixed;left:0;top:0;right:0;background:var(--bindery-ui-accent);transition:transform .2s;height:2px;z-index:2}.📖-in-progress .📖-progress-bar{transform:scaleX(0)}.📖-zoom-content{padding:10px;background:var(--bindery-ui-bg);position:absolute;left:0;right:0;margin:auto}.📖-view-preview .📖-zoom-content{min-width:calc(20px + var(--bindery-spread-width))}.📖-view-flip .📖-zoom-content{min-width:calc(1.1 * var(--bindery-spread-width))}.📖-view-print .📖-zoom-content{min-width:calc(20px + var(--bindery-sheet-width))}.📖-zoom-content>.📖-page{margin:auto}.📖-measure-area{position:fixed;padding:50px 20px;z-index:2;visibility:hidden;top:0;left:0;width:0;height:0;overflow:hidden}.📖-is-overflowing{border-bottom:1px solid #f0f}.📖-print-sheet{margin:0 auto}.📖-error{font:16px/1.4 -apple-system,BlinkMacSystemFont,Roboto,sans-serif;padding:15vh 15vw;z-index:3;position:fixed;top:0;left:0;right:0;bottom:0;background:hsla(0,0%,96%,.7)}.📖-error-title{font-size:1.5em;margin-bottom:16px}.📖-error-text{margin-bottom:16px;white-space:pre-line}.📖-error-footer{opacity:.5;font-size:.66em;text-transform:uppercase;letter-spacing:.02em}.📖-show-bleed .📖-print-sheet{background:#fff;outline:1px solid rgba(0,0,0,.1);box-shadow:0 1px 3px rgba(0,0,0,.2);margin:20px auto}}@media screen{.📖-page{background:#fff;outline:1px solid #ddd;overflow:hidden}.📖-show-bleed .📖-page{box-shadow:none;outline:none;overflow:visible}.📖-placeholder-pulse{animation:a 1s infinite}}@keyframes a{0%{opacity:.2}50%{opacity:.5}to{opacity:.2}}.📖-print-sheet{width:var(--bindery-sheet-width);height:var(--bindery-sheet-height)}.📖-show-bleed-marks .📖-print-sheet .📖-spread-wrapper,.📖-show-crop .📖-print-sheet .📖-spread-wrapper{margin:calc(var(--bindery-bleed) + 12pt) auto}.📖-viewing{margin:0}.📖-zoom-scaler{transform-origin:top left;transform-style:preserve-3d;height:calc(100vh - 120px)}.📖-print-sheet{overflow:hidden;align-items:center;transition:all .2s}.📖-print-sheet,.📖-spread-wrapper{position:relative;display:flex;justify-content:center}.📖-spread-wrapper{margin:0 auto 32px}.📖-print-sheet .📖-spread-wrapper{margin:0 auto}@page{margin:0}@media print{.📖-root *{-webkit-print-color-adjust:exact;color-adjust:exact}.📖-controls{display:none!important}.📖-print-sheet{padding:1px;margin:0 auto;page-break-after:always}.📖-zoom-scaler[style]{transform:none!important}}.📖-print-mark-wrap{display:none;position:absolute;pointer-events:none;top:0;bottom:0;left:0;right:0;z-index:3}.📖-show-bleed-marks .📖-print-mark-wrap,.📖-show-bleed-marks .📖-print-mark-wrap>[class*=bleed],.📖-show-crop .📖-print-mark-wrap,.📖-show-crop .📖-print-mark-wrap>[class*=crop]{display:block}.📖-print-mark-wrap>div{display:none;position:absolute;overflow:hidden}.📖-print-mark-wrap>div:after,.📖-print-mark-wrap>div:before{content:\"\";display:block;position:absolute}.📖-print-mark-wrap>div:before{top:0;left:0}.📖-print-mark-wrap>div:after{bottom:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{width:1px;margin:auto}.📖-mark-bleed-left:after,.📖-mark-bleed-left:before,.📖-mark-bleed-right:after,.📖-mark-bleed-right:before,.📖-mark-crop-fold:after,.📖-mark-crop-fold:before,.📖-mark-crop-left:after,.📖-mark-crop-left:before,.📖-mark-crop-right:after,.📖-mark-crop-right:before{width:1px;height:var(--bindery-mark-length);background-image:linear-gradient(90deg,#000 0,#000 51%,transparent 0);background-size:1px 100%}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{height:1px}.📖-mark-bleed-bottom:after,.📖-mark-bleed-bottom:before,.📖-mark-bleed-top:after,.📖-mark-bleed-top:before,.📖-mark-crop-bottom:after,.📖-mark-crop-bottom:before,.📖-mark-crop-top:after,.📖-mark-crop-top:before{width:var(--bindery-mark-length);height:1px;background-image:linear-gradient(180deg,#000 0,#000 51%,transparent 0);background-size:100% 1px}.📖-mark-crop-fold{right:0;left:0}.📖-mark-crop-left{left:0}.📖-mark-crop-right{right:0}.📖-mark-crop-top{top:0}.📖-mark-crop-bottom{bottom:0}.📖-print-meta{padding:var(--bindery-mark-length);text-align:center;font-family:-apple-system,BlinkMacSystemFont,Roboto,sans-serif;font-size:8pt;display:block!important;position:absolute;bottom:-60pt;left:0;right:0}.📖-mark-bleed-left,.📖-mark-bleed-right,.📖-mark-crop-fold,.📖-mark-crop-left,.📖-mark-crop-right{top:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed));bottom:calc(-1 * var(--bindery-mark-length) - var(--bindery-bleed))}.📖-mark-bleed-bottom,.📖-mark-bleed-top,.📖-mark-crop-bottom,.📖-mark-crop-top{left:calc(-12pt - var(--bindery-bleed));right:calc(-12pt - var(--bindery-bleed))}.📖-mark-bleed-left{left:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-right{right:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-top{top:calc(-1 * var(--bindery-bleed))}.📖-mark-bleed-bottom{bottom:calc(-1 * var(--bindery-bleed))}.📖-view-flip .📖-zoom-scaler{transform-origin:center left}.📖-flap-holder{perspective:5000px;position:absolute;top:0;right:0;left:0;bottom:0;margin:auto;transform-style:preserve-3d}.📖-flip-sizer{position:relative;margin:auto;padding:0 20px;box-sizing:content-box;height:90vh!important}.📖-page3d{margin:auto;width:var(--bindery-page-width);height:var(--bindery-page-height);transform:rotateY(0);transform-style:preserve-3d;transform-origin:left;transition:transform .5s,box-shadow .1s;position:absolute;left:0;right:0;top:0;bottom:0}.📖-page3d:hover{box-shadow:2px 0 4px rgba(0,0,0,.2)}.📖-page3d.📖-flipped{transform:rotateY(-180deg)}.📖-page3d .📖-page{position:absolute;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:none}.📖-page3d .📖-page3d-front{transform:rotateY(0)}.📖-page3d .📖-page3d-back{transform:rotateY(-180deg)}");
 
   /* global BINDERY_VERSION */
 

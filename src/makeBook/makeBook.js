@@ -64,7 +64,15 @@ const makeBook = async (content, rules, updateProgress) => {
   content.style.margin = 0;
   content.style.padding = 0;
 
-  await flowIntoRegions(content, makeNextRegion, applySplit, canSplit, beforeAdd, afterAdd);
+  await flowIntoRegions({
+    content,
+    createRegion: makeNextRegion,
+    applySplit,
+    canSplit,
+    beforeAdd,
+    afterAdd,
+    shouldTraverse: ruleSet.shouldTraverse,
+  });
 
   book.pages = orderPages(book.pages, makeNewPage);
   annotatePages(book.pages);

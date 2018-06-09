@@ -23,6 +23,14 @@ class RuleSet {
     rules.filter(r => r.setup).forEach(r => r.setup());
 
     this.applySplitRules = this.applySplitRules.bind(this);
+
+    const allSelectors = rules.map(r => r.selector).filter(sel => !!sel).join(', ');
+    if (allSelectors) {
+      const shouldTraverse = el => el.querySelector(allSelectors);
+      this.shouldTraverse = shouldTraverse.bind(this);
+    } else {
+      this.shouldTraverse = () => false;
+    }
   }
 
   applySplitRules(original, clone, nextChild, deepClone) {
