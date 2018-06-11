@@ -9,13 +9,9 @@
   flex-wrap: nowrap;
 }
 
-p.continuation {
+.continuation {
   text-indent: unset !important;
-}
-
-li.continuation {
   list-style: none !important;
-  text-indent: unset !important;
 }
 
 .flow-box {

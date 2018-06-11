@@ -28,19 +28,19 @@
 
   &.rotate-clockwise {
     .left & {
-      .page-background { bottom: 0; }
+      .page-background { top: 0; }
     }
     .right & {
-      .page-background { top: 0; }
+      .page-background { bottom: 0; }
     }
   }
 
   &.rotate-counterclockwise {
     .left & {
-      .page-background { top: 0; }
+      .page-background { bottom: 0; }
     }
     .right & {
-      .page-background { bottom: 0; }
+      .page-background { top: 0; }
     }
   }
 
