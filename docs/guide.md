@@ -9,7 +9,7 @@ inBook: true
 
 ## Getting Started
 
-Bindery is intended for web designers and developers of every skill level. Just download,
+Bindery is intended for web designers and developers of every skill level. Just
 include the script tag with your content, and you're ready to go.
 
 ```html
@@ -17,10 +17,17 @@ include the script tag with your content, and you're ready to go.
   <!-- The contents of your book -->
 </div>
 
-<script src="js/bindery.min.js"></script>
+<script src="https://unpkg.com/bindery"></script>
 <script>
   Bindery.makeBook({ content: '#content' });
 </script>
+```
+
+You can also install bindery from [npm](https://www.npmjs.com/package/bindery), or download directly.
+
+
+```
+npm install --save bindery
 ```
 
 <div>
@@ -28,19 +35,7 @@ include the script tag with your content, and you're ready to go.
     ↓ Download bindery.min.js
   </a>
 </div>
-<br>
 
-Or use the hosted version from [unpkg](https://unpkg.com/) directly:
-
-```html
-<script src="https://unpkg.com/bindery/dist/bindery.min.js"></script>
-```
-
-You can also install bindery from [npm](https://www.npmjs.com/package/bindery):
-
-```
-npm install --save bindery
-```
 
 ## Styling
 
@@ -169,19 +164,34 @@ Bindery.makeBook({
 ```
 
 In the example above, we return a string. We could also create an
-element ourselves in javascript.
+element ourselves in javascript. In plain javascript, that would look like:
 
 ```js
 let myCustomFootnote = Bindery.Footnote({
   selector: 'p > a',
   render: (element, number) => {
     let myFootnote = document.createElement('div');
-    myFootnote.classList.add('my-footnote')
+    myFootnote.classList.add('note')
     myFootnote.textContent = `${number}: Link to ${element.href}`;
     return myFootnote;
   }
 });
 ```
+
+You can use any library that creates HTML elements,
+for example [nanohtml](https://github.com/choojs/nanohtml):
+
+```js
+const html = import 'nanohtml';
+
+let myCustomFootnote = Bindery.Footnote({
+  selector: 'p > a',
+  render: (element, number) => html`
+    <div class="note">${number}: Link to ${element.href}</div>
+  `;
+});
+```
+
 
 
 ### Next Steps

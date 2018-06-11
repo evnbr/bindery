@@ -407,17 +407,12 @@ headers using your section titles.
 Keep in mind you can also use multiple
 `RunningHeaders` to create multiple elements— for example, to add both a page number
 at the bottom and a chapter title at the top.
+
 ```js
 Bindery.RunningHeader({
-  render: (page) => {
-    if (page.isEmpty) {
-      return '';
-    } else if (page.isLeft) {
-      return page.number + '·' + page.heading.h1;
-    } else {
-      return page.heading.h2 + '·' + page.number;
-    }
-  },
+  render: (page) => page.isLeft
+    ? `${page.number} · ${page.heading.h1}`
+    : `${page.heading.h2} · ${page.number}`
 })
 ```
 - `render:` A function that takes a `Page` and returns a string of HTML. You'll
@@ -472,38 +467,53 @@ contents, do this:
 ```js
 Bindery.PageReference({
   selector'.toc a',
-  replace: (element, num) => {
+  replace: (element, number) => {
     let row = document.createElement('div');
+    row.classList.add('toc-row');
     row.innerHTML = element.textContent;
-    row.innerHTML += "<span class='num'>" + num + "</span>";
+    row.innerHTML += `<span class='num'>${number}</span>`;
     return row;
   }
 })
 ```
 
-This will transform these anchor links as below:
+You can use any library that creates HTML elements,
+for example [nanohtml](https://github.com/choojs/nanohtml):
+
+```js
+const html = import 'nanohtml';
+
+Bindery.PageReference({
+  selector'.toc a',
+  replace: (element, number) => html`
+    <div class="toc-row">
+      <span>${element.textContent}</span>
+      <span class="num">${number}</span>
+    </div>
+  `;
+})
+```
+
+
+This will transform the HTML of your anchor links like this:
 
 <div class='code-compare' markdown='1'>
 ```html
 <!-- Before -->
-<ul class='toc'>
-  <li>
-    <a href='#chapter1'>
-      Chapter 1
-    </a>
-  </li>
-</ul>
+<nav class='toc'>
+  <a href='#chapter1'>
+    Chapter 1
+  </a>
+</nav>
 ```
 ```html
 <!-- After -->
-<ul class='toc'>
-  <li>
-    <div>
-      Chapter 1
-      <span class='num'>5</span>
-    </div>
-  </li>
-</ul>
+<nav class='toc'>
+  <div class='toc-row'>
+    <span>Chapter 1</span>
+    <span class='num'>5</span>
+  </div>
+</nav>
 ```
 </div>
 
@@ -516,10 +526,10 @@ checking the `href`, Bindery will search the entire text of each page to see if 
 Bindery.PageReference({
   selector: '.index-content li',
   createTest: (el) => {
-    let searchTerm = el.textContent.toLowerCase().trim();
-    return (elToSearch) => {
-      let textToSearch = elToSearch.textContent.toLowerCase();
-      return textToSearch.includes(searchTerm);
+    const searchTerm = el.textContent.toLowerCase().trim();
+    return (page) => {
+      const textOfPage = page.textContent.toLowerCase();
+      return textOfPage.includes(searchTerm);
     }
   },
 })
@@ -560,11 +570,8 @@ create your own testing function from the index entry.
 Bindery.PageReference({
   selector: '[data-ref]',
   createTest: (el) => {
-    let ref = el.getAttribute('data-ref');
-    let selector = `[data-id='${ref}']`;
-    return (pageEl) => {
-      return pageEl.querySelector(selector);
-    }
+    let selector = el.getAttribute('data-ref');
+    return (page) => page.querySelector(selector);
   },
 })
 ```
@@ -608,15 +615,10 @@ but will not create them yourself.
 - `number` the page number, with the first page being 1
 - `heading` The current hierarchy of headings from previous pages, in the form of `{ h1: String, h2: String, ... h6: String }`
 - `isEmpty` `Bool` Whether the page includes flow content
-- `isRight` `Bool` The page is on the right (the front of the leaf)
-- `isLeft` `Bool` The page is on the left (the back of the leaf)
+- `isRight` `Bool` The page is on the right (the front)
+- `isLeft` `Bool` The page is on the left (the back)
 
 ### Book
 You may receive instances of this class when using custom rules,
 but will not create them yourself.
-- `pages` Array of `Page`s
-- `isComplete` Whether layout has completed
-<!-- - `pagesForTest` Used internally by `PageReference`. Function with arguments
-`testFunc` and `callback`, will call callback after layout is completed
-with a string of all the
-page ranges where `testFunc` return true. -->
+- `pages` Array of `Page`

@@ -150,6 +150,11 @@ li {
   max-width: 35rem;
 }
 
+.grid-content {
+  max-width: 55rem;
+}
+
+
 .site-header {
   position: relative;
   margin-top: 1rem;
@@ -266,8 +271,8 @@ li {
 
 .docs-toc-btn {
   position: fixed;
-  top: calc(50vh - 1.5rem);
-  left: -1rem;
+  bottom: 1rem;
+  left: 5%;
   background: white;
   border: 1px solid black;
   width: 2rem;
@@ -301,6 +306,27 @@ li {
   list-style: none;
   padding: 0;
   margin-bottom: 1.5rem;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+}
+.grid figure {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding-bottom: 66.6%;
+  background-color: #f4f4f4;
+}
+
+.grid li {
+  display: block;
+  width: 100%;
+  margin: 0;
+  margin-bottom: 2rem;
+  text-indent: 0;
 }
 
 .docs-content ul li {
@@ -425,11 +451,14 @@ h3 {
   }
 }
 
+// h4 {
+//   font: 0.7rem/1.5 $system;
+//   font-weight: 600;
+//   padding-top: 1rem;
+//   letter-spacing: normal;
+// }
 h4 {
-  font: 0.7rem/1.5 $system;
-  font-weight: 600;
-  padding-top: 1rem;
-  letter-spacing: normal;
+  font-style: italic;
 }
 
 h5 {
@@ -518,6 +547,10 @@ p code, li code {
   }
   .code-compare > div {
     @include sideBySide;
+  }
+  .grid li {
+    max-width: 14rem;
+    margin-right: 1rem;
   }
 }
 

@@ -1,37 +1,47 @@
 simple:
   - title: Getting Started
     id: 1_getting_started
-  - title: Load content from a separate file
+  - title: Load content
     id: 2_content_on_separate_page
-  - title: Create page breaks and a table of contents
+  - title: Configure Rules
     id: 3_using_configuration_options
-  - title: Full-bleed spreads and images
+    desc: Use selectors to create breaks and turn links into page numbers
+    thumb: toc.png
+  - title: Spreads and images
     id: 9_spreads_and_images
-  - title: Customize how elements split across pages
+    thumb: spread.png
+  - title: Handling a split
     id: 7_custom_split
-  - title: Use a Counter
+    thumb: split.png
+  - title: Counters
     id: 10_counters
+    thumb: counter.png
+    desc: Create a numbering that continues across page breaks
   - title: Customize the viewer
     id: 11_custom_controls
-
-advanced:
+    thumb: controls.png
   - title: Create an index
+    desc: Automatically list every page that matches a query
     id: 8_index
+    thumb: index.png
   - title: Create your own rules
     id: 4_custom_rules
     desc: Change the background color per page, add fore-edge graphics
+    thumb: custom.png
   - title: Wikipedia article
     id: 6_wikipedia
     desc: Handle content from an external source
-  - title: Too much content
-    id: 5_maximum_content
+    thumb: wiki.png
 
 gallery:
   - title: evanbrooks.info/bindery
     desc: A book from this site
     url: /bindery/book
-  - title: johncaserta.com
+  - title: John Caserta
     desc: Site and book for John Caserta's projects, writing, and teaching
     url: http://johncaserta.com/bindery
+  - title: Cita Press
+    desc: A feminist indie press publishing public-domain books written by women
+    url: http://citapress.org/#home
   - title: Add yours?
     url: https://github.com/evnbr/bindery

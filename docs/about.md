@@ -25,13 +25,11 @@ Report bugs, make suggestions, or lend a hand
 
 ### What bindery is not
 
-1. *InDesign*— Bindery is for people who are interested in creating layouts
-programmatically. It's not a graphical user interface (though you could build one around it).
-2. *A PDF generator*— Bindery assumes you're printing straight from
-  the browser. If you want to adjust a PDF setting, your browser must support it—for
-  example, you must use a page size provided by your browser's print dialog.
-3. *[LaTeX](https://www.latex-project.org/)*— LaTeX is a markup language and typesetting system popular in the scientific community. Bindery is intended for everyone who knows web standards (or is learning). It takes advantage of all the existing tools and documentation—browsers, text editors, web inspectors, etc.
-4. *[CSS Regions](https://www.w3.org/TR/css-regions-1/)*— CSS Regions was an ill-fated Adobe-led effort to support magazine-like layouts on the web. A polyfill is available [here](https://github.com/FremyCompany/css-regions-polyfill). Bindery's pagination code is much more limited— it doesn't interpret your CSS rules, assumes there's only one flow per page, and assumes you're going to print it.
+1. *InDesign*— Bindery is intended for people who are interested in creating layouts
+with HTML and CSS. It's not a graphical user interface.
+2. *A PDF generator*— Bindery relies on your browser's PDF output. If you want to adjust a PDF setting, your browser must support it.
+3. *[LaTeX](https://www.latex-project.org/)*— LaTeX is a markup language and typesetting system popular in the scientific community. Bindery is intended for everyone who knows HTML and CSS (or is learning), and wants to apply that to print.
+4. *[CSS Regions](https://www.w3.org/TR/css-regions-1/)*— CSS Regions was an ill-fated Adobe-led spec to support magazine-like layouts on the web using new CSS rules like `flow-into`. ([polyfill here](https://github.com/FremyCompany/css-regions-polyfill)). Bindery uses [regionize.js](https://github.com/evnbr/regionize), a simple library that is not controlled by your CSS rules.
 
 <div class="colophon-wrap" markdown="1">
 

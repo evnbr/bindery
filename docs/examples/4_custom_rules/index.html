@@ -10,6 +10,7 @@
 
 <body>
   <script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
+  <script type="text/javascript" src="/bindery/js/bindery-controls.min.js"></script>
   <script>
 
     let shrinkingRule = Bindery.createRule({
@@ -61,6 +62,7 @@
         size: { height: '4in', width: '4in' },
         margin: { top: '0.3in', inner: '0.3in', outer: '0.3in', bottom: '0.3in' },
       },
+      ControlsComponent: BinderyControls,
       rules: [
         rainbowRule,
         shrinkingRule,
