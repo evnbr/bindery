@@ -28,18 +28,12 @@ If you're designing a website, think about books as an extension of the responsi
 </script>
 ```
 
-You can also install bindery from [npm](https://www.npmjs.com/package/bindery), or download directly.
-
+You can also install bindery from [npm](https://www.npmjs.com/package/bindery), or <a href="https://unpkg.com/bindery/dist/bindery.min.js" class="btn" download>download directly</a>.
 
 ```
 npm install --save bindery
 ```
 
-<div>
-  <a href="https://unpkg.com/bindery/dist/bindery.min.js" class="btn" download>
-    ↓ Download bindery.min.js
-  </a>
-</div>
 
 ### Using Rules
 
