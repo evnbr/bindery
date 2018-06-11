@@ -1,3 +1,31 @@
+* {
+  font: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  font: 20px/1.2 serif;
+}
+
+body {
+  margin: 0;
+}
+
+h1 {
+  font-size: 3rem;
+}
+
+h2 {
+  font-size: 2rem;
+  line-height: 2.4rem;
+  margin-bottom: 4.8rem;
+}
+
+sup {
+  font-size: 0.7rem;
+}
+
 .content, .intro {
   margin: 20px auto;
   max-width: 900px;
@@ -6,7 +34,6 @@
 
 p {
   text-indent: 1rem;
-  margin: 0;
 }
 
 figure {
@@ -25,13 +52,13 @@ figure {
   background: green;
 }
 
-
 figure img {
+  width: 100%;
   height: 100%;
 }
 
 figcaption {
-  padding: 20pt;
+  padding: 32pt;
   color: white;
   position: absolute;
   bottom: 0;
@@ -44,4 +71,11 @@ figcaption {
   border: 1px solid black;
   padding: 1rem;
   margin: 1rem 0;
+}
+
+.tootall {
+  height: 550px;
+}
+.toowide {
+  width: 550px;
 }

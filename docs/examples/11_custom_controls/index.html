@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Content on Separate Page</title>
-  <link rel="stylesheet" type="text/css" href="style.css" />
+  <title>Custom controls</title>
+  <link rel="stylesheet" type="text/css" href="../shared/style.css" />
   <style>
     body {
       --bindery-ui-bg: #fff9e4;
@@ -22,7 +22,7 @@
   <script>
       Bindery.makeBook({
         content: {
-          url: '../example_shared/content.html',
+          url: '../shared/content.html',
           selector: ".content",
         },
         ControlsComponent: BinderyControls,

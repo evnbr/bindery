@@ -32,18 +32,15 @@
           PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
           PageBreak({ selector: 'tr', position: 'avoid' }),
           Split({ selector: 'th', fromPrevious: 'th-continued' }),
-          // Bindery.FullBleedSpread({ selector: '.thumb', continue: 'same' }),
           Replace({
-            selector: '.navbox-list a[href]',
+            selector: '.navbox-list a[href], .vertical-navbox a[href]',
             replace: (element) => {
               let href = element.getAttribute('href');
-              if (!href) {
-                href = 'unknown';
-                console.log(element);
-              }
+              if (!href) href = 'unknown';
               const span = document.createElement('span');
-              span.innerHTML = `${element.innerHTML}: `;
-              span.innerHTML += `<a href='${href}'>${href.replace('https://', '')}</a>`;
+              span.classList.add('nav-row');
+              span.innerHTML += `<span class='nav-link'>${element.innerHTML}:</span>`;
+              span.innerHTML += `<a class='nav-url' href='${href}'>${href.replace('https://', '')}</a>`;
               return span;
             },
           }),

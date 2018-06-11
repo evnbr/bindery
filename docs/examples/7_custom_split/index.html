@@ -5,25 +5,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bindery Ex 7 — Custom Split</title>
-  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" type="text/css" href="../shared/style.css" />
 
   <style>
-    .content {
-      font-size: 20px;
-      line-height: 1.4em;
+    p, figure {
+      border-radius: 12pt;
     }
 
     p {
+      text-indent: 0;
       margin: 2pt;
-      padding: 4pt;
+      padding: 8pt;
       border: 1px solid black;
-      border-radius: 4pt;
     }
 
     p.my-continues {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
-      border-bottom: 4px dotted;
+      border-bottom: 2px dashed;
       border-color: red;
       background: #ffeeee;
     }
@@ -31,15 +30,15 @@
     p.my-from {
       border-top-left-radius: 0;
       border-top-right-radius: 0;
-      border-top: 4px dotted;
+      border-top: 2px dashed;
       border-color: blue;
       background: #eeeeff;
     }
 
     p.my-continues.my-from {
       border-color: magenta;
-      border-top: 4px dotted blue;
-      border-bottom: 4px dotted red;
+      border-top: 2px dashed blue;
+      border-bottom: 2px dashed red;
       background: #ffeeff;
     }
   </style>
@@ -52,10 +51,11 @@
   <script>
     Bindery.makeBook({
       content: {
-        url: '../example_shared/content.html',
+        url: '../shared/content.html',
         selector: ".content",
       },
       rules: [
+        Bindery.PageBreak({ selector: 'h1, h2, h3', continue: 'right' }),
         Bindery.Split({
           selector: 'p',
           toNext: 'my-continues',

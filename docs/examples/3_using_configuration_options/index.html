@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Using Configuration</title>
-  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" type="text/css" href="../shared/style.css" />
 </head>
 
 <body>
@@ -14,11 +14,11 @@
   <script>
     Bindery.makeBook({
       content: {
-        url: '../example_shared/content.html',
+        url: '../shared/content.html',
         selector: ".content",
       },
       rules: [
-        Bindery.PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+        Bindery.PageBreak({ selector: 'h1, h2, h3', position: 'before', continue: 'right' }),
         Bindery.Footnote({ selector: 'p' }),
         Bindery.Footnote({
           selector: 'p > a',

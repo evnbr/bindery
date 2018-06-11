@@ -7,8 +7,6 @@ order: 3
 inBook: false
 ---
 
-### Examples
-
 <ul class="grid">
 {% for ex in site.data.examples.simple %}
   <li>

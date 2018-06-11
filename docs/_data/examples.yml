@@ -1,7 +1,5 @@
 simple:
   - title: Getting Started
-    id: 1_getting_started
-  - title: Load content
     id: 2_content_on_separate_page
   - title: Configure Rules
     id: 3_using_configuration_options
@@ -9,29 +7,32 @@ simple:
     thumb: toc.png
   - title: Spreads and images
     id: 9_spreads_and_images
+    desc: Full-bleed, out-of-flow figures
     thumb: spread.png
   - title: Handling a split
     id: 7_custom_split
+    desc: Indicating that an element starts or ends on another page
     thumb: split.png
   - title: Counters
     id: 10_counters
     thumb: counter.png
-    desc: Create a numbering that continues across page breaks
-  - title: Customize the viewer
-    id: 11_custom_controls
-    thumb: controls.png
+    desc: Numbering that continues across page breaks
   - title: Create an index
     desc: Automatically list every page that matches a query
     id: 8_index
     thumb: index.png
   - title: Create your own rules
     id: 4_custom_rules
-    desc: Change the background color per page, add fore-edge graphics
+    desc: Dynamic background and font size, fore-edge graphics
     thumb: custom.png
   - title: Wikipedia article
     id: 6_wikipedia
-    desc: Handle content from an external source
+    desc: Handle HTML from an external source
     thumb: wiki.png
+  - title: Controls
+    desc: Add a print button and set custom colors
+    id: 11_custom_controls
+    thumb: controls.png
 
 gallery:
   - title: evanbrooks.info/bindery

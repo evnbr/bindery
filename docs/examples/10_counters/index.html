@@ -3,8 +3,9 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Using Configuration</title>
-  <link rel="stylesheet" type="text/css" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Counters</title>
+  <link rel="stylesheet" type="text/css" href="../shared/style.css" />
 </head>
 
 <body>
@@ -22,11 +23,11 @@
 
     makeBook({
       content: {
-        url: '../example_shared/content.html',
+        url: '../shared/content.html',
         selector: ".content",
       },
       rules: [
-        PageBreak({ selector: 'h2', position: 'before', continue: 'right' }),
+        PageBreak({ selector: 'h1, h2, h3', position: 'before', continue: 'right' }),
         FullBleedPage({ selector: '.med-figure' }),
         FullBleedSpread({ selector: '.big-figure', continue: 'same' }),
         RunningHeader(),
@@ -34,7 +35,7 @@
           incrementEl: 'h2',
           replaceEl: 'h2',
           replace: (el, counterValue) => {
-            el.insertAdjacentHTML('beforeend', `<span style='color: lime;'>Title ${counterValue} </span>`);
+            el.insertAdjacentHTML('afterbegin', `<div style='color: rgba(175,50,50);'>Section ${counterValue} </div>`);
             return el;
           }
         }),
@@ -43,7 +44,7 @@
           replaceEl: 'p',
           resetEl: 'h2',
           replace: (el, counterValue) => {
-            el.insertAdjacentHTML('afterbegin', `<span style='color: red;'>P ${counterValue} </span>`);
+            el.insertAdjacentHTML('afterbegin', `<span style='color: rgba(175,50,50);'>❡ ${counterValue} </span>`);
             return el;
           }
         }),
@@ -52,7 +53,7 @@
           replaceEl: 'figcaption',
           resetEl: 'h2',
           replace: (el, counterValue) => {
-            el.insertAdjacentHTML('afterbegin', `<span style='color: blue;'>Fig ${counterValue} </span>`);
+            el.insertAdjacentHTML('afterbegin', `<span style='font-style: italic;'>Figure ${counterValue} </span>`);
             return el;
           }
         }),

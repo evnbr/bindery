@@ -6,7 +6,11 @@ body {
   margin: 0;
 }
 
-.footnote {
+.📖-footnote {
+  font-size: 8pt;
+}
+
+table {
   font-size: 8pt;
 }
 
@@ -37,8 +41,8 @@ h4 {
   height: 100%;
 }
 .thumbinner img {
-  height: 100%;
-  width: unset !important;
+  height: unset;
+  width: 100% !important;
   margin: auto;
   display: block;
 }
@@ -132,6 +136,30 @@ table, th, td {
   border-top: 1px solid #ccc !important;
   padding: 1rem 0;
   background: transparent !important;
+}
+
+tr ul {
+  list-style: none;
+  padding: 0;
+}
+tr li {
+  margin-bottom: 0.5em;
+}
+
+.nav-row {
+  display: block;
+}
+
+.nav-link {
+  width: 10em;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.nav-url {
+  max-width: calc(100% - 10em);
+  display: inline-block;
+  vertical-align: top;
 }
 
 .index-content {

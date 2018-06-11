@@ -151,7 +151,7 @@ li {
 }
 
 .grid-content {
-  max-width: 55rem;
+  max-width: 50rem;
 }
 
 
@@ -317,7 +317,7 @@ li {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding-bottom: 66.6%;
+  padding-bottom: 78%;
   background-color: #f4f4f4;
 }
 
@@ -549,8 +549,11 @@ p code, li code {
     @include sideBySide;
   }
   .grid li {
-    max-width: 14rem;
-    margin-right: 1rem;
+    max-width: calc(50% - 0.5rem);
+    margin-right: 0.5rem;
+  }
+  .grid li div, .grid li h4 {
+    padding-right: 1rem;
   }
 }
 
@@ -644,7 +647,10 @@ p code, li code {
   .docs-nav h2 {
     padding-bottom: 3rem;
   }
-
+  .grid li {
+    max-width: calc(33% - 0.5rem);
+    margin-right: 0.5rem;
+  }
 }
 
 .highlight pre, pre.highlight {
