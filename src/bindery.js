@@ -54,12 +54,13 @@ class Bindery {
 
     const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
     const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
+    const controls = opts.ControlsComponent || window.BinderyControls;
     this.viewer = new Viewer({
       pageSetup: this.pageSetup,
       mode: opts.view || Mode.PREVIEW,
       marks: startMarks,
       layout: startLayout,
-      ControlsComponent: opts.ControlsComponent,
+      ControlsComponent: controls,
     });
 
     this.rules = defaultRules;
