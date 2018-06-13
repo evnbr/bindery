@@ -1,7 +1,7 @@
 const throttleFrame = () => {
   let wasCalled = false;
   let queued;
-  return (func) => {
+  const inner = (func) => {
     if (wasCalled) {
       queued = func;
       return;
@@ -11,17 +11,19 @@ const throttleFrame = () => {
     requestAnimationFrame(() => {
       wasCalled = false;
       if (queued) {
-        queued();
+        const queuedFunc = queued;
         queued = null;
+        inner(queuedFunc);
       }
     });
   };
+  return inner;
 };
 
 const throttleTime = (time) => {
   let wasCalled = false;
   let queued;
-  return (func) => {
+  const inner = (func) => {
     if (wasCalled) {
       queued = func;
       return;
@@ -31,11 +33,13 @@ const throttleTime = (time) => {
     setTimeout(() => {
       wasCalled = false;
       if (queued) {
-        queued();
+        const queuedFunc = queued;
         queued = null;
+        inner(queuedFunc);
       }
     }, time);
   };
+  return inner;
 };
 
 
