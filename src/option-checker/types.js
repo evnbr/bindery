@@ -5,6 +5,7 @@ const isObj = val => typeof val === 'object';
 const isFunc = val => typeof val === 'function';
 const isBool = val => typeof val === 'boolean';
 const isStr = val => typeof val === 'string';
+const isNum = val => typeof val === 'number';
 const isArr = val => Array.isArray(val);
 
 const hasProp = (obj, k) => Object.prototype.hasOwnProperty.call(obj, k);
@@ -48,6 +49,10 @@ const T = {
   length: {
     name: 'length (string with absolute units)',
     check: isLength,
+  },
+  number: {
+    name: 'number',
+    check: isNum,
   },
   bool: {
     name: 'bool',

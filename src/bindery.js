@@ -35,6 +35,7 @@ class Bindery {
       content: T.any,
       ControlsComponent: T.func,
       view: T.enum(...vals(Mode)),
+      pageNumberOffset: T.number,
       pageSetup: T.shape({
         name: 'pageSetup',
         margin: T.margin,
@@ -64,6 +65,7 @@ class Bindery {
     });
 
     this.rules = defaultRules;
+    this.rules.push({ pageNumberOffset: opts.pageNumberOffset || 0 });
     if (opts.rules) this.addRules(opts.rules);
 
     this.getContentAsElement(opts.content).then((el) => {

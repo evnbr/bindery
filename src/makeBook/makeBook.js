@@ -11,13 +11,14 @@ const makeBook = async (content, rules, updateProgress) => {
   const estimator = estimateFor(content);
   const ruleSet = new RuleSet(rules);
   const book = new Book();
+  const pageNumberOffset = ruleSet.pageNumberOffset;
 
   const makeNewPage = () => new Page();
 
   const finishPage = (page, allowOverflow) => {
     // finished with this page, can display
     book.pages = orderPages(book.pages, makeNewPage);
-    annotatePages(book.pages);
+    annotatePages(book.pages, pageNumberOffset);
     ruleSet.applyPageDoneRules(page, book);
     page.validateEnd(allowOverflow);
     book.validate();
@@ -75,7 +76,7 @@ const makeBook = async (content, rules, updateProgress) => {
   });
 
   book.pages = orderPages(book.pages, makeNewPage);
-  annotatePages(book.pages);
+  annotatePages(book.pages, pageNumberOffset);
 
   ruleSet.finishEveryPage(book);
   estimator.end();

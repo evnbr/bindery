@@ -8,6 +8,8 @@ const giveUp = (rule, el) => {
 
 class RuleSet {
   constructor(rules) {
+    this.pageNumberOffset = rules.find(r => r.pageNumberOffset).pageNumberOffset;
+
     // Rules for pages
     this.pageRules = rules.filter(r => r.eachPage);
 
