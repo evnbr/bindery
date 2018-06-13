@@ -1,14 +1,15 @@
 import { Page } from '../book';
 import { Mode, Paper, Layout, Marks } from '../constants';
 import { classes, createEl } from '../dom-utils';
-import { oncePerFrameLimiter, oncePerTimeLimiter } from '../utils';
+import { throttleFrame, throttleTime } from '../utils';
 import { gridLayout, printLayout, flipLayout } from '../layouts';
 
 import errorView from './error';
 import listenForPrint from './listenForPrint';
 
-const throttleProgress = oncePerFrameLimiter();
-const throttleRender = oncePerTimeLimiter(100);
+const throttleProgressBar = throttleFrame();
+const throttleRender = throttleTime(100);
+const throttleResize = throttleTime(50);
 const document = window.document;
 
 class Viewer {
@@ -34,7 +35,6 @@ class Viewer {
       this.render();
     });
 
-    const throttleResize = oncePerTimeLimiter(50);
     window.addEventListener('resize', () => {
       throttleResize(() => this.scaleToFit());
     });
@@ -212,7 +212,7 @@ class Viewer {
 
   set progress(p) {
     if (p < 1) {
-      throttleProgress(() => {
+      throttleProgressBar(() => {
         this.progressBar.style.transform = `scaleX(${p})`;
       });
     } else {

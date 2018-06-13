@@ -1,7 +1,7 @@
 import Replace from './Replace';
 import { pageNumbersForTest, formatAsRanges } from './searchPages';
 
-import { shallowEqual, oncePerTimeLimiter } from '../utils';
+import { shallowEqual, throttleTime } from '../utils';
 import { validate, T } from '../option-checker';
 import { c } from '../dom-utils';
 
@@ -22,7 +22,7 @@ class PageReference extends Replace {
       createTest: T.func,
     });
     this.references = [];
-    const throttle = oncePerTimeLimiter(10);
+    const throttle = throttleTime(10);
     this.throttledUpdate = (book) => {
       throttle(() => this.updatePageReferences(book.pages));
     };
