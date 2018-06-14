@@ -46,6 +46,7 @@ class PageReference extends Replace {
     ref.render = render;
     this.references.push(ref);
     const currentResults = pageNumbersForTest(book.pages, test);
+
     ref.render(currentResults); // Replace element immediately, to make sure it'll fit
     return ref;
   }
@@ -55,11 +56,11 @@ class PageReference extends Replace {
     if (!Array.isArray(newValue)) throw Error('Page search returned unexpected result');
 
     const isResolved = newValue.length > 0;
-    const pageRanges = isResolved ? formatAsRanges(newValue) : '?';
+    const pageRanges = isResolved ? formatAsRanges(newValue) : '⌧';
 
     const template = ref.template.cloneNode(true);
     const newRender = this.replace(template, pageRanges);
-    if (!isResolved) newRender.classList.add(c('placeholder-pulse'));
+    if (!isResolved) newRender.classList.add(c('placeholder-num'));
     ref.element.parentNode.replaceChild(newRender, ref.element);
 
     ref.element = newRender;

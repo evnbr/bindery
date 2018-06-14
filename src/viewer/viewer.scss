@@ -127,15 +127,9 @@
     }
   }
 
-  .placeholder-pulse {
-    animation: pulse 1s infinite;
+  .placeholder-num {
+    visibility: hidden !important;
   }
-}
-
-@keyframes pulse {
-  0%   { opacity: 0.2; }
-  50%  { opacity: 0.5; }
-  100% { opacity: 0.2; }
 }
 
 .print-sheet {
