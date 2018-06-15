@@ -1,5 +1,5 @@
 import { flowIntoRegions } from 'regionize';
-import { Book, Page, orderPages, annotatePages } from '../book';
+import { Book, Page, annotatePages } from '../book';
 
 // paginate
 import RuleSet from './RuleSet';
@@ -17,7 +17,7 @@ const makeBook = async (content, rules, updateProgress) => {
 
   const finishPage = (page, allowOverflow) => {
     // finished with this page, can display
-    book.pages = orderPages(book.pages, makeNewPage);
+    book.updatePageOrder();
     annotatePages(book.pages, pageNumberOffset);
     ruleSet.applyPageDoneRules(page, book);
     page.validateEnd(allowOverflow);
@@ -30,7 +30,7 @@ const makeBook = async (content, rules, updateProgress) => {
 
     const newPage = makeNewPage();
     book.currentPage = newPage;
-    book.pages.push(newPage);
+    book.addPage(newPage);
 
     updateProgress(book, estimator.progress);
     newPage.validate();
@@ -75,7 +75,7 @@ const makeBook = async (content, rules, updateProgress) => {
     shouldTraverse: ruleSet.shouldTraverse,
   });
 
-  book.pages = orderPages(book.pages, makeNewPage);
+  book.updatePageOrder();
   annotatePages(book.pages, pageNumberOffset);
 
   ruleSet.finishEveryPage(book);

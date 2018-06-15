@@ -1,8 +1,9 @@
-const indexOfNextInFlowPage = (pages, startIndex) => {
+const indexOfNextReorderablePage = (pages, startIndex) => {
   for (let i = startIndex; i < pages.length; i += 1) {
-    if (!pages[i].isOutOfFlow) return i;
+    const pg = pages[i];
+    if (!pg.isOutOfFlow && !pg.avoidReorder) return i;
   }
-  return startIndex;
+  return null;
 };
 
 // Given an array of pages with alwaysLeft, alwaysRight, and isOutOfFlow
@@ -23,14 +24,18 @@ const orderPages = (pages, makeNewPage) => {
         // are next to each other, they will remain in order, all being pushed
         // backward together.
 
-        const indexToSwap = indexOfNextInFlowPage(orderedPages, i + 1);
+        const indexToSwap = indexOfNextReorderablePage(orderedPages, i + 1);
+        if (!indexToSwap) {
+          // No larger index to swap with, perhaps because
+          // we are optimistically rendering before the book is done
+          break;
+        }
         const pageToMoveUp = orderedPages[indexToSwap];
-        orderedPages.splice(indexToSwap, 1);
-        orderedPages.splice(i, 0, pageToMoveUp);
+        orderedPages.splice(indexToSwap, 1); // remove pg
+        orderedPages.splice(i, 0, pageToMoveUp); // insert pg
       } else {
         // If the page is 'in flow', order must be respected, so extra blank pages
         // are inserted.
-
         orderedPages.splice(i, 0, makeNewPage());
       }
     }

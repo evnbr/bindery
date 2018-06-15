@@ -26,7 +26,7 @@ class FullBleedPage extends OutOfFlow {
       newPage = book.currentPage;
     } else {
       newPage = makeNewPage();
-      book.pages.push(newPage);
+      book.addPage(newPage);
     }
     if (this.rotate !== 'none') {
       const rotateContainer = createEl(`.rotate-container.page-size-rotated.rotate-${this.rotate}`);

@@ -1,3 +1,4 @@
+import { Book } from '../book';
 import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
 import { c, createEl } from '../dom-utils';
@@ -25,11 +26,11 @@ class FullBleedSpread extends OutOfFlow {
       leftPage = book.currentPage;
     } else {
       leftPage = makeNewPage();
-      book.pages.push(leftPage);
+      book.addPage(leftPage);
     }
 
     const rightPage = makeNewPage();
-    book.pages.push(rightPage);
+    book.addPage(rightPage);
 
     if (this.rotate !== 'none') {
       [leftPage, rightPage].forEach((page) => {
@@ -43,12 +44,14 @@ class FullBleedSpread extends OutOfFlow {
     leftPage.element.classList.add(c('spread'));
     leftPage.setPreference('left');
     leftPage.isOutOfFlow = this.continue === 'same';
+    leftPage.avoidReorder = true;
     leftPage.hasOutOfFlowContent = true;
 
     rightPage.background.appendChild(elmt.cloneNode(true));
     rightPage.element.classList.add(c('spread'));
     rightPage.setPreference('right');
     rightPage.isOutOfFlow = this.continue === 'same';
+    rightPage.avoidReorder = true;
     rightPage.hasOutOfFlowContent = true;
   }
 }

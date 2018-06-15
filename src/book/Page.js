@@ -15,10 +15,9 @@ class Page {
   }
 
   setLeftRight(dir) {
-    const isLeft = dir === 'left';
     this.side = dir;
-    this.element.classList.toggle(classes.leftPage, isLeft);
-    this.element.classList.toggle(classes.rightPage, !isLeft);
+    this.element.classList.toggle(classes.leftPage, this.isLeft);
+    this.element.classList.toggle(classes.rightPage, !this.isLeft);
   }
   get isLeft() {
     return this.side === 'left';
@@ -29,9 +28,9 @@ class Page {
   }
 
   setPreference(dir) {
-    const isLeft = dir === 'left';
-    this.alwaysLeft = isLeft;
-    this.alwaysRight = !isLeft;
+    const preferLeft = dir === 'left';
+    this.alwaysLeft = preferLeft;
+    this.alwaysRight = !preferLeft;
   }
 
   get suppressErrors() {

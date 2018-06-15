@@ -1,3 +1,4 @@
+import { Book } from '../book';
 import FullBleedPage from './FullBleedPage';
 
 const createEl = (tag, txt) => {
@@ -19,7 +20,9 @@ const pageStub = n => ({
 const spread = new FullBleedPage({ selector: 'figure' });
 
 test('Spread gets created', () => {
-  const book = { pages: [pageStub(0), pageStub(1)] };
+  const book = new Book();
+  book.addPage(pageStub(0));
+  book.addPage(pageStub(1));
   book.currentPage = book.pages[1];
 
   const el = createEl('figure');
@@ -33,7 +36,9 @@ test('Spread gets created', () => {
 });
 
 test('Blank page gets reused', () => {
-  const book = { pages: [pageStub(0), pageStub(1)] };
+  const book = new Book();
+  book.addPage(pageStub(0));
+  book.addPage(pageStub(1));
   book.currentPage = book.pages[1];
   book.currentPage.isEmpty = true;
 
@@ -50,7 +55,9 @@ test('Blank page gets reused', () => {
 test('Pages get placed in rotate container', () => {
   const rotatedSpread = new FullBleedPage({ rotate: 'clockwise', selector: 'figure' });
 
-  const book = { pages: [pageStub(0), pageStub(1)] };
+  const book = new Book();
+  book.addPage(pageStub(0));
+  book.addPage(pageStub(1));
   book.currentPage = book.pages[1];
   book.currentPage.isEmpty = true;
 
