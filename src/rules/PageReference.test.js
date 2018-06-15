@@ -25,7 +25,7 @@ test('TOC placeholder gets created if target is not yet in the book', () => {
   book.pages[0].element.appendChild(toc);
 
   const newToc = pageRef.afterAdd(toc, book);
-  expect(newToc.textContent).toBe('Read more, ?');
+  expect(newToc.textContent).toBe('Read more, ⌧');
 });
 
 test('TOC gets rendered after result is in book', () => {
