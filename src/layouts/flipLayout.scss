@@ -48,7 +48,7 @@
     position: absolute;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    box-shadow: none;
+    box-shadow: 0 0 2px rgba(0,0,0,0.1);
   }
 
   .page3d-front {
