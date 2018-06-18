@@ -139,7 +139,21 @@
 
 .show-crop .print-sheet .spread-wrapper,
 .show-bleed-marks .print-sheet .spread-wrapper {
-  margin: calc(var(--bindery-bleed) + 12pt) auto;
+  margin-top: calc(var(--bindery-bleed) + 12pt);
+  margin-bottom: calc(var(--bindery-bleed) + 12pt);
+}
+
+.spread-wrapper {
+  .print-sheet-spread & {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .print-sheet-left & {
+    margin-right: 0;
+  }
+  .print-sheet-right & {
+    margin-left: 0;
+  }
 }
 
 .viewing {
@@ -163,13 +177,17 @@
   transition: all 0.2s;
 }
 
+.print-sheet-left {
+  justify-content: left;
+}
+
+.print-sheet-right {
+  justify-content: right;
+}
+
 .spread-wrapper {
   position: relative;
   display: flex;
   justify-content: center;
   margin: 0 auto 32px;
-}
-
-.print-sheet .spread-wrapper {
-  margin: 0 auto;
 }

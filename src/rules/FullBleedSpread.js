@@ -1,4 +1,3 @@
-import { Book } from '../book';
 import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
 import { c, createEl } from '../dom-utils';

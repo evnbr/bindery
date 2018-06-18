@@ -32,20 +32,21 @@ class PageSetup {
     const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
 
-    const bleedAmount = `2 * ${this.bleed}`;
-    const marksAmount = `2 * ${this.bleed} + 2 * ${this.markLength}`;
+    const doubleBleed = `2 * ${this.bleed}`;
+    const doubleMarks = `${doubleBleed} + 2 * ${this.markLength}`;
+    const singleMarks = `${this.bleed} + ${this.markLength}`;
     switch (this.paper) {
     case Paper.AUTO:
       return { width, height };
     case Paper.AUTO_BLEED:
       return {
-        width: `calc(${width} + ${bleedAmount})`,
-        height: `calc(${height} + ${bleedAmount})`,
+        width: `calc(${width} + ${this.printTwoUp ? doubleBleed : this.bleed})`,
+        height: `calc(${height} + ${doubleBleed})`,
       };
     case Paper.AUTO_MARKS:
       return {
-        width: `calc(${width} + ${marksAmount})`,
-        height: `calc(${height} + ${marksAmount})`,
+        width: `calc(${width} + ${this.printTwoUp ? doubleMarks : singleMarks})`,
+        height: `calc(${height} + ${doubleMarks})`,
       };
     case Paper.LETTER_LANDSCAPE:
       return { width: letter.height, height: letter.width };

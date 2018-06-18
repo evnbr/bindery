@@ -16,6 +16,11 @@ const classes = {
   rightPage: 'right',
   isOverflowing: 'is-overflowing',
 
+  printSheet: 'print-sheet',
+  sheetSpread: 'print-sheet-spread',
+  sheetLeft: 'print-sheet-left',
+  sheetRight: 'print-sheet-right',
+
   toNext: 'continues',
   fromPrev: 'continuation',
 };

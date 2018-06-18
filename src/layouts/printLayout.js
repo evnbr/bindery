@@ -1,4 +1,4 @@
-import { createEl } from '../dom-utils';
+import { createEl, classes } from '../dom-utils';
 import { Page } from '../book';
 import { Layout } from '../constants';
 
@@ -23,7 +23,7 @@ const renderPrintLayout = (bookPages, doubleSided, layout) => {
   const marks = isTwoUp ? printMarksSpread : printMarksSingle;
   const spread = isTwoUp ? twoPageSpread : onePageSpread;
 
-  const printSheet = children => createEl('.print-sheet', [spread(children)]);
+  const printSheet = children => createEl('print-sheet', [spread(children)]);
 
   if (isTwoUp) {
     for (let i = 0; i < pages.length; i += 2) {
@@ -36,11 +36,13 @@ const renderPrintLayout = (bookPages, doubleSided, layout) => {
         pages[i].element,
         pages[i + 1].element,
         spreadMarks]);
+      sheet.classList.add(classes.sheetSpread);
       printLayout.appendChild(sheet);
     }
   } else {
     pages.forEach((pg) => {
       const sheet = printSheet([pg.element, marks()]);
+      sheet.classList.add(pg.isLeft ? classes.sheetLeft : classes.sheetRight);
       printLayout.appendChild(sheet);
     });
   }
