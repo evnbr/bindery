@@ -122,8 +122,17 @@
 
     .show-bleed & {
       box-shadow: none;
-      outline: none;
       overflow: visible;
+      &:after {
+        content: '';
+        outline: 1px dotted rgba(0, 255, 255, 0.7);
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        z-index: 99;
+      }
     }
   }
 
