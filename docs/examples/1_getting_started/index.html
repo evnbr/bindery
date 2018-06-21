@@ -1,3 +1,7 @@
+---
+layout: blank
+---
+
 <!DOCTYPE html>
 <html>
 
@@ -52,8 +56,13 @@
   </section>
 
 
-  <script type="text/javascript" src="/bindery/js/bindery-controls.min.js"></script>
-  <script type="text/javascript" src="/bindery/js/bindery.umd.js"></script>
+  {% if jekyll.environment == "production" %}
+    <script type="text/javascript" src='https://unpkg.com/bindery'></script>
+    <script type="text/javascript" src='https://unpkg.com/bindery-controls'></script>
+  {% else %}
+    <script type="text/javascript" src='/bindery/bindery_dev_build/bindery.umd.js'></script>
+    <script type="text/javascript" src='/bindery/bindery_dev_build/bindery-controls.min.js'></script>
+  {% endif %}
   <script>
     Bindery.makeBook({ content: ".content" });
   </script>

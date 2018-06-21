@@ -3,6 +3,7 @@
 node_modules/
 dist/
 coverage/
+docs/bindery_dev_build/
 
 *.sketch
 *.map

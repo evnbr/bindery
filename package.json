@@ -40,7 +40,7 @@
     "rollup-plugin-sizes": "^0.4.2"
   },
   "scripts": {
-    "build": "rollup -c && cp dist/bindery.umd.js docs/js && cp dist/bindery.umd.js.map docs/js",
+    "build": "rollup -c && cp dist/bindery.umd.js docs/bindery_dev_build && cp dist/bindery.umd.js.map docs/bindery_dev_build",
     "dev": "rollup -c -w",
     "test": "jest && codecov",
     "coverage": "jest --coverage",

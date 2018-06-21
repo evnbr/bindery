@@ -17,7 +17,7 @@ include the script tag with your content, and you're ready to go.
   <!-- The contents of your book -->
 </div>
 
-<script src="https://unpkg.com/bindery@2.2.2"></script>
+<script src="https://unpkg.com/bindery@2.2.3/dist/bindery.min.js"></script>
 <script>
   Bindery.makeBook({ content: '#content' });
 </script>
