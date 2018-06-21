@@ -73,6 +73,7 @@ const makeBook = async (content, rules, updateProgress) => {
     beforeAdd,
     afterAdd,
     shouldTraverse: ruleSet.shouldTraverse,
+    didWaitFor: t => estimator.addWaitTime(t),
   });
 
   book.updatePageOrder();
