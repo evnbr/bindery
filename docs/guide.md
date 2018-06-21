@@ -7,7 +7,7 @@ order: 0
 inBook: true
 ---
 
-## Getting Started
+### Getting Started
 
 Bindery is intended for web designers and developers of every skill level. Just
 include the script tag with your content, and you're ready to go.
@@ -17,7 +17,7 @@ include the script tag with your content, and you're ready to go.
   <!-- The contents of your book -->
 </div>
 
-<script src="https://unpkg.com/bindery"></script>
+<script src="https://unpkg.com/bindery@2.2.2"></script>
 <script>
   Bindery.makeBook({ content: '#content' });
 </script>
@@ -37,7 +37,7 @@ npm install --save bindery
 </div>
 
 
-## Styling
+### Styling
 
 Use your existing web CSS if you've got it—96 CSS pixels equals 1 CSS inch. That should be around 1 inch while printed, although some browsers might adjust the scale a little. CSS also supports points (`pt`), pica (`pc`), inches (`in`), and millimeters (`mm`).
 
@@ -46,7 +46,7 @@ these refer to the browser width, not width of a book page. Also, avoid
 changing sizes or layout when using `@media print`. Bindery won't be able
 to use that information when flowing content across pages, and you won't be able to see them in the preview.
 
-## Preparing Content
+### Preparing Content
 
 Your book content is probably pretty long, so you may want to keep it in a separate
 file. This also prevents any flash of unstyled content
@@ -85,33 +85,11 @@ it might look something like this.
 ```
 
 
-## Rules
+### Rules
 
 You've now got content flowing across your pages. Next, you'll probably want
 to add page breaks, spreads, running headers, and the other elements of a usable book.
-
-The easiest way to add these features is to use `book-` attributes
-to your HTML tags, like `book-page-break` and `book-full-bleed` below.
-
-```html
-<div id="content">
-  <h2 book-page-break="before">
-    Chapter 1
-  </h2>
-  <p></p>
-  <figure class="big-figure" book-full-bleed="spread">
-    <img src="figure1.png" />
-  </figure>
-</div>
-
-<script>
-  Bindery.makeBook({
-    content: '#content',
-  });
-</script>
-```
-
-If you don't want to add tags all over your HTML, you can also create rules
+You can do that by creating rules
 that apply to selectors, like you would with CSS.
 
 ```html
@@ -134,7 +112,7 @@ that apply to selectors, like you would with CSS.
 </script>
 ```
 
-## Book Components
+### Book Components
 
 For rules that create new elements on the page, you can
 pass in your own function. You can use whatever other tools or

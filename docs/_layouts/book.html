@@ -13,6 +13,7 @@
         PageBreak,
         FullBleedPage,
         FullBleedSpread,
+        PageReference,
         RunningHeader,
         Footnote,
         Paper,
@@ -20,19 +21,26 @@
         Marks,
       } = Bindery;
 
+      const cleanedURL = (url) => {
+        let clean = url;
+        if (url[url.length - 1] === '/') {
+          clean = url.substr(0, url.length - 1);
+        }
+        clean = clean.replace('http://', '').replace('https://', '')
+        return clean;
+      }
+
       makeBook({
         content: {
           url: '/bindery/book-content/',
           selector: '.content',
         },
-        ControlsComponent: BinderyControls,
         printSetup: {
-          paper: Paper.AUTO_MARKS,
-          layout: Layout.SPREADS,
-          marks: Marks.BOTH,
+          paper: Paper.AUTO_BLEED,
+          bleed: '0.125in', // Blurb
         },
         pageSetup: {
-          size: { width: '4in', height: '6in' },
+          size: { width: '4.25in', height: '6.875in' }, // Lulu
           margin: {
             top: '0.6in',
             bottom: '0.5in',
@@ -40,6 +48,7 @@
             outer: '0.3in',
           },
         },
+        pageNumberOffset: -4,
         rules: [
           createRule({
             selector: '.colophon-wrap',
@@ -49,17 +58,12 @@
             }
           }),
           PageBreak({
-            selector: 'h2',
-            position: 'before',
-            continue: 'right',
-          }),
-          PageBreak({
             selector: 'h1',
             position: 'before',
             continue: 'right',
           }),
           FullBleedPage({
-            selector: 'h1',
+            selector: '#cover, h1',
             continue: 'right',
           }),
           PageBreak({
@@ -67,20 +71,23 @@
             position: 'before',
             continue: 'right',
           }),
-          FullBleedPage({
-            selector: '.logo',
-            continue: 'right',
-          }),
           PageBreak({
             selector: '.highlight',
             position: 'avoid',
           }),
+          PageReference({
+            selector: '.toc-num',
+            replace: (el, num) => {
+              el.textContent = `${num}`;
+              return el;
+            },
+          }),
           RunningHeader({
             render: (page) => {
-              if (page.isEmpty) return '';
-              if (page.isLeft) return `${page.number} · https://evanbrooks.info/bindery `;
+              if (page.isEmpty || page.number < 1) return '';
+              if (page.isLeft) return `${page.number} · Bindery.js `;
               else if (page.isRight) {
-                let section = Object.values(page.heading).join(' · ');
+                let section = page.heading.h1 || '';
                 if (section !== '') return `${section} · ${page.number}`;
                 else return `${page.number}`;
               }
@@ -88,9 +95,7 @@
           }),
           Footnote({
             selector: '.post-content a',
-            render: (element, number) => {
-              return '<i>' + number + '</i>: ' + element.href;
-            }
+            render: (el, num) =>  `<i>${num}</i>: ${cleanedURL(el.href)}`,
           }),
         ]
       });

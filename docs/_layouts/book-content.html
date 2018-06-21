@@ -8,7 +8,18 @@
     <main class="content" aria-label="Content">
       {% assign pages_list = (site.pages | sort: 'order') %}
 
-      <div class="logo"></div>
+      <div id="cover">
+        <div class="logo"></div>
+
+        How to<br>
+        build a<br>
+        book with<br>
+        HTML<br>
+        &amp; CSS
+        <em class="cover-subtitle">
+          Using Bindery.js v2.2.2
+        </em>
+      </div>
       {% for k in pages_list %}
         {% if k.inBook %}{% unless k.order %}
           <article class="post-content">
@@ -17,12 +28,14 @@
         {% endunless %}{% endif %}
       {% endfor %}
 
+      <div class="spacer-page"></div>
+
       <section class="toc">
         {% for p in pages_list %}
           {% if p.inBook and p.order %}
-            <div>
-              <a href="#{{p.title}}">{{ p.title }}</a>
-              <span book-pages-with-selector="#{{p.title}}" style="float: right;"></span>
+            <div class="toc-row">
+              <a class="toc-num" href="#{{p.title}}"></a>
+              <a class="toc-title" href="#{{p.title}}">{{ p.title }}</a>
             </div>
           {% endif %}
         {% endfor %}
@@ -30,12 +43,54 @@
 
       {% for p in pages_list %}
         {% if p.inBook and p.order %}
-          <h1 id="{{p.title}}">{{ p.title | escape }}</h1>
-          <article class="post-content docs-content">
-            {{ p.content | markdownify }}
-          </article>
+          <h1 id="{{p.title}}">{{ p.shortTitle | escape }}</h1>
+          {% if p.shortTitle != 'Examples' %}
+            <article class="post-content docs-content">
+              {{ p.content | markdownify }}
+            </article>
+          {% else %}
+            <article class="post-content">
+              <!-- Jekyll won't recursively render liquid, so Demos is pasted-->
+              <ul class="grid">
+                {% for ex in site.data.examples.simple %}
+                  <li>
+                    <a href="/bindery/examples/{{ ex.id }}">
+                      <figure
+                        style="background-image: url(/bindery/assets/thumbs/{{ ex.thumb }});">
+                      </figure>
+                      <div class="grid-label">
+                        <h4>{{ ex.title | escape }}</h4>
+                        <p>{{ ex.desc | escape }}</p>
+                      </div>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+
+              <h2>Gallery</h2>
+
+              <ul class="grid">
+                {% for ex in site.data.examples.gallery %}
+                  <li>
+                    <a href="{{ ex.url }}">
+                      <figure
+                        style="background-image: url(/bindery/assets/thumbs/{{ ex.thumb }});">
+                      </figure>
+                      <div class="grid-label">
+                        <h4>{{ ex.title | escape }}</h4>
+                        <p>{{ ex.desc | escape }}</p>
+                      </div>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </article>
+          {% endif %}
         {% endif %}
       {% endfor %}
+
+      <div class="spacer-page"></div>
+      <div class="spacer-page"></div>
     </main>
   </body>
 </html>

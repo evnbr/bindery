@@ -1,48 +1,53 @@
 simple:
   - title: Getting Started
     id: 2_content_on_separate_page
+    thumb: start.png
+    desc: Fetch content and flow it through pages
   - title: Configure Rules
     id: 3_using_configuration_options
-    desc: Use selectors to create breaks and turn links into page numbers
+    desc: Page breaks, footnotes, and a table of contents
     thumb: toc.png
-  - title: Spreads and images
+  - title: Spreads and Images
     id: 9_spreads_and_images
-    desc: Full-bleed, out-of-flow figures
+    desc: Full-bleed, out-of-flow spreads
     thumb: spread.png
-  - title: Handling a split
+  - title: Handle a Split
     id: 7_custom_split
-    desc: Indicating that an element starts or ends on another page
+    desc: Indicate that an element starts or ends on another page
     thumb: split.png
   - title: Counters
     id: 10_counters
     thumb: counter.png
-    desc: Numbering that continues across page breaks
-  - title: Create an index
+    desc: Number figures and sections (alternative to CSS Counters)
+  - title: Index
     desc: Automatically list every page that matches a query
     id: 8_index
     thumb: index.png
+  - title: Wikipedia Article
+    id: 6_wikipedia
+    desc: Create a book from HTML you didn't write
+    thumb: wiki.png
   - title: Create your own rules
     id: 4_custom_rules
     desc: Dynamic background and font size, fore-edge graphics
     thumb: custom.png
-  - title: Wikipedia article
-    id: 6_wikipedia
-    desc: Handle HTML from an external source
-    thumb: wiki.png
   - title: Controls
-    desc: Add a print button and set custom colors
+    desc: Customize the color of background and buttons
     id: 11_custom_controls
     thumb: controls.png
 
 gallery:
-  - title: evanbrooks.info/bindery
+  - title: for/with/in
+    desc: Published by members of HTML Output, RISD Fall 2014
+    url: http://htmloutput.risd.gd/
+    thumb: forwithin.jpg
+  - title: Bindery docs
     desc: A book from this site
     url: /bindery/book
+    thumb: docs.png
   - title: John Caserta
     desc: Site and book for John Caserta's projects, writing, and teaching
-    url: http://johncaserta.com/bindery
-  - title: Cita Press
-    desc: A feminist indie press publishing public-domain books written by women
-    url: http://citapress.org/#home
+    url: http://johncaserta.com/
+    thumb: jc.gif
   - title: Add yours?
-    url: https://github.com/evnbr/bindery
+    url: https://github.com/evnbr/bindery/blob/master/docs/_data/examples.yml

@@ -126,7 +126,16 @@ Bindery.makeBook({
 
 If you are frequently switching between views or print options,
 you can install `bindery-controls` to create a UI to configure without
-reloading.
+reloading. Just include the controls script before calling `makeBook`;
+
+```html
+<script src="https://unpkg.com/bindery@2.2.2"></script>
+<script src="https://unpkg.com/bindery-controls"></script>
+
+<script>
+  Bindery.makeBook({ content: '#content' })
+</script>
+```
 
 <div>
   <a href="https://unpkg.com/bindery-controls/dist/bindery-controls.min.js" class="btn" download>
@@ -134,21 +143,24 @@ reloading.
   </a>
 </div>
 
-```html
-<script type="text/javascript" src='/js/bindery.min.js'></script>
-<script type="text/javascript" src='/js/bindery-controls.min.js'></script>
-<script>
-  Bindery.makeBook({
-    content: '#content',
-    controls: BinderyControls,
-  })
-</script>
-```
 
-Or, you can also install [bindery-controls from npm](https://www.npmjs.com/package/bindery-controls):
+If you're using [bindery-controls from npm](https://www.npmjs.com/package/bindery-controls),
+make sure you pass in the controls component as an explicit option.
 
 ```
 npm install --save bindery-controls
+```
+
+```js
+import Bindery from 'bindery';
+import Controls from 'bindery-controls';
+
+...
+
+Bindery.makeBook({
+  content: '#content',
+  ControlsComponent: Controls,
+})
 ```
 
 

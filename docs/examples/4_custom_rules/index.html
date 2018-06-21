@@ -13,16 +13,18 @@
   <script type="text/javascript" src="/bindery/js/bindery-controls.min.js"></script>
   <script>
 
+    // shrink each paragraph font by 0.8
     let shrinkingRule = Bindery.createRule({
       selector: "p",
-      enlargeBy: 16,
+      enlargeBy: 24,
       beforeAdd: function(element) {
-        element.style.fontSize = 16 + this.enlargeBy + "px";
-        this.enlargeBy = this.enlargeBy * 0.9;
+        element.style.fontSize = 12 + this.enlargeBy + "pt";
+        this.enlargeBy = this.enlargeBy * 0.8;
         return element;
       },
     });
 
+    // Set the background hue by % through book
     let rainbowRule = Bindery.createRule({
       eachPage: function(page, book) {
         let pct = page.number / book.pageCount;
@@ -30,6 +32,7 @@
       }
     });
 
+    // Position the edge images by % through book
     let foreedgeRule = Bindery.createRule({
       eachPage: function(page, book) {
         let edgePaint = document.createElement("div");
@@ -59,7 +62,6 @@
         selector: ".content"
       },
       pageSetup: {
-        size: { height: '4in', width: '4in' },
         margin: { top: '0.3in', inner: '0.3in', outer: '0.3in', bottom: '0.3in' },
       },
       ControlsComponent: BinderyControls,
