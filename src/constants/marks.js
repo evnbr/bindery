@@ -1,6 +1,6 @@
-const NONE = 0;
-const CROP = 1;
-const BLEED = 2;
-const BOTH = 3;
+const NONE = 1;
+const CROP = 2;
+const BLEED = 3;
+const BOTH = 4;
 
 export { NONE, CROP, BLEED, BOTH };

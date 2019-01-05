@@ -1,5 +1,5 @@
-const FLIPBOOK = 0;
-const PREVIEW = 1;
-const PRINT = 2;
+const FLIPBOOK = 1;
+const PREVIEW = 2;
+const PRINT = 3;
 
 export { FLIPBOOK, PREVIEW, PRINT };

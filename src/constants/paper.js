@@ -1,10 +1,10 @@
-const AUTO = 0;
-const AUTO_BLEED = 1;
-const AUTO_MARKS = 2;
-const LETTER_PORTRAIT = 3;
-const LETTER_LANDSCAPE = 4;
-const A4_PORTRAIT = 5;
-const A4_LANDSCAPE = 6;
+const AUTO = 1;
+const AUTO_BLEED = 2;
+const AUTO_MARKS = 3;
+const LETTER_PORTRAIT = 4;
+const LETTER_LANDSCAPE = 5;
+const A4_PORTRAIT = 6;
+const A4_LANDSCAPE = 7;
 
 export {
   AUTO,

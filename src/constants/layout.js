@@ -1,5 +1,5 @@
-const PAGES = 0;
-const SPREADS = 1;
-const BOOKLET = 2;
+const PAGES = 1;
+const SPREADS = 2;
+const BOOKLET = 3;
 
 export { PAGES, BOOKLET, SPREADS };
