@@ -129,7 +129,7 @@ you can install `bindery-controls` to create a UI to configure without
 reloading. Just include the controls script before calling `makeBook`;
 
 ```html
-<script src="https://unpkg.com/bindery@2.2.2"></script>
+<script src="https://unpkg.com/bindery"></script>
 <script src="https://unpkg.com/bindery-controls"></script>
 
 <script>
