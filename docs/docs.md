@@ -48,9 +48,6 @@ Bindery.makeBook({
 
 - `size:` Book size, in the form of `{ width: String, height: String }`. Values must include absolute CSS units.
 - `margin:` Book margin, in the form of `{ top: String, outer: String, bottom: String, inner: String }`. Values must include absolute CSS units.
-- `bleed:` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
-and [spreads](#fullbleedspread), and sets the position of bleed and
-crop marks.
 
 ```js
 Bindery.makeBook({
@@ -58,7 +55,6 @@ Bindery.makeBook({
   pageSetup: {
     size: { width: '4in', height: '6in' },
     margin: { top: '12pt', inner: '12pt', outer: '16pt', bottom: '20pt' },
-    bleed: '12pt',
   },
 });
 ```
@@ -88,6 +84,9 @@ Note that setting the paper size through bindery [only works in Chrome and Opera
   - `Bindery.Marks.CROP` Note that crop marks are always outset by the bleed amount.`default`
   - `Bindery.Marks.BLEED`
   - `Bindery.Marks.BOTH`
+- `bleed:` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
+and [spreads](#fullbleedspread), and sets the position of bleed and
+crop marks.
 
 ```js
 Bindery.makeBook({
@@ -96,6 +95,7 @@ Bindery.makeBook({
     layout: Bindery.Layout.BOOKLET,
     paper: Bindery.Paper.AUTO_BLEED,
     marks: Bindery.Marks.CROP,
+    bleed: '12pt',
   },
 });
 ```
@@ -129,7 +129,7 @@ you can install `bindery-controls` to create a UI to configure without
 reloading. Just include the controls script before calling `makeBook`;
 
 ```html
-<script src="https://unpkg.com/bindery@2.2.2"></script>
+<script src="https://unpkg.com/bindery"></script>
 <script src="https://unpkg.com/bindery-controls"></script>
 
 <script>
