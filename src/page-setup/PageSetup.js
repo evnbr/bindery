@@ -7,7 +7,7 @@ import { Paper, Layout } from '../constants';
 const letter = Object.freeze({ width: '8.5in', height: '11in' });
 const a4 = Object.freeze({ width: '210mm', height: '297mm' });
 
-const supportsCustomPageSize = !!window.chrome && !!window.chrome.webstore;
+const supportsCustomPageSize = !!window.chrome;
 
 class PageSetup {
   constructor(opts = {}, printOpts = {}) {
