@@ -2,8 +2,8 @@ import { Page } from '../book';
 import { createEl } from '../dom-utils';
 import padPages from './padPages';
 
-const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
-const onePageSpread = children => createEl('.spread-wrapper.page-size', children);
+const twoPageSpread = children => createEl('.spread-wrapper.spread-centered.spread-size', children);
+const onePageSpread = children => createEl('.spread-wrapper.spread-centered.page-size', children);
 
 const renderGridLayout = (bookPages, isTwoUp) => {
   const pages = isTwoUp ? padPages(bookPages, () => new Page()) : bookPages;

@@ -6,8 +6,8 @@ import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 import padPages from './padPages';
 import orderPagesBooklet from './orderPagesBooklet';
 
-const twoPageSpread = children => createEl('.spread-wrapper.spread-size', children);
-const onePageSpread = children => createEl('.spread-wrapper.page-size', children);
+const twoPageSpread = children => createEl('.spread-wrapper', children);
+const onePageSpread = children => createEl('.spread-wrapper', children);
 
 const renderPrintLayout = (bookPages, doubleSided, layout) => {
   const isTwoUp = layout !== Layout.PAGES;
@@ -33,8 +33,8 @@ const renderPrintLayout = (bookPages, doubleSided, layout) => {
         spreadMarks.appendChild(meta);
       }
       const sheet = printSheet([
-        pages[i].element,
-        pages[i + 1].element,
+        createEl('.page-bleed-clip.page-bleed-clip-left', [pages[i].element]),
+        createEl('.page-bleed-clip.page-bleed-clip-right', [pages[i + 1].element]),
         spreadMarks]);
       sheet.classList.add(classes.sheetSpread);
       printLayout.appendChild(sheet);

@@ -146,10 +146,22 @@
   height: var(--bindery-sheet-height);
 }
 
-.show-crop .print-sheet .spread-wrapper,
-.show-bleed-marks .print-sheet .spread-wrapper {
-  margin-top: calc(var(--bindery-bleed) + 12pt);
-  margin-bottom: calc(var(--bindery-bleed) + 12pt);
+.page-bleed-clip {
+  overflow: hidden;
+}
+
+.page-bleed-clip-left {
+  padding-left: calc(var(--bindery-bleed) + 12pt);
+}
+
+.page-bleed-clip-right {
+  padding-right: calc(var(--bindery-bleed) + 12pt);
+}
+
+.show-crop .print-sheet .page-bleed-clip,
+.show-bleed-marks .print-sheet .page-bleed-clip {
+  padding-top: calc(var(--bindery-bleed) + 12pt);
+  padding-bottom: calc(var(--bindery-bleed) + 12pt);
 }
 
 .spread-wrapper {
@@ -198,5 +210,8 @@
   position: relative;
   display: flex;
   justify-content: center;
+}
+
+.spread-centered {
   margin: 0 auto 32px;
 }

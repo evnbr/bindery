@@ -4,11 +4,11 @@ const directions = ['top', 'bottom', 'left', 'right'];
 const bleedMarks = () => directions.map(dir => createEl(`.mark-bleed-${dir}`));
 const cropMarks = () => directions.map(dir => createEl(`.mark-crop-${dir}`));
 
-const printMarksSingle = () => createEl('.print-mark-wrap', [
+const printMarksSingle = () => createEl('.page-size.print-mark-wrap', [
   ...cropMarks(), ...bleedMarks(),
 ]);
 
-const printMarksSpread = () => createEl('.print-mark-wrap', [
+const printMarksSpread = () => createEl('.spread-size.print-mark-wrap', [
   createEl('.mark-crop-fold'), ...cropMarks(), ...bleedMarks(),
 ]);
 
