@@ -246,7 +246,7 @@ class Viewer {
       || (this.mode === Mode.PRINT && this.layout !== Layout.PAGES);
     const limit = sideBySide ? 2 : 1;
 
-    const makeSpread = pgs => createEl('.spread-wrapper.spread-size', pgs);
+    const makeSpread = pgs => createEl('.spread-wrapper.spread-centered.spread-size', pgs);
 
     book.pages.forEach((page, i) => {
       if (this.content.contains(page.element) && page.element.parentNode !== this.content) return;
