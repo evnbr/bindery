@@ -318,8 +318,8 @@ li {
   background-position: center;
   background-repeat: no-repeat;
   background-color: #f4f4f4;
-  width: 28vw;
-  height: 20vw;
+  width: 8rem;
+  height: 6rem;
   flex-shrink: 0;
   margin-right: 1rem;
 }
@@ -556,27 +556,27 @@ p code, li code {
   }
 }
 
-@media (min-width: 50rem) {
-  .responsive-grid li {
-    max-width: calc(33% - 0.5rem);
-    margin-right: 0.5rem;
-  }
-  .responsive-grid li div,
-  .responsive-grid li h4 {
-    padding-right: 1rem;
-  }
-  .responsive-grid a {
-    flex-direction: column; // stack vertical
-    align-items: stretch;
-  }
-  .responsive-grid figure {
-    // figure is width of cell
-    width: unset;
-    height: unset;
-    padding-bottom: 78%;
-    margin-right: 0;
-  }
-}
+// @media (min-width: 50rem) {
+//   .responsive-grid li {
+//     max-width: calc(33% - 0.5rem);
+//     margin-right: 0.5rem;
+//   }
+//   .responsive-grid li div,
+//   .responsive-grid li h4 {
+//     padding-right: 1rem;
+//   }
+//   .responsive-grid a {
+//     flex-direction: column; // stack vertical
+//     align-items: stretch;
+//   }
+//   .responsive-grid figure {
+//     // figure is width of cell
+//     width: unset;
+//     height: unset;
+//     padding-bottom: 78%;
+//     margin-right: 0;
+//   }
+// }
 
 
 @media (max-width: $wide-enough-for-side-nav) {
@@ -668,9 +668,9 @@ p code, li code {
   .docs-nav h2 {
     padding-bottom: 3rem;
   }
-  .responsive-grid li {
-    max-width: calc(33% - 0.5rem);
-  }
+  // .responsive-grid li {
+  //   max-width: calc(33% - 0.5rem);
+  // }
 }
 
 .highlight pre, pre.highlight {

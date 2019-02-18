@@ -38,16 +38,24 @@ simple:
 
 gallery:
   - title: for/with/in
-    desc: Published by members of HTML Output, RISD Fall 2014
+    desc: Book and site to explore the web browser as a design tool 
     url: http://htmloutput.risd.gd/
+    credit: Members of HTML Output, RISD Fall 2014
     thumb: forwithin.jpg
+  - title: John Caserta
+    desc: Book and site to document projects, writing, and teaching
+    url: http://johncaserta.com/
+    credit: John Caserta
+    thumb: jc.gif
+  - title: Let's try listening again
+    desc: Catalog for the 13th annual A.I.R. Biennial
+    url: https://letstrylisteningagain.org/
+    credit: Lukas Eigler-Harding
+    thumb: listen.png
   - title: Bindery docs
     desc: A book from this site
+    credit: 
     url: /bindery/book
     thumb: docs.png
-  - title: John Caserta
-    desc: Site and book for John Caserta's projects, writing, and teaching
-    url: http://johncaserta.com/
-    thumb: jc.gif
   - title: Add yours?
     url: https://github.com/evnbr/bindery/blob/master/docs/_data/examples.yml
