@@ -50,7 +50,7 @@ to use that information when flowing content across pages, and you won't be able
 
 Your book content is probably pretty long, so you may want to keep it in a separate
 file. This also prevents any flash of unstyled content
-you might have seen before bindery runs.You can fetch content by
+you might have seen before bindery runs. You can fetch content by
 passing in the URL and selector, like this:
 
 ```js
@@ -116,7 +116,7 @@ that apply to selectors, like you would with CSS.
 
 For rules that create new elements on the page, you can
 pass in your own function. You can use whatever other tools or
-libraries you like as long, as long you return
+libraries you like, as long as you return
 an HTML element or line of text.
 
 
