@@ -1,6 +1,6 @@
 {
   "name": "bindery",
-  "version": "2.2.7",
+  "version": "2.2.8",
   "description": "Book layout in the browser",
   "main": "dist/bindery.cjs.js",
   "module": "dist/bindery.esm.js",
@@ -44,8 +44,7 @@
     "dev": "rollup -c -w",
     "test": "jest && codecov",
     "coverage": "jest --coverage",
-    "docs": "cd docs && jekyll serve",
-    "lint": "eslint src/ webpack.*.js --cache"
+    "docs": "cd docs && jekyll serve"
   },
   "jest": {
     "collectCoverage": true,
