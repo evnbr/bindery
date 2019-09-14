@@ -1,4 +1,5 @@
 import { Page } from '../book';
+import Controls from '../controls';
 import { Mode, Paper, Layout, Marks } from '../constants';
 import { classes, createEl } from '../dom-utils';
 import { throttleFrame, throttleTime } from '../utils';
@@ -13,7 +14,7 @@ const throttleResize = throttleTime(50);
 const document = window.document;
 
 class Viewer {
-  constructor({ pageSetup, mode, layout, marks, ControlsComponent }) {
+  constructor({ pageSetup, mode, layout, marks }) {
     this.book = null;
     this.pageSetup = pageSetup;
 
@@ -39,25 +40,23 @@ class Viewer {
       throttleResize(() => this.scaleToFit());
     });
 
-    if (ControlsComponent) {
-      this.controls = new ControlsComponent(
-        { Mode, Paper, Layout, Marks }, // Available options
-        { // Initial props
-          paper: this.pageSetup.paper,
-          layout: this.layout,
-          mode: this.mode,
-          marks,
-        },
-        { // Actions
-          setMode: this.setMode.bind(this),
-          setPaper: this.setSheetSize.bind(this),
-          setLayout: this.setLayout.bind(this),
-          setMarks: this.setMarks.bind(this),
-          getPageSize: () => this.pageSetup.displaySize,
-        }
-      );
-      this.element.appendChild(this.controls.element);
-    }
+    this.controls = new Controls(
+      { Mode, Paper, Layout, Marks }, // Available options
+      { // Initial props
+        paper: this.pageSetup.paper,
+        layout: this.layout,
+        mode: this.mode,
+        marks,
+      },
+      { // Actions
+        setMode: this.setMode.bind(this),
+        setPaper: this.setSheetSize.bind(this),
+        setLayout: this.setLayout.bind(this),
+        setMarks: this.setMarks.bind(this),
+        getPageSize: () => this.pageSetup.displaySize,
+      }
+    );
+    this.element.appendChild(this.controls.element);
 
     this.inProgress = true;
 

@@ -25,6 +25,10 @@ class Bindery {
       this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
       throw Error('Bindery: You must include a source element or selector');
     }
+    if (opts.ControlsComponent) {
+      this.viewer.displayError('Controls are now included', 'Please remove the controls component');
+      throw Error('Bindery: controls are now included');
+    }
 
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
@@ -33,7 +37,6 @@ class Bindery {
       name: 'makeBook',
       autorun: T.bool,
       content: T.any,
-      ControlsComponent: T.func,
       view: T.enum(...vals(Mode)),
       pageNumberOffset: T.number,
       pageSetup: T.shape({
@@ -55,13 +58,11 @@ class Bindery {
 
     const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
     const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
-    const controls = opts.ControlsComponent || window.BinderyControls;
     this.viewer = new Viewer({
       pageSetup: this.pageSetup,
       mode: opts.view || Mode.PREVIEW,
       marks: startMarks,
       layout: startLayout,
-      ControlsComponent: controls,
     });
 
     this.rules = defaultRules;

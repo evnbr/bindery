@@ -1,0 +1,277 @@
+$system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+
+@media screen {
+  .viewing .controls {
+    display: flex !important;
+  }
+}
+
+$btn-pad: 8px 20px;
+$btn-hover: rgba(0,0,0,0.04);
+$btn-active: rgba(0,0,0,0.08);
+
+.controls {
+  font: 16px / 1.4 $system;
+  display: none;
+  flex-direction: row;
+  align-items: start;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  margin: auto;
+  color: var(--bindery-ui-text);
+  padding: 10px;
+  overflow: hidden;
+  transition: height 0.3s;
+  -webkit-font-smoothing: antialiased;
+
+  * {
+    font: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  a {
+    color: var(--bindery-ui-accent);
+    text-decoration: none;
+  }
+}
+
+.row {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  cursor: default;
+  user-select: none;
+}
+
+.print-options {
+  display: flex;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: all 0.3s;
+  flex-wrap: nowrap;
+  transition-delay: 0.1s;
+  .view-print & {
+    max-width: 720px;
+    margin-right: 12px;
+    opacity: 1;
+  }
+  .in-progress & {
+    opacity: 0;
+    display: none;
+  }
+}
+.controls .print-options .control {
+  background-color: transparent;
+}
+
+.controls .btn {
+  -webkit-appearance: none;
+  cursor: pointer;
+  display: inline-block;
+  margin-right: 8px;
+  text-decoration: none;
+
+  &:hover {
+    background: $btn-hover;
+  }
+
+  &:active {
+    background: $btn-active;
+  }
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.control {
+  border-radius: 32px;
+  color: var(--bindery-ui-text);
+  padding: $btn-pad;
+}
+
+.controls .btn-light {
+  background: none;
+  border: none;
+}
+
+.controls .btn-main {
+  background: var(--bindery-ui-accent);
+  border-color: var(--bindery-ui-accent);
+  color: white;
+
+  &:hover {
+    background: var(--bindery-ui-accent);
+    opacity: 0.7;
+  }
+
+  &:active {
+    background: black;
+    opacity: 1;
+  }
+}
+
+.view-row {
+  margin-left: auto;
+  margin-right: 12px;
+  transition: all 0.3s;
+  .in-progress & {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .debug & {
+    display: none;
+  }
+}
+
+.btn-print {
+  transition: all 0.3s;
+  .in-progress & {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.controls .select-wrap {
+  padding-right: 36px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  width: 100%;
+
+  &:after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    top: 14px;
+    border-bottom: 1px solid currentColor;
+    border-right: 1px solid currentColor;
+    padding: 3px;
+    transform: rotate(45deg);
+  }
+
+  &:hover {
+    background-color: $btn-hover;
+  }
+  &:active {
+    background-color: $btn-hover;
+  }
+
+  &.hidden-select {
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    color: transparent;
+  }
+}
+
+.select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+
+  -webkit-appearance: none;
+  -moz-appearance:none;
+  padding: $btn-pad;
+  color: black;
+  border: transparent;
+  width: 100%;
+}
+
+@media screen and (max-width: 720px) {
+  .print-options {
+    max-width: unset;
+    max-height: 0;
+    .view-print & {
+      max-width: unset;
+      max-height: 240px;
+      margin: 0;
+    }
+  }
+
+  .root {
+    transition: all 0.2s;
+  }
+
+  .view-print.root {
+    padding-top: 120px;
+  }
+  .controls {
+    height: 60px;
+  }
+
+  .view-row {
+    margin-left: auto;
+  }
+  .view-print .controls {
+    height: 104px;
+  }
+
+  .print-options {
+    top: 54px;
+    right: 10px;
+    position: fixed;
+    margin: 0;
+    .row {
+      margin: 0;
+    }
+  }
+}
+
+.view-print .controls {
+  background: var(--bindery-ui-bg);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.14);
+}
+
+.view-flip .controls {
+  background: transparent;
+  box-shadow: none;
+}
+
+
+@media screen and (max-width: 960px) {
+  .in-progress {
+    .controls {
+      background: transparent;
+      box-shadow: none;
+    }
+    .root {
+      padding-top: 40px;
+    }
+  }
+  .controls {
+    background: var(--bindery-ui-bg);
+    box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.14);
+  }
+  .root {
+    padding-top: 72px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .view-print.root {
+    padding-top: 190px;
+  }
+
+  .view-print .controls {
+    background: var(--bindery-ui-bg);
+    height: 180px;
+  }
+  .print-options {
+    flex-direction: column;
+    align-items: stretch;
+    left: 10px;
+  }
+  .hidden-select {
+    display: none;
+  }
+}

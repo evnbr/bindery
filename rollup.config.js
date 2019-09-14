@@ -1,7 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import minify from 'rollup-plugin-babel-minify';
-// import sizes from 'rollup-plugin-sizes';
 
 import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
