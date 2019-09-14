@@ -169,12 +169,6 @@
     margin-left: auto;
     margin-right: auto;
   }
-  .print-sheet-left & {
-    margin-right: 0;
-  }
-  .print-sheet-right & {
-    margin-left: 0;
-  }
 }
 
 .viewing {
@@ -210,6 +204,7 @@
   position: relative;
   display: flex;
   justify-content: center;
+  margin: auto;
 }
 
 .spread-centered {

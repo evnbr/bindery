@@ -74,6 +74,7 @@ class Viewer {
   get inProgress() {
     return this.element.classList.contains(classes.inProgress);
   }
+
   set inProgress(newVal) {
     this.element.classList.toggle(classes.inProgress, newVal);
     if (newVal && this.controls) this.controls.setInProgress();
@@ -86,6 +87,7 @@ class Viewer {
   get isShowingCropMarks() {
     return this.element.classList.contains(classes.showCrop);
   }
+
   set isShowingCropMarks(newVal) {
     this.element.classList.toggle(classes.showCrop, newVal);
   }
@@ -93,6 +95,7 @@ class Viewer {
   get isShowingBleedMarks() {
     return this.element.classList.contains(classes.showBleedMarks);
   }
+
   set isShowingBleedMarks(newVal) {
     this.element.classList.toggle(classes.showBleedMarks, newVal);
   }
@@ -100,6 +103,7 @@ class Viewer {
   get isShowingBleed() {
     return this.element.classList.contains(classes.showBleed);
   }
+
   set isShowingBleed(newVal) {
     this.element.classList.toggle(classes.showBleed, newVal);
   }
@@ -107,6 +111,7 @@ class Viewer {
   get isViewing() {
     return document.body.classList.contains(classes.isViewing);
   }
+
   set isViewing(newVal) {
     document.body.classList.toggle(classes.isViewing, newVal);
   }
@@ -155,28 +160,33 @@ class Viewer {
       }
     }
   }
+
   scrollToBottom() {
     const scroll = document.scrollingElement;
     if (!scroll) return;
     const scrollMax = scroll.scrollHeight - scroll.offsetHeight;
     scroll.scrollTop = scrollMax;
   }
+
   clear() {
     this.book = null;
     this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
     this.content.innerHTML = '';
   }
+
   show() {
     if (this.element.parentNode) return;
     document.body.appendChild(this.element);
     this.isViewing = true;
   }
+
   hide() {
     // TODO this doesn't work if the target is an existing node
     if (!this.element.parentNode) return;
     this.element.parentNode.removeChild(this.element);
     this.isViewing = false;
   }
+
   render(newBook) {
     if (newBook) this.book = newBook;
     if (!this.book) return;
@@ -219,6 +229,7 @@ class Viewer {
       this.progressBar.style.transform = '';
     }
   }
+
   updateProgress(book, estimatedProgress) {
     this.book = book;
     this.progress = estimatedProgress;
