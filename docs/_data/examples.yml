@@ -45,15 +45,15 @@ gallery:
   - title: John Caserta
     desc: Book and site to document projects, writing, and teaching
     url: http://johncaserta.com/
-    credit: John Caserta
+    credit: John Caserta, 2017
     thumb: jc.gif
   - title: Let's try listening again
     desc: Catalog for the 13th annual A.I.R. Biennial
     url: https://letstrylisteningagain.org/
-    credit: Lukas Eigler-Harding
+    credit: Lukas Eigler-Harding, 2019
     thumb: listen.png
   - title: Bindery docs
-    desc: A book from this site
+    desc: A book from this site, Just now
     credit: 
     url: /bindery/book
     thumb: docs.png
