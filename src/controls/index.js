@@ -1,7 +1,4 @@
 import { c } from '../dom-utils';
-
-import './controls.scss';
-
 import {
   dropdown,
   option,

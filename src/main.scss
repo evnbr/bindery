@@ -1,6 +1,7 @@
 $system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
 
 @import './book/book.scss';
+@import './controls/controls.scss';
 @import './rules/fullBleed.scss';
 @import './viewer/viewer.scss';
 @import './viewer/print.scss';
