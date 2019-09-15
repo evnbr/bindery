@@ -113,7 +113,7 @@ class Controls {
     viewSelect = dropdown(
       { onchange: e => actions.setMode(e.target.value) },
       [
-        option({ value: Mode.PREVIEW }, 'Preview'),
+        option({ value: Mode.PREVIEW }, 'Grid'),
         option({ value: Mode.FLIPBOOK }, 'Flipbook'),
         option({ value: Mode.PRINT }, 'Print Preview'),
       ].map((opt) => {
