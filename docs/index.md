@@ -6,16 +6,18 @@ order: -1
 inBook: true
 ---
 
-*Bindery.js* is a library for designing printable books with HTML and CSS.
+# Make a printable book with HTML & CSS
 
-At its simplest, Bindery flows content over multiple pages. From there, the designer can create running headers, spreads, footnotes, tables of contents, indexes, and more. Bindery also provides print options like bleed, crop marks, and booklet ordering.
+*Bindery.js* is an open-source javascript library for designing printable books with a web browser. 
 
-Web designers can think about books as an extension of responsive design, and print designers can express layouts programmatically, without the need for InDesign.
+First, Bindery divides your content into multiple pages. Design each page with running headers, spreads, footnotes, and more. Generate page numbers for a table of contents or index. When you're ready to print, you can configure bleed, crop marks, and booklet ordering.
+
+If you're a web designer, you can think about books as an extension of responsive design. If you're a print designer, you can express layouts programmatically, without the need for InDesign.
 
 <div class="home-btns">
   <a class="btn" href="/bindery/book">Try a Demo</a>
   <a class="btn" href="/bindery/guide">
-    Get Started →
+    Learn how →
   </a>
   <a class="btn" href="https://github.com/evnbr/bindery">View on Github ↗</a>
 </div>

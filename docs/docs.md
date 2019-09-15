@@ -64,26 +64,26 @@ Bindery.makeBook({
 Note that setting the paper size through bindery [only works in Chrome and Opera](https://caniuse.com/#feat=css-paged-media) as of 2017. Users with other browsers must set the size in the system print dialog.
 
 - `layout:`
-  - `Bindery.Layout.PAGES` One page per sheet, in numerical order `default`
-  - `Bindery.Layout.SPREADS` Two pages per sheet, in numerical order
-  - `Bindery.Layout.BOOKLET` Two pages per sheet, in booklet order. For printing double
+  - `PAGES` One page per sheet, in numerical order `default`
+  - `SPREADS` Two pages per sheet, in numerical order
+  - `BOOKLET` Two pages per sheet, in booklet order. For printing double
   sided and folding into a saddle stitched booklet.
 - `paper:`
-  - `Bindery.Paper.AUTO` Sets paper to the size of the page or, if the layout is
+  - `AUTO` Sets paper to the size of the page or, if the layout is
    `spreads` or `booklet`, twice as wide as the page.
    Note that marks will not be visible. `default`
-  - `Bindery.Paper.AUTO_BLEED` The size of the page plus the size of the bleed.
+  - `AUTO_BLEED` The size of the page plus the size of the bleed.
   Note that marks will not be visible.
-  - `Bindery.Paper.AUTO_MARKS` The size of the page plus room for crop and bleed marks.
-  - `Bindery.Paper.LETTER_PORTRAIT`
-  - `Bindery.Paper.LETTER_LANDSCAPE`
-  - `Bindery.Paper.A4_PORTRAIT`
-  - `Bindery.Paper.A4_LANDSCAPE`
+  - `AUTO_MARKS` The size of the page plus room for crop and bleed marks.
+  - `LETTER_PORTRAIT`
+  - `LETTER_LANDSCAPE`
+  - `A4_PORTRAIT`
+  - `A4_LANDSCAPE`
 - `marks:`
-  - `Bindery.Marks.NONE`
-  - `Bindery.Marks.CROP` Note that crop marks are always outset by the bleed amount.`default`
-  - `Bindery.Marks.BLEED`
-  - `Bindery.Marks.BOTH`
+  - `NONE`
+  - `CROP` Note that crop marks are always outset by the bleed amount.`default`
+  - `BLEED`
+  - `BOTH`
 - `bleed:` Amount of bleed. Values must include absolute CSS units. This affects the size of [full-bleed pages](#fullbleedpage)
 and [spreads](#fullbleedspread), and sets the position of bleed and
 crop marks.
@@ -100,16 +100,16 @@ Bindery.makeBook({
 });
 ```
 
-## Preview
+### Preview
 
 - `view:`
-  - `Bindery.View.PREVIEW` shows the spreads of the book as they will appear when
+  - `PREVIEW` shows the spreads of the book as they will appear when
   the book is trimmed and bound. If you choose this mode, Bindery will switch to `PRINT`
   before printing. `default`
-  - `Bindery.View.PRINT` shows the complete printed sheet, which may include multiple pages,
+  - `PRINT` shows the complete printed sheet, which may include multiple pages,
   marks, and bleed if those options are enabled.
   Note that when printing a booklet, pages will appear out of order.
-  - `Bindery.View.FLIPBOOK` shows a three-dimensional preview, making it easy
+  - `FLIPBOOK` shows a three-dimensional preview, making it easy
 to visualize which pages will end up on the backs of others. If you choose this mode,
 Bindery will switch to `PRINT` before printing.
 
@@ -380,14 +380,14 @@ at the bottom and a chapter title at the top.
 
 ```js
 Bindery.RunningHeader({
-  render: (page) => page.isLeft
-    ? `${page.number} · ${page.heading.h1}`
-    : `${page.heading.h2} · ${page.number}`
+  render: (pageInfo) => pageInfo.isLeft
+    ? `${pageInfo.number} · ${pageInfo.heading.h1}`
+    : `${pageInfo.heading.h2} · ${pageInfo.number}`
 })
 ```
-- `render:` A function that takes a `Page` and returns a string of HTML. You'll
-probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` property
-of the `Page` — see [`Page`](#page) for details. `Optional`
+- `render:` A function that takes a `PageInfo` and returns a string of HTML. You'll
+probably want to use the `number`, `isLeft`, `isEmpty`, and `heading` properties — 
+see [`PageInfo`](#pageinfo) for details. `Optional`
 
 ### Footnote
 Add a footnote to the bottom of the flow area. Footnotes cut into the area for
@@ -579,7 +579,7 @@ change the layout drastically.
 
 ## Advanced
 
-### Page
+### PageInfo
 You may receive instances of this class when using custom rules,
 but will not create them yourself.
 - `number` the page number, with the first page being 1
@@ -588,7 +588,7 @@ but will not create them yourself.
 - `isRight` `Bool` The page is on the right (the front)
 - `isLeft` `Bool` The page is on the left (the back)
 
-### Book
+### BookInfo
 You may receive instances of this class when using custom rules,
 but will not create them yourself.
 - `pages` Array of `Page`

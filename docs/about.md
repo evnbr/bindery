@@ -7,13 +7,9 @@ order: 4
 inBook: true
 ---
 
-<!-- ## Notes -->
+# About
 
-<!-- ### Print to Web to Print
-
-Computer printers predate computer screens. Here is where a short history would go. -->
-
-### Background
+### History
 
 Bindery.js 1.0 was developed in Spring 2014 for [for/with/in](http://htmloutput.risd.gd),
 a publication from participants in the graphic design course *HTML Output* at [RISD](http://risd.edu). It was based on the [much-maligned](https://alistapart.com/blog/post/css-regions-considered-harmful), [now abandoned](https://arstechnica.com/information-technology/2014/01/google-plans-to-dump-adobe-css-tech-to-make-blink-fast-not-rich) CSS Regions spec, using [a polyfill](https://github.com/FremyCompany/css-regions-polyfill). [Catherine Leigh Schmidt](http://cath.land) and [Lukas WinklerPrins](http://ltwp.net) produced a Jekyll theme called [Baby Bindery](https://github.com/thedesignoffice/babybindery) for the [Design Office](http://thedesignoffice.org/) based on this initial version.

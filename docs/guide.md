@@ -1,11 +1,13 @@
 ---
 layout: page
-title:  Guide
-shortTitle: Guide
+title:  Learn
+shortTitle: Learn
 permalink: /guide/
 order: 0
 inBook: true
 ---
+
+# Learn
 
 ### Getting Started
 

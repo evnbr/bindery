@@ -3,8 +3,8 @@
 // Define defaults for each variable.
 
 $black: black;
-$accent: #0000d0;
-$accent-dark: navy;
+$accent: #999;
+$accent-dark: #222;
 
 $string: #b93b5a;
 $keyword: purple;
@@ -15,7 +15,7 @@ $docs-options-inset: 6rem;
 $wide-enough-for-side-nav: 65rem;
 $narrow: 40rem;
 
-$system: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+$system: system-ui, sans-serif;
 $serif: T, Times, Times New Roman, serif;
 $mono: 'Input Mono', 'Source Code Pro', Menlo, Consolas, Monaco, monospace;
 
@@ -28,7 +28,7 @@ $mono: 'Input Mono', 'Source Code Pro', Menlo, Consolas, Monaco, monospace;
 }
 
 html {
-  font: 24px/1.5 $serif;
+  font: 24px/1.55 $serif;
   letter-spacing: 0.007em;
   font-weight: 300;
 }
@@ -70,7 +70,7 @@ em {
   font: 0.6rem/1.4 $system;
   display: inline-block;
   padding: 0.4rem 0.9rem 0.45rem;
-  border-radius: 24px;
+  border-radius: 8px;
   border: 1px solid currentColor;
   background: transparent;
   font-weight: 400;
@@ -78,15 +78,17 @@ em {
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
+  transition: all 0.2s;
 
   &:hover {
     // color: white;
-    color: $accent;
+    color: black;
     opacity: 1;
-    background: transparent;
+    background: #f4f4f4;
   }
   &:active {
-    opacity: 0.5;
+    background: #eee;
+    // opacity: 0.5;
   }
 }
 .btn-link {
@@ -124,7 +126,7 @@ li {
   background-image: linear-gradient(to bottom, black 50%,rgba(0,0,0,0) 50%);
   background-repeat: repeat-x;
   background-size: 2px .06em;
-  background-position: 0 1.18em;
+  background-position: 0 1.22em;
   &:hover {
     color: $accent;
     background-image: linear-gradient(to bottom, $accent 50%,rgba(0,0,0,0) 50%);
@@ -132,10 +134,14 @@ li {
 }
 
 
-.site-header, .page-content, .site-footer {
+.page-content, .site-footer {
   margin: 0 5%;
   // max-width: 45rem;
   // padding: 0 1rem;
+}
+
+.site-header {
+  margin: 0 5%;
 }
 
 .short-title {
@@ -148,12 +154,8 @@ li {
 
 .post-content {
   max-width: 35rem;
+  margin: 1.5rem auto 0;
 }
-
-.grid-content {
-  max-width: 50rem;
-}
-
 
 .site-header {
   position: relative;
@@ -197,14 +199,13 @@ li {
 .scroll-back {
   display: none;
   position: fixed;
-  top: 5rem;
-  left: calc(5% + 0.1rem);
-  text-align: right;
+  bottom: 1rem;
+  right: 1rem;
   z-index: 999;
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s;
-  transform: scale(0.8) ;
+  transform: scale(0.7) ;
   .docs-scrolled & {
     transform: translate3d(0, 0, 0);
     opacity: 1;
@@ -228,41 +229,25 @@ li {
 }
 
 .docs-nav {
-  font: 0.6rem / 1.5 $mono;
-  z-index: 99;
-  position: fixed;
-  display: block;
-  width: 12rem;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  transform: translate3d(-100%,0,0);
-  max-height: 100%;
-  overflow-y: scroll;
-  padding: 3rem 0 2rem 2rem;
-  transition: all 0.2s;
+  // font: 0.8rem / 1.5 $mono;
+  display: flex;
+  flex-flow: wrap;
   font-weight: 400;
-
-  // border-right: 1px solid black;
-  // background: white;
 
   a {
     position: relative;
+    // color: #aaa;
+    // background: transparent;
     &:hover {
       color: $accent;
       opacity: 1;
+      // background: transparent;
     }
   }
-  .selected::before {
-    content: '';
-    background: currentColor;
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    left: -1em;
-    top: 0.5rem;
-    border-radius: 50%;
+  .selected {
+    color: black;
   }
+
 
   .docs-nav-visible & {
     transform: translate3d(0,0,0);
@@ -318,10 +303,10 @@ li {
   background-position: center;
   background-repeat: no-repeat;
   background-color: #f4f4f4;
-  width: 8rem;
-  height: 6rem;
+  width: 6rem;
+  height: 4rem;
   flex-shrink: 0;
-  margin-right: 1rem;
+  margin-right: 1.5rem;
 }
 
 .grid li {
@@ -380,24 +365,24 @@ li {
 .docs-nav-item {
   position: relative;
   margin-bottom: 1rem;
+  width: 25%;
   // font-weight: 600;
-  // font-style: italic;
-  text-transform: uppercase;
+  font-style: italic;
+  // text-transform: uppercase;
 }
 .docs-nav-subitem {
   // font-weight: 400;
+  // font: 0.6rem / 1.5 $mono;
+  width: unset;
   text-transform: none;
   font-style: normal;
   margin-bottom: 0 !important;
+  // margin-left: 3ch;
   &:last-child {
     // margin-bottom: 1rem !important;
     padding-bottom: 0;
   }
 
-}
-
-.page-content {
-  // padding-top: 1rem;
 }
 
 .logo {
@@ -412,10 +397,14 @@ li {
 
 .site-title {
   font-weight: 400;
+  max-width: 35rem;
+  margin: auto;
+  display: flex;
 }
 
 .site-nav {
-  transition: opacity 0.25s;
+  display: flex;
+  margin-left: 0.75rem;
 }
 
 .site-header a {
@@ -435,8 +424,9 @@ figure > img {
 }
 
 h1 {
-  font-size: 2rem;
-  margin: 2rem 0;
+  font-size: 3rem;
+  line-height: 1.15em;
+  margin: 1rem -0.1rem;
 }
 
 h2 {
@@ -456,11 +446,15 @@ h2 {
 
 h3 {
   font-style: italic;
-  margin: 4.5rem 0 1.5rem;
+  margin: 3rem 0 1.5rem;
 
   &:first-child {
     margin-top: 1.5rem;
   }
+}
+
+h1 + h3 {
+  margin-top: 1.5rem;
 }
 
 h4 {
@@ -501,15 +495,20 @@ p code, li code {
     letter-spacing: 0.01em;
   }
   .site-nav {
-    margin: 1rem 0;
+    margin-top: 0.75rem;
+    margin-left: 0;
+  }
+  .site-title {
+    flex-direction: column;
   }
   .nav-item {
     margin-right: 0.5em;
   }
   div pre.highlight {
-    padding: 0 5%;
+    border-radius: 0;
+    padding: 1em 5%;
     box-shadow: none;
-    margin: 1.5rem -5%;
+    margin: 0.5rem -5%;
   }
   // pre, code {
   //   font-size:  0.7rem;
@@ -524,7 +523,7 @@ p code, li code {
 }
 
 @mixin sideBySide {
-  width: 45%;
+  width: calc(50% - 6px);
   display: inline-block;
   vertical-align: top;
   pre {
@@ -539,20 +538,19 @@ p code, li code {
   .site-header {
     margin-top: 2rem;
   }
-  .site-nav {
-    position: absolute;
-    left: $sidebar-width;
-    left: 4rem;
-    top: 0;
-  }
   .logo {
     height: 40px;
     width: 40px;
     -webkit-mask-size: 40px;
     -webkit-mask: url(logo40.svg) no-repeat 50% 50%;
   }
-  .code-compare > div {
-    @include sideBySide;
+  .code-compare {
+    display: flex;
+    flex-flow: wrap;
+    > div {
+      flex-grow: 1;
+      margin-right: 0.5rem;
+    }
   }
 }
 
@@ -591,15 +589,14 @@ p code, li code {
   }
   .docs-nav-item {
     margin: 0;
-    max-width: 30rem;
+    width: 50%;
+    // max-width: 30rem;
   }
   .docs-nav-item a {
-    display: block;
+    display: inline;
   }
   .nav-sub {
     padding-bottom: 1.5rem;
-    display: inline-block;
-    vertical-align: top;
   }
   .docs-nav-subitem {
     padding-top: 0;
@@ -607,7 +604,7 @@ p code, li code {
     display: block;
     width: auto;
     a {
-      width: auto;
+      display: inline;
     }
   }
 }
@@ -623,43 +620,30 @@ p code, li code {
     display: block;
   }
   .site-header {
-    position: fixed;
+    // position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 99;
   }
-  .docs-scrolled .site-nav {
-    opacity: 0;
-    pointer-events: none;
-  }
-  pre {
-    width: calc(100vw - 8rem);
-  }
-  .docs-content pre {
-    width: calc(100vw - 16rem);
-  }
-  .page-content {
-    margin-top: 6rem;
-  }
-  .post-content {
-    padding-left: 4rem;
-  }
+  // .page-content {
+  //   margin-top: 6rem;
+  // }
   .docs-content {
     // max-width: 28rem;
-    margin-left: 8rem;
+    // margin-left: 8rem;
     // padding-left: 0;
   }
 
   .docs-nav {
-    top: 7rem;
-    width: $sidebar-width;
-    background: transparent;
-    border: 0;
-    padding: 0 0 2rem 0;
-    padding-left: 5%;
-    transform: none;
-    border: 0;
+    // top: 7rem;
+    // width: $sidebar-width;
+    // background: transparent;
+    // border: 0;
+    // padding: 0 0 2rem 0;
+    // padding-left: 5%;
+    // transform: none;
+    // border: 0;
     .selected::before {
       display: block;
     }
@@ -668,16 +652,17 @@ p code, li code {
   .docs-nav h2 {
     padding-bottom: 3rem;
   }
-  // .responsive-grid li {
-  //   max-width: calc(33% - 0.5rem);
-  // }
+}
+
+.highlight {
+  height: 100%;
 }
 
 .highlight pre, pre.highlight {
-  padding-left: 1.5rem;
-  padding-bottom: 0.1em;
-  box-shadow: inset 0.5px 0 0 0 black;
+  padding: 1rem 1.5rem;
   margin: 1.5rem 0;
+  background: #fafafa;
+  border-radius: 8px;
 }
 
 .highlight pre code {
@@ -746,8 +731,8 @@ html.book {
     }
   }
 
-  .code-compare > div {
-    @include sideBySide;
+  .code-compare {
+    display: flex;
   }
 
   .📖-running-header, .📖-footer {
@@ -760,22 +745,12 @@ html.book {
     margin-top: 8rem;
     font-size: 2rem;
     line-height: 1.2;
-    .toc-row {
-      // display: inline;
-    }
     .toc-num {
       width: 4rem;
       text-align: right;
       margin-right: 1rem;
       display: inline-block;
     }
-  }
-  .toc-title {
-    // text-decoration: underline;
-    // background-image: linear-gradient(black, black);
-    // background-repeat: repeat-x;
-    // background-size: 1px 1px;
-    // background-position: 0 1.2em;
   }
   pre.highlight {
     box-shadow: none;
@@ -784,6 +759,7 @@ html.book {
     padding: 0;
     margin: 1.5rem 0;
     margin-top: 0;
+    background: none;
   }
   .highlighter-rouge:first-child {
     margin-top: 0;

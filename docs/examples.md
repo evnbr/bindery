@@ -1,11 +1,13 @@
 ---
 layout: grid
-title:  Examples
-shortTitle: Examples
+title:  Books
+shortTitle: Books
 permalink: /examples/
 order: 3
 inBook: true
 ---
+
+# Books & websites made with bindery
 
 ### Gallery
 
