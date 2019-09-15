@@ -49,25 +49,13 @@ $btn-active: rgba(0,0,0,0.08);
 }
 
 .print-options {
-  display: flex;
-  opacity: 0;
-  max-width: 0;
-  overflow: hidden;
-  transition: all 0.3s;
-  flex-wrap: nowrap;
-  transition-delay: 0.1s;
+  display: none;
   .view-print & {
-    max-width: 720px;
-    margin-right: 12px;
-    opacity: 1;
+    display: flex;
   }
   .in-progress & {
-    opacity: 0;
     display: none;
   }
-}
-.controls .print-options .control {
-  background-color: transparent;
 }
 
 .controls .btn {
@@ -94,6 +82,7 @@ $btn-active: rgba(0,0,0,0.08);
   color: var(--bindery-ui-text);
   padding: $btn-pad;
   border: 1px solid #ddd;
+  margin-right: 12px;
 }
 
 .controls .btn-light {
@@ -118,8 +107,6 @@ $btn-active: rgba(0,0,0,0.08);
 }
 
 .view-row {
-  margin-left: auto;
-  margin-right: 12px;
   transition: all 0.3s;
   .in-progress & {
     opacity: 0;
@@ -131,6 +118,7 @@ $btn-active: rgba(0,0,0,0.08);
 }
 
 .btn-print {
+  margin-left: auto;
   transition: all 0.3s;
   .in-progress & {
     opacity: 0;
@@ -143,12 +131,13 @@ $btn-active: rgba(0,0,0,0.08);
   transition: all 0.2s;
   white-space: nowrap;
   width: 100%;
+  position: relative;
 
   &:after {
     content: "";
     position: absolute;
-    right: 12px;
-    top: 14px;
+    right: 9px;
+    top: 12px;
     border-bottom: 1px solid;
     border-right: 1px solid;
     padding: 0px;
@@ -206,25 +195,16 @@ $btn-active: rgba(0,0,0,0.08);
   .view-print.root {
     padding-top: 120px;
   }
-  .controls {
-    height: 60px;
-  }
 
-  .view-row {
-    margin-left: auto;
-  }
   .view-print .controls {
-    height: 104px;
+    height: 64px;
   }
 
   .print-options {
-    top: 54px;
-    right: 10px;
+    top: 48px;
+    left: 10px;
     position: fixed;
     margin: 0;
-    .row {
-      margin: 0;
-    }
   }
 }
 
@@ -263,14 +243,23 @@ $btn-active: rgba(0,0,0,0.08);
 
   .view-print .controls {
     background: var(--bindery-ui-bg);
-    height: 180px;
+    height: 140px;
   }
   .print-options {
     flex-direction: column;
     align-items: stretch;
     left: 10px;
+    right: 10px;
+    .row {
+      margin-bottom: 0.25rem;
+    }
+    .select-wrap {
+      margin: 0;
+    }
   }
+
   .hidden-select {
     display: none;
   }
+
 }
