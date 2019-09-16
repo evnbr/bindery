@@ -5,8 +5,8 @@
   // eslint-disable-next-line no-confusing-arrow
   const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + ((4 - (2 * t)) * t);
 
-  const anchors = Array.from(document.querySelectorAll('h2, h3, h4, h5'));
-  const nav = document.querySelector('.docs-nav');
+  // const anchors = Array.from(document.querySelectorAll('h2, h3, h4, h5'));
+  const anchors = Array.from(document.querySelectorAll('h2'));
 
   let currentAnchor;
   let throttleScroll;
@@ -44,7 +44,7 @@
         history.replaceState(undefined, undefined, `#${inview.id}`);
       }
     }
-    if (scrollPos > 10) {
+    if (scrollPos > 60) {
       document.body.classList.add('docs-scrolled');
     } else {
       document.body.classList.remove('docs-scrolled');

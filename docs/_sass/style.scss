@@ -190,7 +190,7 @@ li {
       left: 0;
       right: 0;
       margin: auto;
-      top: 120%;
+      top: 100%;
       border-radius: 50%;
     }
   }
@@ -231,6 +231,7 @@ li {
 
 .credit {
   font: 0.6rem / 1.5 $system;
+  margin-top: 0.2rem;
 }
 
 .docs-nav {
@@ -375,12 +376,17 @@ li {
   // font-style: italic;
   // text-transform: uppercase;
 }
+
+body {
+  counter-reset: docsnav 0;
+}
+
 .docs-nav-subitem {
   // font-weight: 400;
   // font: 0.6rem / 1.5 $mono;
   width: unset;
   text-transform: none;
-  // font-style: italic;
+  font-style: italic;
   margin-bottom: 0 !important;
   // margin-left: 3ch;
   &:last-child {
@@ -390,13 +396,62 @@ li {
 }
 
 .docs-nav-group > a {
-  font-style: italic;
   background: transparent;
 }
-.docs-nav-group a > span {
+
+.docs-nav-group {
+  counter-increment: docsnav;
+}
+
+.docs-scroll-nav {
+  position: fixed;
+  right: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s;
+  transform: scale(0.97);
+  .docs-scrolled & {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+    pointer-events: all;
+  }
+  a {
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+    overflow: hidden;
+    border-radius: 100%;
+    margin-bottom: 0.75rem;
+    border: 1px solid black;
+    background: transparent;
+    text-align: center;
+    text-shadow: none;
+  }
+  a:hover {
+    background: black;
+    color: white;
+  }
+  .selected {
+    background: black;
+    color: white;
+  }
+}
+
+.docs-nav-group > a::before {
+  content: counter(docsnav);
+  border: 1px solid;
+  line-height: 1.5rem;
+  width: 1.5rem;
   display: block;
-  font-style: normal;
-  font-size: 1.5rem;
+  text-align: center;
+  border-radius: 50%;
+  margin-bottom: 0.75rem;
+}
+
+.nav-sub {
+  margin-top: 0.5rem;
 }
 
 .logo {
@@ -449,9 +504,27 @@ h2 {
   font-size: 2rem;
 }
 
+body {
+  counter-reset: docs 0;
+}
 
 .docs-content h2 {
   position: relative;
+}
+
+.docs-content h2::before {
+  counter-increment: docs;
+  content: counter(docs);
+  display: inline-block;
+  border: 1px solid;
+  border-radius: 50%;
+  width: 2rem;
+  line-height: 2rem;
+  font-size: 1rem;
+  text-align: center;
+  margin-right: 0.75rem;
+  position: relative;
+  top: -0.3rem;
 }
 
 .docs-content h3 {
@@ -530,7 +603,7 @@ p code, li code {
     margin-right: 0.2rem;
     margin-bottom: 0.2rem;
     margin-top: 0.25rem;
-  }
+  }  
 }
 
 @mixin sideBySide {
@@ -590,6 +663,11 @@ p code, li code {
       display: inline;
     }
   }
+  .docs-scroll-nav a {
+    height: 0.4rem;
+    width: 0.4rem;
+  }
+
 }
 
 @media (min-width: $wide-enough-for-side-nav) {
@@ -613,6 +691,13 @@ p code, li code {
   .docs-nav h2 {
     padding-bottom: 3rem;
   }
+
+  .docs-content h2::before {
+    position: absolute;
+    left: -3rem;
+    top: 0.55rem;
+  }
+
 }
 
 .highlight {
