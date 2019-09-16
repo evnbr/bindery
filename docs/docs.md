@@ -591,4 +591,4 @@ but will not create them yourself.
 ### BookInfo
 You may receive instances of this class when using custom rules,
 but will not create them yourself.
-- `pages` Array of `Page`
+- `pages` Array of [PageInfo](#pageinfo)

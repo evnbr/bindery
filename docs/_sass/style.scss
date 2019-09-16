@@ -15,9 +15,10 @@ $docs-options-inset: 6rem;
 $wide-enough-for-side-nav: 65rem;
 $narrow: 40rem;
 
-$system: system-ui, sans-serif;
+// $system: system-ui, sans-serif;
 $serif: T, Times, Times New Roman, serif;
 $mono: 'Input Mono', 'Source Code Pro', Menlo, Consolas, Monaco, monospace;
+$system: system-ui, sans-serif;
 
 * {
   margin: 0;
@@ -28,7 +29,7 @@ $mono: 'Input Mono', 'Source Code Pro', Menlo, Consolas, Monaco, monospace;
 }
 
 html {
-  font: 24px/1.55 $serif;
+  font: 24px/1.5 $serif;
   letter-spacing: 0.007em;
   font-weight: 300;
 }
@@ -69,7 +70,7 @@ em {
 .btn, .post-content .btn {
   font: 0.6rem/1.4 $system;
   display: inline-block;
-  padding: 0.4rem 0.9rem 0.45rem;
+  padding: 0.4rem 0.9rem;
   border-radius: 8px;
   border: 1px solid currentColor;
   background: transparent;
@@ -228,6 +229,10 @@ li {
   }
 }
 
+.credit {
+  font: 0.6rem / 1.5 $system;
+}
+
 .docs-nav {
   // font: 0.8rem / 1.5 $mono;
   display: flex;
@@ -304,7 +309,7 @@ li {
   background-repeat: no-repeat;
   background-color: #f4f4f4;
   width: 6rem;
-  height: 4rem;
+  height: 5rem;
   flex-shrink: 0;
   margin-right: 1.5rem;
 }
@@ -362,12 +367,12 @@ li {
 }
 
 
-.docs-nav-item {
+.docs-nav-group {
   position: relative;
   margin-bottom: 1rem;
   width: 25%;
   // font-weight: 600;
-  font-style: italic;
+  // font-style: italic;
   // text-transform: uppercase;
 }
 .docs-nav-subitem {
@@ -375,14 +380,23 @@ li {
   // font: 0.6rem / 1.5 $mono;
   width: unset;
   text-transform: none;
-  font-style: normal;
+  // font-style: italic;
   margin-bottom: 0 !important;
   // margin-left: 3ch;
   &:last-child {
     // margin-bottom: 1rem !important;
     padding-bottom: 0;
   }
+}
 
+.docs-nav-group > a {
+  font-style: italic;
+  background: transparent;
+}
+.docs-nav-group a > span {
+  display: block;
+  font-style: normal;
+  font-size: 1.5rem;
 }
 
 .logo {
@@ -427,6 +441,7 @@ h1 {
   font-size: 3rem;
   line-height: 1.15em;
   margin: 1rem -0.1rem;
+  max-width: 32rem;
 }
 
 h2 {
@@ -485,7 +500,7 @@ p code, li code {
 }
 @media (max-width: 512px) {
   .btn, .post-content .btn {
-    display: block;
+    // display: block;
   }
 }
 
@@ -510,10 +525,6 @@ p code, li code {
     box-shadow: none;
     margin: 0.5rem -5%;
   }
-  // pre, code {
-  //   font-size:  0.7rem;
-  //   line-height: 1.1rem;
-  // }
   .btn, .post-content .btn {
     font-size: 0.7rem;
     margin-right: 0.2rem;
@@ -547,34 +558,12 @@ p code, li code {
   .code-compare {
     display: flex;
     flex-flow: wrap;
-    > div {
+    > .highlighter-rouge {
       flex-grow: 1;
       margin-right: 0.5rem;
     }
   }
 }
-
-// @media (min-width: 50rem) {
-//   .responsive-grid li {
-//     max-width: calc(33% - 0.5rem);
-//     margin-right: 0.5rem;
-//   }
-//   .responsive-grid li div,
-//   .responsive-grid li h4 {
-//     padding-right: 1rem;
-//   }
-//   .responsive-grid a {
-//     flex-direction: column; // stack vertical
-//     align-items: stretch;
-//   }
-//   .responsive-grid figure {
-//     // figure is width of cell
-//     width: unset;
-//     height: unset;
-//     padding-bottom: 78%;
-//     margin-right: 0;
-//   }
-// }
 
 
 @media (max-width: $wide-enough-for-side-nav) {
@@ -587,22 +576,16 @@ p code, li code {
   .long-title {
     display: none;
   }
-  .docs-nav-item {
+  .docs-nav-group {
     margin: 0;
     width: 50%;
     // max-width: 30rem;
-  }
-  .docs-nav-item a {
-    display: inline;
   }
   .nav-sub {
     padding-bottom: 1.5rem;
   }
   .docs-nav-subitem {
     padding-top: 0;
-    box-shadow: none;
-    display: block;
-    width: auto;
     a {
       display: inline;
     }
@@ -626,28 +609,6 @@ p code, li code {
     right: 0;
     z-index: 99;
   }
-  // .page-content {
-  //   margin-top: 6rem;
-  // }
-  .docs-content {
-    // max-width: 28rem;
-    // margin-left: 8rem;
-    // padding-left: 0;
-  }
-
-  .docs-nav {
-    // top: 7rem;
-    // width: $sidebar-width;
-    // background: transparent;
-    // border: 0;
-    // padding: 0 0 2rem 0;
-    // padding-left: 5%;
-    // transform: none;
-    // border: 0;
-    .selected::before {
-      display: block;
-    }
-  }
 
   .docs-nav h2 {
     padding-bottom: 3rem;
@@ -660,9 +621,25 @@ p code, li code {
 
 .highlight pre, pre.highlight {
   padding: 1rem 1.5rem;
-  margin: 1.5rem 0;
   background: #fafafa;
   border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+.code-compare {
+  margin: 1.5rem 0;
+  .highlight {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  div.highlighter-rouge {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+  
+div.highlighter-rouge {
+  margin: 1.5rem 0;
 }
 
 .highlight pre code {
@@ -671,7 +648,6 @@ p code, li code {
 }
 
 pre {
-  // padding: 8px 12px;
   overflow-x: auto;
 
   > code {

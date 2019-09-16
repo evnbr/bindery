@@ -7,7 +7,7 @@ order: 3
 inBook: true
 ---
 
-# Books & websites made with bindery
+# Books using bindery.js
 
 ### Gallery
 
@@ -21,14 +21,14 @@ inBook: true
       <div class="grid-label">
         <h4>{{ ex.title | escape }}</h4>
         <p>{{ ex.desc | escape }}</p>
-        <div>{{ ex.credit | escape }}</div>
+        <div class="credit">{{ ex.credit | escape }}</div>
       </div>
     </a>
   </li>
 {% endfor %}
 </ul>
 
-### Examples
+### Examples to get started
 
 <ul class="grid responsive-grid">
 {% for ex in site.data.examples.simple %}
@@ -40,7 +40,7 @@ inBook: true
       <div class="grid-label">
         <h4>{{ ex.title | escape }}</h4>
         <p>{{ ex.desc | escape }}</p>
-        <div>{{ ex.credit | escape }}</div>
+        <div class="credit">{{ ex.credit | escape }}</div>
       </div>
     </a>
   </li>

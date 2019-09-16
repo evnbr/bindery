@@ -47,14 +47,24 @@ gallery:
     url: http://johncaserta.com/
     credit: John Caserta, 2017
     thumb: jc.gif
-  - title: Let's try listening again
+  - title: Let’s try listening again
     desc: Catalog for the 13th annual A.I.R. Biennial
     url: https://letstrylisteningagain.org/
     credit: Lukas Eigler-Harding, 2019
     thumb: listen.png
-  - title: Bindery docs
-    desc: A book from this site, just now
-    credit: 
+  - title: Automatic Book
+    desc: Workshop at Hochschule der Bildenden Künste Saar 
+    url: https://www.jacobheftmann.com/teaching/automatic-book-workshop
+    credit: Jacob Heftmann, 2019
+    thumb: automatic.gif
+  - title: Every Photo
+    desc: A book generated from a Small Victories feed
+    url: https://bindery-demo.smvi.co/
+    credit: Jacob Heftmann, 2019
+    thumb: every.gif
+  - title: How to make a book with HTML & CSS
+    desc: These docs as a book
+    credit: Just now
     url: /bindery/book
     thumb: docs.png
   - title: Add yours?

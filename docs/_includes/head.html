@@ -12,26 +12,4 @@
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | relative_url }}">
   <link rel="stylesheet" href="{{ "/assets/fonts.css" | relative_url }}">
-
-  <script>
-  // let starCount;
-  // let url = 'https://api.github.com/repos/evnbr/bindery';
-  // fetch(url).then((response) => {
-  //   return response.json();
-  // }).then((json) => {
-  //   starCount = json.stargazers_count;
-  //   setStars();
-  // });
-  //
-  // setStars = function() {
-  //   let el = document.querySelector("#stars");
-  //   if (el && starCount) {
-  //     el.textContent = starCount;
-  //   }
-  // }
-  </script>
-
-  {% if jekyll.environment == 'production' and site.google_analytics %}
-  {% include google-analytics.html %}
-  {% endif %}
 </head>
