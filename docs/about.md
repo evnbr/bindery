@@ -25,7 +25,8 @@ Report bugs, make suggestions, or lend a hand
 with HTML and CSS. It's not a graphical user interface.
 2. *A PDF generator*— Bindery relies on your browser's PDF output. If you want to adjust a PDF setting, your browser must support it.
 3. *[LaTeX](https://www.latex-project.org)*— LaTeX is a markup language and typesetting system popular in the scientific community. Bindery is intended for everyone who knows HTML and CSS (or is learning), and wants to apply that to print.
-4. *[CSS Regions](https://www.w3.org/TR/css-regions-1)*— CSS Regions was an ill-fated Adobe-led spec to support magazine-like layouts on the web using new CSS rules like `flow-into`. ([polyfill here](https://github.com/FremyCompany/css-regions-polyfill)). Bindery uses [regionize.js](https://github.com/evnbr/regionize), a simple library that is not controlled by your CSS rules.
+4. *[CSS Regions](https://www.w3.org/TR/css-regions-1)*— CSS Regions was an ill-fated Adobe-led spec to support magazine-like layouts on the web using new CSS rules like `flow-into`. A polyfill for Regions is ([available here](https://github.com/FremyCompany/css-regions-polyfill)). Bindery uses [regionize.js](https://github.com/evnbr/regionize), a simple library that is not controlled by your CSS rules.
+5. *[CSS Paged Media, Level 3](https://drafts.csswg.org/css-page-3/)* & *[CSS Generated Content (Draft)](https://www.w3.org/TR/css-gcpm-3/)*— These drafts of web standards could eventually support some of the features in bindery, though browser makers have not implemented them. Will they? Who knows. See [paged.js](https://www.pagedmedia.org/paged-js/) for a polyfill inspired by these specs. 
 
 <div class="colophon-wrap" markdown="1">
 
