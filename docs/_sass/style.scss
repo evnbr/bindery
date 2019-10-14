@@ -13,7 +13,7 @@ $sidebar-width: 12rem;
 $docs-options-inset: 6rem;
 
 $wide-enough-for-side-nav: 65rem;
-$narrow: 40rem;
+$narrow: 36rem;
 
 // $system: system-ui, sans-serif;
 $serif: T, Times, Times New Roman, serif;
@@ -544,7 +544,7 @@ p code, li code {
     flex-direction: column;
   }
   .nav-item {
-    margin-right: 0.5em;
+    margin-right: 0.8em;
   }
   .docs-nav-group {
     width: 50%;
