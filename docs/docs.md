@@ -184,52 +184,6 @@ Bindery.PageBreak({
 })
 ```
 
-### FullBleedPage
-Removes the selected element from the ordinary flow of the book and places it on its own
-page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
-- `selector:` Which elements the rule should be applied to.
-- `continue:` Where to resume the book flow after adding the
-full bleed page. `Optional`
-  - `'same'` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup. `default`
-  - `'next'` Continues on a new page
-  - `'left'` Continues on the next left page, inserting another page when appropriate
-  - `'right'` Continues on the next right page, inserting another page when appropriate
-- `rotate:` Add a rotation the full-bleed content. `Optional`
-  - `'none'` `default`
-  - `'clockwise'` The top will become the left edge
-  - `'counterclockwise'` The top will become the right edge
-  - `'inward'` The top will become the outside edge
-  - `'outward'` The top will become the inside edge
-
-```js
-Bindery.FullBleedPage({
-  selector: '.big-figure',
-  continue: 'same'
-}),
-```
-
-### FullBleedSpread
-The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
-- `selector:` Which elements the rule should be applied to.
-- `continue:` Where to resume the book flow after adding the
-full bleed element. `Optional`
-  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
-  - `'next'` Continues on a new page after the spread.
-  - `'left'` Continues on the next left page after the spread
-  - `'right'` Continues on the next right page after the spread
-- `rotate:` Add a rotation the full-bleed content. `Optional`
-  - `'none'` `default`
-  - `'clockwise'` The top will become the left edge
-  - `'counterclockwise'` The top will become the right edge
-
-```js
-Bindery.FullBleedSpread({
-  selector: '.wide-figure',
-  continue: 'next',
-  rotate: 'clockwise',
-}),
-```
-
 ### Split
 <!-- - `Bindery.Split({})` -->
 
@@ -408,6 +362,52 @@ Bindery.Footnote({
   render: (element, number) => {
     return '<i>' + number + '</i>: Link to ' + element.href;
   }
+}),
+```
+
+### FullBleedPage
+Removes the selected element from the ordinary flow of the book and places it on its own
+page. Good for displaying figures and imagery. You can use CSS to do your own layout on this page— `width: 100%; height: 100%` will fill the whole bleed area.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed page. `Optional`
+  - `'same'` Continues on the previous page where the element would have been. This will fill the remainder of that page, avoiding a gap, though note that it results in a different order than your original markup. `default`
+  - `'next'` Continues on a new page
+  - `'left'` Continues on the next left page, inserting another page when appropriate
+  - `'right'` Continues on the next right page, inserting another page when appropriate
+- `rotate:` Add a rotation the full-bleed content. `Optional`
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+  - `'inward'` The top will become the outside edge
+  - `'outward'` The top will become the inside edge
+
+```js
+Bindery.FullBleedPage({
+  selector: '.big-figure',
+  continue: 'same'
+}),
+```
+
+### FullBleedSpread
+The same as [`FullBleedPage`](#fullbleedpage), but places the element across two pages.
+- `selector:` Which elements the rule should be applied to.
+- `continue:` Where to resume the book flow after adding the
+full bleed element. `Optional`
+  - `'same'` `default` Continue where the element was, so there's not a blank gap before the spread.
+  - `'next'` Continues on a new page after the spread.
+  - `'left'` Continues on the next left page after the spread
+  - `'right'` Continues on the next right page after the spread
+- `rotate:` Add a rotation the full-bleed content. `Optional`
+  - `'none'` `default`
+  - `'clockwise'` The top will become the left edge
+  - `'counterclockwise'` The top will become the right edge
+
+```js
+Bindery.FullBleedSpread({
+  selector: '.wide-figure',
+  continue: 'next',
+  rotate: 'clockwise',
 }),
 ```
 

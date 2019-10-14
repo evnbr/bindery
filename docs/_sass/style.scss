@@ -68,7 +68,7 @@ em {
 }
 
 .btn, .post-content .btn {
-  font: 0.7rem/1.4 $mono;
+  font: 0.6rem/1.4 $system;
   display: inline-block;
   padding: 0.4rem 0.9rem;
   border-radius: 8px;
@@ -398,10 +398,10 @@ li {
 
 .docs-nav-subitem {
   // font-weight: 400;
-  // font: 0.6rem / 1.5 $mono;
+  font: 0.7rem / 1.5 $mono;
   width: unset;
   text-transform: none;
-  font-style: italic;
+  // font-style: italic;
   margin-bottom: 0 !important;
   // margin-left: 3ch;
   &:last-child {
@@ -590,8 +590,8 @@ p code, li code {
     align-items: center;
   }
   .grid figure {
-    width: 6rem;
-    height: 5rem;
+    width: 8rem;
+    height: 6rem;
     padding-bottom: 0;
   }
   .code-compare {
