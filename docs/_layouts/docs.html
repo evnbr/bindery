@@ -6,17 +6,8 @@ layout: default
   </div>
 
   <div class="post-content docs-content">
-    <h1>Docs</h1>
-    <nav class="docs-scroll-nav">
-        <a href="#setup">1</a>
-        <a href="#flowing-content">2</a>
-        <a href="#page-elements">3</a>
-        <a href="#referencing-pages">4</a>
-        <a href="#advanced">5</a>
-    </nav>
-
     <nav class="docs-nav">
-        <!-- <h2>{{ page.title | escape }}</h1> -->
+        <h1>{{ page.shortTitle | escape }}</h1>
   
         <div class="docs-nav-group">
           <a href="#setup">Setup</a>
@@ -43,12 +34,6 @@ layout: default
               <a href="#pagebreak">PageBreak</a>
             </div>
             <div class="docs-nav-item docs-nav-subitem">
-              <a href="#fullbleedpage">FullBleedPage</a>
-            </div>
-            <div class="docs-nav-item docs-nav-subitem">
-              <a href="#fullbleedspread">FullBleedSpread</a>
-            </div>
-            <div class="docs-nav-item docs-nav-subitem">
               <a href="#split">Split</a>
             </div>
             <div class="docs-nav-item docs-nav-subitem">
@@ -66,6 +51,12 @@ layout: default
             <div class="docs-nav-item docs-nav-subitem">
               <a href="#footnote">Footnote</a>
             </div>
+            <div class="docs-nav-item docs-nav-subitem">
+              <a href="#fullbleedpage">FullBleedPage</a>
+            </div>
+            <div class="docs-nav-item docs-nav-subitem">
+              <a href="#fullbleedspread">FullBleedSpread</a>
+            </div>
           </div>
         </div>
 
@@ -77,6 +68,17 @@ layout: default
             </div>
             <div class="docs-nav-item docs-nav-subitem">
               <a href="#creating-an-index">Index</a>
+            </div>
+          </div>
+        </div>
+        <div class="docs-nav-group">
+          <a href="#advanced">Advanced</a>
+          <div class="nav-sub">
+            <div class="docs-nav-item docs-nav-subitem">
+              <a href="#pageinfo">PageInfo</a>
+            </div>
+            <div class="docs-nav-item docs-nav-subitem">
+              <a href="#bookinfo">BookInfo</a>
             </div>
           </div>
         </div>

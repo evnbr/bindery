@@ -37,11 +37,6 @@ simple:
     thumb: controls.png
 
 gallery:
-  - title: for/with/in
-    desc: Book and site to explore the web browser as a design tool 
-    url: http://htmloutput.risd.gd/
-    credit: Members of HTML Output, RISD Fall 2014
-    thumb: forwithin.jpg
   - title: John Caserta
     desc: Book and site to document projects, writing, and teaching
     url: http://johncaserta.com/
@@ -64,8 +59,13 @@ gallery:
     thumb: every.gif
   - title: How to make a book with HTML & CSS
     desc: These docs as a book
-    credit: Just now
+    credit: Evan Brooks, 2019
     url: /bindery/book
     thumb: docs.png
+  - title: for/with/in
+    desc: Book and site to explore the web browser as a design tool 
+    url: http://htmloutput.risd.gd/
+    credit: Members of HTML Output, RISD Fall 2014
+    thumb: forwithin.jpg
   - title: Add yours?
     url: https://github.com/evnbr/bindery/blob/master/docs/_data/examples.yml

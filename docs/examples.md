@@ -7,7 +7,7 @@ order: 3
 inBook: true
 ---
 
-# Books using bindery.js
+# Books
 
 ### Gallery
 
@@ -28,7 +28,7 @@ inBook: true
 {% endfor %}
 </ul>
 
-### Examples to get started
+### Examples
 
 <ul class="grid responsive-grid">
 {% for ex in site.data.examples.simple %}
