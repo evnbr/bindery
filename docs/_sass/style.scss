@@ -420,9 +420,10 @@ li {
 }
 
 .logo {
-  width: 32px;
-  height: 32px;
-  -webkit-mask: url(logo32.svg) no-repeat 50% 50%;
+  height: 40px;
+  width: 40px;
+  -webkit-mask-size: 40px;
+  -webkit-mask: url(logo40.svg) no-repeat 50% 50%;
   background: currentColor;
   vertical-align: middle;
   margin-right: 1.8rem;
@@ -578,12 +579,6 @@ p code, li code {
 @media (min-width: $narrow) {
   .site-header {
     margin-top: 2rem;
-  }
-  .logo {
-    height: 40px;
-    width: 40px;
-    -webkit-mask-size: 40px;
-    -webkit-mask: url(logo40.svg) no-repeat 50% 50%;
   }
   .grid a {
     flex-direction: row;
