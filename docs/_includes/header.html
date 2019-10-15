@@ -16,8 +16,7 @@
             <div class="nav-item">
           {% endif %}
               <a href="{{ p.url | relative_url }}">
-                <span class='long-title'>{{ p.shortTitle | escape }}</span>
-                <span class='short-title'>{{ p.shortTitle | escape }}</span>
+                {{ p.title | escape }}
               </a>
             </div>
         {% endif %}

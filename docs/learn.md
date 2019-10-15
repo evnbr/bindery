@@ -1,7 +1,6 @@
 ---
 layout: page
 title:  Learn
-shortTitle: Learn
 permalink: /learn/
 order: 0
 inBook: true

@@ -1,7 +1,6 @@
 ---
 layout: grid
 title:  Books
-shortTitle: Books
 permalink: /books/
 order: 3
 inBook: true

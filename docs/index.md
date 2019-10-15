@@ -1,6 +1,5 @@
 ---
-title: Introduction
-shortTitle: Intro
+title: Intro
 layout: page
 order: -1
 inBook: true

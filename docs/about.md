@@ -1,7 +1,6 @@
 ---
 layout: page
 title:  About
-shortTitle: About
 permalink: /about/
 order: 4
 inBook: true

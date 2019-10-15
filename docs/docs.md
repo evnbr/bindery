@@ -1,7 +1,6 @@
 ---
 layout: docs
-title:  Documentation
-shortTitle: Docs
+title:  Docs
 permalink: /docs/
 order: 2
 inBook: true
