@@ -42,6 +42,10 @@ gallery:
     url: http://johncaserta.com/
     credit: John Caserta, 2017
     thumb: jc.gif
+  - title: Cita Press
+    desc: A feminist indie press publishing public-domain books written by women
+    credit: Juliana Castro, 2017
+    thumb: cita.gif
   - title: Let’s try listening again
     desc: Catalog for the 13th annual A.I.R. Biennial
     url: https://letstrylisteningagain.org/
