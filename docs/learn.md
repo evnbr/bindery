@@ -2,7 +2,7 @@
 layout: page
 title:  Learn
 shortTitle: Learn
-permalink: /guide/
+permalink: /learn/
 order: 0
 inBook: true
 ---

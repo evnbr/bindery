@@ -2,7 +2,7 @@
 layout: grid
 title:  Books
 shortTitle: Books
-permalink: /examples/
+permalink: /books/
 order: 3
 inBook: true
 ---
