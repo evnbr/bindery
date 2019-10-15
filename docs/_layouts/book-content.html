@@ -43,7 +43,7 @@
 
       {% for p in pages_list %}
         {% if p.inBook and p.order %}
-          <h1 id="{{p.title}}">{{ p.title | escape }}</h1>
+          <h1 class="h1-page" id="{{p.title}}">{{ p.title | escape }}</h1>
           {% if p.title != 'Books' %}
             <article class="post-content docs-content">
               {{ p.content | markdownify }}

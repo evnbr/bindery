@@ -12,7 +12,7 @@ $keyword: purple;
 $sidebar-width: 12rem;
 $docs-options-inset: 6rem;
 
-$wide-enough-for-side-nav: 65rem;
+$wide-enough-for-side-nav: 68rem;
 $narrow: 36rem;
 
 // $system: system-ui, sans-serif;
@@ -643,6 +643,9 @@ p code, li code {
   .docs-nav-group {
     width: auto;
   }
+  html {
+    font-size: 26px;
+  }
 }
 
 @media (min-width: $wide-enough-for-side-nav) {
@@ -761,6 +764,10 @@ html.book {
     margin-bottom: 1rem;
   }
   h1 {
+    display: none;
+  }
+  .h1-page {
+    display: block;
     text-align: center;
     font-size: 4.5rem;
     line-height: 6in;
@@ -828,6 +835,10 @@ html.book {
   .grid figure {
     width: 8rem;
     height: 6rem;
+    padding: 0;
+  }
+  .grid a {
+    flex-direction: row;
   }
 }
 
