@@ -3,5 +3,8 @@
   "private": true,
   "devDependencies": {
     "lerna": "^3.18.3"
+  },
+  "scripts": {
+    "test": "lerna run test"
   }
 }
