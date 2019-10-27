@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strict": true,
+  }
+}

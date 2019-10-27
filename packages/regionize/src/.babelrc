@@ -1,0 +1,34 @@
+{
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "babel-preset-env",
+        ]
+      ],
+      "plugins": [
+        ["transform-runtime", {
+          "polyfill": false,
+          "regenerator": true
+        }],
+      ]
+    },
+    "development": {
+      "presets": [
+        [
+          "babel-preset-env",
+          {
+            "modules": false
+          }
+        ]
+      ],
+      "plugins": [
+        "external-helpers",
+        ["transform-runtime", {
+          "polyfill": false,
+          "regenerator": true
+        }],
+      ]
+    }
+  }
+}

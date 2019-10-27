@@ -1,0 +1,60 @@
+{
+  "name": "regionize",
+  "version": "0.1.3",
+  "description": "Flow HTML through multiple regions",
+  "main": "dist/regionize.cjs.js",
+  "module": "dist/regionize.esm.js",
+  "browser": "dist/regionize.umd.js",
+  "unpkg": "dist/regionize.min.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/evnbr/regionize.git"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.11",
+    "babel-core": "^6.26.3",
+    "babel-jest": "^22.4.4",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.12.0",
+    "jest": "^22.4.4",
+    "rollup": "^0.59.2",
+    "rollup-plugin-babel": "^3.0.4",
+    "rollup-plugin-babel-minify": "^5.0.0",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-typescript2": "^0.18.1",
+    "ts-jest": "^23.10.5",
+    "tslib": "^1.9.3",
+    "typescript": "^3.2.2"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "test-travis": "jest && codecov"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/src/**.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**"
+    ]
+  },
+  "keywords": [
+    "regions",
+    "pagination"
+  ],
+  "author": {
+    "name": "Evan Brooks",
+    "url": "https://evanbrooks.info"
+  },
+  "license": "MIT"
+}
