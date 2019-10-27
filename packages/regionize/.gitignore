@@ -1,0 +1,12 @@
+.DS_Store
+
+node_modules/
+dist/
+coverage/
+
+*.map
+*.log
+
+.eslintcache
+stats.json
+.rpt2_cache/
