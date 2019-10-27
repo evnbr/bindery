@@ -1,67 +1,7 @@
 {
-  "name": "bindery",
-  "version": "2.2.9",
-  "description": "Book layout in the browser",
-  "main": "dist/bindery.cjs.js",
-  "module": "dist/bindery.esm.js",
-  "browser": "dist/bindery.umd.js",
-  "unpkg": "dist/bindery.min.js",
-  "files": [
-    "dist"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/evnbr/bindery.git"
-  },
-  "dependencies": {
-    "regionize": "^0.1.3"
-  },
+  "name": "root",
+  "private": true,
   "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.6.0",
-    "@babel/preset-env": "^7.6.0",
-    "@babel/runtime": "^7.6.0",
-    "babel-core": "^6.26.3",
-    "babel-jest": "^22.4.4",
-    "cssnano": "^4.1.10",
-    "eslint": "^6.4.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2",
-    "jest": "^24.9.0",
-    "node-sass": "^4.12.0",
-    "postcss": "^7.0.18",
-    "postcss-class-prefix": "^0.3.0",
-    "rollup": "^1.21.3",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-babel-minify": "^9.0.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-postcss": "^2.0.3",
-    "rollup-plugin-sass": "^1.2.2",
-    "rollup-plugin-sizes": "^0.5.1"
-  },
-  "scripts": {
-    "build": "rollup -c && cp dist/bindery.umd.js docs/bindery_dev_build && cp dist/bindery.umd.js.map docs/bindery_dev_build",
-    "dev": "rollup -c -w",
-    "test": "jest && codecov",
-    "coverage": "jest --coverage",
-    "docs": "cd docs && jekyll serve"
-  },
-  "jest": {
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "**/src/**.{js,jsx}",
-      "!**/node_modules/**",
-      "!**/vendor/**"
-    ]
-  },
-  "keywords": [
-    "book",
-    "pagination",
-    "print"
-  ],
-  "author": {
-    "name": "Evan Brooks",
-    "url": "https://evanbrooks.info"
-  },
-  "license": "MIT"
+    "lerna": "^3.18.3"
+  }
 }
