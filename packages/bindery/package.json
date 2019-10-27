@@ -53,7 +53,10 @@
       "**/src/**.{js,jsx}",
       "!**/node_modules/**",
       "!**/vendor/**"
-    ]
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ]    
   },
   "keywords": [
     "book",
