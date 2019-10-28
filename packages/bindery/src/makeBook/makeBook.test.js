@@ -35,7 +35,6 @@ const mockRegion = function () {
 };
 
 
-jest.unmock('regionize');
 const regionize = require('regionize');
 
 regionize.Region = mockRegion;
