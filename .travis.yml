@@ -5,4 +5,4 @@ install:
   - npm install -g codecov
   - npm install
   - lerna bootstrap
-script: lerna run test
+script: cd packages/bindery && npm run test
