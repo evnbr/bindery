@@ -9,7 +9,7 @@ const createEl = (className, content = []) => {
   if (typeof content === 'string') {
     div.textContent = content;
   } else if (Array.isArray(content)) {
-    content.forEach((child) => div.appendChild(child));
+    div.append(...content);
   }
   return div;
 };

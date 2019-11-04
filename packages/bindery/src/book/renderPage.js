@@ -19,7 +19,6 @@ const renderPage = (pageInfo) => {
   } = pageInfo;
 
   let backgroundEl = createEl('page-background');
-  const footerEl = createEl('footer');
   if (backgroundContent) {
     backgroundEl.append(backgroundContent);
     if (rotation && rotation !== 'none') {
@@ -28,14 +27,13 @@ const renderPage = (pageInfo) => {
       backgroundEl = rotateContainer;
     }
   }
+
   const pg = createEl('page', [
     backgroundEl,
     flowRegion.element,
-    footerEl,
+    createEl('footer', footnoteElements),
   ]);
-  if (footnoteElements) {
-    footerEl.append(...footnoteElements);
-  }
+
   if (runningHeader) {
     pg.append(runningHeader);
   }
