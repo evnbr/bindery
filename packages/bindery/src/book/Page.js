@@ -1,7 +1,11 @@
 import { Region } from 'regionize';
 import { safeMeasure, createEl, classes, c } from '../dom-utils';
 
-
+// TODO: renderPage needs to be called
+// after any change to pageInfo that affects
+// the size of the flow region. These changes
+// need to be flushed before regionize tries
+// to measure the element again.
 const renderPage = (pageInfo) => {
   const {
     flowRegion,
