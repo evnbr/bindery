@@ -1,5 +1,5 @@
 const pageNumbersForTest = (pages, test) =>
-  pages.filter(pg => pg.number && test(pg.element)).map(pg => pg.number);
+  pages.filter(pg => pg.number && test(pg.getLastRenderedElement())).map(pg => pg.number);
 
 const pageNumbersForSelector = (pages, sel) =>
   pageNumbersForTest(pages, el => el.querySelector(sel));

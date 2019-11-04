@@ -5,8 +5,8 @@ const padPages = (pages, makePage) => {
   }
   const spacerPage = makePage();
   const spacerPage2 = makePage();
-  spacerPage.element.style.visibility = 'hidden';
-  spacerPage2.element.style.visibility = 'hidden';
+  spacerPage.isSpacer = true;
+  spacerPage2.isSpacer = true;
   pages.unshift(spacerPage);
   pages.push(spacerPage2);
 

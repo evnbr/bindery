@@ -11,6 +11,7 @@ const renderPage = (pageInfo) => {
     flowRegion,
     isLeft,
     isSpread,
+    isSpacer,
     suppress,
     rotation,
     backgroundContent,
@@ -43,6 +44,7 @@ const renderPage = (pageInfo) => {
   pg.classList.toggle(classes.rightPage, !isLeft);
   if (suppress) pg.classList.add(classes.isOverflowing);
   if (isSpread) pg.classList.add(c('spread'));
+  if (isSpacer) pg.style.visibility = 'hidden';
   return pg;
 };
 
@@ -117,8 +119,13 @@ class Page {
   }
 
   get element() {
+    console.warn(`Rerendering page ${this} wastefully via .element getter`);
     this.updateAndReplaceElement();
     return this.currentElement;
+  }
+
+  getLastRenderedElement() {
+    return this.currentElement || this.render();
   }
 
   updateAndReplaceElement() {

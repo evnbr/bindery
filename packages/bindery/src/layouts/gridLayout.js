@@ -11,12 +11,15 @@ const renderGridLayout = (bookPages, isTwoUp) => {
   const gridLayout = document.createDocumentFragment();
   if (isTwoUp) {
     for (let i = 0; i < pages.length; i += 2) {
-      const wrap = twoPageSpread([pages[i].element, pages[i + 1].element]);
+      const wrap = twoPageSpread([
+        pages[i].getLastRenderedElement(),
+        pages[i + 1].getLastRenderedElement()
+      ]);
       gridLayout.appendChild(wrap);
     }
   } else {
     pages.forEach((pg) => {
-      const wrap = onePageSpread([pg.element]);
+      const wrap = onePageSpread([pg.getLastRenderedElement()]);
       gridLayout.appendChild(wrap);
     });
   }

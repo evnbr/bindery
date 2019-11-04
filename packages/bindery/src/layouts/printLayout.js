@@ -33,15 +33,15 @@ const renderPrintLayout = (bookPages, doubleSided, layout) => {
         spreadMarks.appendChild(meta);
       }
       const sheet = printSheet([
-        createEl('.page-bleed-clip.page-bleed-clip-left', [pages[i].element]),
-        createEl('.page-bleed-clip.page-bleed-clip-right', [pages[i + 1].element]),
+        createEl('.page-bleed-clip.page-bleed-clip-left', [pages[i].getLastRenderedElement()]),
+        createEl('.page-bleed-clip.page-bleed-clip-right', [pages[i + 1].getLastRenderedElement()]),
         spreadMarks]);
       sheet.classList.add(classes.sheetSpread);
       printLayout.appendChild(sheet);
     }
   } else {
     pages.forEach((pg) => {
-      const sheet = printSheet([pg.element, marks()]);
+      const sheet = printSheet([pg.getLastRenderedElement(), marks()]);
       sheet.classList.add(pg.isLeft ? classes.sheetLeft : classes.sheetRight);
       printLayout.appendChild(sheet);
     });

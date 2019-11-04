@@ -26,7 +26,7 @@ const annotatePages = (pages, offset) => {
   pages.forEach((page) => {
     page.heading = {};
     Object.keys(running).forEach((tagName, i) => {
-      const element = page.element.querySelector(tagName);
+      const element = page.flowRegion.element.querySelector(tagName);
       if (element) {
         running[tagName] = element.textContent;
         // clear remainder

@@ -44,13 +44,13 @@ const renderFlipLayout = (bookPages, doubleSided) => {
       setLeaf(newLeaf);
     });
 
-    const rightPage = pages[i].element;
+    const rightPage = pages[i].getLastRenderedElement();
     let leftPage;
     rightPage.classList.add(c('page3d-front'));
     flap.appendChild(rightPage);
     if (doubleSided) {
       flap.classList.add(c('doubleSided'));
-      leftPage = pages[i + 1].element;
+      leftPage = pages[i + 1].getLastRenderedElement();
     } else {
       leftPage = createEl('.page');
     }

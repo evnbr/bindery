@@ -259,21 +259,22 @@ class Viewer {
     const makeSpread = pgs => createEl('.spread-wrapper.spread-centered.spread-size', pgs);
 
     book.pages.forEach((page, i) => {
-      if (this.content.contains(page.element) && page.element.parentNode !== this.content) return;
+      const currentElement = page.getLastRenderedElement();
+      if (this.content.contains(currentElement) && currentElement.parentNode !== this.content) return;
       if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
-        this.lastSpreadInProgress.appendChild(page.element);
+        this.lastSpreadInProgress.append(currentElement);
         return;
       }
-      this.lastSpreadInProgress = makeSpread([page.element]);
+      this.lastSpreadInProgress = makeSpread([currentElement]);
       if (i === 0 && sideBySide) {
         const spacer = new Page();
-        spacer.element.style.visibility = 'hidden';
+        spacer.isSpacer = true;
         this.lastSpreadInProgress.insertBefore(
-          spacer.element,
+          spacer.render(),
           this.lastSpreadInProgress.firstElementChild
         );
       }
-      this.content.appendChild(this.lastSpreadInProgress);
+      this.content.append(this.lastSpreadInProgress);
     });
 
     if (needsZoomUpdate) this.scaleToFit();
