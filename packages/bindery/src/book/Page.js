@@ -13,7 +13,11 @@ class Page {
   }
 
   setState(updates) {
-    const newState = { ...this.pageState, ...updates };
+    const newState = {
+      ...this.pageState,
+      ...updates };
+    newState.isLeft = newState.side === 'left';
+    newState.isRight = newState.side === 'right';
     this.pageState = newState;
   }
 
@@ -22,18 +26,12 @@ class Page {
     return safeMeasure(testPage.render(), () => testPage.flowRegion.isReasonableSize);
   }
 
-  get isLeft() {
-    return this.side === 'left';
+  get prefersRight() {
+    return this.pageState.preferredSide === 'right';
   }
 
-  get isRight() {
-    return this.side === 'right';
-  }
-
-  setPreference(dir) {
-    const preferLeft = dir === 'left';
-    this.alwaysLeft = preferLeft;
-    this.alwaysRight = !preferLeft;
+  get prefersLeft() {
+    return this.pageState.preferredSide === 'left';
   }
 
   get suppressErrors() {
@@ -50,13 +48,13 @@ class Page {
 
   validate() {
     if (!this.hasOverflowed()) return;
-    const suspect = this.currentElement;
-    if (suspect) {
-      console.warn('Bindery: Content overflows, probably due to a style set on:', suspect);
-      suspect.parentNode.removeChild(suspect);
-    } else {
-      console.warn('Bindery: Content overflows.');
-    }
+    // const suspect = this.currentElement;
+    // if (suspect) {
+    //   console.warn('Bindery: Content overflows, probably due to a style set on:', suspect);
+    //   suspect.parentNode.removeChild(suspect);
+    // } else {
+    //   console.warn('Bindery: Content overflows.');
+    // }
   }
 
   validateEnd(allowOverflow) {
@@ -68,11 +66,14 @@ class Page {
   }
 
   hasOverflowed() {
-    return safeMeasure(this.element, () => this.flowRegion.hasOverflowed());
+    return safeMeasure(
+      this.getElementWithAllPendingUpdates(),
+      () => this.flowRegion.hasOverflowed()
+    );
   }
 
   render() {
-    const info = this;
+    const info = { ...this, ...this.pageState };
     return renderPage(info);
   }
 

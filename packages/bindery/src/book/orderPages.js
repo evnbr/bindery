@@ -16,7 +16,7 @@ const orderPages = (pages, makeNewPage) => {
     const page = orderedPages[i];
     const isLeft = i % 2 !== 0;
 
-    if ((isLeft && page.alwaysRight) || (!isLeft && page.alwaysLeft)) {
+    if ((isLeft && page.prefersRight) || (!isLeft && page.prefersLeft)) {
       if (page.isOutOfFlow) {
         // If the page is 'out of flow', we'd prefer not to add a blank page.
         // Instead it floats backwards in the book, pulling the next

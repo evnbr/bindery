@@ -19,28 +19,29 @@ class Footnote extends Replace {
   }
 
   afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
-    if (!book.currentPage.footnoteElements) {
-      book.currentPage.footnoteElements = [];
-    }
+    const prevFootnotes = book.currentPage.pageState.footnoteElements || [];
 
-    const number = book.currentPage.footnoteElements.length + 1;
+    const number = prevFootnotes.length + 1;
 
-    const footnoteEl = createEl('.footnote');
+    const newFootnote = createEl('.footnote');
     const contents = this.render(element, number);
-    if (contents instanceof HTMLElement) footnoteEl.append(contents);
-    else footnoteEl.innerHTML = contents;
+    if (contents instanceof HTMLElement) newFootnote.append(contents);
+    else newFootnote.innerHTML = contents;
 
-    // book.currentPage.footer.appendChild(footnote);
-    book.currentPage.footnoteElements.push(footnoteEl);
+    book.currentPage.setState({
+      footnoteElements: [...prevFootnotes, newFootnote],
+    });
 
     return super.afterAdd(element, book, continueOnNewPage, makeNewPage, (overflowEl) => {
-      book.currentPage.footnoteElements = book.currentPage.footnoteElements.filter((el) => el !== footnoteEl);
+      book.currentPage.setState({
+        footnoteElements: prevFootnotes,
+      });
       return overflowCallback(overflowEl);
     });
   }
 
   createReplacement(book, element) {
-    const number = book.currentPage.footnoteElements.length;
+    const number = book.currentPage.pageState.footnoteElements.length;
     return this.replace(element, number);
   }
 

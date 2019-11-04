@@ -14,25 +14,32 @@ class PageBreak extends Rule {
       position: T.enum('before', 'after', 'both', 'avoid'),
     });
   }
+
   get avoidSplit() {
     return this.position === 'avoid';
   }
+
   beforeAdd(elmt, book, continueOnNewPage) {
     if (this.position === 'before' || this.position === 'both') {
       if (!book.currentPage.isEmpty) {
         continueOnNewPage();
       }
       if (this.continue !== 'next') {
-        book.currentPage.setPreference(this.continue);
+        book.currentPage.setState({
+          preferredSide: this.continue,
+        });
       }
     }
     return elmt;
   }
+
   afterAdd(elmt, book, continueOnNewPage) {
     if (this.position === 'after' || this.position === 'both') {
       const newPage = continueOnNewPage(true);
       if (this.continue !== 'next') {
-        newPage.setPreference(this.continue);
+        newPage.setState({
+          preferredSide: this.continue,
+        });
       }
     }
     return elmt;

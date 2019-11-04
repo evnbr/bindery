@@ -18,7 +18,7 @@ class RunningHeader extends Rule {
 
   eachPage(page) {
     const el = createEl('.running-header');
-    el.innerHTML = this.render(page);
+    el.innerHTML = this.render(page.pageState);
     page.setState({
       runningHeader: el,
     });
