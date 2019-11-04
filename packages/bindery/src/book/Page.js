@@ -11,9 +11,11 @@ const renderPage = (pageInfo) => {
     flowRegion,
     isLeft,
     isSpread,
+    suppress,
     rotation,
     backgroundContent,
     footnoteElements,
+    runningHeader,
   } = pageInfo;
 
   let backgroundEl = createEl('page-background');
@@ -26,16 +28,20 @@ const renderPage = (pageInfo) => {
       backgroundEl = rotateContainer;
     }
   }
-  if (footnoteElements) {
-    footerEl.append(...footnoteElements);
-  }
   const pg = createEl('page', [
     backgroundEl,
     flowRegion.element,
     footerEl,
   ]);
+  if (footnoteElements) {
+    footerEl.append(...footnoteElements);
+  }
+  if (runningHeader) {
+    pg.append(runningHeader);
+  }
   pg.classList.toggle(classes.leftPage, isLeft);
   pg.classList.toggle(classes.rightPage, !isLeft);
+  if (suppress) pg.classList.add(classes.isOverflowing);
   if (isSpread) pg.classList.add(c('spread'));
   return pg;
 };
@@ -76,7 +82,6 @@ class Page {
 
   set suppressErrors(newVal) {
     this.suppress = newVal;
-    this.element.classList.toggle(classes.isOverflowing, newVal);
   }
 
   get isEmpty() {
