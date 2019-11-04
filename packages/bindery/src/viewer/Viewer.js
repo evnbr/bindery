@@ -268,7 +268,7 @@ class Viewer {
       this.lastSpreadInProgress = makeSpread([currentElement]);
       if (i === 0 && sideBySide) {
         const spacer = new Page();
-        spacer.isSpacer = true;
+        spacer.setState({ isSpacer: true });
         this.lastSpreadInProgress.insertBefore(
           spacer.render(),
           this.lastSpreadInProgress.firstElementChild

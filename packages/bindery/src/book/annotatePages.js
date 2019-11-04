@@ -6,7 +6,9 @@ const annotatePages = (pages, offset) => {
   const facingPages = true;
   if (facingPages) {
     pages.forEach((page, i) => {
-      page.number = offset + i + 1;
+      page.setState({
+        number: offset + i + 1,
+      });
       page.setLeftRight((i % 2 === 0) ? 'right' : 'left');
     });
   } else {

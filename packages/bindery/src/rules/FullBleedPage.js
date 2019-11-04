@@ -27,9 +27,11 @@ class FullBleedPage extends OutOfFlow {
       newPage = makeNewPage();
       book.addPage(newPage);
     }
-    newPage.rotation = this.rotate;
-    newPage.backgroundContent = elmt;
-    newPage.hasOutOfFlowContent = true;
+    newPage.setState({
+      rotation: this.rotate,
+      backgroundContent: elmt,
+      hasOutOfFlowContent: true,
+    });
   }
 }
 

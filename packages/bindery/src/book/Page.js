@@ -6,6 +6,14 @@ class Page {
   constructor() {
     this.flowRegion = new Region(createEl('flow-box'));
     this.needsLayoutUpdate = false;
+    this.currentElement = null;
+    this.pageState = {};
+    Object.seal(this);
+  }
+
+  setState(updates) {
+    const newState = { ...this.pageState, ...updates };
+    this.pageState = newState;
   }
 
   static isSizeValid() {
