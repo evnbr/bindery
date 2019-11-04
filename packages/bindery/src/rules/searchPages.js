@@ -1,6 +1,6 @@
 const pageNumbersForTest = (pages, test) => pages
-  .filter((pg) => pg.number && test(pg.getElementWithAllPendingUpdates()))
-  .map((pg) => pg.number);
+  .filter((pg) => pg.pageState.number && test(pg.getElementWithAllPendingUpdates()))
+  .map((pg) => pg.pageState.number);
 
 const pageNumbersForSelector = (pages, sel) =>
   pageNumbersForTest(pages, (el) => el.querySelector(sel));
