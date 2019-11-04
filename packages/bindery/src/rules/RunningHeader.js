@@ -15,6 +15,7 @@ class RunningHeader extends Rule {
       render: T.func,
     });
   }
+
   eachPage(page) {
     if (!page.runningHeader) {
       const elmt = createEl('.running-header');
@@ -22,6 +23,7 @@ class RunningHeader extends Rule {
     }
     page.runningHeader.innerHTML = this.render(page);
   }
+
   render(page) {
     return page.number;
   }

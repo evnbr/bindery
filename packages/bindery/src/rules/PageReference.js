@@ -42,7 +42,7 @@ class PageReference extends Replace {
 
   createReference(book, test, elmt) {
     const ref = { test, template: elmt, element: elmt, value: null };
-    const render = newValue => this.render(ref, newValue);
+    const render = (newValue) => this.render(ref, newValue);
     ref.render = render;
     this.references.push(ref);
     const currentResults = pageNumbersForTest(book.pages, test);
@@ -71,7 +71,7 @@ class PageReference extends Replace {
     const href = element.getAttribute('href');
     if (!href) return null;
     const selector = safeIDSel(href);
-    return el => el.querySelector(selector);
+    return (el) => el.querySelector(selector);
   }
 
   updatePageReferences(pages) {
