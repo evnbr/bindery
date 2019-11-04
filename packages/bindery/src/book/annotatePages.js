@@ -32,7 +32,7 @@ const annotatePages = (pages, offset) => {
   pages.forEach((page) => {
     const currentHeadings = {};
     Object.keys(running).forEach((tagName, i) => {
-      const element = page.flowRegion.element.querySelector(tagName);
+      const element = page.getElementWithAllPendingUpdates().querySelector(tagName);
       if (element) {
         running[tagName] = element.textContent;
         // clear remainder
