@@ -1,5 +1,6 @@
 import { Region } from 'regionize';
 import { safeMeasure, createEl } from '../dom-utils';
+import renderPage from './renderPage';
 
 class Page {
   constructor() {
@@ -79,6 +80,11 @@ class Page {
 
   getLastRenderedElement() {
     return this.currentElement || this.render();
+  }
+
+  getElementWithAllPendingUpdates() {
+    this.updateAndReplaceElement();
+    return this.currentElement;
   }
 
   updateAndReplaceElement() {

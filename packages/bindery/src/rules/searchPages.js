@@ -1,8 +1,9 @@
-const pageNumbersForTest = (pages, test) =>
-  pages.filter(pg => pg.number && test(pg.getLastRenderedElement())).map(pg => pg.number);
+const pageNumbersForTest = (pages, test) => pages
+  .filter((pg) => pg.number && test(pg.getElementWithAllPendingUpdates()))
+  .map((pg) => pg.number);
 
 const pageNumbersForSelector = (pages, sel) =>
-  pageNumbersForTest(pages, el => el.querySelector(sel));
+  pageNumbersForTest(pages, (el) => el.querySelector(sel));
 
 const formatAsRanges = (pageNumbers) => {
   let str = '';
