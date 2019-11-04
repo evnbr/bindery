@@ -17,29 +17,38 @@ class Footnote extends Replace {
       render: T.func,
     });
   }
+
   afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
-    const number = book.currentPage.footer.children.length + 1;
+    if (!book.currentPage.footnoteElements) {
+      book.currentPage.footnoteElements = [];
+    }
 
-    const footnote = createEl('.footnote');
+    const number = book.currentPage.footnoteElements.length + 1;
+
+    const footnoteEl = createEl('.footnote');
     const contents = this.render(element, number);
-    if (contents instanceof HTMLElement) footnote.appendChild(contents);
-    else footnote.innerHTML = contents;
+    if (contents instanceof HTMLElement) footnoteEl.append(contents);
+    else footnoteEl.innerHTML = contents;
 
-    book.currentPage.footer.appendChild(footnote);
+    // book.currentPage.footer.appendChild(footnote);
+    book.currentPage.footnoteElements.push(footnoteEl);
 
     return super.afterAdd(element, book, continueOnNewPage, makeNewPage, (overflowEl) => {
-      book.currentPage.footer.removeChild(footnote);
+      book.currentPage.footnoteElements = book.currentPage.footnoteElements.filter((el) => el !== footnoteEl);
       return overflowCallback(overflowEl);
     });
   }
+
   createReplacement(book, element) {
-    const number = book.currentPage.footer.children.length;
+    const number = book.currentPage.footnoteElements.length;
     return this.replace(element, number);
   }
+
   replace(element, number) {
     element.insertAdjacentHTML('beforeEnd', `<sup class="bindery-sup">${number}</sup>`);
     return element;
   }
+
   render(element, number) {
     return `<sup>${number}</sup> Default footnote (<a href='/bindery/docs/#footnote'>Learn how to change it</a>)`;
   }

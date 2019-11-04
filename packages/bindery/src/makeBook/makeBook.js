@@ -39,7 +39,7 @@ const makeBook = async (content, rules, updateProgress) => {
 
   const makeNextRegion = () => {
     const newPage = addPageToBook();
-    return newPage.flow;
+    return newPage.flowRegion;
   };
 
   const applySplit = ruleSet.applySplitRules;

@@ -1,6 +1,5 @@
 import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
-import { c, createEl } from '../dom-utils';
 
 // Options:
 // selector: String
@@ -17,6 +16,7 @@ class FullBleedSpread extends OutOfFlow {
       rotate: T.enum('none', 'clockwise', 'counterclockwise'),
     });
   }
+
   createOutOfFlowPages(elmt, book, makeNewPage) {
     elmt.parentNode.removeChild(elmt);
 
@@ -33,21 +33,19 @@ class FullBleedSpread extends OutOfFlow {
 
     if (this.rotate !== 'none') {
       [leftPage, rightPage].forEach((page) => {
-        const rotateContainer = createEl(`.rotate-container.spread-size-rotated.rotate-spread-${this.rotate}`);
-        rotateContainer.appendChild(page.background);
-        page.element.appendChild(rotateContainer);
+        page.rotation = this.rotate;
       });
     }
 
-    leftPage.background.appendChild(elmt);
-    leftPage.element.classList.add(c('spread'));
+    leftPage.backgroundContent = elmt;
+    leftPage.isSpread = true;
     leftPage.setPreference('left');
     leftPage.isOutOfFlow = this.continue === 'same';
     leftPage.avoidReorder = true;
     leftPage.hasOutOfFlowContent = true;
 
-    rightPage.background.appendChild(elmt.cloneNode(true));
-    rightPage.element.classList.add(c('spread'));
+    rightPage.backgroundContent = elmt.cloneNode(true);
+    rightPage.isSpread = true;
     rightPage.setPreference('right');
     rightPage.isOutOfFlow = this.continue === 'same';
     rightPage.avoidReorder = true;

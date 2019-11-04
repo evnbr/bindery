@@ -1,6 +1,5 @@
 import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
-import { createEl } from '../dom-utils';
 
 // Options:
 // selector: String
@@ -28,12 +27,8 @@ class FullBleedPage extends OutOfFlow {
       newPage = makeNewPage();
       book.addPage(newPage);
     }
-    if (this.rotate !== 'none') {
-      const rotateContainer = createEl(`.rotate-container.page-size-rotated.rotate-${this.rotate}`);
-      rotateContainer.appendChild(newPage.background);
-      newPage.element.appendChild(rotateContainer);
-    }
-    newPage.background.appendChild(elmt);
+    newPage.rotation = this.rotate;
+    newPage.backgroundContent = elmt;
     newPage.hasOutOfFlowContent = true;
   }
 }

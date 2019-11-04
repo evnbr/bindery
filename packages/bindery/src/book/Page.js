@@ -1,24 +1,57 @@
 import { Region } from 'regionize';
-import { safeMeasure, createEl, classes } from '../dom-utils';
+import { safeMeasure, createEl, classes, c } from '../dom-utils';
+
+
+const renderPage = (pageInfo) => {
+  const {
+    flowRegion,
+    isLeft,
+    isSpread,
+    rotation,
+    backgroundContent,
+    footnoteElements,
+  } = pageInfo;
+
+  let backgroundEl = createEl('page-background');
+  const footerEl = createEl('footer');
+  if (backgroundContent) {
+    backgroundEl.append(backgroundContent);
+    if (rotation && rotation !== 'none') {
+      const rotateContainer = createEl(`.rotate-container.page-size-rotated.rotate-${rotation}`);
+      rotateContainer.append(backgroundEl);
+      backgroundEl = rotateContainer;
+    }
+  }
+  if (footnoteElements) {
+    footerEl.append(...footnoteElements);
+  }
+  const pg = createEl('page', [
+    backgroundEl,
+    flowRegion.element,
+    footerEl,
+  ]);
+  pg.classList.toggle(classes.leftPage, isLeft);
+  pg.classList.toggle(classes.rightPage, !isLeft);
+  if (isSpread) pg.classList.add(c('spread'));
+  return pg;
+};
 
 class Page {
   constructor() {
-    this.flow = new Region(createEl('flow-box'));
-    this.footer = createEl('footer');
-    this.background = createEl('page-background');
-    this.element = createEl('page', [this.background, this.flow.element, this.footer]);
+    this.flowRegion = new Region(createEl('flow-box'));
+    this.needsLayoutUpdate = false;
   }
 
   static isSizeValid() {
     const testPage = new Page();
-    return safeMeasure(testPage.element, () => testPage.flow.isReasonableSize);
+    return safeMeasure(testPage.render(), () => testPage.flowRegion.isReasonableSize);
   }
 
   setLeftRight(dir) {
     this.side = dir;
-    this.element.classList.toggle(classes.leftPage, this.isLeft);
-    this.element.classList.toggle(classes.rightPage, !this.isLeft);
+    this.needsLayoutUpdate = true;
   }
+
   get isLeft() {
     return this.side === 'left';
   }
@@ -43,7 +76,7 @@ class Page {
   }
 
   get isEmpty() {
-    return !this.hasOutOfFlowContent && this.flow.isEmpty;
+    return !this.hasOutOfFlowContent && this.flowRegion.isEmpty;
   }
 
   validate() {
@@ -60,13 +93,33 @@ class Page {
   validateEnd(allowOverflow) {
     if (!this.hasOverflowed()) return;
     console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
-    if (!this.suppressErrors && !this.flow.suppressErrors && !allowOverflow) {
+    if (!this.suppressErrors && !this.flowRegion.suppressErrors && !allowOverflow) {
       throw Error('Bindery: Moved to new page when last one is still overflowing');
     }
   }
 
   hasOverflowed() {
-    return safeMeasure(this.element, () => this.flow.hasOverflowed());
+    return safeMeasure(this.element, () => this.flowRegion.hasOverflowed());
+  }
+
+  render() {
+    const info = this;
+    return renderPage(info);
+  }
+
+  get element() {
+    this.updateAndReplaceElement();
+    return this.currentElement;
+  }
+
+  updateAndReplaceElement() {
+    const oldPage = this.currentElement;
+    const newPage = this.render();
+
+    this.currentElement = newPage;
+    if (oldPage && oldPage.parentNode) {
+      oldPage.parentNode.replaceChild(newPage, oldPage);
+    }
   }
 }
 
