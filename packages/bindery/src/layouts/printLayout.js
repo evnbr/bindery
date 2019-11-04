@@ -15,8 +15,8 @@ const renderPrintLayout = (bookPages, doubleSided, layout) => {
   const isBooklet = layout === Layout.BOOKLET;
 
   let pages = bookPages;
-  if (isSpreads) pages = padPages(pages, () => new Page());
-  else if (isBooklet) pages = orderPagesBooklet(pages, () => new Page());
+  if (isSpreads) pages = padPages(pages, (state) => new Page(state));
+  else if (isBooklet) pages = orderPagesBooklet(pages, (state) => new Page(state));
 
   const printLayout = document.createDocumentFragment();
 

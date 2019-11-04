@@ -3,12 +3,13 @@ import { safeMeasure, createEl } from '../dom-utils';
 import renderPage from './renderPage';
 
 class Page {
-  constructor() {
+  constructor(initialState) {
     this.flowRegion = new Region(createEl('flow-box'));
     this.needsLayoutUpdate = false;
     this.currentElement = null;
     this.pageState = {};
     Object.seal(this);
+    this.setState(initialState);
   }
 
   setState(updates) {
@@ -19,11 +20,6 @@ class Page {
   static isSizeValid() {
     const testPage = new Page();
     return safeMeasure(testPage.render(), () => testPage.flowRegion.isReasonableSize);
-  }
-
-  setLeftRight(dir) {
-    this.side = dir;
-    this.needsLayoutUpdate = true;
   }
 
   get isLeft() {

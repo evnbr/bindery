@@ -3,7 +3,7 @@ import { c, createEl } from '../dom-utils';
 import padPages from './padPages';
 
 const renderFlipLayout = (bookPages, doubleSided) => {
-  const pages = padPages(bookPages, () => new Page());
+  const pages = padPages(bookPages, (state) => new Page(state));
 
   const flipLayout = document.createDocumentFragment();
   const sizer = createEl('.spread-size.flip-sizer');

@@ -5,6 +5,7 @@ class OutOfFlow extends Rule {
     super(options);
     this.name = 'Out of Flow';
   }
+
   beforeAdd(elmt) {
     // Avoid breaking inside this element. Once it's completely added,
     // it will moved onto the background layer.
@@ -12,6 +13,7 @@ class OutOfFlow extends Rule {
     elmt.setAttribute('data-ignore-overflow', true);
     return elmt;
   }
+
   afterAdd(elmt, book, continueOnNewPage, makeNewPage) {
     this.createOutOfFlowPages(elmt, book, makeNewPage);
 
@@ -19,7 +21,9 @@ class OutOfFlow extends Rule {
     if (this.continue !== 'same' || book.currentPage.hasOutOfFlowContent) {
       continueOnNewPage(true);
       if (this.continue === 'left' || this.continue === 'right') {
-        book.currentPage.setPreference(this.continue);
+        book.currentPage.setState({
+          preferredSide: this.continue,
+        });
       }
     }
 

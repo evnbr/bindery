@@ -6,7 +6,7 @@ const twoPageSpread = children => createEl('.spread-wrapper.spread-centered.spre
 const onePageSpread = children => createEl('.spread-wrapper.spread-centered.page-size', children);
 
 const renderGridLayout = (bookPages, isTwoUp) => {
-  const pages = isTwoUp ? padPages(bookPages, () => new Page()) : bookPages;
+  const pages = isTwoUp ? padPages(bookPages, (state) => new Page(state)) : bookPages;
 
   const gridLayout = document.createDocumentFragment();
   if (isTwoUp) {

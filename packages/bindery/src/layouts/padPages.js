@@ -3,10 +3,8 @@ const padPages = (pages, makePage) => {
     const pg = makePage();
     pages.push(pg);
   }
-  const spacerPage = makePage();
-  const spacerPage2 = makePage();
-  spacerPage.setState({ isSpacer: true });
-  spacerPage2.setState({ isSpacer: true });
+  const spacerPage = makePage({ isSpacer: true });
+  const spacerPage2 = makePage({ isSpacer: true });
   pages.unshift(spacerPage);
   pages.push(spacerPage2);
 

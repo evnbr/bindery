@@ -8,11 +8,15 @@ const annotatePages = (pages, offset) => {
     pages.forEach((page, i) => {
       page.setState({
         number: offset + i + 1,
+        side: (i % 2 === 0) ? 'right' : 'left',
       });
-      page.setLeftRight((i % 2 === 0) ? 'right' : 'left');
     });
   } else {
-    pages.forEach((page) => { page.setLeftRight('right'); });
+    pages.forEach((page) => {
+      page.setState({
+        side: 'right',
+      });
+    });
   }
 
   // ———
@@ -26,7 +30,7 @@ const annotatePages = (pages, offset) => {
   const running = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
 
   pages.forEach((page) => {
-    page.heading = {};
+    const currentHeadings = {};
     Object.keys(running).forEach((tagName, i) => {
       const element = page.flowRegion.element.querySelector(tagName);
       if (element) {
@@ -37,8 +41,11 @@ const annotatePages = (pages, offset) => {
         });
       }
       if (running[tagName] !== '') {
-        page.heading[tagName] = running[tagName];
+        currentHeadings[tagName] = running[tagName];
       }
+    });
+    page.setState({
+      heading: currentHeadings,
     });
   });
 };

@@ -17,11 +17,11 @@ class RunningHeader extends Rule {
   }
 
   eachPage(page) {
-    if (!page.runningHeader) {
-      const elmt = createEl('.running-header');
-      page.runningHeader = elmt;
-    }
-    page.runningHeader.innerHTML = this.render(page);
+    const el = createEl('.running-header');
+    el.innerHTML = this.render(page);
+    page.setState({
+      runningHeader: el,
+    });
   }
 
   render(page) {
