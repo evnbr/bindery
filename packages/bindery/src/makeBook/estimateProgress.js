@@ -1,4 +1,4 @@
-const sec = ms => (ms / 1000).toFixed(2);
+const sec = (ms) => (ms / 1000).toFixed(2);
 
 const estimateFor = (content) => {
   const start = window.performance.now();
@@ -14,7 +14,10 @@ const estimateFor = (content) => {
       const end = window.performance.now();
       const total = end - start;
       const layout = total - timeWaiting;
-      console.log(`📖 Layout ready in ${sec(layout)}s (plus ${sec(timeWaiting)}s waiting for images)`);
+
+      const pt1 = `📖 Layout ready in ${sec(layout)}s`;
+      const pt2 = timeWaiting > 0 ? `(plus ${sec(timeWaiting)}s waiting for images)` : '';
+      console.log(`${pt1} ${pt2}`);
     },
   };
 };
