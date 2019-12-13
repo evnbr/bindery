@@ -1,12 +1,12 @@
-import { Page } from '../book';
-import Controls from '../controls';
-import { Mode, Paper, Layout, Marks } from '../constants';
-import { classes, createEl } from '../dom-utils';
-import { throttleFrame, throttleTime } from '../utils';
-import { gridLayout, printLayout, flipLayout } from '../layouts';
+import { Page } from "../book";
+import Controls from "../controls";
+import { Mode, Paper, Layout, Marks } from "../constants";
+import { classes, createEl } from "../dom-utils";
+import { throttleFrame, throttleTime } from "../utils";
+import { gridLayout, printLayout, flipLayout } from "../layouts";
 
-import errorView from './error';
-import listenForPrint from './listenForPrint';
+import errorView from "./error";
+import listenForPrint from "./listenForPrint";
 
 const throttleProgressBar = throttleFrame();
 const throttleRender = throttleTime(100);
@@ -14,14 +14,14 @@ const throttleResize = throttleTime(50);
 const document = window.document;
 
 class Viewer {
-  constructor({ pageSetup, mode, layout, marks }) {
+  constructor({ pageSetup, mode, layout, marks, controlOptions }) {
     this.book = null;
     this.pageSetup = pageSetup;
 
-    this.progressBar = createEl('progress-bar');
-    this.content = createEl('zoom-content');
-    this.scaler = createEl('zoom-scaler', [this.content]);
-    this.element = createEl('root', [this.progressBar, this.scaler]);
+    this.progressBar = createEl("progress-bar");
+    this.content = createEl("zoom-content");
+    this.scaler = createEl("zoom-scaler", [this.content]);
+    this.element = createEl("root", [this.progressBar, this.scaler]);
 
     this.doubleSided = true;
     this.layout = layout;
@@ -36,24 +36,27 @@ class Viewer {
       this.render();
     });
 
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       throttleResize(() => this.scaleToFit());
     });
 
     this.controls = new Controls(
       { Mode, Paper, Layout, Marks }, // Available options
-      { // Initial props
+      {
+        // Initial props
         paper: this.pageSetup.paper,
         layout: this.layout,
         mode: this.mode,
         marks,
+        options: controlOptions || {}
       },
-      { // Actions
+      {
+        // Actions
         setMode: this.setMode.bind(this),
         setPaper: this.setSheetSize.bind(this),
         setLayout: this.setLayout.bind(this),
         setMarks: this.setMarks.bind(this),
-        getPageSize: () => this.pageSetup.displaySize,
+        getPageSize: () => this.pageSetup.displaySize
       }
     );
     this.element.appendChild(this.controls.element);
@@ -125,7 +128,9 @@ class Viewer {
     this.render();
 
     this.scaleToFit();
-    setTimeout(() => { this.scaleToFit(); }, 300);
+    setTimeout(() => {
+      this.scaleToFit();
+    }, 300);
   }
 
   setLayout(str) {
@@ -143,8 +148,8 @@ class Viewer {
 
   setMarks(str) {
     const newVal = parseInt(str, 10);
-    this.isShowingCropMarks = (newVal === Marks.CROP || newVal === Marks.BOTH);
-    this.isShowingBleedMarks = (newVal === Marks.BLEED || newVal === Marks.BOTH);
+    this.isShowingCropMarks = newVal === Marks.CROP || newVal === Marks.BOTH;
+    this.isShowingBleedMarks = newVal === Marks.BLEED || newVal === Marks.BOTH;
   }
 
   displayError(title, text) {
@@ -155,7 +160,7 @@ class Viewer {
       this.scrollToBottom();
       if (this.book) {
         const flow = this.book.currentPage.flow;
-        if (flow) flow.currentElement.style.outline = '3px solid red';
+        if (flow) flow.currentElement.style.outline = "3px solid red";
       }
     }
   }
@@ -170,7 +175,7 @@ class Viewer {
   clear() {
     this.book = null;
     this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
-    this.content.innerHTML = '';
+    this.content.innerHTML = "";
   }
 
   show() {
@@ -202,8 +207,12 @@ class Viewer {
 
     window.requestAnimationFrame(() => {
       const pages = this.book.pages.slice();
-      const fragment = this.viewFor(this.mode)(pages, this.doubleSided, this.layout);
-      this.content.innerHTML = '';
+      const fragment = this.viewFor(this.mode)(
+        pages,
+        this.doubleSided,
+        this.layout
+      );
+      this.content.innerHTML = "";
       this.content.appendChild(fragment);
       if (!this.hasRendered) this.hasRendered = true;
       else this.scrollPercent = prevScroll;
@@ -225,7 +234,7 @@ class Viewer {
         this.progressBar.style.transform = `scaleX(${p})`;
       });
     } else {
-      this.progressBar.style.transform = '';
+      this.progressBar.style.transform = "";
     }
   }
 
@@ -252,22 +261,30 @@ class Viewer {
     }
 
     const sideBySide =
-      this.mode === Mode.PREVIEW
-      || (this.mode === Mode.PRINT && this.layout !== Layout.PAGES);
+      this.mode === Mode.PREVIEW ||
+      (this.mode === Mode.PRINT && this.layout !== Layout.PAGES);
     const limit = sideBySide ? 2 : 1;
 
-    const makeSpread = pgs => createEl('.spread-wrapper.spread-centered.spread-size', pgs);
+    const makeSpread = pgs =>
+      createEl(".spread-wrapper.spread-centered.spread-size", pgs);
 
     book.pages.forEach((page, i) => {
-      if (this.content.contains(page.element) && page.element.parentNode !== this.content) return;
-      if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
+      if (
+        this.content.contains(page.element) &&
+        page.element.parentNode !== this.content
+      )
+        return;
+      if (
+        this.lastSpreadInProgress &&
+        this.lastSpreadInProgress.children.length < limit
+      ) {
         this.lastSpreadInProgress.appendChild(page.element);
         return;
       }
       this.lastSpreadInProgress = makeSpread([page.element]);
       if (i === 0 && sideBySide) {
         const spacer = new Page();
-        spacer.element.style.visibility = 'hidden';
+        spacer.element.style.visibility = "hidden";
         this.lastSpreadInProgress.insertBefore(
           spacer.element,
           this.lastSpreadInProgress.firstElementChild
