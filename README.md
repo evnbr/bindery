@@ -7,7 +7,7 @@
 [![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/bindery.svg)](https://www.npmjs.com/package/bindery)
 
 [Intro](https://evanbrooks.info/bindery/) ·
-[Guide](https://evanbrooks.info/bindery/guide) ·
+[Learn](https://evanbrooks.info/bindery/learn) ·
 [Docs](https://evanbrooks.info/bindery/docs) ·
 [Examples](https://evanbrooks.info/bindery/examples) ·
 [About](https://evanbrooks.info/bindery/about)
@@ -55,7 +55,7 @@ makeBook({
 });
 ```
 
-For more, see the [Guide](https://evanbrooks.info/bindery/guide) and [Docs](https://evanbrooks.info/bindery/docs).
+For more, see [Learn](https://evanbrooks.info/bindery/learn) and the [Docs](https://evanbrooks.info/bindery/docs).
 
 ### Developing
 

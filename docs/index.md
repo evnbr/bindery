@@ -13,7 +13,7 @@ If you're a web designer, you can think about books as an extension of responsiv
 
 <div class="home-btns">
   <a class="btn" href="/bindery/book">Try a Demo</a>
-  <a class="btn" href="/bindery/guide">
+  <a class="btn" href="/bindery/learn">
     Learn how →
   </a>
   <a class="btn" href="https://github.com/evnbr/bindery">Github ↗</a>
