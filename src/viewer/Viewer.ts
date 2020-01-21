@@ -1,4 +1,4 @@
-import { Page } from '../book';
+import { Page, Book } from '../book';
 import Controls from '../controls';
 import { Mode, Paper, Layout, Marks } from '../constants';
 import { classes, createEl } from '../dom-utils';
@@ -13,7 +13,26 @@ const throttleRender = throttleTime(100);
 const throttleResize = throttleTime(50);
 const document = window.document;
 
+const makeSpread = (pgs: HTMLElement[]) => {
+  return createEl('.spread-wrapper.spread-centered.spread-size', pgs);
+}
+
 class Viewer {
+  book: any;
+  pageSetup: any;
+  progressBar: HTMLElement;
+  content: HTMLElement;
+  scaler: HTMLElement;
+  element: HTMLElement;
+  doubleSided: boolean;
+  layout: any;
+  mode: any;
+  currentLeaf: number;
+  controls: Controls;
+  error: any;
+  lastSpreadInProgress: any;
+  hasRendered: any;
+
   constructor({ pageSetup, mode, layout, marks }) {
     this.book = null;
     this.pageSetup = pageSetup;
@@ -186,7 +205,7 @@ class Viewer {
     this.isViewing = false;
   }
 
-  render(newBook) {
+  render(newBook?: Book) {
     if (newBook) this.book = newBook;
     if (!this.book) return;
     this.show();
@@ -219,21 +238,22 @@ class Viewer {
     throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
   }
 
-  set progress(p) {
-    if (p < 1) {
+  set progress(newVal: number) {
+    if (newVal < 1) {
       throttleProgressBar(() => {
-        this.progressBar.style.transform = `scaleX(${p})`;
+        this.progressBar.style.transform = `scaleX(${newVal})`;
       });
     } else {
       this.progressBar.style.transform = '';
     }
   }
 
-  updateProgress(book, estimatedProgress) {
+  updateProgress(book: Book, estimatedProgress: number) {
     this.book = book;
     this.progress = estimatedProgress;
 
     if (!document || !document.scrollingElement) return;
+    
     // don't rerender if preview is out of view
     const scrollTop = document.scrollingElement.scrollTop;
     const scrollH = document.scrollingElement.scrollHeight;
@@ -244,21 +264,15 @@ class Viewer {
     throttleRender(() => this.renderProgress(book, estimatedProgress));
   }
 
-  renderProgress(book, estimatedProgress) {
+  renderProgress(book: Book, estimatedProgress: number) {
     const needsZoomUpdate = !this.content.firstElementChild;
-
-    if (this.controls) {
-      this.controls.updateProgress(book.pageCount, estimatedProgress);
-    }
 
     const sideBySide =
       this.mode === Mode.PREVIEW
       || (this.mode === Mode.PRINT && this.layout !== Layout.PAGES);
     const limit = sideBySide ? 2 : 1;
 
-    const makeSpread = pgs => createEl('.spread-wrapper.spread-centered.spread-size', pgs);
-
-    book.pages.forEach((page, i) => {
+    book.pages.forEach((page: Page, i: number) => {
       if (this.content.contains(page.element) && page.element.parentNode !== this.content) return;
       if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
         this.lastSpreadInProgress.appendChild(page.element);

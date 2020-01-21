@@ -11,6 +11,10 @@ import {
 const supportsCustomPageSize = !!window.chrome;
 
 class Controls {
+  element: HTMLElement;
+  setDone: () => void;
+  setInProgress: () => void;
+
   constructor(availableOptions, initialState, actions) {
     const { Mode, Paper, Layout, Marks } = availableOptions;
 
@@ -68,10 +72,12 @@ class Controls {
     const sheetSizeSelect = dropdown({ onchange: updatePaper }, paperSizes);
 
     const layoutSelect = dropdown(
-      { onchange: (e) => {
-        actions.setLayout(e.target.value);
-        updateSheetSizeNames();
-      } },
+      {
+        onchange: (e: Event) => {
+          actions.setLayout(e.target.value);
+          updateSheetSizeNames();
+        }
+      },
       [
         option({ value: Layout.PAGES }, '1 Page / Sheet'),
         option({ value: Layout.SPREADS }, '1 Spread / Sheet'),
@@ -84,7 +90,11 @@ class Controls {
     const arrangement = row([layoutSelect]);
 
     marksSelect = dropdown(
-      { onchange: e => actions.setMarks(e.target.value) },
+      {
+        onchange: (e: Event) => {
+          actions.setMarks(e.target.value);
+        }
+      },
       [
         option({ value: Marks.NONE }, 'No Marks'),
         option({ value: Marks.CROP, selected: true }, 'Crop Marks'),
@@ -104,14 +114,16 @@ class Controls {
 
     this.setDone = () => {};
     this.setInProgress = () => {};
-    this.updateProgress = () => {};
 
     printBtn.classList.add(c('btn-print'));
     const options = row([arrangement, sheetSize, marks]);
     options.classList.add(c('print-options'));
 
     viewSelect = dropdown(
-      { onchange: e => actions.setMode(e.target.value) },
+      { onchange: (e: Event) => {
+          actions.setMode(e.target.value);
+        },
+      },
       [
         option({ value: Mode.PREVIEW }, 'Grid'),
         option({ value: Mode.FLIPBOOK }, 'Flipbook'),

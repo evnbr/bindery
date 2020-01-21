@@ -17,8 +17,30 @@ const rAF = () => new Promise((resolve) => {
   requestAnimationFrame(t => resolve(t));
 });
 
+declare const BINDERY_VERSION: string;
+
+interface BinderyOptions {
+  autoupdate?: boolean;
+  autorun?: boolean;
+  ControlsComponent?: any;
+  content?: HTMLElement;
+  pageNumberOffset?: number;
+  printSetup?: {};
+  pageSetup?: {};
+  rules: Rule[];
+  view?: number;
+}
+
 class Bindery {
-  constructor(opts = {}) {
+  autorun: boolean;
+  autoupdate: boolean;
+  viewer: any;
+  content: HTMLElement;
+  pageSetup: PageSetup;
+  rules: Rule[];
+  layoutInProgress: boolean;
+
+  constructor(opts: BinderyOptions = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
     if (!opts.content) {
@@ -76,12 +98,12 @@ class Bindery {
   }
 
   // Convenience constructor
-  static makeBook(opts = {}) {
+  static makeBook(opts: BinderyOptions = {}) {
     opts.autorun = opts.autorun ? opts.autorun : true;
     return new Bindery(opts);
   }
 
-  async getContentAsElement(content) {
+  async getContentAsElement(content): Promise<HTMLElement> {
     if (content instanceof HTMLElement) return content;
     if (typeof content === 'string') {
       const el = document.querySelector(content);
@@ -97,20 +119,20 @@ class Bindery {
     throw Error('Bindery: Source must be an element or selector');
   }
 
-  async fetchContent(url, sel) {
+  async fetchContent(url: string, selector?: string) {
     const response = await fetch(url);
     if (response.status !== 200) {
       this.viewer.displayError(response.status, `Could not find file at "${url}"`);
       throw Error(`Bindery: Could not find file at "${url}"`);
     }
     const fetchedContent = await response.text();
-    const el = parseHTML(fetchedContent, sel);
+    const el = parseHTML(fetchedContent, selector);
     if (!(el instanceof HTMLElement)) {
       this.viewer.displayError(
         'Source not specified',
-        `Could not find element that matches selector "${sel}"`
+        `Could not find element that matches selector "${selector}"`
       );
-      throw Error(`Bindery: Could not find element that matches selector "${sel}"`);
+      throw Error(`Bindery: Could not find element that matches selector "${selector}"`);
     }
     return el;
   }
@@ -120,7 +142,7 @@ class Bindery {
     if (this.content) this.content.style.display = '';
   }
 
-  addRules(newRules) {
+  addRules(newRules: Rule[]) {
     newRules.forEach((rule) => {
       if (rule instanceof rules.Rule) {
         this.rules.push(rule);

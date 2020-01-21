@@ -1,14 +1,19 @@
 import { div, button, select, option } from './dom';
 import { c, createEl } from '../dom-utils';
 
-const row = (children) => createEl('row', children);
+const row = (children: HTMLElement[]) => createEl('row', children);
 
 // Button
-const btn = (attrs, txt) => button(`${c('control')} ${c('btn')}`, attrs, txt);
-const btnMain = (attrs, txt) => button(`${c('control')} ${c('btn')} ${c('btn-main')}`, attrs, txt);
+const btn = (attrs: {}, txt: string) => {
+  return button(`${c('control')} ${c('btn')}`, attrs, txt);
+}
+const btnMain = (attrs: {}, txt: string) => {
+  return button(`${c('control')} ${c('btn')} ${c('btn-main')}`, attrs, txt);
+}
 
-const dropdown = (attrs, options) => {
-  const selectVal = createEl('select-val', [], 'Value');
+const dropdown = (attrs: {}, options: HTMLOptionElement[]) => {
+  const selectVal = createEl('select-val', []);
+  selectVal.textContent = 'Value';
   const selectEl = select(c('select'), attrs, options);
   const updateVal = () => {
     selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
