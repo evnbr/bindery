@@ -6,13 +6,27 @@ import { validate, T } from '../option-checker';
 import { c } from '../dom-utils';
 
 // Compatible with ids that start with numbers
-const startsNum = sel => sel.length > 2 && sel[0] === '#' && /^\d+$/.test(sel[1]);
-const safeIDSel = sel => (startsNum(sel) ? `[id="${sel.replace('#', '')}"]` : sel);
+const startsWithNumber = (sel: string) => {
+  return sel.length > 2 && sel[0] === '#' && /^\d+$/.test(sel[1]);
+}
+const safeIDSel = (sel: string) => {
+  return (startsWithNumber(sel) ? `[id="${sel.replace('#', '')}"]` : sel);
+}
+
+interface PageReferenceInstance {
+  value: any;
+  element: HTMLElement;
+  template: HTMLElement;
+  render: ((newVal: any) => void);
+}
 
 // Options:
 // selector: String
 // replace: function (HTMLElement, number) => HTMLElement
 class PageReference extends Replace {
+  references: PageReferenceInstance[];
+  throttledUpdate: (book: any) => void;
+
   constructor(options) {
     super(options);
     validate(options, {
@@ -40,10 +54,17 @@ class PageReference extends Replace {
     return ref.element;
   }
 
-  createReference(book, test, elmt) {
-    const ref = { test, template: elmt, element: elmt, value: null };
-    const render = newValue => this.render(ref, newValue);
-    ref.render = render;
+  createReference(book, test, elmt): PageReferenceInstance {
+    const ref = {
+      test,
+      template: elmt,
+      element: elmt,
+      value: null,
+      render: null
+    } as PageReferenceInstance;
+    ref.render = (newValue) => {
+      return this.render(ref, newValue);
+    };
     this.references.push(ref);
     const currentResults = pageNumbersForTest(book.pages, test);
 
@@ -51,7 +72,7 @@ class PageReference extends Replace {
     return ref;
   }
 
-  render(ref, newValue) {
+  render(ref: PageReferenceInstance, newValue) {
     if (!newValue || shallowEqual(ref.value, newValue)) return;
     if (!Array.isArray(newValue)) throw Error('Page search returned unexpected result');
 

@@ -19,26 +19,31 @@ const rAF = () => new Promise((resolve) => {
 
 declare const BINDERY_VERSION: string;
 
+interface PrintSetup {
+  layout: number
+  marks: number,
+}
+
 interface BinderyOptions {
   autoupdate?: boolean;
   autorun?: boolean;
   ControlsComponent?: any;
   content?: HTMLElement;
   pageNumberOffset?: number;
-  printSetup?: {};
+  printSetup?: PrintSetup;
   pageSetup?: {};
-  rules: Rule[];
+  rules?: any[];
   view?: number;
 }
 
 class Bindery {
   autorun: boolean;
   autoupdate: boolean;
-  viewer: any;
-  content: HTMLElement;
+  viewer: Viewer;
+  content!: HTMLElement;
   pageSetup: PageSetup;
-  rules: Rule[];
-  layoutInProgress: boolean;
+  rules: any[];
+  layoutInProgress: boolean = false;
 
   constructor(opts: BinderyOptions = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
@@ -111,7 +116,7 @@ class Bindery {
         this.viewer.displayError('Content not specified', `Could not find element that matches selector "${content}"`);
         console.error(`Bindery: Could not find element that matches selector "${content}"`);
       }
-      return el;
+      return el as HTMLElement;
     }
     if (typeof content === 'object' && content.url) {
       return this.fetchContent(content.url, content.selector);
@@ -142,7 +147,7 @@ class Bindery {
     if (this.content) this.content.style.display = '';
   }
 
-  addRules(newRules: Rule[]) {
+  addRules(newRules: any[]) {
     newRules.forEach((rule) => {
       if (rule instanceof rules.Rule) {
         this.rules.push(rule);

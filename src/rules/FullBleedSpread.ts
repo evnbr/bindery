@@ -6,6 +6,9 @@ import { c, createEl } from '../dom-utils';
 // selector: String
 
 class FullBleedSpread extends OutOfFlow {
+  rotate!: string;
+  continue!: string;
+
   constructor(options) {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';

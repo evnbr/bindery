@@ -40,7 +40,7 @@ class Footnote extends Replace {
     element.insertAdjacentHTML('beforeEnd', `<sup class="bindery-sup">${number}</sup>`);
     return element;
   }
-  render(element, number) {
+  render(element, number): (string | HTMLElement) {
     return `<sup>${number}</sup> Default footnote (<a href='/bindery/docs/#footnote'>Learn how to change it</a>)`;
   }
 }

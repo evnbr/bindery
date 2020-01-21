@@ -6,6 +6,8 @@ import { createEl } from '../dom-utils';
 // selector: String
 
 class FullBleedPage extends OutOfFlow {
+  rotate!: string;
+  
   constructor(options) {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';
