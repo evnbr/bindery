@@ -4,6 +4,7 @@ import rules from './rules';
 import { Mode, Paper, Layout, Marks } from './constants';
 import './main.scss';
 
+declare const BINDERY_VERSION: string;
 
 const BinderyWithRules = Object.assign(Bindery, rules);
 BinderyWithRules.View = Mode;
