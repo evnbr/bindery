@@ -1,6 +1,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import minify from 'rollup-plugin-babel-minify';
+import typescript from 'rollup-plugin-typescript2';
 
 import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
@@ -13,7 +14,7 @@ import pkg from './package.json';
 const extend = (a, b) => Object.assign({}, a, b);
 
 const baseConfig = {
-  input: 'src/index.js',
+  input: 'src/index.ts',
 };
 
 const baseOutput = {
@@ -41,6 +42,7 @@ export default [
     plugins: [
       resolve(),
       commonjs(),
+      typescript(),
       sassPlugin(),
     ],
   }),
@@ -55,6 +57,7 @@ export default [
     plugins: [
       resolve(),
       commonjs(),
+      typescript(),
       sassPlugin(),
       minify({
         comments: false,
@@ -71,6 +74,7 @@ export default [
     external: ['regionize'],
     plugins: [
       resolve(),
+      typescript(),
       sassPlugin(),
     ],
   }),

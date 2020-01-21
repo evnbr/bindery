@@ -2,10 +2,10 @@
 // prefix classes
 const p = '📖-';
 
-const prefix = str => `${p}${str}`;
-const prefixClass = str => `.${prefix(str)}`;
+const prefix = (str: String) => `${p}${str}`;
+const prefixClass = (str: String) => `.${prefix(str)}`;
 
-const prefixer = (str) => {
+const prefixer = (str: String) => {
   if (str[0] === '.') {
     return prefixClass(str.substr(1));
   }

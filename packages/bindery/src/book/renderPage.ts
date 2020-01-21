@@ -5,7 +5,7 @@ import { createEl, classes, c } from '../dom-utils';
 // the size of the flow region. These changes
 // need to be flushed before regionize tries
 // to measure the element again.
-const renderPage = (pageInfo) => {
+const renderPage = (pageInfo: PageInfo): HTMLElement => {
   const {
     flowRegion,
     isLeft,

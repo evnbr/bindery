@@ -1,10 +1,10 @@
 const overflowAttr = 'data-ignore-overflow';
 // Walk up the tree to see if we are within
 // an overflow-ignoring node
-const ignoreOverflow = (element: HTMLElement): boolean => {
+const shouldIgnoreOverflow = (element: HTMLElement): boolean => {
   if (element.hasAttribute(overflowAttr)) return true;
-  if (element.parentElement) return ignoreOverflow(element.parentElement);
+  if (element.parentElement) return shouldIgnoreOverflow(element.parentElement);
   return false;
 };
 
-export default ignoreOverflow;
+export default shouldIgnoreOverflow;

@@ -2,7 +2,7 @@ import prefixer from './prefixer';
 
 const doc = window.document;
 // Create div with prefixed classes
-const createEl = (className, content = []) => {
+const createEl = (className: String, content = []): HTMLElement => {
   const div = doc.createElement('div');
   div.className = className.split('.').filter((txt) => txt !== '').map(prefixer).join(' ');
 

@@ -1,0 +1,76 @@
+---
+---
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bindery Ex 8 — Creating an Index</title>
+  <link rel="stylesheet" type="text/css" href="../shared/style.css" />
+
+  <style>
+    .index-content {
+      columns: 2;
+      font-size: 0.8rem;
+    }
+
+    .index-content h4 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .index-content ul, li {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .index-content ul {
+      margin-bottom: 1.3em;
+    }
+
+    .index-content li {
+      text-indent: -1.3em;
+      padding-left: 1.3em;
+    }
+
+    .index-content li span {
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  {% include latest-bindery.html %}
+  <script>
+      const {
+        Footnote,
+        RunningHeader,
+        PageBreak
+      } = Bindery;
+
+      Bindery.makeBook({
+        content: {
+          url: 'content.html',
+          selector: ".content",
+        },
+        rules: [
+          PageBreak({ selector: 'h1, h2, h3', position: 'before', continue: 'right' }),
+          RunningHeader(),
+          Footnote({
+            selector: '[data-footnote]',
+            render: (elmt, number) => {
+              let note = 'Something extremely long, something extremely long, something extremely long.';
+              return note;
+            },
+          }),
+        ],
+      });
+
+  </script>
+
+  <script type="text/javascript" src='/bindery/js/viewSourceButton.js'></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import { yieldIfNecessary } from './schedule';
-import ignoreOverflow from './ignoreOverflow';
+import shouldIgnoreOverflow from './shouldIgnoreOverflow';
 import { ElementGetter } from './types';
 import { nextWordEnd, previousWordEnd } from './stringUtils';
 
@@ -37,7 +37,7 @@ const fillWordsUntilOverflow = async (
   const originalText = textNode.nodeValue || '';
   container.appendChild(textNode);
 
-  if (!hasOverflowed() || ignoreOverflow(container)) {
+  if (!hasOverflowed() || shouldIgnoreOverflow(container)) {
     // The whole thing fits
     return { completed: true };
   }
@@ -68,13 +68,13 @@ const fillWordsUntilOverflow = async (
 
   // trim text to word
   const fittingText = originalText.substr(0, wordEnd);
-  const overflowingText = originalText.substr(wordEnd);
+  const remainderText = originalText.substr(wordEnd);
   textNode.nodeValue = fittingText;
 
   // Create a new text node for the next flow box
   return {
     completed: true,
-    remainder: createTextNode(overflowingText)
+    remainder: createTextNode(remainderText)
   };
 };
 
@@ -87,19 +87,19 @@ const fillWords = async (
   getNextContainer: ElementGetter,
   hasOverflowed: Checker
 ): Promise<TextLayoutResult> => {
-  const textLayout = await fillWordsUntilOverflow(textNode, container, hasOverflowed);
+  const result = await fillWordsUntilOverflow(textNode, container, hasOverflowed);
 
-  if (textLayout.remainder) {
+  if (result.remainder) {
     const nextContainer = getNextContainer();
     return fillWords(
-      textLayout.remainder,
+      result.remainder,
       nextContainer,
       getNextContainer,
       hasOverflowed
     );
   }
 
-  return textLayout;
+  return result;
 };
 
 export {

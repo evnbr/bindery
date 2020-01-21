@@ -88,7 +88,9 @@ class Page {
   }
 
   getElementWithAllPendingUpdates() {
-    this.updateAndReplaceElement();
+    if (this.needsLayoutUpdate) {
+      this.updateAndReplaceElement();
+    }
     return this.currentElement;
   }
 

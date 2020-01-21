@@ -30,7 +30,10 @@
     let rainbowRule = Bindery.createRule({
       eachPage: function(page, book) {
         let pct = page.number / book.pageCount;
-        page.background.style.backgroundColor = "hsl(" + (pct * 360) + ", 80%, 80%)";
+        // page.background.style.backgroundColor = "hsl(" + (pct * 360) + ", 80%, 80%)";
+        page.setState({
+          rainbowColor: `hsl("${pct * 360}", 80%, 80%)`,
+        });
       }
     });
 
@@ -71,6 +74,12 @@
         shrinkingRule,
         foreedgeRule,
       ],
+      renderPage: (pageInfo) => {
+        const page = Bindery.renderPage(pageInfo);
+        page.background.style.backgroundColor = pageInfo.rainbowColor;
+
+        return page;
+      }
     });
   </script>
 

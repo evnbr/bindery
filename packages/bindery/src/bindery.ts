@@ -17,8 +17,14 @@ const rAF = () => new Promise((resolve) => {
   requestAnimationFrame(t => resolve(t));
 });
 
+declare const BINDERY_VERSION: string;
+
+interface BinderyOptions {
+  content?: HTMLElement,
+}
+
 class Bindery {
-  constructor(opts = {}) {
+  constructor(opts: BinderyOptions = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
     if (!opts.content) {
