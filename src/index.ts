@@ -6,11 +6,14 @@ import './main.scss';
 
 declare const BINDERY_VERSION: string;
 
-const BinderyWithRules = Object.assign(Bindery, rules);
-BinderyWithRules.View = Mode;
-BinderyWithRules.Paper = Paper;
-BinderyWithRules.Layout = Layout;
-BinderyWithRules.Marks = Marks;
-BinderyWithRules.version = BINDERY_VERSION;
+const constants = {
+    View: Mode,
+    Paper,
+    Layout,
+    Marks,
+    version: BINDERY_VERSION,
+}
+
+const BinderyWithRules = Object.assign(Bindery, rules, constants);
 
 export default BinderyWithRules;

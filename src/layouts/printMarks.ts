@@ -12,9 +12,9 @@ const printMarksSpread = () => createEl('.spread-size.print-mark-wrap', [
   createEl('.mark-crop-fold'), ...cropMarks(), ...bleedMarks(),
 ]);
 
-const bookletMeta = (i, len) => {
+const bookletMeta = (i: number, len: number) => {
   const isFront = i % 4 === 0;
-  const sheetIndex = parseInt((i + 1) / 4, 10) + 1;
+  const sheetIndex = Math.round((i + 1) / 4) + 1;
   return createEl('.print-meta', `Sheet ${sheetIndex} of ${len / 4}: ${isFront ? 'Outside' : 'Inside'}`);
 };
 

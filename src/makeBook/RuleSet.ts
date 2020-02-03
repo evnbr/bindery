@@ -1,5 +1,6 @@
 import { classes } from '../dom-utils';
 import Rule from '../rules/Rule';
+import Split from '../rules/Split';
 import dedupe from './dedupeRules';
 import recoverFromRule from './recoverFromRule';
 
@@ -7,12 +8,22 @@ const giveUp = (rule, el) => {
   console.warn(`Couldn't apply ${rule.name}, caused overflows twice when adding: `, el);
 };
 
+interface PageRule extends Rule {
+  eachPage: (Page, Book) => void;
+}
+interface BeforeAddRule extends Rule {
+  beforeAdd: (a, b, c, d) => void;
+}
+interface AfterAddRule extends Rule {
+  afterAdd: (a, b, c, d, e) => void;
+}
+
 class RuleSet {
   pageNumberOffset: number;
-  pageRules: Rule[];
-  beforeAddRules: Rule[];
-  afterAddRules: Rule[];
-  didSplitRules: Rule[];
+  pageRules: PageRule[];
+  beforeAddRules: BeforeAddRule[];
+  afterAddRules: AfterAddRule[];
+  didSplitRules: Split[];
   selectorsNotToSplit: string[];
   shouldTraverse: (el: Element) => boolean;
 
@@ -45,12 +56,12 @@ class RuleSet {
     }
   }
 
-  applySplitRules(original, clone, nextChild, deepClone) {
+  applySplitRules(original, clone) {
     original.classList.add(classes.toNext);
     clone.classList.add(classes.fromPrev);
 
     this.didSplitRules.filter(r => original.matches(r.selector)).forEach((rule) => {
-      rule.didSplit(original, clone, nextChild, deepClone);
+      rule.didSplit(original, clone);
     });
   }
 
@@ -79,7 +90,7 @@ class RuleSet {
 
     const attemptRecovery = el => recoverFromRule(el, book, continueOnNewPage);
     const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));
-    const uniqueRules = dedupe(matchingRules);
+    const uniqueRules = dedupe(matchingRules) as AfterAddRule[];
 
     uniqueRules.forEach((rule) => {
       const retry = (el) => {

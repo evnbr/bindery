@@ -2,6 +2,19 @@ import { Region } from 'regionize';
 import { safeMeasure, createEl, classes } from '../dom-utils';
 
 class Page {
+  flow: Region;
+  footer: HTMLElement;
+  background: HTMLElement;
+  element: HTMLElement;
+
+  side?: string;
+  number?: number;
+
+  suppress = false;
+  hasOutOfFlowContent = false;
+  alwaysLeft = false;
+  alwaysRight = false;
+
   constructor() {
     this.flow = new Region(createEl('flow-box'));
     this.footer = createEl('footer');
@@ -14,7 +27,7 @@ class Page {
     return safeMeasure(testPage.element, () => testPage.flow.isReasonableSize);
   }
 
-  setLeftRight(dir) {
+  setLeftRight(dir: string) {
     this.side = dir;
     this.element.classList.toggle(classes.leftPage, this.isLeft);
     this.element.classList.toggle(classes.rightPage, !this.isLeft);
@@ -48,7 +61,7 @@ class Page {
 
   validate() {
     if (!this.hasOverflowed()) return;
-    const suspect = this.currentElement;
+    const suspect = this.flow.currentElement;
     if (suspect) {
       console.warn('Bindery: Content overflows, probably due to a style set on:', suspect);
       suspect.parentNode.removeChild(suspect);

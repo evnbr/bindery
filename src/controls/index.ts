@@ -8,7 +8,7 @@ import {
 } from './components';
 
 // TODO: This is not a particularly robust check.
-const supportsCustomPageSize = !!window.chrome;
+const supportsCustomPageSize = !!window.hasOwnProperty('chrome');
 
 class Controls {
   element: HTMLElement;
@@ -74,7 +74,8 @@ class Controls {
     const layoutSelect = dropdown(
       {
         onchange: (e: Event) => {
-          actions.setLayout(e.target.value);
+          const target = e.target as HTMLSelectElement;
+          actions.setLayout(target.value);
           updateSheetSizeNames();
         }
       },
@@ -92,7 +93,8 @@ class Controls {
     marksSelect = dropdown(
       {
         onchange: (e: Event) => {
-          actions.setMarks(e.target.value);
+          const target = e.target as HTMLSelectElement;
+          actions.setMarks(target.value);
         }
       },
       [
@@ -121,7 +123,8 @@ class Controls {
 
     viewSelect = dropdown(
       { onchange: (e: Event) => {
-          actions.setMode(e.target.value);
+          const target = e.target as HTMLSelectElement;
+          actions.setMode(target.value);
         },
       },
       [

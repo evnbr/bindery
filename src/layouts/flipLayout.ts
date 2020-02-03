@@ -10,7 +10,9 @@ const renderFlipLayout = (bookPages, doubleSided) => {
   const flapHolder = createEl('.spread-size.flap-holder');
   sizer.appendChild(flapHolder);
   flipLayout.appendChild(sizer);
-  const flaps = [];
+
+  const flaps: HTMLElement[] = [];
+
   let currentLeaf = -1;
 
   let leftOffset = 4;

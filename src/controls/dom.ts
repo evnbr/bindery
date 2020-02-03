@@ -4,7 +4,7 @@ const isFunc = (val: any) => typeof val === 'function';
 const isStr = (val: any) => typeof val === 'string';
 
 
-const h = (tagName: string, cls: string, attrs: {}, children: HTMLElement[], text?: string) => {
+const h = (tagName: string, cls: string | null, attrs: {}, children: HTMLElement[], text?: string) => {
   const el = document.createElement(tagName);
   if (cls) el.className = cls;
   if (text) el.textContent = text;
