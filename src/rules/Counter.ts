@@ -3,10 +3,16 @@ import { validate, T } from '../option-checker';
 
 
 class Counter extends Rule {
+  counterValue: number;
+  incrementEl: string = '';
+  resetEl: string = '';
+  replaceEl: string = '';
+
   constructor(options) {
     super(options);
     this.selector = '*';
     this.counterValue = 0;
+
     validate(options, {
       name: 'Counter',
       replaceEl: T.string,

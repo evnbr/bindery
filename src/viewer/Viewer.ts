@@ -180,7 +180,7 @@ class Viewer {
   }
 
   scrollToBottom() {
-    const scroll = document.scrollingElement;
+    const scroll = document.scrollingElement as HTMLElement;
     if (!scroll) return;
     const scrollMax = scroll.scrollHeight - scroll.offsetHeight;
     scroll.scrollTop = scrollMax;
@@ -216,7 +216,7 @@ class Viewer {
 
     const prevScroll = this.scrollPercent;
 
-    if (this.controls) this.controls.setDone(this.book.pages.length);
+    if (this.controls) this.controls.setDone();
     this.progress = 1;
 
     window.requestAnimationFrame(() => {
@@ -254,10 +254,11 @@ class Viewer {
 
     if (!document || !document.scrollingElement) return;
     
+    const scroller = document.scrollingElement as HTMLElement;
     // don't rerender if preview is out of view
-    const scrollTop = document.scrollingElement.scrollTop;
-    const scrollH = document.scrollingElement.scrollHeight;
-    const h = document.scrollingElement.offsetHeight;
+    const scrollTop = scroller.scrollTop;
+    const scrollH = scroller.scrollHeight;
+    const h = scroller.offsetHeight;
     if (scrollH > h * 3 && scrollTop < h) return;
 
     // don't rerender too often

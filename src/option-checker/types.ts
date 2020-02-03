@@ -23,6 +23,11 @@ const isShapeExact = template => input => isObj(input)
 
 const isEnum = cases => str => cases.includes(str);
 
+const lengthChecker = {
+  name: 'length (string with absolute units)',
+  check: isLength,
+};
+
 const T = {
   any: {
     name: 'any',
@@ -46,10 +51,7 @@ const T = {
     name: 'string',
     check: isStr,
   },
-  length: {
-    name: 'length (string with absolute units)',
-    check: isLength,
-  },
+  length: lengthChecker,
   number: {
     name: 'number',
     check: isNum,
@@ -70,26 +72,24 @@ const T = {
     name: 'array',
     check: isArr,
   },
-};
-
-T.margin = {
-  name: 'margin ({ top, inner, outer, bottom })',
-  check: isShapeExact({
-    name: 'margin',
-    top: T.length,
-    inner: T.length,
-    outer: T.length,
-    bottom: T.length,
-  }),
-};
-
-T.size = {
-  name: 'size ({ width, height })',
-  check: isShapeExact({
-    name: 'size',
-    width: T.length,
-    height: T.length,
-  }),
+  margin: {
+    name: 'margin ({ top, inner, outer, bottom })',
+    check: isShapeExact({
+      name: 'margin',
+      top: lengthChecker,
+      inner: lengthChecker,
+      outer: lengthChecker,
+      bottom: lengthChecker,
+    }),
+  },
+  size: {
+    name: 'size ({ width, height })',
+    check: isShapeExact({
+      name: 'size',
+      width: lengthChecker,
+      height: lengthChecker,
+    }),
+  }
 };
 
 export default T;

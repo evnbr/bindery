@@ -1,4 +1,5 @@
 import { classes } from '../dom-utils';
+import Rule from '../rules/Rule';
 import dedupe from './dedupeRules';
 import recoverFromRule from './recoverFromRule';
 
@@ -7,6 +8,14 @@ const giveUp = (rule, el) => {
 };
 
 class RuleSet {
+  pageNumberOffset: number;
+  pageRules: Rule[];
+  beforeAddRules: Rule[];
+  afterAddRules: Rule[];
+  didSplitRules: Rule[];
+  selectorsNotToSplit: string[];
+  shouldTraverse: (el: Element) => boolean;
+
   constructor(rules) {
     const offsetRule = rules.find(r => r.pageNumberOffset);
     this.pageNumberOffset = offsetRule ? offsetRule.pageNumberOffset : 0;

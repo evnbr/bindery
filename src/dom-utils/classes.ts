@@ -11,6 +11,7 @@ const classes = {
   viewPrint: 'view-print',
   viewFlip: 'view-flip',
   inProgress: 'in-progress',
+  allModes: [''],
 
   leftPage: 'left',
   rightPage: 'right',
@@ -30,7 +31,7 @@ Object.keys(classes).forEach((k) => {
   classes[k] = prefix(val);
 });
 
-classes.allModes = [classes.viewPreview, classes.viewPrint, classes.viewFlip];
+classes['allModes'] = [classes.viewPreview, classes.viewPrint, classes.viewFlip];
 classes[Mode.PREVIEW] = classes.viewPreview;
 classes[Mode.PRINT] = classes.viewPrint;
 classes[Mode.FLIPBOOK] = classes.viewFlip;

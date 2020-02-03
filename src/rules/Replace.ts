@@ -30,7 +30,7 @@ class Replace extends Rule {
   createReplacement(book, element) {
     return this.replace(element);
   }
-  replace(element) {
+  replace(element, info?) {
     element.insertAdjacentHTML('beforeEnd', '<sup class="bindery-sup">Default Replacement</sup>');
     return element;
   }

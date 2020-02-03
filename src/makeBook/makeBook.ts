@@ -48,7 +48,7 @@ const makeBook = async (content, rules, updateProgress) => {
     if (dontSplitSel.some(sel => element.matches(sel))) {
       return false;
     }
-    if (element.parentElement) return canSplit(element.parentElement, dontSplitSel);
+    if (element.parentElement) return canSplit(element.parentElement);
     return true;
   };
 

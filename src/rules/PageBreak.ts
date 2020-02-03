@@ -2,10 +2,13 @@ import Rule from './Rule';
 import { validate, T } from '../option-checker';
 
 class PageBreak extends Rule {
+  continue: string = '';
+  position: string = '';
+
   constructor(options) {
+    super(options);
     options.position = options.position || 'before';
     options.continue = options.continue || 'next';
-    super(options);
 
     validate(options, {
       name: 'PageBreak',

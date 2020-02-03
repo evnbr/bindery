@@ -2,6 +2,9 @@ import Rule from './Rule';
 import { validate, T } from '../option-checker';
 
 class Split extends Rule {
+  toNext: string | null = null;
+  fromPrevious: string | null = null;
+
   constructor(options) {
     super(options);
 

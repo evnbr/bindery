@@ -17,7 +17,7 @@ interface PageReferenceInstance {
   value: any;
   element: HTMLElement;
   template: HTMLElement;
-  render: ((newVal: any) => void);
+  test: any;
 }
 
 // Options:
@@ -60,15 +60,11 @@ class PageReference extends Replace {
       template: elmt,
       element: elmt,
       value: null,
-      render: null
     } as PageReferenceInstance;
-    ref.render = (newValue) => {
-      return this.render(ref, newValue);
-    };
     this.references.push(ref);
     const currentResults = pageNumbersForTest(book.pages, test);
 
-    ref.render(currentResults); // Replace element immediately, to make sure it'll fit
+    this.render(ref, currentResults); // Replace element immediately, to make sure it'll fit
     return ref;
   }
 
@@ -82,7 +78,7 @@ class PageReference extends Replace {
     const template = ref.template.cloneNode(true);
     const newRender = this.replace(template, pageRanges);
     if (!isResolved) newRender.classList.add(c('placeholder-num'));
-    ref.element.parentNode.replaceChild(newRender, ref.element);
+    ref.element.parentNode!.replaceChild(newRender, ref.element);
 
     ref.element = newRender;
     ref.value = newValue;
@@ -102,7 +98,7 @@ class PageReference extends Replace {
     results.forEach(({ ref, data }) => this.render(ref, data));
   }
 
-  replace(template, number) {
+  replace(template, number?) {
     template.insertAdjacentHTML('beforeend', `, <span>${number}</span>`);
     return template;
   }

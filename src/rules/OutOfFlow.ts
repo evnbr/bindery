@@ -1,9 +1,14 @@
 import Rule from './Rule';
 
 class OutOfFlow extends Rule {
+  continue?: string;
+
   constructor(options) {
     super(options);
     this.name = 'Out of Flow';
+  }
+  createOutOfFlowPages(elmt: any, book: any, makeNewPage: any) {
+    throw Error('createOutOfFlowPages must be overridden');
   }
   beforeAdd(elmt) {
     // Avoid breaking inside this element. Once it's completely added,
