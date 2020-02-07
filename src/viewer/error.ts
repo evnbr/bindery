@@ -2,6 +2,8 @@
 
 import { createEl } from '../dom-utils';
 
+declare const BINDERY_VERSION: string;
+
 export default function (title, text) {
   return createEl('.error', [
     createEl('.error-title', title),

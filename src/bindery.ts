@@ -48,15 +48,6 @@ class Bindery {
   constructor(opts: BinderyOptions = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
-    if (!opts.content) {
-      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
-      throw Error('Bindery: You must include a source element or selector');
-    }
-    if (opts.ControlsComponent) {
-      this.viewer.displayError('Controls are now included', 'Please remove the controls component');
-      throw Error('Bindery: controls are now included');
-    }
-
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
 
@@ -91,6 +82,14 @@ class Bindery {
       marks: startMarks,
       layout: startLayout,
     });
+    if (!opts.content) {
+      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
+      throw Error('Bindery: You must include a source element or selector');
+    }
+    if (opts.ControlsComponent) {
+      this.viewer.displayError('Controls are now included', 'Please remove the controls component');
+      throw Error('Bindery: controls are now included');
+    }
 
     this.rules = defaultRules;
     this.rules.push({ pageNumberOffset: opts.pageNumberOffset || 0 });
