@@ -4,7 +4,7 @@ import { Book, PageMaker } from '../book';
 class OutOfFlow extends Rule {
   continue?: string;
 
-  constructor(options) {
+  constructor(options: {}) {
     super(options);
     this.name = 'Out of Flow';
   }

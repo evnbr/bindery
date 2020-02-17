@@ -4,6 +4,7 @@ import Split from '../rules/Split';
 import dedupe from './dedupeRules';
 import recoverFromRule from './recoverFromRule';
 import { Book, Page, PageMaker } from '../book';
+import { RegionGetter } from 'regionize/dist/types/types';
 
 const giveUp = (rule: Rule, el: HTMLElement) => {
   console.warn(`Couldn't apply ${rule.name}, caused overflows twice when adding: `, el);
@@ -45,6 +46,9 @@ function isOffsetRule (rule: Rule): rule is OffsetRule {
 function isDidSplitRule (rule: Rule): rule is DidSplitRule {
   return !!rule.selector && rule.hasOwnProperty('didSplit');
 }
+function isAvoidSplitRule (rule: Rule): rule is AvoidSplitRule {
+  return !!rule.selector && rule.hasOwnProperty('avoidSplit');
+}
 
 
 class RuleSet {
@@ -68,7 +72,7 @@ class RuleSet {
     this.afterAddRules = rules.filter(isAfterAddRule);
 
     // Rules for layout
-    this.selectorsNotToSplit = rules.filter(r => r.avoidSplit).map(r => r.selector);
+    this.selectorsNotToSplit = rules.filter(isAvoidSplitRule).map(r => r.selector);
     this.didSplitRules = rules.filter(isDidSplitRule);
 
     // setup
@@ -103,7 +107,7 @@ class RuleSet {
   }
 
   // Rules for elements
-  applyBeforeAddRules(element: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker) {
+  applyBeforeAddRules(element: HTMLElement, book: Book, continueOnNewPage: RegionGetter, makeNewPage: PageMaker) {
     let addedElement = element;
 
     const matchingRules = this.beforeAddRules.filter(rule => addedElement.matches(rule.selector));
@@ -114,7 +118,7 @@ class RuleSet {
     return addedElement;
   }
 
-  applyAfterAddRules(originalElement: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker) {
+  applyAfterAddRules(originalElement: HTMLElement, book: Book, continueOnNewPage: RegionGetter, makeNewPage: PageMaker) {
     let addedElement = originalElement;
 
     const attemptRecovery = (el: HTMLElement) => recoverFromRule(el, book, continueOnNewPage);

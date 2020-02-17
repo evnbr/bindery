@@ -6,7 +6,7 @@ import createEl from './createEl';
 const doc = window.document;
 
 // Create stylesheet with id
-const addStylesheet = (id) => {
+const addStylesheet = (id: string): HTMLStyleElement => {
   const style = doc.createElement('style');
   style.id = id;
   doc.head.appendChild(style);
@@ -14,10 +14,12 @@ const addStylesheet = (id) => {
 };
 
 // Fetch or create stylesheet with id
-const stylesheet = id => doc.querySelector(`#${id}`) || addStylesheet(id);
+const stylesheet = (id: string): HTMLStyleElement => {
+  return doc.querySelector(`#${id}`) || addStylesheet(id);
+}
 
 // Parse html from text
-const parseHTML = (text, selector) => {
+const parseHTML = (text: string, selector: string) => {
   const wrapper = doc.createElement('div');
   wrapper.innerHTML = text;
   return wrapper.querySelector(selector);
