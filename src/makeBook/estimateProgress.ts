@@ -1,6 +1,6 @@
 const sec = (ms: number) => (ms / 1000).toFixed(2);
 
-const estimateFor = (content) => {
+const estimateFor = (content: HTMLElement) => {
   const start = window.performance.now();
   const capacity = content.querySelectorAll('*').length;
   let timeWaiting = 0;

@@ -4,7 +4,7 @@
     "declarationDir": "./dist/types",
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "outDir": "./build",
     "strict": true,
     "target": "es2018",

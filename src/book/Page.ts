@@ -9,11 +9,15 @@ class Page {
 
   side?: string;
   number?: number;
+  heading: ;
 
   suppress = false;
   hasOutOfFlowContent = false;
   alwaysLeft = false;
   alwaysRight = false;
+
+  isOutOfFlow = false; // used by spreads
+  avoidReorder = false; // used by 2-page spreads
 
   constructor() {
     this.flow = new Region(createEl('flow-box'));
@@ -72,7 +76,7 @@ class Page {
     }
   }
 
-  validateEnd(allowOverflow) {
+  validateEnd(allowOverflow: boolean) {
     if (!this.hasOverflowed()) return;
     console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
     if (!this.suppressErrors && !this.flow.suppressErrors && !allowOverflow) {

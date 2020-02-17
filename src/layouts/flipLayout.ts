@@ -2,7 +2,7 @@ import { Page } from '../book';
 import { c, createEl } from '../dom-utils';
 import padPages from './padPages';
 
-const renderFlipLayout = (bookPages, doubleSided) => {
+const renderFlipLayout = (bookPages: Page[], doubleSided: boolean) => {
   const pages = padPages(bookPages, () => new Page());
 
   const flipLayout = document.createDocumentFragment();
@@ -21,7 +21,7 @@ const renderFlipLayout = (bookPages, doubleSided) => {
   }
   flapHolder.style.width = `${pages.length * leftOffset}px`;
 
-  const setLeaf = (n) => {
+  const setLeaf = (n: number) => {
     let newLeaf = n;
     if (newLeaf === currentLeaf) newLeaf += 1;
     currentLeaf = newLeaf;

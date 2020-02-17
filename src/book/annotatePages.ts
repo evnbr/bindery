@@ -1,4 +1,6 @@
-const annotatePages = (pages, offset) => {
+import { Page } from '../book';
+
+const annotatePages = (pages: Page[], offset: number) => {
   // ———
   // NUMBERING
 
@@ -21,21 +23,23 @@ const annotatePages = (pages, offset) => {
   // Every time one is selected, it annotates all following pages
   // and clears any subselectors.
   // TODO: Make this configurable
-  const running = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
+  const headers = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
+  const headingKeys = Object.keys(headers) as (keyof typeof headers)[];
 
   pages.forEach((page) => {
     page.heading = {};
-    Object.keys(running).forEach((tagName, i) => {
+    headingKeys.forEach((tagName, i) => {
       const element = page.element.querySelector(tagName);
-      if (element) {
-        running[tagName] = element.textContent;
+      if (element && element.textContent) {
+        headers[tagName] = element.textContent;
+        
         // clear remainder
-        Object.keys(running).forEach((tag, j) => {
-          if (j > i) running[tag] = '';
+        headingKeys.forEach((tag, j) => {
+          if (j > i) headers[tag] = '';
         });
       }
-      if (running[tagName] !== '') {
-        page.heading[tagName] = running[tagName];
+      if (headers[tagName] !== '') {
+        page.heading[tagName] = headers[tagName];
       }
     });
   });

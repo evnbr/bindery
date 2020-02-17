@@ -1,4 +1,4 @@
-const isElement = node => node.nodeType === Node.ELEMENT_NODE;
+const isElement = (node: any) => node.nodeType === Node.ELEMENT_NODE;
 const isObj = (val: any) => typeof val === 'object';
 const isFunc = (val: any) => typeof val === 'function';
 const isStr = (val: any) => typeof val === 'string';
