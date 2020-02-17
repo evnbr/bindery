@@ -93,7 +93,7 @@ class PageSetup {
   updateStyleVars() {
     const page = this.size;
     const sheet = this.sheetSize;
-    const vars = {
+    const cssVariables = {
       'spread-width': this.spreadSize.width,
       'page-width': page.width,
       'page-height': page.height,
@@ -103,12 +103,14 @@ class PageSetup {
       'margin-outer': this.margin.outer,
       'margin-top': this.margin.top,
       'margin-bottom': this.margin.bottom,
-      bleed: this.bleed,
+      'bleed': this.bleed,
       'mark-length': this.markLength,
     };
-    const str = Object.keys(vars).map(k => `--bindery-${k}: ${vars[k]};`).join('');
+    const cssStr = Object.entries(cssVariables).map(([k, v]) => {
+      return `--bindery-${k}: ${v};`
+    }).join('');
 
-    const rootRule = `:root { ${str} }`;
+    const rootRule = `:root { ${cssStr} }`;
     const pageRule = `@page { size: ${sheet.width} ${sheet.height}; }`;
 
     stylesheet('binderyPage').innerHTML = `${rootRule} ${pageRule}`;

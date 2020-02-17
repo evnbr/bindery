@@ -1,7 +1,10 @@
 import { Page } from '../book';
 
-const pageNumbersForTest = (pages: Page[], test: ((el: HTMLElement) => boolean)) => {
-  return pages.filter((pg) => pg.number && test(pg.element)).map((pg) => pg.number);
+const pageNumbersForTest = (pages: Page[], test: ((el: HTMLElement) => boolean)): number[] => {
+  return pages
+    .filter((pg) => !!pg.number)
+    .filter((pg) => test(pg.element))
+    .map((pg) => pg.number as number);
 }
 
 const pageNumbersForSelector = (pages: Page[], selector: string) => {

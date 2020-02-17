@@ -17,7 +17,7 @@ class Split extends Rule {
     });
   }
 
-  didSplit(original, clone) {
+  didSplit(original: HTMLElement, clone: HTMLElement) {
     if (this.toNext) original.classList.add(this.toNext);
     if (this.fromPrevious) clone.classList.add(this.fromPrevious);
   }

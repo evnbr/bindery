@@ -71,14 +71,14 @@ class PageReference extends Replace {
     return ref;
   }
 
-  render(ref: PageReferenceInstance, newValue) {
+  render(ref: PageReferenceInstance, newValue: number[]) {
     if (!newValue || shallowEqual(ref.value, newValue)) return;
     if (!Array.isArray(newValue)) throw Error('Page search returned unexpected result');
 
     const isResolved = newValue.length > 0;
     const pageRanges = isResolved ? formatAsRanges(newValue) : '⌧';
 
-    const template = ref.template.cloneNode(true);
+    const template = ref.template.cloneNode(true) as HTMLElement;
     const newRender = this.replace(template, pageRanges);
     if (!isResolved) newRender.classList.add(c('placeholder-num'));
     ref.element.parentNode!.replaceChild(newRender, ref.element);
@@ -98,12 +98,14 @@ class PageReference extends Replace {
 
   updatePageReferences(pages: Page[]) {
     // querySelector first, then rerender
-    const results = this.references.map(ref =>
-      ({ ref, data: pageNumbersForTest(pages, ref.test) }));
+    const results = this.references.map((ref) => {
+      return { ref, data: pageNumbersForTest(pages, ref.test) }
+    });
+
     results.forEach(({ ref, data }) => this.render(ref, data));
   }
 
-  replace(template, number?) {
+  replace(template: HTMLElement, number: string) {
     template.insertAdjacentHTML('beforeend', `, <span>${number}</span>`);
     return template;
   }
