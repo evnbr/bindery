@@ -134,7 +134,7 @@ class Viewer {
     document.body.classList.toggle(classes.isViewing, newVal);
   }
 
-  setSheetSize(str) {
+  setSheetSize(str: string) {
     const newVal = parseInt(str, 10);
 
     this.pageSetup.paper = newVal;
@@ -147,7 +147,7 @@ class Viewer {
     setTimeout(() => { this.scaleToFit(); }, 300);
   }
 
-  setLayout(str) {
+  setLayout(str: string) {
     const newVal = parseInt(str, 10);
 
     if (newVal === this.layout) return;
@@ -160,13 +160,13 @@ class Viewer {
     this.render();
   }
 
-  setMarks(str) {
+  setMarks(str: string) {
     const newVal = parseInt(str, 10);
     this.isShowingCropMarks = (newVal === Marks.CROP || newVal === Marks.BOTH);
     this.isShowingBleedMarks = (newVal === Marks.BLEED || newVal === Marks.BOTH);
   }
 
-  displayError(title, text) {
+  displayError(title: string, text: string) {
     this.show();
     if (!this.error) {
       this.error = errorView(title, text);
@@ -231,7 +231,7 @@ class Viewer {
     });
   }
 
-  viewFor(mode) {
+  viewFor(mode: number) {
     if (mode === Mode.PREVIEW) return gridLayout;
     else if (mode === Mode.FLIPBOOK) return flipLayout;
     else if (mode === Mode.PRINT) return printLayout;

@@ -1,7 +1,9 @@
-const isCommandP = e => (e.ctrlKey || e.metaKey) && e.keyCode === 80;
+const isCommandP = (e: KeyboardEvent) => {
+  return (e.ctrlKey || e.metaKey) && e.keyCode === 80;
+}
 
 // Automatically switch into print mode
-const listenForPrint = (beforePrint) => {
+const listenForPrint = (beforePrint: Function) => {
   if (window.matchMedia) {
     const mediaQueryList = window.matchMedia('print');
     mediaQueryList.addListener((mql) => {

@@ -24,17 +24,17 @@ class Counter extends Rule {
   setup() {
     this.counterValue = 0;
   }
-  beforeAdd(el) {
+  beforeAdd(el: HTMLElement) {
     if (el.matches(this.incrementEl)) this.counterValue += 1;
     if (el.matches(this.resetEl)) this.counterValue = 0;
     if (el.matches(this.replaceEl)) return this.createReplacement(el);
     return el;
   }
-  createReplacement(element) {
+  createReplacement(element: HTMLElement) {
     return this.replace(element, this.counterValue);
   }
-  replace(element, counterValue) {
-    element.textContent = counterValue;
+  replace(element: HTMLElement, counterValue: number) {
+    element.textContent = `${counterValue}`;
     return element;
   }
 }

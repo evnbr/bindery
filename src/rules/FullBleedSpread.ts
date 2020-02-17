@@ -1,6 +1,7 @@
 import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
 import { c, createEl } from '../dom-utils';
+import { Book, PageMaker } from '../book';
 
 // Options:
 // selector: String
@@ -20,7 +21,7 @@ class FullBleedSpread extends OutOfFlow {
       rotate: T.enum('none', 'clockwise', 'counterclockwise'),
     });
   }
-  createOutOfFlowPages(elmt, book, makeNewPage) {
+  createOutOfFlowPages(elmt: HTMLElement, book: Book, makeNewPage: PageMaker) {
     elmt.parentNode.removeChild(elmt);
 
     let leftPage;

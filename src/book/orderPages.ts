@@ -1,4 +1,4 @@
-import { Page } from "../book";
+import { Page, PageMaker } from "../book";
 
 const indexOfNextReorderablePage = (pages: Page[], startIndex: number) => {
   for (let i = startIndex; i < pages.length; i += 1) {
@@ -11,7 +11,7 @@ const indexOfNextReorderablePage = (pages: Page[], startIndex: number) => {
 // Given an array of pages with alwaysLeft, alwaysRight, and isOutOfFlow
 // properties, orders them so that alwaysLeft and alwaysRight are true.
 
-const orderPages = (pages: Page[], makeNewPage: (() => Page)) => {
+const orderPages = (pages: Page[], makeNewPage: PageMaker) => {
   const orderedPages = pages.slice();
 
   for (let i = 0; i < orderedPages.length; i += 1) {

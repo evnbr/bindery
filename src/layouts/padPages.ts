@@ -1,6 +1,6 @@
-import { Page } from '../book';
+import { Page, PageMaker } from '../book';
 
-const padPages = (pages: Page[], makePage: (() => Page)) => {
+const padPages = (pages: Page[], makePage: PageMaker) => {
   if (pages.length % 2 !== 0) {
     const pg = makePage();
     pages.push(pg);

@@ -1,6 +1,8 @@
 import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
 import { createEl } from '../dom-utils';
+import { Book, PageMaker } from '../book';
+
 
 // Options:
 // selector: String
@@ -20,8 +22,10 @@ class FullBleedPage extends OutOfFlow {
     });
   }
 
-  createOutOfFlowPages(elmt, book, makeNewPage) {
-    elmt.parentNode.removeChild(elmt);
+  createOutOfFlowPages(elmt: HTMLElement, book: Book, makeNewPage: PageMaker) {
+    if (elmt.parentNode) {
+      elmt.parentNode.removeChild(elmt);
+    }
 
     let newPage;
     if (book.currentPage.isEmpty) {

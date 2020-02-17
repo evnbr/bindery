@@ -1,6 +1,8 @@
 import Replace from './Replace';
 import { validate, T } from '../option-checker';
 import { createEl } from '../dom-utils';
+import { Book, PageMaker } from '../book';
+
 
 // Options:
 // selector: String
@@ -17,7 +19,7 @@ class Footnote extends Replace {
       render: T.func,
     });
   }
-  afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
+  afterAdd(element: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker, overflowCallback: Function) {
     const number = book.currentPage.footer.children.length + 1;
 
     const footnote = createEl('.footnote');
@@ -27,20 +29,20 @@ class Footnote extends Replace {
 
     book.currentPage.footer.appendChild(footnote);
 
-    return super.afterAdd(element, book, continueOnNewPage, makeNewPage, (overflowEl) => {
+    return super.afterAdd(element, book, continueOnNewPage, makeNewPage, (overflowEl: HTMLElement) => {
       book.currentPage.footer.removeChild(footnote);
       return overflowCallback(overflowEl);
     });
   }
-  createReplacement(book, element) {
+  createReplacement(book: Book, element: HTMLElement) {
     const number = book.currentPage.footer.children.length;
     return this.replace(element, number);
   }
-  replace(element, number) {
-    element.insertAdjacentHTML('beforeEnd', `<sup class="bindery-sup">${number}</sup>`);
+  replace(element: HTMLElement, number: number) {
+    element.insertAdjacentHTML('beforeend', `<sup class="bindery-sup">${number}</sup>`);
     return element;
   }
-  render(element, number): (string | HTMLElement) {
+  render(element: HTMLElement, number: number): (string | HTMLElement) {
     return `<sup>${number}</sup> Default footnote (<a href='/bindery/docs/#footnote'>Learn how to change it</a>)`;
   }
 }

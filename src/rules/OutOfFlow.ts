@@ -1,4 +1,5 @@
 import Rule from './Rule';
+import { Book, PageMaker } from '../book';
 
 class OutOfFlow extends Rule {
   continue?: string;
@@ -7,17 +8,17 @@ class OutOfFlow extends Rule {
     super(options);
     this.name = 'Out of Flow';
   }
-  createOutOfFlowPages(elmt: any, book: any, makeNewPage: any) {
+  createOutOfFlowPages(elmt: any, book: Book, makeNewPage: PageMaker) {
     throw Error('createOutOfFlowPages must be overridden');
   }
-  beforeAdd(elmt) {
+  beforeAdd(elmt: HTMLElement) {
     // Avoid breaking inside this element. Once it's completely added,
     // it will moved onto the background layer.
 
-    elmt.setAttribute('data-ignore-overflow', true);
+    elmt.setAttribute('data-ignore-overflow', 'true');
     return elmt;
   }
-  afterAdd(elmt, book, continueOnNewPage, makeNewPage) {
+  afterAdd(elmt: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker) {
     this.createOutOfFlowPages(elmt, book, makeNewPage);
 
     // Catches cases when we didn't need to create a new page. but unclear

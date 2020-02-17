@@ -1,5 +1,6 @@
 import Replace from './Replace';
 import { pageNumbersForTest, formatAsRanges } from './searchPages';
+import { Book, Page } from '../book';
 
 import { shallowEqual, throttleTime } from '../utils';
 import { validate, T } from '../option-checker';
@@ -13,11 +14,13 @@ const safeIDSel = (sel: string) => {
   return (startsWithNumber(sel) ? `[id="${sel.replace('#', '')}"]` : sel);
 }
 
+declare type TestFunction = (el: HTMLElement) => boolean;
+
 interface PageReferenceInstance {
   value: any;
   element: HTMLElement;
   template: HTMLElement;
-  test: any;
+  test: TestFunction;
 }
 
 // Options:
@@ -25,7 +28,7 @@ interface PageReferenceInstance {
 // replace: function (HTMLElement, number) => HTMLElement
 class PageReference extends Replace {
   references: PageReferenceInstance[];
-  throttledUpdate: (book: any) => void;
+  throttledUpdate: (book: Book) => void;
 
   constructor(options) {
     super(options);
@@ -42,11 +45,11 @@ class PageReference extends Replace {
     };
   }
 
-  eachPage(page, book) {
+  eachPage(page: Page, book: Book) {
     this.throttledUpdate(book);
   }
 
-  afterAdd(elmt, book) {
+  afterAdd(elmt: HTMLElement, book: Book) {
     const test = this.createTest(elmt);
     if (!test) return elmt;
 
@@ -54,7 +57,7 @@ class PageReference extends Replace {
     return ref.element;
   }
 
-  createReference(book, test, elmt): PageReferenceInstance {
+  createReference(book: Book, test: TestFunction, elmt: HTMLElement): PageReferenceInstance {
     const ref = {
       test,
       template: elmt,
@@ -84,14 +87,16 @@ class PageReference extends Replace {
     ref.value = newValue;
   }
 
-  createTest(element) {
+  createTest(element: HTMLElement): TestFunction | null {
     const href = element.getAttribute('href');
     if (!href) return null;
     const selector = safeIDSel(href);
-    return el => el.querySelector(selector);
+    return (el: HTMLElement) => {
+      return !!el.querySelector(selector);
+    }
   }
 
-  updatePageReferences(pages) {
+  updatePageReferences(pages: Page[]) {
     // querySelector first, then rerender
     const results = this.references.map(ref =>
       ({ ref, data: pageNumbersForTest(pages, ref.test) }));

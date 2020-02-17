@@ -1,4 +1,5 @@
 import Rule from './Rule';
+import { Book, PageMaker } from '../book';
 
 // Options:
 // selector: String
@@ -9,13 +10,13 @@ class Replace extends Rule {
     super(options);
     this.name = 'Replace';
   }
-  afterAdd(element, book, continueOnNewPage, makeNewPage, overflowCallback) {
+  afterAdd(element: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker, overflowCallback: Function) {
     const parent = element.parentNode;
     if (!parent) {
       console.error(element);
       throw Error(`Bindery.Replace({ selector: '${this.selector}' }).afterAdd called on element that hasn't been added.`);
     }
-    const defensiveClone = element.cloneNode(true);
+    const defensiveClone = element.cloneNode(true) as HTMLElement;
     const replacement = this.createReplacement(book, defensiveClone);
     parent.replaceChild(replacement, element);
 
@@ -27,11 +28,11 @@ class Replace extends Rule {
 
     return replacement;
   }
-  createReplacement(book, element) {
+  createReplacement(book: Book, element: HTMLElement) {
     return this.replace(element);
   }
-  replace(element, info?) {
-    element.insertAdjacentHTML('beforeEnd', '<sup class="bindery-sup">Default Replacement</sup>');
+  replace(element: HTMLElement, info?: any) {
+    element.insertAdjacentHTML('beforeend', '<sup class="bindery-sup">Default Replacement</sup>');
     return element;
   }
 }

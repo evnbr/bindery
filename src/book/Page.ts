@@ -6,10 +6,11 @@ class Page {
   footer: HTMLElement;
   background: HTMLElement;
   element: HTMLElement;
+  runningHeader?: HTMLElement; // used by running header. TODO: only supports one
 
   side?: string;
   number?: number;
-  heading: ;
+  heading: { [key: string]: any } = {}; // used by running headers
 
   suppress = false;
   hasOutOfFlowContent = false;

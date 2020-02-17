@@ -1,5 +1,6 @@
 import Rule from './Rule';
 import { validate, T } from '../option-checker';
+import { Book, PageMaker } from '../book';
 
 class PageBreak extends Rule {
   continue: string = '';
@@ -20,7 +21,7 @@ class PageBreak extends Rule {
   get avoidSplit() {
     return this.position === 'avoid';
   }
-  beforeAdd(elmt, book, continueOnNewPage) {
+  beforeAdd(elmt: HTMLElement, book: Book, continueOnNewPage: Function) {
     if (this.position === 'before' || this.position === 'both') {
       if (!book.currentPage.isEmpty) {
         continueOnNewPage();
@@ -31,7 +32,7 @@ class PageBreak extends Rule {
     }
     return elmt;
   }
-  afterAdd(elmt, book, continueOnNewPage) {
+  afterAdd(elmt: HTMLElement, book: Book, continueOnNewPage: Function) {
     if (this.position === 'after' || this.position === 'both') {
       const newPage = continueOnNewPage(true);
       if (this.continue !== 'next') {

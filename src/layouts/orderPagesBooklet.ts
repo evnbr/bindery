@@ -1,6 +1,6 @@
-import { Page } from '../book';
+import { Page, PageMaker } from '../book';
 
-const orderPagesBooklet = (pages: Page[], makePage) => {
+const orderPagesBooklet = (pages: Page[], makePage: PageMaker) => {
   while (pages.length % 4 !== 0) {
     const spacerPage = makePage();
     spacerPage.element.style.visibility = 'hidden';

@@ -1,6 +1,7 @@
 import Rule from './Rule';
 import { validate, T } from '../option-checker';
 import { createEl } from '../dom-utils';
+import { Page } from '../book';
 
 // Options:
 // selector: String
@@ -15,7 +16,7 @@ class RunningHeader extends Rule {
       render: T.func,
     });
   }
-  eachPage(page) {
+  eachPage(page: Page) {
     if (!page.runningHeader) {
       const elmt = createEl('.running-header');
       page.element.appendChild(elmt);
@@ -23,8 +24,8 @@ class RunningHeader extends Rule {
     }
     page.runningHeader.innerHTML = this.render(page);
   }
-  render(page) {
-    return page.number;
+  render(page: Page) {
+    return `${page.number}`;
   }
 }
 

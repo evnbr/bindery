@@ -1,34 +1,38 @@
-const pageNumbersForTest = (pages, test) => {
+import { Page } from '../book';
+
+const pageNumbersForTest = (pages: Page[], test: ((el: HTMLElement) => boolean)) => {
   return pages.filter((pg) => pg.number && test(pg.element)).map((pg) => pg.number);
 }
 
-const pageNumbersForSelector = (pages, sel) => {
-  return pageNumbersForTest(pages, (el) => el.querySelector(sel));
+const pageNumbersForSelector = (pages: Page[], selector: string) => {
+  return pageNumbersForTest(pages, (el: HTMLElement) => {
+    return !!el.querySelector(selector)
+  });
 }
 
-const formatAsRanges = (pageNumbers) => {
+const formatAsRanges = (pageNumbers: number[]) => {
   let str = '';
   let prevNum = pageNumbers[0];
   let isInARange = false;
 
-  const addFirst = (num) => {
+  const addFirst = (num: number) => {
     str += `${num}`;
   };
   const continueRange = () => {
     isInARange = true;
   };
-  const endRange = (endNum) => {
+  const endRange = (endNum: number) => {
     isInARange = false;
     str += `–${endNum}`;
   };
-  const addComma = (num) => {
+  const addComma = (num: number) => {
     str += `, ${num}`;
   };
-  const endAndAdd = (endNum, num) => {
+  const endAndAdd = (endNum: number, num: number) => {
     endRange(endNum);
     addComma(num);
   };
-  const addLast = (num, isAdjacent) => {
+  const addLast = (num: number, isAdjacent: boolean) => {
     if (isAdjacent) endRange(num);
     else if (isInARange && !isAdjacent) endAndAdd(prevNum, num);
     else addComma(num);

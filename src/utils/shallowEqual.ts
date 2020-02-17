@@ -1,5 +1,6 @@
 // https://github.com/moroshko/shallow-equal/blob/master/src/arrays.js
-const shallowEqual = (a, b) => {
+
+const shallowEqual = (a: any[], b: any[]) => {
   if (a === b) return true;
   if (!a || !b) return false;
 

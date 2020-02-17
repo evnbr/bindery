@@ -6,7 +6,7 @@ const MAXIMUM_PAGE_LIMIT = 2000;
 class Book {
   rawPages: Page[] = [];
   orderedPages: Page[] = [];
-  currentPage?: Page;
+  currentPage!: Page;
 
   addPage(newPage: Page) {
     this.rawPages.push(newPage);
