@@ -48,7 +48,7 @@
     "postbuild": "npm run package && npm run clean && npm run movetodocs",
     "test": "jest",
     "clean": "rimraf build",
-    "movetodocs": "cp dist/bindery.umd.js docs/bindery_dev_build && cp dist/bindery.umd.js.map docs/bindery_dev_build",
+    "movetodocs": "cp dist/bindery.umd.js docs/bindery_local_build.js",
     "coverage": "jest --coverage",
     "docs": "cd docs && jekyll serve"
   },

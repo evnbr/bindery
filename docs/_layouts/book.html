@@ -3,11 +3,7 @@
 
   {% include head.html %}
   <body>
-    {% if jekyll.environment == "production" %}
-      <script type="text/javascript" src='https://unpkg.com/bindery'></script>
-    {% else %}
-      <script type="text/javascript" src='/bindery/bindery_dev_build/bindery.umd.js'></script>
-    {% endif %}
+    {% include latest-bindery.html %}
 
     <script>
       const {
