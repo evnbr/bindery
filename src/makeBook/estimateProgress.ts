@@ -1,4 +1,4 @@
-const sec = ms => (ms / 1000).toFixed(2);
+const sec = (ms: number) => (ms / 1000).toFixed(2);
 
 const estimateFor = (content) => {
   const start = window.performance.now();
@@ -8,7 +8,7 @@ const estimateFor = (content) => {
 
   return {
     increment: () => { completed += 1; },
-    addWaitTime: (t) => { timeWaiting += t; },
+    addWaitTime: (t: number) => { timeWaiting += t; },
     get progress() { return completed / capacity; },
     end: () => {
       const end = window.performance.now();

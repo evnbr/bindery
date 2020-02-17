@@ -64,7 +64,9 @@ class Page {
     const suspect = this.flow.currentElement;
     if (suspect) {
       console.warn('Bindery: Content overflows, probably due to a style set on:', suspect);
-      suspect.parentNode.removeChild(suspect);
+      if (suspect.parentNode) {
+        suspect.parentNode.removeChild(suspect);
+      }
     } else {
       console.warn('Bindery: Content overflows.');
     }

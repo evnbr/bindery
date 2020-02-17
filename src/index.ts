@@ -2,7 +2,7 @@
 import Bindery from './bindery';
 import rules from './rules';
 import { Mode, Paper, Layout, Marks } from './constants';
-import './main.scss';
+import '../src/main.scss';
 
 declare const BINDERY_VERSION: string;
 

@@ -4,12 +4,11 @@ import orderPages from './orderPages';
 const MAXIMUM_PAGE_LIMIT = 2000;
 
 class Book {
-  constructor() {
-    this.rawPages = [];
-    this.orderedPages = [];
-  }
+  rawPages: Page[] = [];
+  orderedPages: Page[] = [];
+  currentPage?: Page;
 
-  addPage(newPage) {
+  addPage(newPage: Page) {
     this.rawPages.push(newPage);
     this.updatePageOrder();
   }
