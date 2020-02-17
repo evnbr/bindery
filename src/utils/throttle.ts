@@ -1,6 +1,6 @@
 const throttleFrame = () => {
   let wasCalled = false;
-  let queued: Function;
+  let queued: Function | undefined;
   const inner = (func: Function) => {
     if (wasCalled) {
       queued = func;
@@ -12,7 +12,7 @@ const throttleFrame = () => {
       wasCalled = false;
       if (queued) {
         const queuedFunc = queued;
-        queued = null;
+        queued = undefined;
         inner(queuedFunc);
       }
     });
@@ -22,7 +22,7 @@ const throttleFrame = () => {
 
 const throttleTime = (ms: number) => {
   let wasCalled = false;
-  let queued: Function;
+  let queued: Function | undefined;
   const inner = (func: Function) => {
     if (wasCalled) {
       queued = func;
@@ -34,7 +34,7 @@ const throttleTime = (ms: number) => {
       wasCalled = false;
       if (queued) {
         const queuedFunc = queued;
-        queued = null;
+        queued = undefined;
         inner(queuedFunc);
       }
     }, ms);

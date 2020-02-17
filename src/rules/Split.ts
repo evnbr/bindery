@@ -5,7 +5,7 @@ class Split extends Rule {
   toNext: string | null = null;
   fromPrevious: string | null = null;
 
-  constructor(options) {
+  constructor(options: {}) {
     super(options);
 
     validate(options, {

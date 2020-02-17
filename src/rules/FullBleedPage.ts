@@ -10,7 +10,7 @@ import { Book, PageMaker } from '../book';
 class FullBleedPage extends OutOfFlow {
   rotate!: string;
   
-  constructor(options) {
+  constructor(options: {}) {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';
     super(options);

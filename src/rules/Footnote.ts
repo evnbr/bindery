@@ -10,7 +10,7 @@ import { Book, PageMaker } from '../book';
 // render: function (Page) => HTMLElement
 
 class Footnote extends Replace {
-  constructor(options) {
+  constructor(options: {}) {
     super(options);
     validate(options, {
       name: 'Footnote',

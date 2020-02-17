@@ -11,8 +11,12 @@ import Viewer from './viewer';
 import rules from './rules';
 import { validate, T } from './option-checker';
 import { parseHTML } from './dom-utils';
+import { Book } from './book';
+import Rule from './rules/Rule';
 
-const vals = obj => Object.keys(obj).map(k => obj[k]);
+const vals = (obj: { [key: string]: any}) => {
+  return Object.keys(obj).map(k => obj[k]);
+};
 const rAF = () => new Promise((resolve) => {
   requestAnimationFrame(t => resolve(t));
 });
@@ -42,7 +46,7 @@ class Bindery {
   viewer: Viewer;
   content!: HTMLElement;
   pageSetup: PageSetup;
-  rules: any[];
+  rules: Rule[];
   layoutInProgress: boolean = false;
 
   constructor(opts: BinderyOptions = {}) {
@@ -107,7 +111,7 @@ class Bindery {
     return new Bindery(opts);
   }
 
-  async getContentAsElement(content): Promise<HTMLElement> {
+  async getContentAsElement(content: any): Promise<HTMLElement> {
     if (content instanceof HTMLElement) return content;
     if (typeof content === 'string') {
       const el = document.querySelector(content);
@@ -126,7 +130,7 @@ class Bindery {
   async fetchContent(url: string, selector?: string) {
     const response = await fetch(url);
     if (response.status !== 200) {
-      this.viewer.displayError(response.status, `Could not find file at "${url}"`);
+      this.viewer.displayError(`${response.status}`, `Could not find file at "${url}"`);
       throw Error(`Bindery: Could not find file at "${url}"`);
     }
     const fetchedContent = await response.text();
@@ -164,27 +168,27 @@ class Bindery {
     }
 
     this.content.style.display = '';
-    const content = this.content.cloneNode(true);
+    const content = this.content.cloneNode(true) as HTMLElement;
     this.content.style.display = 'none';
 
     this.layoutInProgress = true;
     this.viewer.clear(); // In case we're updating an existing layout
     this.viewer.show();
     this.pageSetup.updateStyleVars();
-    this.viewer.inProgress = true;
+    this.viewer.isInProgress = true;
 
     try {
-      const onProgress = (current, progress) => this.viewer.updateProgress(current, progress);
+      const onProgress = (current: Book, progress: number) => this.viewer.updateProgress(current, progress);
       const book = await makeBook(content, this.rules, onProgress);
       this.viewer.progress = 1;
       this.layoutInProgress = false;
       await rAF();
       this.viewer.render(book);
-      this.viewer.inProgress = false;
+      this.viewer.isInProgress = false;
       return book;
     } catch (e) {
       this.layoutInProgress = false;
-      this.viewer.inProgress = false;
+      this.viewer.isInProgress = false;
       this.viewer.displayError('Layout couldn\'t complete', e.message);
       console.error(e);
       return null;

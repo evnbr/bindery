@@ -3,44 +3,73 @@ import Rule from '../rules/Rule';
 import Split from '../rules/Split';
 import dedupe from './dedupeRules';
 import recoverFromRule from './recoverFromRule';
+import { Book, Page, PageMaker } from '../book';
 
-const giveUp = (rule, el) => {
+const giveUp = (rule: Rule, el: HTMLElement) => {
   console.warn(`Couldn't apply ${rule.name}, caused overflows twice when adding: `, el);
 };
 
 interface PageRule extends Rule {
-  eachPage: (Page, Book) => void;
+  eachPage: (pg: Page, book: Book) => void;
 }
 interface BeforeAddRule extends Rule {
-  beforeAdd: (a, b, c, d) => void;
+  selector: string;
+  beforeAdd: (a, b, c, d) => HTMLElement;
 }
 interface AfterAddRule extends Rule {
-  afterAdd: (a, b, c, d, e) => void;
+  selector: string;
+  afterAdd: (a, b, c, d, e) => HTMLElement;
 }
+interface OffsetRule extends Rule {
+  pageNumberOffset: number;
+}
+interface AvoidSplitRule extends Rule {
+  avoidSplit: boolean;
+}
+interface DidSplitRule extends Rule {
+  didSplit: (a: HTMLElement, b: HTMLElement) => void;
+}
+
+function isPageRule (rule: Rule): rule is PageRule {
+  return rule.hasOwnProperty('eachPage');
+}
+function isBeforeAddRule (rule: Rule): rule is BeforeAddRule {
+  return !!rule.selector && rule.hasOwnProperty('beforeAdd');
+}
+function isAfterAddRule (rule: Rule): rule is AfterAddRule {
+  return !!rule.selector && rule.hasOwnProperty('afterAdd');
+}
+function isOffsetRule (rule: Rule): rule is OffsetRule {
+  return rule.hasOwnProperty('pageNumberOffset');
+}
+function isDidSplitRule (rule: Rule): rule is DidSplitRule {
+  return !!rule.selector && rule.hasOwnProperty('didSplit');
+}
+
 
 class RuleSet {
   pageNumberOffset: number;
   pageRules: PageRule[];
   beforeAddRules: BeforeAddRule[];
   afterAddRules: AfterAddRule[];
-  didSplitRules: Split[];
+  didSplitRules: DidSplitRule[];
   selectorsNotToSplit: string[];
-  shouldTraverse: (el: Element) => boolean;
+  shouldTraverse: (el: HTMLElement) => boolean;
 
-  constructor(rules) {
-    const offsetRule = rules.find(r => r.pageNumberOffset);
+  constructor(rules: Rule[]) {
+    const offsetRule = rules.find(isOffsetRule);
     this.pageNumberOffset = offsetRule ? offsetRule.pageNumberOffset : 0;
 
     // Rules for pages
-    this.pageRules = rules.filter(r => r.eachPage);
+    this.pageRules = rules.filter(isPageRule);
 
     // Rules for elements
-    this.beforeAddRules = rules.filter(r => r.selector && r.beforeAdd);
-    this.afterAddRules = rules.filter(r => r.selector && r.afterAdd);
+    this.beforeAddRules = rules.filter(isBeforeAddRule);
+    this.afterAddRules = rules.filter(isAfterAddRule);
 
     // Rules for layout
     this.selectorsNotToSplit = rules.filter(r => r.avoidSplit).map(r => r.selector);
-    this.didSplitRules = rules.filter(r => r.selector && r.didSplit);
+    this.didSplitRules = rules.filter(isDidSplitRule);
 
     // setup
     rules.filter(r => r.setup).forEach(r => r.setup());
@@ -49,14 +78,14 @@ class RuleSet {
 
     const allSelectors = rules.map(r => r.selector).filter(sel => !!sel).join(', ');
     if (allSelectors) {
-      const shouldTraverse = el => el.querySelector(allSelectors);
+      const shouldTraverse = (el: HTMLElement) => !!el.querySelector(allSelectors);
       this.shouldTraverse = shouldTraverse.bind(this);
     } else {
       this.shouldTraverse = () => false;
     }
   }
 
-  applySplitRules(original, clone) {
+  applySplitRules(original: HTMLElement, clone: HTMLElement) {
     original.classList.add(classes.toNext);
     clone.classList.add(classes.fromPrev);
 
@@ -66,15 +95,15 @@ class RuleSet {
   }
 
   // Rules for pages
-  applyPageDoneRules(pg, book) {
+  applyPageDoneRules(pg: Page, book: Book) {
     this.pageRules.forEach(rule => rule.eachPage(pg, book));
   }
-  finishEveryPage(book) {
+  finishEveryPage(book: Book) {
     this.pageRules.forEach(rule => book.pages.forEach(pg => rule.eachPage(pg, book)));
   }
 
   // Rules for elements
-  applyBeforeAddRules(element, book, continueOnNewPage, makeNewPage) {
+  applyBeforeAddRules(element: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker) {
     let addedElement = element;
 
     const matchingRules = this.beforeAddRules.filter(rule => addedElement.matches(rule.selector));
@@ -85,15 +114,15 @@ class RuleSet {
     return addedElement;
   }
 
-  applyAfterAddRules(originalElement, book, continueOnNewPage, makeNewPage) {
+  applyAfterAddRules(originalElement: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker) {
     let addedElement = originalElement;
 
-    const attemptRecovery = el => recoverFromRule(el, book, continueOnNewPage);
+    const attemptRecovery = (el: HTMLElement) => recoverFromRule(el, book, continueOnNewPage);
     const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));
     const uniqueRules = dedupe(matchingRules) as AfterAddRule[];
 
     uniqueRules.forEach((rule) => {
-      const retry = (el) => {
+      const retry = (el: HTMLElement) => {
         attemptRecovery(el);
         return rule.afterAdd(el, book, continueOnNewPage, makeNewPage, () => giveUp(rule, el));
       };

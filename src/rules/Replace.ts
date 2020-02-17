@@ -6,7 +6,7 @@ import { Book, PageMaker } from '../book';
 // replace: function (HTMLElement) => HTMLElement
 
 class Replace extends Rule {
-  constructor(options) {
+  constructor(options: {}) {
     super(options);
     this.name = 'Replace';
   }

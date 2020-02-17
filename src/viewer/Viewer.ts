@@ -20,18 +20,20 @@ const makeSpread = (pgs: HTMLElement[]) => {
 class Viewer {
   book: any;
   pageSetup: any;
+
   progressBar: HTMLElement;
   content: HTMLElement;
   scaler: HTMLElement;
   element: HTMLElement;
+  error?: HTMLElement;
+
   doubleSided: boolean;
-  layout: any;
-  mode: any;
+  layout: number;
+  mode: number;
   currentLeaf: number;
   controls: Controls;
-  error: any;
   lastSpreadInProgress: any;
-  hasRendered: any;
+  hasRendered: boolean = false;
 
   constructor({ pageSetup, mode, layout, marks }) {
     this.book = null;
@@ -77,23 +79,23 @@ class Viewer {
     );
     this.element.appendChild(this.controls.element);
 
-    this.inProgress = true;
+    this.isInProgress = true;
 
     this.show();
   }
 
-  setMode(newVal) {
+  setMode(newVal: string) {
     const newMode = parseInt(newVal, 10);
     if (newMode === this.mode) return;
     this.mode = newMode;
     this.render();
   }
 
-  get inProgress() {
+  get isInProgress() {
     return this.element.classList.contains(classes.inProgress);
   }
 
-  set inProgress(newVal) {
+  set isInProgress(newVal) {
     this.element.classList.toggle(classes.inProgress, newVal);
     if (newVal && this.controls) this.controls.setInProgress();
   }

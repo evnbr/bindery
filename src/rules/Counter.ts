@@ -8,7 +8,7 @@ class Counter extends Rule {
   resetEl: string = '';
   replaceEl: string = '';
 
-  constructor(options) {
+  constructor(options: {}) {
     super(options);
     this.selector = '*';
     this.counterValue = 0;

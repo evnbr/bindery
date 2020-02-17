@@ -11,34 +11,34 @@ import Split from './Split';
 
 export default {
   Rule,
-  Split(options) {
+  Split(options: {}) {
     return new Split(options);
   },
-  Counter(options) {
+  Counter(options: {}) {
     return new Counter(options);
   },
-  FullBleedPage(options) {
+  FullBleedPage(options: {}) {
     return new FullBleedPage(options);
   },
-  Footnote(options) {
+  Footnote(options: {}) {
     return new Footnote(options);
   },
-  RunningHeader(options) {
+  RunningHeader(options: {}) {
     return new RunningHeader(options);
   },
-  Replace(options) {
+  Replace(options: {}) {
     return new Replace(options);
   },
-  FullBleedSpread(options) {
+  FullBleedSpread(options: {}) {
     return new FullBleedSpread(options);
   },
-  PageBreak(options) {
+  PageBreak(options: {}) {
     return new PageBreak(options);
   },
-  PageReference(options) {
+  PageReference(options: {}) {
     return new PageReference(options);
   },
-  createRule(options) {
+  createRule(options: {}) {
     return new Rule(options);
   },
 };

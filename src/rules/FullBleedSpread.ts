@@ -10,7 +10,7 @@ class FullBleedSpread extends OutOfFlow {
   rotate!: string;
   continue!: string;
 
-  constructor(options) {
+  constructor(options: {}) {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';
     super(options);
@@ -22,7 +22,9 @@ class FullBleedSpread extends OutOfFlow {
     });
   }
   createOutOfFlowPages(elmt: HTMLElement, book: Book, makeNewPage: PageMaker) {
-    elmt.parentNode.removeChild(elmt);
+    if (!!elmt.parentNode) {
+      elmt.parentNode.removeChild(elmt);
+    }
 
     let leftPage;
     if (book.currentPage.isEmpty) {

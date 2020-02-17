@@ -30,7 +30,7 @@ class PageReference extends Replace {
   references: PageReferenceInstance[];
   throttledUpdate: (book: Book) => void;
 
-  constructor(options) {
+  constructor(options: {}) {
     super(options);
     validate(options, {
       name: 'PageReference',
