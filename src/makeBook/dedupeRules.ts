@@ -3,11 +3,11 @@ import FullBleedSpread from '../rules/FullBleedSpread';
 import PageBreak from '../rules/PageBreak';
 import Rule from '../rules/Rule';
 
-const isSpread = rule => rule instanceof FullBleedSpread;
-const isPage = rule => rule instanceof FullBleedPage;
-const isBreak = rule => rule instanceof PageBreak;
+const isSpread = (rule: Rule) => rule instanceof FullBleedSpread;
+const isPage = (rule: Rule) => rule instanceof FullBleedPage;
+const isBreak = (rule: Rule) => rule instanceof PageBreak;
 
-const isFullPageRule = rule => isSpread(rule) || isPage(rule) || isBreak(rule);
+const isFullPageRule = (rule: Rule) => isSpread(rule) || isPage(rule) || isBreak(rule);
 
 const dedupe = (inputRules: Rule[]): Rule[] => {
   const conflictRules = inputRules.filter(isFullPageRule);

@@ -1,5 +1,5 @@
 import { Page } from '../book';
-import { c, createEl } from '../dom-utils';
+import { prefixer, createEl } from '../dom-utils';
 import padPages from './padPages';
 
 const renderFlipLayout = (bookPages: Page[], doubleSided: boolean) => {
@@ -48,15 +48,15 @@ const renderFlipLayout = (bookPages: Page[], doubleSided: boolean) => {
 
     const rightPage = pages[i].element;
     let leftPage;
-    rightPage.classList.add(c('page3d-front'));
+    rightPage.classList.add(prefixer('page3d-front'));
     flap.appendChild(rightPage);
     if (doubleSided) {
-      flap.classList.add(c('doubleSided'));
+      flap.classList.add(prefixer('doubleSided'));
       leftPage = pages[i + 1].element;
     } else {
       leftPage = createEl('.page');
     }
-    leftPage.classList.add(c('page3d-back'));
+    leftPage.classList.add(prefixer('page3d-back'));
     flap.appendChild(leftPage);
 
     // TODO: Dynamically add/remove pages.

@@ -45,7 +45,7 @@ class Page {
     return this.side === 'right';
   }
 
-  setPreference(dir) {
+  setPreference(dir: 'left' | 'right') {
     const preferLeft = dir === 'left';
     this.alwaysLeft = preferLeft;
     this.alwaysRight = !preferLeft;

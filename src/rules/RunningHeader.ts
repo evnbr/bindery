@@ -1,4 +1,4 @@
-import Rule from './Rule';
+import Rule, { RuleOptions } from './Rule';
 import { validate, T } from '../option-checker';
 import { createEl } from '../dom-utils';
 import { Page } from '../book';
@@ -9,7 +9,7 @@ import { Page } from '../book';
 // TODO selectorHierarchy: [ String ], ie [ 'h1', 'h2', 'h3.chapter' ]
 
 class RunningHeader extends Rule {
-  constructor(options = {}) {
+  constructor(options: RuleOptions = {}) {
     super(options);
     validate(options, {
       name: 'RunningHeader',

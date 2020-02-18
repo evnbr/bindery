@@ -2,6 +2,7 @@ import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
 import { createEl } from '../dom-utils';
 import { Book, PageMaker } from '../book';
+import { RuleOptions } from './Rule';
 
 
 // Options:
@@ -10,7 +11,7 @@ import { Book, PageMaker } from '../book';
 class FullBleedPage extends OutOfFlow {
   rotate!: string;
   
-  constructor(options: {}) {
+  constructor(options: RuleOptions) {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';
     super(options);

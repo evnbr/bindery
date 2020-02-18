@@ -1,4 +1,4 @@
-import classes from './classes';
+import { classes, classForMode, allModeClasses } from './classes';
 import prefixer from './prefixer';
 import safeMeasure from './safeMeasure';
 import createEl from './createEl';
@@ -19,11 +19,10 @@ const stylesheet = (id: string): HTMLStyleElement => {
 }
 
 // Parse html from text
-const parseHTML = (text: string, selector: string) => {
+const parseHTML = (text: string, selector?: string) => {
   const wrapper = doc.createElement('div');
   wrapper.innerHTML = text;
-  return wrapper.querySelector(selector);
+  return selector ? wrapper.querySelector(selector) : wrapper;
 };
 
-const c = prefixer;
-export { c, classes, createEl, stylesheet, safeMeasure, parseHTML };
+export { prefixer, classes, classForMode, allModeClasses, createEl, stylesheet, safeMeasure, parseHTML };

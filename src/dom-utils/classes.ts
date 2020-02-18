@@ -11,7 +11,6 @@ const classes = {
   viewPrint: 'view-print',
   viewFlip: 'view-flip',
   inProgress: 'in-progress',
-  allModes: [''],
 
   leftPage: 'left',
   rightPage: 'right',
@@ -27,13 +26,24 @@ const classes = {
 };
 
 Object.keys(classes).forEach((k) => {
-  const val = classes[k];
-  classes[k] = prefix(val);
+  const key = k as keyof typeof classes;
+  const val = classes[key];
+  classes[key] = prefix(val);
 });
 
-classes['allModes'] = [classes.viewPreview, classes.viewPrint, classes.viewFlip];
-classes[Mode.PREVIEW] = classes.viewPreview;
-classes[Mode.PRINT] = classes.viewPrint;
-classes[Mode.FLIPBOOK] = classes.viewFlip;
+const allModeClasses = [classes.viewPreview, classes.viewPrint, classes.viewFlip];
 
-export default classes;
+const classForMode = (mode: number): string => {
+  switch (mode) {
+    case Mode.PREVIEW: return classes.viewPreview;
+    case Mode.PRINT: return classes.viewPrint;
+    case Mode.FLIPBOOK: return classes.viewFlip;
+    default: throw Error ("Unknonw mode");
+  }
+}
+
+export {
+  classes,
+  allModeClasses,
+  classForMode
+};

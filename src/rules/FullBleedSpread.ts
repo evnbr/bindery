@@ -1,7 +1,8 @@
 import OutOfFlow from './OutOfFlow';
 import { validate, T } from '../option-checker';
-import { c, createEl } from '../dom-utils';
+import { prefixer, createEl } from '../dom-utils';
 import { Book, PageMaker } from '../book';
+import { RuleOptions } from './Rule';
 
 // Options:
 // selector: String
@@ -10,7 +11,7 @@ class FullBleedSpread extends OutOfFlow {
   rotate!: string;
   continue!: string;
 
-  constructor(options: {}) {
+  constructor(options: RuleOptions) {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';
     super(options);
@@ -46,14 +47,14 @@ class FullBleedSpread extends OutOfFlow {
     }
 
     leftPage.background.appendChild(elmt);
-    leftPage.element.classList.add(c('spread'));
+    leftPage.element.classList.add(prefixer('spread'));
     leftPage.setPreference('left');
     leftPage.isOutOfFlow = this.continue === 'same';
     leftPage.avoidReorder = true;
     leftPage.hasOutOfFlowContent = true;
 
     rightPage.background.appendChild(elmt.cloneNode(true));
-    rightPage.element.classList.add(c('spread'));
+    rightPage.element.classList.add(prefixer('spread'));
     rightPage.setPreference('right');
     rightPage.isOutOfFlow = this.continue === 'same';
     rightPage.avoidReorder = true;

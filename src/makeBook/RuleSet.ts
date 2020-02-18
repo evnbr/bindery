@@ -15,11 +15,11 @@ interface PageRule extends Rule {
 }
 interface BeforeAddRule extends Rule {
   selector: string;
-  beforeAdd: (a, b, c, d) => HTMLElement;
+  beforeAdd: (...args: any) => HTMLElement;
 }
 interface AfterAddRule extends Rule {
   selector: string;
-  afterAdd: (a, b, c, d, e) => HTMLElement;
+  afterAdd: (...args: any) => HTMLElement;
 }
 interface OffsetRule extends Rule {
   pageNumberOffset: number;

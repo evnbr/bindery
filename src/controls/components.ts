@@ -1,20 +1,20 @@
 import { div, button, select, option } from './dom';
-import { c, createEl } from '../dom-utils';
+import { prefixer, createEl } from '../dom-utils';
 
 const row = (children: HTMLElement[]) => createEl('row', children);
 
 // Button
 const btn = (attrs: {}, txt: string) => {
-  return button(`${c('control')} ${c('btn')}`, attrs, txt);
+  return button(`${prefixer('control')} ${prefixer('btn')}`, attrs, txt);
 }
 const btnMain = (attrs: {}, txt: string) => {
-  return button(`${c('control')} ${c('btn')} ${c('btn-main')}`, attrs, txt);
+  return button(`${prefixer('control')} ${prefixer('btn')} ${prefixer('btn-main')}`, attrs, txt);
 }
 
 const dropdown = (attrs: {}, options: HTMLOptionElement[]) => {
   const selectVal = createEl('select-val', []);
   selectVal.textContent = 'Value';
-  const selectEl = select(c('select'), attrs, options);
+  const selectEl = select(prefixer('select'), attrs, options);
   const updateVal = () => {
     selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
   };

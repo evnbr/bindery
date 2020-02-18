@@ -1,4 +1,4 @@
-import Rule from './Rule';
+import Rule, { RuleOptions } from './Rule';
 import { Book, PageMaker } from '../book';
 
 // Options:
@@ -6,7 +6,7 @@ import { Book, PageMaker } from '../book';
 // replace: function (HTMLElement) => HTMLElement
 
 class Replace extends Rule {
-  constructor(options: {}) {
+  constructor(options: RuleOptions) {
     super(options);
     this.name = 'Replace';
   }

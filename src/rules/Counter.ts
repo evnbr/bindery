@@ -1,4 +1,4 @@
-import Rule from './Rule';
+import Rule, { RuleOptions } from './Rule';
 import { validate, T } from '../option-checker';
 
 
@@ -8,7 +8,7 @@ class Counter extends Rule {
   resetEl: string = '';
   replaceEl: string = '';
 
-  constructor(options: {}) {
+  constructor(options: RuleOptions) {
     super(options);
     this.selector = '*';
     this.counterValue = 0;

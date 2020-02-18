@@ -8,7 +8,7 @@ const {
   FullBleedSpread,
 } = rules;
 
-const replacer = (element, number) => {
+const replacer = (element: HTMLElement, number: number) => {
   element.textContent = `${number}`;
   return element;
 };
@@ -30,7 +30,7 @@ export default [
 
   Footnote({
     selector: '[book-footnote-text]',
-    render: (element, number) => {
+    render: (element: HTMLElement, number: number) => {
       const txt = element.getAttribute('book-footnote-text');
       return `<i>${number}</i>${txt}`;
     },
@@ -39,29 +39,37 @@ export default [
   PageReference({
     selector: '[book-pages-with-text]',
     replace: replacer,
-    createTest: (element) => {
-      const term = element.getAttribute('book-pages-with-text').toLowerCase().trim();
-      return page => page.textContent.toLowerCase().includes(term);
+    createTest: (element: HTMLElement) => {
+      const text = element.getAttribute('book-pages-with-text') || '';
+      const term = text.toLowerCase().trim();
+      return (pageElement: HTMLElement) => { 
+        const pageText = pageElement.textContent || '';
+        return pageText.toLowerCase().includes(term);
+      }
     },
   }),
 
   PageReference({
     selector: '[book-pages-with-selector]',
     replace: replacer,
-    createTest: (element) => {
-      const sel = element.getAttribute('book-pages-with-selector').trim();
-      return page => page.querySelector(sel);
+    createTest: (element: HTMLElement) => {
+      const txt = element.getAttribute('book-pages-with-selector') || '';
+      const selector = txt.trim();
+      return (pageElement: HTMLElement) => {
+        return pageElement.querySelector(selector);
+      }
     },
   }),
 
   PageReference({
     selector: '[book-pages-with]',
     replace: replacer,
-    createTest: (element) => {
-      const term = element.textContent.toLowerCase().trim();
-      return (page) => {
-        const txt = page.textContent.toLowerCase();
-        return txt.includes(term);
+    createTest: (element: HTMLElement) => {
+      const text = element.textContent || '';
+      const term = text.toLowerCase().trim();
+      return (pageElement: HTMLElement) => {
+        const pageText = pageElement.textContent || '';
+        return pageText.toLowerCase().includes(term);
       };
     },
   }),

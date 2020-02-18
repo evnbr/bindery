@@ -2,6 +2,7 @@ import Replace from './Replace';
 import { validate, T } from '../option-checker';
 import { createEl } from '../dom-utils';
 import { Book, PageMaker } from '../book';
+import { RuleOptions } from './Rule';
 
 
 // Options:
@@ -10,7 +11,7 @@ import { Book, PageMaker } from '../book';
 // render: function (Page) => HTMLElement
 
 class Footnote extends Replace {
-  constructor(options: {}) {
+  constructor(options: RuleOptions) {
     super(options);
     validate(options, {
       name: 'Footnote',

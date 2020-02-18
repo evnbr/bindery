@@ -1,4 +1,4 @@
-import { c } from '../dom-utils';
+import { prefixer } from '../dom-utils';
 import {
   dropdown,
   option,
@@ -18,13 +18,13 @@ class Controls {
   constructor(availableOptions, initialState, actions) {
     const { Mode, Paper, Layout, Marks } = availableOptions;
 
-    let viewSelect;
-    let marksSelect;
+    let viewSelect: HTMLElement;
+    let marksSelect: HTMLElement;
 
     const print = () => {
       actions.setMode(Mode.PRINT);
 
-      const sel = viewSelect.querySelector('select');
+      const sel = viewSelect.querySelector('select')!;
       sel.value = Mode.PRINT;
       sel.dispatchEvent(new Event('change'));
 
@@ -59,13 +59,14 @@ class Controls {
     };
     updateSheetSizeNames();
 
-    const updatePaper = (e) => {
-      const newVal = parseInt(e.target.value, 10);
+    const updatePaper = (e: Event) => {
+      const sel = e.target as HTMLSelectElement
+      const newVal = parseInt(sel.value, 10);
       actions.setPaper(newVal);
       if (newVal === Paper.AUTO || newVal === Paper.AUTO_BLEED) {
-        marksSelect.classList.add(c('hidden-select'));
+        marksSelect.classList.add(prefixer('hidden-select'));
       } else {
-        marksSelect.classList.remove(c('hidden-select'));
+        marksSelect.classList.remove(prefixer('hidden-select'));
       }
     };
 
@@ -108,7 +109,7 @@ class Controls {
       })
     );
     if (supportsCustomPageSize) {
-      marksSelect.classList.add(c('hidden-select'));
+      marksSelect.classList.add(prefixer('hidden-select'));
     }
     const marks = row([marksSelect]);
     const sheetSize = row([sheetSizeSelect]);
@@ -117,9 +118,9 @@ class Controls {
     this.setDone = () => {};
     this.setInProgress = () => {};
 
-    printBtn.classList.add(c('btn-print'));
+    printBtn.classList.add(prefixer('btn-print'));
     const options = row([arrangement, sheetSize, marks]);
-    options.classList.add(c('print-options'));
+    options.classList.add(prefixer('print-options'));
 
     viewSelect = dropdown(
       { onchange: (e: Event) => {
@@ -137,9 +138,9 @@ class Controls {
       })
     );
     const viewRow = row([viewSelect]);
-    viewRow.classList.add(c('view-row'));
+    viewRow.classList.add(prefixer('view-row'));
 
-    this.element = div(c('controls'), [viewRow, options, printBtn]);
+    this.element = div(prefixer('controls'), [viewRow, options, printBtn]);
   }
 
 }

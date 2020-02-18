@@ -1,15 +1,13 @@
-import Rule from './Rule';
+import Rule, { RuleOptions } from './Rule';
 import { validate, T } from '../option-checker';
 import { Book, PageMaker } from '../book';
 
 class PageBreak extends Rule {
-  continue: string = '';
-  position: string = '';
+  continue: 'next' | 'left' | 'right' | 'same' = 'next';
+  position: 'before' | 'after' | 'both' | 'avoid' = 'before';
 
-  constructor(options) {
+  constructor(options: RuleOptions) {
     super(options);
-    options.position = options.position || 'before';
-    options.continue = options.continue || 'next';
 
     validate(options, {
       name: 'PageBreak',
@@ -26,7 +24,7 @@ class PageBreak extends Rule {
       if (!book.currentPage.isEmpty) {
         continueOnNewPage();
       }
-      if (this.continue !== 'next') {
+      if (this.continue !== 'next' && this.continue !== 'same') {
         book.currentPage.setPreference(this.continue);
       }
     }

@@ -4,7 +4,8 @@ import { Book, Page } from '../book';
 
 import { shallowEqual, throttleTime } from '../utils';
 import { validate, T } from '../option-checker';
-import { c } from '../dom-utils';
+import { prefixer } from '../dom-utils';
+import { RuleOptions } from './Rule';
 
 // Compatible with ids that start with numbers
 const startsWithNumber = (sel: string) => {
@@ -30,7 +31,7 @@ class PageReference extends Replace {
   references: PageReferenceInstance[];
   throttledUpdate: (book: Book) => void;
 
-  constructor(options: {}) {
+  constructor(options: RuleOptions) {
     super(options);
     validate(options, {
       name: 'PageReference',
@@ -80,7 +81,7 @@ class PageReference extends Replace {
 
     const template = ref.template.cloneNode(true) as HTMLElement;
     const newRender = this.replace(template, pageRanges);
-    if (!isResolved) newRender.classList.add(c('placeholder-num'));
+    if (!isResolved) newRender.classList.add(prefixer('placeholder-num'));
     ref.element.parentNode!.replaceChild(newRender, ref.element);
 
     ref.element = newRender;

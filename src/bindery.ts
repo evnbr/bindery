@@ -96,7 +96,7 @@ class Bindery {
     }
 
     this.rules = defaultRules;
-    this.rules.push({ pageNumberOffset: opts.pageNumberOffset || 0 });
+    this.rules.push(new Rule({ pageNumberOffset: opts.pageNumberOffset || 0 }));
     if (opts.rules) this.addRules(opts.rules);
 
     this.getContentAsElement(opts.content).then((el) => {

@@ -1,7 +1,7 @@
 import { Page, Book } from '../book';
 import Controls from '../controls';
 import { Mode, Paper, Layout, Marks } from '../constants';
-import { classes, createEl } from '../dom-utils';
+import { classes, allModeClasses, classForMode, createEl } from '../dom-utils';
 import { throttleFrame, throttleTime } from '../utils';
 import { gridLayout, printLayout, flipLayout } from '../layouts';
 
@@ -212,8 +212,8 @@ class Viewer {
     if (!this.book) return;
     this.show();
 
-    this.element.classList.remove(...classes.allModes);
-    this.element.classList.add(classes[this.mode]);
+    this.element.classList.remove(...allModeClasses);
+    this.element.classList.add(classForMode(this.mode));
     this.isShowingBleed = this.mode === Mode.PRINT;
 
     const prevScroll = this.scrollPercent;

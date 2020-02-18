@@ -1,4 +1,9 @@
-const validate = (opts, validOpts) => {
+interface OptionSet {
+  name?: string;
+  [key: string]: any;
+}
+
+const validate = (opts: OptionSet, validOpts: OptionSet) => {
   if (!validOpts) throw Error('Valid options not specified');
 
   Object.keys(opts).forEach((k) => {
