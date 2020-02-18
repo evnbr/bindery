@@ -1,6 +1,6 @@
 import Rule, { RuleOptions } from './Rule';
 import { validate, T } from '../option-checker';
-import { Book, PageMaker } from '../book';
+import { Book } from '../book';
 
 class PageBreak extends Rule {
   continue: 'next' | 'left' | 'right' | 'same' = 'next';

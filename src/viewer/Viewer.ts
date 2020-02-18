@@ -7,6 +7,7 @@ import { gridLayout, printLayout, flipLayout } from '../layouts';
 
 import errorView from './error';
 import listenForPrint from './listenForPrint';
+import PageSetup from '../page-setup';
 
 const throttleProgressBar = throttleFrame();
 const throttleRender = throttleTime(100);
@@ -17,9 +18,16 @@ const makeSpread = (pgs: HTMLElement[]) => {
   return createEl('.spread-wrapper.spread-centered.spread-size', pgs);
 }
 
+interface ViewerOptions {
+  pageSetup: PageSetup;
+  mode: number;
+  layout: number;
+  marks: number;
+}
+
 class Viewer {
-  book: any;
-  pageSetup: any;
+  book?: Book;
+  pageSetup: PageSetup;
 
   progressBar: HTMLElement;
   content: HTMLElement;
@@ -35,8 +43,7 @@ class Viewer {
   lastSpreadInProgress: any;
   hasRendered: boolean = false;
 
-  constructor({ pageSetup, mode, layout, marks }) {
-    this.book = null;
+  constructor({ pageSetup, mode, layout, marks }: ViewerOptions) {
     this.pageSetup = pageSetup;
 
     this.progressBar = createEl('progress-bar');
@@ -136,8 +143,8 @@ class Viewer {
     document.body.classList.toggle(classes.isViewing, newVal);
   }
 
-  setSheetSize(str: string) {
-    const newVal = parseInt(str, 10);
+  setSheetSize(rawVal: any) {
+    const newVal = parseInt(rawVal, 10);
 
     this.pageSetup.paper = newVal;
     this.pageSetup.updateStyleVars();
@@ -149,8 +156,8 @@ class Viewer {
     setTimeout(() => { this.scaleToFit(); }, 300);
   }
 
-  setLayout(str: string) {
-    const newVal = parseInt(str, 10);
+  setLayout(rawVal: any) {
+    const newVal = parseInt(rawVal, 10);
 
     if (newVal === this.layout) return;
     this.layout = newVal;
@@ -162,8 +169,8 @@ class Viewer {
     this.render();
   }
 
-  setMarks(str: string) {
-    const newVal = parseInt(str, 10);
+  setMarks(rawVal: any) {
+    const newVal = parseInt(rawVal, 10);
     this.isShowingCropMarks = (newVal === Marks.CROP || newVal === Marks.BOTH);
     this.isShowingBleedMarks = (newVal === Marks.BLEED || newVal === Marks.BOTH);
   }
@@ -189,8 +196,8 @@ class Viewer {
   }
 
   clear() {
-    this.book = null;
-    this.lastSpreadInProgress = null; // TODO: Make this clearer, after first render
+    this.book = undefined;
+    this.lastSpreadInProgress = undefined; // TODO: Make this clearer, after first render
     this.content.innerHTML = '';
   }
 
@@ -222,8 +229,10 @@ class Viewer {
     this.progress = 1;
 
     window.requestAnimationFrame(() => {
+      if (!this.book) throw Error('Book missing');
       const pages = this.book.pages.slice();
-      const fragment = this.viewFor(this.mode)(pages, this.doubleSided, this.layout);
+      const render = this.renderFunctionFor(this.mode);
+      const fragment = render(pages, this.doubleSided, this.layout);
       this.content.innerHTML = '';
       this.content.appendChild(fragment);
       if (!this.hasRendered) this.hasRendered = true;
@@ -233,7 +242,7 @@ class Viewer {
     });
   }
 
-  viewFor(mode: number) {
+  renderFunctionFor(mode: number) {
     if (mode === Mode.PREVIEW) return gridLayout;
     else if (mode === Mode.FLIPBOOK) return flipLayout;
     else if (mode === Mode.PRINT) return printLayout;
