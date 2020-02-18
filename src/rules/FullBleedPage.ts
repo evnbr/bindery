@@ -10,6 +10,7 @@ import { RuleOptions } from './Rule';
 
 class FullBleedPage extends OutOfFlow {
   rotate!: string;
+  continue!: string;
   
   constructor(options: RuleOptions) {
     options.continue = options.continue || 'same';

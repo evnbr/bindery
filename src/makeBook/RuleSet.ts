@@ -32,22 +32,22 @@ interface DidSplitRule extends Rule {
 }
 
 function isPageRule (rule: Rule): rule is PageRule {
-  return rule.hasOwnProperty('eachPage');
+  return rule.eachPage;
 }
 function isBeforeAddRule (rule: Rule): rule is BeforeAddRule {
-  return !!rule.selector && rule.hasOwnProperty('beforeAdd');
+  return !!rule.selector && rule.beforeAdd;
 }
 function isAfterAddRule (rule: Rule): rule is AfterAddRule {
-  return !!rule.selector && rule.hasOwnProperty('afterAdd');
+  return !!rule.selector && rule.afterAdd;
 }
 function isOffsetRule (rule: Rule): rule is OffsetRule {
-  return rule.hasOwnProperty('pageNumberOffset');
+  return rule.pageNumberOffset;
 }
 function isDidSplitRule (rule: Rule): rule is DidSplitRule {
-  return !!rule.selector && rule.hasOwnProperty('didSplit');
+  return !!rule.selector && rule.didSplit;
 }
 function isAvoidSplitRule (rule: Rule): rule is AvoidSplitRule {
-  return !!rule.selector && rule.hasOwnProperty('avoidSplit');
+  return !!rule.selector && rule.avoidSplit;
 }
 
 

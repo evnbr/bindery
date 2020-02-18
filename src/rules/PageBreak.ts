@@ -3,11 +3,13 @@ import { validate, T } from '../option-checker';
 import { Book } from '../book';
 
 class PageBreak extends Rule {
-  continue: 'next' | 'left' | 'right' | 'same' = 'next';
-  position: 'before' | 'after' | 'both' | 'avoid' = 'before';
+  continue: 'next' | 'left' | 'right' | 'same';
+  position: 'before' | 'after' | 'both' | 'avoid';
 
   constructor(options: RuleOptions) {
     super(options);
+    this.continue = options.continue || 'next';
+    this.position = options.position || 'before';
 
     validate(options, {
       name: 'PageBreak',
