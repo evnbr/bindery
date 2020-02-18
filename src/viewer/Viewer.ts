@@ -69,7 +69,6 @@ class Viewer {
     });
 
     this.controls = new Controls(
-      { Mode, Paper, Layout, Marks }, // Available options
       { // Initial props
         paper: this.pageSetup.paper,
         layout: this.layout,

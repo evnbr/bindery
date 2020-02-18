@@ -1,4 +1,5 @@
 import { prefixer } from '../dom-utils';
+import { Mode, Paper, Layout, Marks } from '../constants';
 import {
   dropdown,
   option,
@@ -6,6 +7,21 @@ import {
   row,
   div,
 } from './components';
+
+interface ControlsInitialState {
+  paper: number;
+  marks: number;
+  mode: number;
+  layout: number;
+}
+interface ControlsActions {
+  setMode: (newVal: any) => void;
+  setLayout: (newVal: any) => void;
+  setPaper: (newVal: any) => void;
+  setMarks: (newVal: any) => void;
+  getPageSize: () => { width: number, height: number };
+}
+
 
 // TODO: This is not a particularly robust check.
 const supportsCustomPageSize = !!window.hasOwnProperty('chrome');
@@ -15,8 +31,7 @@ class Controls {
   setDone: () => void;
   setInProgress: () => void;
 
-  constructor(availableOptions, initialState, actions) {
-    const { Mode, Paper, Layout, Marks } = availableOptions;
+  constructor(initialState: ControlsInitialState, actions: ControlsActions) {
 
     let viewSelect: HTMLElement;
     let marksSelect: HTMLElement;
@@ -25,7 +40,7 @@ class Controls {
       actions.setMode(Mode.PRINT);
 
       const sel = viewSelect.querySelector('select')!;
-      sel.value = Mode.PRINT;
+      sel.value = `${Mode.PRINT}`;
       sel.dispatchEvent(new Event('change'));
 
       setTimeout(window.print, 10);
@@ -104,7 +119,7 @@ class Controls {
         option({ value: Marks.BLEED }, 'Bleed Marks'),
         option({ value: Marks.BOTH }, 'Crop and Bleed'),
       ].map((opt) => {
-        if (opt.value === initialState.marks) { opt.selected = true; }
+        if (parseInt(opt.value, 10) === initialState.marks) { opt.selected = true; }
         return opt;
       })
     );
@@ -133,7 +148,7 @@ class Controls {
         option({ value: Mode.FLIPBOOK }, 'Flipbook'),
         option({ value: Mode.PRINT }, 'Print Preview'),
       ].map((opt) => {
-        if (opt.value === initialState.mode) { opt.selected = true; }
+        if (parseInt(opt.value, 10) === initialState.mode) { opt.selected = true; }
         return opt;
       })
     );
