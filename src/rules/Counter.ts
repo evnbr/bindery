@@ -1,17 +1,27 @@
 import Rule, { RuleOptions } from './Rule';
 import { validate, T } from '../option-checker';
 
+interface CounterRuleOptions extends RuleOptions {
+  incrementEl?: string;
+  resetEl?: string;
+  replaceEl?: string;
+}
 
 class Counter extends Rule {
   counterValue: number;
-  incrementEl: string = '';
-  resetEl: string = '';
-  replaceEl: string = '';
+  incrementEl!: string;
+  resetEl!: string;
+  replaceEl!: string;
 
-  constructor(options: RuleOptions) {
+  constructor(options: CounterRuleOptions) {
     super(options);
     this.selector = '*';
     this.counterValue = 0;
+
+    this.incrementEl = options.incrementEl;
+    this.resetEl = options.resetEl;
+    this.replaceEl = options.replaceEl;
+  
 
     validate(options, {
       name: 'Counter',

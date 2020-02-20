@@ -1,5 +1,5 @@
 import error from './error';
-import { c } from '../dom-utils';
+import { prefixer } from '../dom-utils';
 
 global.BINDERY_VERSION = 'v0';
 const el = error('Title', 'Desc');
@@ -9,5 +9,5 @@ test('Creates error', () => {
 });
 
 test('Sets error title', () => {
-  expect(el.querySelector(c('.error-title')).textContent).toBe('Title');
+  expect(el.querySelector(prefixer('.error-title')).textContent).toBe('Title');
 });

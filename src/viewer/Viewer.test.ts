@@ -58,7 +58,7 @@ test('updateProgress() adds pages when called multiple times', () => {
 
   const didAdd2 = partialBook.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd2).toEqual([true, true]);
-  expect(viewer.inProgress).toBe(true);
+  expect(viewer.isInProgress).toBe(true);
 
   partialBook.pages.push(mockPage(), mockPage());
   viewer.updateProgress(partialBook, 0.5);
@@ -66,7 +66,7 @@ test('updateProgress() adds pages when called multiple times', () => {
 
   const didAdd4 = partialBook.pages.map(pg => viewer.element.contains(pg.element));
   expect(didAdd4).toEqual([true, true, true, true]);
-  expect(viewer.inProgress).toBe(true);
+  expect(viewer.isInProgress).toBe(true);
 });
 
 test('viewer.clear() removes all pages', () => {
