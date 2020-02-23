@@ -1,6 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import minify from 'rollup-plugin-babel-minify';
+import { terser } from 'rollup-plugin-terser';
 
 import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
@@ -22,12 +22,16 @@ const baseOutput = {
   banner: `/* 📖 Bindery v${pkg.version} */`,
 };
 
-const sassPlugin = () => sass({
+const sassPlugin = ({ shouldMinify } = {}) => sass({
   insert: true,
-  processor: (css) => postcss([
-    prefixer('📖-'),
-    cssnano(),
-  ]).process(css).then((result) => result.css),
+  processor: (css) => postcss(
+    shouldMinify ? [
+      prefixer('📖-'),
+      cssnano(),
+    ] : [
+      prefixer('📖-'),
+    ]
+  ).process(css).then((result) => result.css),
 });
 
 export default [
@@ -55,9 +59,9 @@ export default [
     plugins: [
       resolve(),
       commonjs(),
-      sassPlugin(),
-      minify({
-        comments: false,
+      sassPlugin({ shouldMinify: true }),
+      terser({
+        ecma: 2018,
       }),
     ],
   }),
