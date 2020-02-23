@@ -1,4 +1,4 @@
-import { isLength } from '../css-length';
+import { isLength } from '../utils';
 import validateRuntimeOptions from './validate';
 
 const isObj  = (val: any) => typeof val === 'object';

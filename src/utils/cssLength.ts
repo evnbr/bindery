@@ -7,7 +7,7 @@ const parseLength = (str: string) => {
 
   const matches = str.match(cssNumberRegEx);
   if (!matches) {
-    throw Error(`Failed to parsse css length from "${str}"`);
+    throw Error(`Failed to parse css length from "${str}"`);
   }
   return {
     val: Number(matches[1]),

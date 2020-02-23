@@ -1,5 +1,5 @@
 import { stylesheet } from '../dom-utils';
-import { parseLength } from '../css-length';
+import { parseLength } from '../utils';
 
 import defaultPageSetup from './defaultPageSetup';
 import { SheetSize, SheetLayout } from '../constants';
