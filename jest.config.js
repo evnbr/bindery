@@ -12,4 +12,5 @@ module.exports = {
     'json',
     'node',
   ],
+  setupFiles: ['./jest.setup.js'],
 };

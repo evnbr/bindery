@@ -12,13 +12,18 @@ import pkg from './package.json';
 
 const extend = (a, b) => Object.assign({}, a, b);
 
+const classPrefix = 'bindery-';
+
 const baseConfig = {
   input: 'build/index.js',
 };
 
 const baseOutput = {
   name: 'Bindery',
-  intro: `const BINDERY_VERSION = 'v${pkg.version}'`,
+  intro: `
+const BINDERY_VERSION = 'v${pkg.version}';
+const BINDERY_CLASS_PREFIX = '${classPrefix}';
+  `,
   banner: `/* 📖 Bindery v${pkg.version} */`,
 };
 
@@ -26,11 +31,11 @@ const sassPlugin = ({ shouldMinify } = {}) => sass({
   insert: true,
   processor: (css) => postcss(
     shouldMinify ? [
-      prefixer('📖-'),
+      prefixer(classPrefix),
       cssnano(),
     ] : [
-      prefixer('📖-'),
-    ]
+      prefixer(classPrefix),
+    ],
   ).process(css).then((result) => result.css),
 });
 

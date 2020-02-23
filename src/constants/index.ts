@@ -1,3 +1,7 @@
+declare const BINDERY_CLASS_PREFIX: string;
+
+export const classPrefix = BINDERY_CLASS_PREFIX;
+
 export enum SheetLayout {
     PAGES = 'pages',
     SPREADS = 'spreads',
@@ -26,5 +30,4 @@ export enum ViewerMode {
     PREVIEW = 'preview',
     PRINT = 'print',
  }
-
 
