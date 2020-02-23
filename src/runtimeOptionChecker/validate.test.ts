@@ -1,5 +1,5 @@
 import validate from './validate';
-import T from './types';
+import T from './RuntimeTypes';
 
 const kIsFunc = { k: T.func };
 test('Handles functions', () => {

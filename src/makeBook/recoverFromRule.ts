@@ -1,4 +1,4 @@
-import { Book, PageMaker } from "../book";
+import { Book } from "../book";
 import { RegionGetter } from "regionize/dist/types/types";
 
 // TODO:

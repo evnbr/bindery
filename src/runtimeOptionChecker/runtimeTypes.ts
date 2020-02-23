@@ -40,7 +40,7 @@ const lengthChecker = {
   check: isLength,
 };
 
-const T = {
+const RuntimeTypes = {
   any: {
     name: 'any',
     check: () => true,

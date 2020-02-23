@@ -3,8 +3,9 @@ import Rule from '../rules/Rule';
 import Split from '../rules/Split';
 import dedupe from './dedupeRules';
 import recoverFromRule from './recoverFromRule';
-import { Book, Page, PageMaker } from '../book';
+import { Book, Page } from '../book';
 import { RegionGetter } from 'regionize/dist/types/types';
+import { PageMaker } from '../types';
 
 const giveUp = (rule: Rule, el: HTMLElement) => {
   console.warn(`Couldn't apply ${rule.name}, caused overflows twice when adding: `, el);
