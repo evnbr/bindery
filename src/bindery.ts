@@ -82,7 +82,7 @@ class Bindery {
     const startMarks = opts.printSetup ? opts.printSetup.marks || PageMarks.Crop : PageMarks.Crop;
     this.viewer = new Viewer({
       pageSetup: this.pageSetup,
-      mode: opts.view || ViewerMode.Preview,
+      mode: opts.view || ViewerMode.PREVIEW,
       marks: startMarks,
       layout: startLayout,
     });

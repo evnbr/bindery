@@ -12,19 +12,19 @@ export enum PageMarks {
 }
 
 export enum SheetSize {
-    Auto = 'auto',
-    AutoBleed = 'auto-bleed',
-    AutoMarks = 'auto-marks',
-    LetterPortait = 'letter-portrait',
-    LetterLandscape = 'letter-landscape',
-    A4Portrait = 'a4-portrait',
-    A4Landscape = 'a4-landscape',
-};
+    AUTO = 'auto',
+    AUTO_BLEED = 'auto-bleed',
+    AUTO_MARKS = 'auto-marks',
+    LETTER_PORTRAIT = 'letter-portrait',
+    LETTER_LANDSCAPE = 'letter-landscape',
+    A4_PORTRAIT = 'a4-portrait',
+    A4_LANDSCAPE = 'a4-landscape',
+}
 
 export enum ViewerMode {
-    Flipbook = 'flipbook',
-    Preview = 'preview',
-    Print = 'print',
- };
+    FLIPBOOK = 'flipbook',
+    PREVIEW = 'preview',
+    PRINT = 'print',
+ }
 
 

@@ -33,13 +33,13 @@ interface ControlsActions {
 }
 
 const sizeLabels: [ SheetSize, string ][] = [
-  [ SheetSize.Auto, 'Auto' ],
-  [ SheetSize.AutoBleed, 'Auto + Bleed' ],
-  [ SheetSize.AutoMarks, 'Auto + Marks' ],
-  [ SheetSize.LetterPortait, 'Letter Portrait' ],
-  [ SheetSize.LetterLandscape, 'Auto' ],
-  [ SheetSize.A4Portrait, 'A4 Portrait' ],
-  [ SheetSize.A4Portrait, 'A4 Landscape' ],
+  [ SheetSize.AUTO, 'Auto' ],
+  [ SheetSize.AUTO_BLEED, 'Auto + Bleed' ],
+  [ SheetSize.AUTO_MARKS, 'Auto + Marks' ],
+  [ SheetSize.LETTER_PORTRAIT, 'Letter Portrait' ],
+  [ SheetSize.LETTER_LANDSCAPE, 'Auto' ],
+  [ SheetSize.A4_PORTRAIT, 'A4 Portrait' ],
+  [ SheetSize.A4_PORTRAIT, 'A4 Landscape' ],
 ];
 
 // TODO: This is not a particularly robust check.
@@ -57,10 +57,10 @@ class Controls {
     let marksSelect: HTMLElement;
 
     const print = () => {
-      actions.setMode(ViewerMode.Print);
+      actions.setMode(ViewerMode.PRINT);
 
       const sel = viewSelect.querySelector('select')!;
-      sel.value = ViewerMode.Print;
+      sel.value = ViewerMode.PRINT;
       sel.dispatchEvent(new Event('change'));
 
       setTimeout(window.print, 10);
@@ -138,9 +138,9 @@ class Controls {
 
 
     viewSelect = enumDropdown([
-        [ ViewerMode.Preview, 'Grid'],
-        [ ViewerMode.Flipbook, 'Flipbook'],
-        [ ViewerMode.Print, 'Print Preview']
+        [ ViewerMode.PREVIEW, 'Grid'],
+        [ ViewerMode.FLIPBOOK, 'Flipbook'],
+        [ ViewerMode.PRINT, 'Print Preview']
       ],
       initialState.mode,
       (newMode) => {

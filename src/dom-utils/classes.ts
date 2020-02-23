@@ -35,9 +35,9 @@ const allModeClasses = [classes.viewPreview, classes.viewPrint, classes.viewFlip
 
 const classForMode = (mode: ViewerMode): string => {
   switch (mode) {
-    case ViewerMode.Preview: return classes.viewPreview;
-    case ViewerMode.Print: return classes.viewPrint;
-    case ViewerMode.Flipbook: return classes.viewFlip;
+    case ViewerMode.PREVIEW: return classes.viewPreview;
+    case ViewerMode.PRINT: return classes.viewPrint;
+    case ViewerMode.FLIPBOOK: return classes.viewFlip;
     default: throw Error (`Getting class for unknown mode: ${mode}`);
   }
 }

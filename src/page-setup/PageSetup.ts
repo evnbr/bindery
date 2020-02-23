@@ -36,7 +36,7 @@ class PageSetup {
     this.margin = opts.margin || defaultPageSetup.margin;
     this.markLength = '12pt';
 
-    this.paper = supportsCustomPageSize ? (printOpts.paper || SheetSize.Auto) : SheetSize.AutoMarks;
+    this.paper = supportsCustomPageSize ? (printOpts.paper || SheetSize.AUTO) : SheetSize.AUTO_MARKS;
     this.bleed = printOpts.bleed || defaultPageSetup.bleed;
     this.printTwoUp = !!printOpts.layout && (printOpts.layout !== SheetLayout.PAGES);
   }
@@ -58,25 +58,25 @@ class PageSetup {
     const singleMarks = `${this.bleed} + ${this.markLength}`;
 
     switch (this.paper) {
-    case SheetSize.Auto:
+    case SheetSize.AUTO:
       return { width, height };
-    case SheetSize.AutoBleed:
+    case SheetSize.AUTO_BLEED:
       return {
         width: `calc(${width} + ${this.printTwoUp ? doubleBleed : this.bleed})`,
         height: `calc(${height} + ${doubleBleed})`,
       };
-    case SheetSize.AutoMarks:
+    case SheetSize.AUTO_MARKS:
       return {
         width: `calc(${width} + ${this.printTwoUp ? doubleMarks : singleMarks})`,
         height: `calc(${height} + ${doubleMarks})`,
       };
-    case SheetSize.LetterLandscape:
+    case SheetSize.LETTER_LANDSCAPE:
       return { width: letter.height, height: letter.width };
-    case SheetSize.LetterPortait:
+    case SheetSize.LETTER_PORTRAIT:
       return letter;
-    case SheetSize.A4Portrait:
+    case SheetSize.A4_PORTRAIT:
       return a4;
-    case SheetSize.A4Landscape:
+    case SheetSize.A4_LANDSCAPE:
       return { width: a4.height, height: a4.width };
     default:
       throw Error(`Can't get dimensions for unknown paper size: ${this.paper}`);

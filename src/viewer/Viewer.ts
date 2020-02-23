@@ -62,7 +62,7 @@ class Viewer {
     this.currentLeaf = 0;
 
     listenForPrint(() => {
-      this.mode = ViewerMode.Print;
+      this.mode = ViewerMode.PRINT;
       this.render();
     });
 
@@ -147,7 +147,7 @@ class Viewer {
     this.pageSetup.paper = newVal;
     this.pageSetup.updateStyleVars();
 
-    this.mode = ViewerMode.Print;
+    this.mode = ViewerMode.PRINT;
     this.render();
 
     this.scaleToFit();
@@ -161,7 +161,7 @@ class Viewer {
     this.pageSetup.printTwoUp = this.isTwoUp;
     this.pageSetup.updateStyleVars();
 
-    this.mode = ViewerMode.Print;
+    this.mode = ViewerMode.PRINT;
     this.render();
   }
 
@@ -216,7 +216,7 @@ class Viewer {
 
     this.element.classList.remove(...allModeClasses);
     this.element.classList.add(classForMode(this.mode));
-    this.isShowingBleed = this.mode === ViewerMode.Print;
+    this.isShowingBleed = this.mode === ViewerMode.PRINT;
 
     const prevScroll = this.scrollPercent;
 
@@ -238,9 +238,9 @@ class Viewer {
   }
 
   renderFunctionFor(mode: ViewerMode) {
-    if (mode === ViewerMode.Preview) return renderGridViewer;
-    else if (mode === ViewerMode.Flipbook) return renderFlipbookViewer;
-    else if (mode === ViewerMode.Print) return renderPrintSheetViewer;
+    if (mode === ViewerMode.PREVIEW) return renderGridViewer;
+    else if (mode === ViewerMode.FLIPBOOK) return renderFlipbookViewer;
+    else if (mode === ViewerMode.PRINT) return renderPrintSheetViewer;
     throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
   }
 
@@ -275,8 +275,8 @@ class Viewer {
     const needsZoomUpdate = !this.content.firstElementChild;
 
     const sideBySide =
-      this.mode === ViewerMode.Preview
-      || (this.mode === ViewerMode.Print && this.sheetLayout !== SheetLayout.PAGES);
+      this.mode === ViewerMode.PREVIEW
+      || (this.mode === ViewerMode.PRINT && this.sheetLayout !== SheetLayout.PAGES);
     const limit = sideBySide ? 2 : 1;
 
     book.pages.forEach((page: Page, i: number) => {
