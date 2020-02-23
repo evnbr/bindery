@@ -1,6 +1,6 @@
 import Replace from './Replace';
-import { pageNumbersForTest, formatAsRanges } from './searchPages';
-import { Book, Page } from '../book';
+import { formatAsRanges } from '../utils';
+import { Book, Page, pageNumbersForTest } from '../book';
 
 import { shallowEqual, throttleTime } from '../utils';
 import { validate, T } from '../option-checker';

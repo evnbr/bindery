@@ -2,7 +2,6 @@ import Book from './Book';
 import Page from './Page';
 import orderPages from './orderPages';
 import annotatePages from './annotatePages';
+import { pageNumbersForTest, pageNumbersForSelector } from './searchPages';
 
-export type PageMaker = (() => Page);
-
-export { Book, Page, orderPages, annotatePages };
+export { Book, Page, orderPages, annotatePages, pageNumbersForTest, pageNumbersForSelector };
