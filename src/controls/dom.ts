@@ -7,11 +7,18 @@ interface Attrs {
   [key: string]: any
 }
 
-const h = (tagName: string, cls: string | null, attrs: Attrs, children: HTMLElement[], text?: string) => {
+interface DomAttributes {
+  onchange?: (e: Event) => any,
+  onclick?: (e: Event) => any,
+  value?: string,
+}
+
+const h = (tagName: string, cls: string | null, attrs: DomAttributes, children: HTMLElement[], text?: string) => {
   const el = document.createElement(tagName);
   if (cls) el.className = cls;
   if (text) el.textContent = text;
   if (attrs) for (const k in attrs) {
+    // @ts-ignore TODO replace with hyperscript anyways
     const v = attrs[k];
     // @ts-ignore TODO replace with hyperscript anyways
     if (isFunc(v)) el[k] = v;
@@ -34,4 +41,4 @@ const option = (attrs: {}, label: string) => {
   return h('option', null, attrs, [], label) as HTMLOptionElement;
 }
 
-export { div, button, select, option };
+export { div, button, select, option, DomAttributes };

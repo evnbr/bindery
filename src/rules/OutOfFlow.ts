@@ -1,5 +1,6 @@
 import Rule from './Rule';
-import { Book, PageMaker } from '../book';
+import { Book } from '../book';
+import { PageMaker } from '../types';
 
 class OutOfFlow extends Rule {
   continue?: string;

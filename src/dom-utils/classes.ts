@@ -1,5 +1,5 @@
 import prefix from './prefixer';
-import { Mode } from '../constants';
+import { ViewerMode } from '../constants';
 
 const classes = {
   showBleed: 'show-bleed',
@@ -33,12 +33,12 @@ Object.keys(classes).forEach((k) => {
 
 const allModeClasses = [classes.viewPreview, classes.viewPrint, classes.viewFlip];
 
-const classForMode = (mode: number): string => {
+const classForMode = (mode: ViewerMode): string => {
   switch (mode) {
-    case Mode.PREVIEW: return classes.viewPreview;
-    case Mode.PRINT: return classes.viewPrint;
-    case Mode.FLIPBOOK: return classes.viewFlip;
-    default: throw Error ("Unknonw mode");
+    case ViewerMode.Preview: return classes.viewPreview;
+    case ViewerMode.Print: return classes.viewPrint;
+    case ViewerMode.Flipbook: return classes.viewFlip;
+    default: throw Error (`Getting class for unknown mode: ${mode}`);
   }
 }
 

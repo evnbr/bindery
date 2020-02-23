@@ -3,7 +3,7 @@ interface OptionSet {
   [key: string]: any;
 }
 
-const validate = (opts: OptionSet, validOpts: OptionSet) => {
+const validateRuntimeOptions = (opts: OptionSet, validOpts: OptionSet) => {
   if (!validOpts) throw Error('Valid options not specified');
 
   Object.keys(opts).forEach((k) => {
@@ -21,4 +21,4 @@ const validate = (opts: OptionSet, validOpts: OptionSet) => {
   return true;
 };
 
-export default validate;
+export default validateRuntimeOptions;

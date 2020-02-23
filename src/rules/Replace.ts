@@ -1,5 +1,6 @@
 import Rule, { RuleOptions } from './Rule';
-import { Book, PageMaker } from '../book';
+import { Book } from '../book';
+import { PageMaker } from '../types';
 
 // Options:
 // selector: String

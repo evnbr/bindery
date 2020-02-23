@@ -1,5 +1,5 @@
 import Rule, { RuleOptions } from './Rule';
-import { validate, T } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
 import { createEl } from '../dom-utils';
 import { Page } from '../book';
 
@@ -11,9 +11,9 @@ import { Page } from '../book';
 class RunningHeader extends Rule {
   constructor(options: RuleOptions = {}) {
     super(options);
-    validate(options, {
+    validateRuntimeOptions(options, {
       name: 'RunningHeader',
-      render: T.func,
+      render: RuntimeTypes.func,
     });
   }
   eachPage(page: Page) {

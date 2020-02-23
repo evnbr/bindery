@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import { validate, T } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
 
 class Split extends Rule {
   toNext: string | null = null;
@@ -8,12 +8,12 @@ class Split extends Rule {
   constructor(options: {}) {
     super(options);
 
-    validate(options, {
+    validateRuntimeOptions(options, {
       name: 'Split',
-      selector: T.string,
-      toNext: T.string,
-      fromPrevious: T.string,
-      didSplit: T.func,
+      selector: RuntimeTypes.string,
+      toNext: RuntimeTypes.string,
+      fromPrevious: RuntimeTypes.string,
+      didSplit: RuntimeTypes.func,
     });
   }
 

@@ -2,7 +2,7 @@ import { Page } from '../book';
 import { prefixer, createEl } from '../dom-utils';
 import padPages from './padPages';
 
-const renderFlipLayout = (bookPages: Page[], doubleSided: boolean) => {
+const renderFlipbookViewer = (bookPages: Page[], doubleSided: boolean) => {
   const pages = padPages(bookPages, () => new Page());
 
   const flipLayout = document.createDocumentFragment();
@@ -73,4 +73,4 @@ const renderFlipLayout = (bookPages: Page[], doubleSided: boolean) => {
   return flipLayout;
 };
 
-export default renderFlipLayout;
+export { renderFlipbookViewer };

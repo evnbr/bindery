@@ -1,5 +1,5 @@
 import Rule, { RuleOptions } from './Rule';
-import { validate, T } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
 
 interface CounterRuleOptions extends RuleOptions {
   incrementEl?: string;
@@ -9,26 +9,26 @@ interface CounterRuleOptions extends RuleOptions {
 
 class Counter extends Rule {
   counterValue: number;
-  incrementEl!: string;
-  resetEl!: string;
-  replaceEl!: string;
+  incrementEl: string;
+  resetEl: string;
+  replaceEl: string;
 
   constructor(options: CounterRuleOptions) {
     super(options);
     this.selector = '*';
     this.counterValue = 0;
 
-    this.incrementEl = options.incrementEl;
-    this.resetEl = options.resetEl;
-    this.replaceEl = options.replaceEl;
+    this.incrementEl = options.incrementEl || '';
+    this.resetEl = options.resetEl || '';
+    this.replaceEl = options.replaceEl || '';
   
 
-    validate(options, {
+    validateRuntimeOptions(options, {
       name: 'Counter',
-      replaceEl: T.string,
-      resetEl: T.string,
-      incrementEl: T.string,
-      replace: T.func,
+      replaceEl: RuntimeTypes.string,
+      resetEl: RuntimeTypes.string,
+      incrementEl: RuntimeTypes.string,
+      replace: RuntimeTypes.func,
     });
   }
   setup() {

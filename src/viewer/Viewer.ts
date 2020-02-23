@@ -1,9 +1,11 @@
 import { Page, Book } from '../book';
 import Controls from '../controls';
-import { Mode, Paper, Layout, Marks } from '../constants';
+import { ViewerMode, PageMarks, SheetSize, SheetLayout } from '../constants';
 import { classes, allModeClasses, classForMode, createEl } from '../dom-utils';
 import { throttleFrame, throttleTime } from '../utils';
-import { gridLayout, printLayout, flipLayout } from '../layouts';
+import { renderGridViewer } from './gridViewer';
+import { renderPrintSheetViewer } from './printSheetViewer';
+import { renderFlipbookViewer } from './flipbookViewer';
 
 import errorView from './error';
 import listenForPrint from './listenForPrint';
@@ -20,9 +22,9 @@ const makeSpread = (pgs: HTMLElement[]) => {
 
 interface ViewerOptions {
   pageSetup: PageSetup;
-  mode: number;
-  layout: number;
-  marks: number;
+  mode: ViewerMode;
+  layout: SheetLayout;
+  marks: PageMarks;
 }
 
 class Viewer {
@@ -36,8 +38,8 @@ class Viewer {
   error?: HTMLElement;
 
   doubleSided: boolean;
-  layout: number;
-  mode: number;
+  sheetLayout: SheetLayout;
+  mode: ViewerMode;
   currentLeaf: number;
   controls: Controls;
   lastSpreadInProgress: any;
@@ -52,7 +54,7 @@ class Viewer {
     this.element = createEl('root', [this.progressBar, this.scaler]);
 
     this.doubleSided = true;
-    this.layout = layout;
+    this.sheetLayout = layout;
 
     this.setMarks(marks);
     this.mode = mode;
@@ -60,7 +62,7 @@ class Viewer {
     this.currentLeaf = 0;
 
     listenForPrint(() => {
-      this.mode = Mode.PRINT;
+      this.mode = ViewerMode.Print;
       this.render();
     });
 
@@ -71,7 +73,7 @@ class Viewer {
     this.controls = new Controls(
       { // Initial props
         paper: this.pageSetup.paper,
-        layout: this.layout,
+        layout: this.sheetLayout,
         mode: this.mode,
         marks,
       },
@@ -90,8 +92,7 @@ class Viewer {
     this.show();
   }
 
-  setMode(newVal: string) {
-    const newMode = parseInt(newVal, 10);
+  setMode(newMode: ViewerMode) {
     if (newMode === this.mode) return;
     this.mode = newMode;
     this.render();
@@ -107,7 +108,7 @@ class Viewer {
   }
 
   get isTwoUp() {
-    return this.layout !== Layout.PAGES;
+    return this.sheetLayout !== SheetLayout.PAGES;
   }
 
   get isShowingCropMarks() {
@@ -142,36 +143,31 @@ class Viewer {
     document.body.classList.toggle(classes.isViewing, newVal);
   }
 
-  setSheetSize(rawVal: any) {
-    const newVal = parseInt(rawVal, 10);
-
+  setSheetSize(newVal: SheetSize) {
     this.pageSetup.paper = newVal;
     this.pageSetup.updateStyleVars();
 
-    this.mode = Mode.PRINT;
+    this.mode = ViewerMode.Print;
     this.render();
 
     this.scaleToFit();
     setTimeout(() => { this.scaleToFit(); }, 300);
   }
 
-  setLayout(rawVal: any) {
-    const newVal = parseInt(rawVal, 10);
-
-    if (newVal === this.layout) return;
-    this.layout = newVal;
+  setLayout(newVal: SheetLayout) {
+    if (newVal === this.sheetLayout) return;
+    this.sheetLayout = newVal;
 
     this.pageSetup.printTwoUp = this.isTwoUp;
     this.pageSetup.updateStyleVars();
 
-    this.mode = Mode.PRINT;
+    this.mode = ViewerMode.Print;
     this.render();
   }
 
-  setMarks(rawVal: any) {
-    const newVal = parseInt(rawVal, 10);
-    this.isShowingCropMarks = (newVal === Marks.CROP || newVal === Marks.BOTH);
-    this.isShowingBleedMarks = (newVal === Marks.BLEED || newVal === Marks.BOTH);
+  setMarks(newVal: PageMarks) {
+    this.isShowingCropMarks = (newVal === PageMarks.Crop || newVal === PageMarks.Both);
+    this.isShowingBleedMarks = (newVal === PageMarks.Bleed || newVal === PageMarks.Both);
   }
 
   displayError(title: string, text: string) {
@@ -220,7 +216,7 @@ class Viewer {
 
     this.element.classList.remove(...allModeClasses);
     this.element.classList.add(classForMode(this.mode));
-    this.isShowingBleed = this.mode === Mode.PRINT;
+    this.isShowingBleed = this.mode === ViewerMode.Print;
 
     const prevScroll = this.scrollPercent;
 
@@ -231,7 +227,7 @@ class Viewer {
       if (!this.book) throw Error('Book missing');
       const pages = this.book.pages.slice();
       const render = this.renderFunctionFor(this.mode);
-      const fragment = render(pages, this.doubleSided, this.layout);
+      const fragment = render(pages, this.doubleSided, this.sheetLayout);
       this.content.innerHTML = '';
       this.content.appendChild(fragment);
       if (!this.hasRendered) this.hasRendered = true;
@@ -241,10 +237,10 @@ class Viewer {
     });
   }
 
-  renderFunctionFor(mode: number) {
-    if (mode === Mode.PREVIEW) return gridLayout;
-    else if (mode === Mode.FLIPBOOK) return flipLayout;
-    else if (mode === Mode.PRINT) return printLayout;
+  renderFunctionFor(mode: ViewerMode) {
+    if (mode === ViewerMode.Preview) return renderGridViewer;
+    else if (mode === ViewerMode.Flipbook) return renderFlipbookViewer;
+    else if (mode === ViewerMode.Print) return renderPrintSheetViewer;
     throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
   }
 
@@ -279,8 +275,8 @@ class Viewer {
     const needsZoomUpdate = !this.content.firstElementChild;
 
     const sideBySide =
-      this.mode === Mode.PREVIEW
-      || (this.mode === Mode.PRINT && this.layout !== Layout.PAGES);
+      this.mode === ViewerMode.Preview
+      || (this.mode === ViewerMode.Print && this.sheetLayout !== SheetLayout.PAGES);
     const limit = sideBySide ? 2 : 1;
 
     book.pages.forEach((page: Page, i: number) => {

@@ -1,8 +1,9 @@
 import Replace from './Replace';
-import { validate, T } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
 import { createEl } from '../dom-utils';
-import { Book, PageMaker } from '../book';
+import { Book } from '../book';
 import { RuleOptions } from './Rule';
+import { PageMaker } from '../types';
 
 
 // Options:
@@ -13,11 +14,11 @@ import { RuleOptions } from './Rule';
 class Footnote extends Replace {
   constructor(options: RuleOptions) {
     super(options);
-    validate(options, {
+    validateRuntimeOptions(options, {
       name: 'Footnote',
-      selector: T.string,
-      replace: T.func,
-      render: T.func,
+      selector: RuntimeTypes.string,
+      replace: RuntimeTypes.func,
+      render: RuntimeTypes.func,
     });
   }
   afterAdd(element: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker, overflowCallback: Function) {

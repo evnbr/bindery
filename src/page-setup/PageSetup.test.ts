@@ -1,11 +1,11 @@
-import { Paper } from '../constants';
+import { SheetSize } from '../constants';
 import PageSetup from './PageSetup';
 
 const pageOpts = {
   size: { width: '4in', height: '6in' },
 };
 const printOpts = {
-  paper: Paper.AUTO_MARKS,
+  paper: SheetSize.AutoMarks,
   bleed: '8pt',
 };
 const pageSetup = new PageSetup(pageOpts, printOpts);

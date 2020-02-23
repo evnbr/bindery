@@ -3,7 +3,7 @@ import { formatAsRanges } from '../utils';
 import { Book, Page, pageNumbersForTest } from '../book';
 
 import { shallowEqual, throttleTime } from '../utils';
-import { validate, T } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
 import { prefixer } from '../dom-utils';
 import { RuleOptions } from './Rule';
 
@@ -33,11 +33,11 @@ class PageReference extends Replace {
 
   constructor(options: RuleOptions) {
     super(options);
-    validate(options, {
+    validateRuntimeOptions(options, {
       name: 'PageReference',
-      selector: T.string,
-      replace: T.func,
-      createTest: T.func,
+      selector: RuntimeTypes.string,
+      replace: RuntimeTypes.func,
+      createTest: RuntimeTypes.func,
     });
     this.references = [];
     const throttle = throttleTime(10);

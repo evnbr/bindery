@@ -1,8 +1,9 @@
 import OutOfFlow from './OutOfFlow';
-import { validate, T } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
 import { createEl } from '../dom-utils';
-import { Book, PageMaker } from '../book';
+import { Book } from '../book';
 import { RuleOptions } from './Rule';
+import { PageMaker } from '../types';
 
 
 // Options:
@@ -16,11 +17,11 @@ class FullBleedPage extends OutOfFlow {
     options.continue = options.continue || 'same';
     options.rotate = options.rotate || 'none';
     super(options);
-    validate(options, {
+    validateRuntimeOptions(options, {
       name: 'FullBleedPage',
-      selector: T.string,
-      continue: T.enum('next', 'same', 'left', 'right'),
-      rotate: T.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise'),
+      selector: RuntimeTypes.string,
+      continue: RuntimeTypes.enum('next', 'same', 'left', 'right'),
+      rotate: RuntimeTypes.enum('none', 'inward', 'outward', 'clockwise', 'counterclockwise'),
     });
   }
 

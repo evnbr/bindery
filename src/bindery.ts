@@ -2,14 +2,14 @@
 
 // main
 import PageSetup from './page-setup';
-import { Mode, Paper, Layout, Marks } from './constants';
+import { ViewerMode, SheetSize, SheetLayout, PageMarks } from './constants';
 import defaultRules from './defaults';
 
 // components
 import makeBook from './makeBook';
 import Viewer from './viewer';
 import rules from './rules';
-import { validate, T } from './option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from './option-checker';
 import { parseHTML } from './dom-utils';
 import { Book } from './book';
 import Rule from './rules/Rule';
@@ -17,15 +17,15 @@ import Rule from './rules/Rule';
 const vals = (obj: { [key: string]: any}) => {
   return Object.keys(obj).map(k => obj[k]);
 };
-const rAF = () => new Promise((resolve) => {
+const nextFrame = () => new Promise((resolve) => {
   requestAnimationFrame(t => resolve(t));
 });
 
 declare const BINDERY_VERSION: string;
 
 interface PrintSetup {
-  layout: number
-  marks: number,
+  layout: SheetLayout
+  marks: PageMarks,
 }
 
 interface BinderyOptions {
@@ -37,7 +37,7 @@ interface BinderyOptions {
   printSetup?: PrintSetup;
   pageSetup?: {};
   rules?: any[];
-  view?: number;
+  view?: ViewerMode;
 }
 
 class Bindery {
@@ -55,34 +55,34 @@ class Bindery {
     this.autorun = opts.autorun || true;
     this.autoupdate = opts.autoupdate || false;
 
-    validate(opts, {
+    validateRuntimeOptions(opts, {
       name: 'makeBook',
-      autorun: T.bool,
-      content: T.any,
-      view: T.enum(...vals(Mode)),
-      pageNumberOffset: T.number,
-      pageSetup: T.shape({
+      autorun: RuntimeTypes.bool,
+      content: RuntimeTypes.any,
+      view: RuntimeTypes.enum(...vals(ViewerMode)),
+      pageNumberOffset: RuntimeTypes.number,
+      pageSetup: RuntimeTypes.shape({
         name: 'pageSetup',
-        margin: T.margin,
-        size: T.size,
+        margin: RuntimeTypes.margin,
+        size: RuntimeTypes.size,
       }),
-      printSetup: T.shape({
+      printSetup: RuntimeTypes.shape({
         name: 'printSetup',
-        bleed: T.length,
-        layout: T.enum(...vals(Layout)),
-        marks: T.enum(...vals(Marks)),
-        paper: T.enum(...vals(Paper)),
+        bleed: RuntimeTypes.length,
+        layout: RuntimeTypes.enum(...vals(SheetLayout)),
+        marks: RuntimeTypes.enum(...vals(PageMarks)),
+        paper: RuntimeTypes.enum(...vals(SheetSize)),
       }),
-      rules: T.array,
+      rules: RuntimeTypes.array,
     });
 
     this.pageSetup = new PageSetup(opts.pageSetup, opts.printSetup);
 
-    const startLayout = opts.printSetup ? opts.printSetup.layout || Layout.PAGES : Layout.PAGES;
-    const startMarks = opts.printSetup ? opts.printSetup.marks || Marks.CROP : Marks.CROP;
+    const startLayout = opts.printSetup ? opts.printSetup.layout || SheetLayout.PAGES : SheetLayout.PAGES;
+    const startMarks = opts.printSetup ? opts.printSetup.marks || PageMarks.Crop : PageMarks.Crop;
     this.viewer = new Viewer({
       pageSetup: this.pageSetup,
-      mode: opts.view || Mode.PREVIEW,
+      mode: opts.view || ViewerMode.Preview,
       marks: startMarks,
       layout: startLayout,
     });
@@ -182,7 +182,7 @@ class Bindery {
       const book = await makeBook(content, this.rules, onProgress);
       this.viewer.progress = 1;
       this.layoutInProgress = false;
-      await rAF();
+      await nextFrame();
       this.viewer.render(book);
       this.viewer.isInProgress = false;
       return book;

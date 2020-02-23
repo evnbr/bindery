@@ -1,5 +1,5 @@
 import { isLength } from '../css-length';
-import validate from './validate';
+import validateRuntimeOptions from './validate';
 
 const isObj  = (val: any) => typeof val === 'object';
 const isFunc = (val: any) => typeof val === 'function';
@@ -17,7 +17,7 @@ const hasSameKeys = (opts: {}, required: {}) => {
 
 const isShape = (template: {}) => {
   return (input: any) => {
-    return isObj(input) && validate(input, template);
+    return isObj(input) && validateRuntimeOptions(input, template);
   }
 }
 
@@ -25,7 +25,7 @@ const isShapeExact = (template: {}) => {
   return (input: any) => {
     return isObj(input)
     && hasSameKeys(input, template)
-    && validate(input, template);
+    && validateRuntimeOptions(input, template);
   }
 }
 
@@ -104,4 +104,4 @@ const T = {
   }
 };
 
-export default T;
+export default RuntimeTypes;

@@ -1,4 +1,5 @@
-import { Page, PageMaker } from '../book';
+import { Page } from '../book';
+import { PageMaker } from '../types';
 
 const padPages = (pages: Page[], makePage: PageMaker) => {
   if (pages.length % 2 !== 0) {

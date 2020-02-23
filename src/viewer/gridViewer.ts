@@ -9,7 +9,7 @@ const onePageSpread = (...children: HTMLElement[]) => {
   return createEl('.spread-wrapper.spread-centered.page-size', children);
 }
 
-const renderGridLayout = (bookPages: Page[], isTwoUp: boolean) => {
+const renderGridViewer = (bookPages: Page[], isTwoUp: boolean) => {
   const pages = isTwoUp ? padPages(bookPages, () => new Page()) : bookPages;
 
   const gridLayout = document.createDocumentFragment();
@@ -28,4 +28,4 @@ const renderGridLayout = (bookPages: Page[], isTwoUp: boolean) => {
   return gridLayout;
 };
 
-export default renderGridLayout;
+export { renderGridViewer };

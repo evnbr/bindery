@@ -1,6 +1,30 @@
-import * as Paper from './paper';
-import * as Mode from './modes';
-import * as Layout from './layout';
-import * as Marks from './marks';
+export enum SheetLayout {
+    PAGES = 1,
+    SPREADS = 2,
+    BOOKLET = 3,
+}
 
-export { Mode, Paper, Layout, Marks };
+export enum PageMarks {
+    None,
+    Crop,
+    Bleed,
+    Both,
+}
+
+export enum SheetSize {
+    Auto = 'auto',
+    AutoBleed = 'auto-bleed',
+    AutoMarks = 'auto-marks',
+    LetterPortait = 'letter-portrait',
+    LetterLandscape = 'letter-landscape',
+    A4Portrait = 'a4-portrait',
+    A4Landscape = 'a4-landscape',
+};
+
+export enum ViewerMode {
+    Flipbook = 'flipbook',
+    Preview = 'preview',
+    Print = 'print',
+ };
+
+

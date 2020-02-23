@@ -2,7 +2,7 @@ import { stylesheet } from '../dom-utils';
 import { parseLength } from '../css-length';
 
 import defaultPageSetup from './defaultPageSetup';
-import { Paper, Layout } from '../constants';
+import { SheetSize, SheetLayout } from '../constants';
 
 const letter = Object.freeze({ width: '8.5in', height: '11in' });
 const a4 = Object.freeze({ width: '210mm', height: '297mm' });
@@ -17,16 +17,16 @@ interface PageSetupOptions {
 }
 
 interface PrintSetupOptions {
-  paper?: number;
+  paper?: SheetSize;
   bleed?: string;
-  layout?: any;
+  layout?: SheetLayout;
 }
 
 
 class PageSetup {
   size: any;
   margin: any;
-  paper: any;
+  paper: SheetSize;
   bleed: string;
   printTwoUp: boolean;
   markLength: string;
@@ -36,12 +36,12 @@ class PageSetup {
     this.margin = opts.margin || defaultPageSetup.margin;
     this.markLength = '12pt';
 
-    this.paper = supportsCustomPageSize ? (printOpts.paper || Paper.AUTO) : Paper.AUTO_MARKS;
+    this.paper = supportsCustomPageSize ? (printOpts.paper || SheetSize.Auto) : SheetSize.AutoMarks;
     this.bleed = printOpts.bleed || defaultPageSetup.bleed;
-    this.printTwoUp = printOpts.layout && printOpts.layout !== Layout.PAGES;
+    this.printTwoUp = !!printOpts.layout && (printOpts.layout !== SheetLayout.PAGES);
   }
 
-  get displaySize() {
+  get displaySize(): { width: string, height: string, bleed: string } {
     const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
     const bleed = this.bleed;
@@ -49,40 +49,41 @@ class PageSetup {
     return { width, height, bleed };
   }
 
-  get sheetSize() {
+  get sheetSize(): { width: string, height: string } {
     const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
 
     const doubleBleed = `2 * ${this.bleed}`;
     const doubleMarks = `${doubleBleed} + 2 * ${this.markLength}`;
     const singleMarks = `${this.bleed} + ${this.markLength}`;
+
     switch (this.paper) {
-    case Paper.AUTO:
+    case SheetSize.Auto:
       return { width, height };
-    case Paper.AUTO_BLEED:
+    case SheetSize.AutoBleed:
       return {
         width: `calc(${width} + ${this.printTwoUp ? doubleBleed : this.bleed})`,
         height: `calc(${height} + ${doubleBleed})`,
       };
-    case Paper.AUTO_MARKS:
+    case SheetSize.AutoMarks:
       return {
         width: `calc(${width} + ${this.printTwoUp ? doubleMarks : singleMarks})`,
         height: `calc(${height} + ${doubleMarks})`,
       };
-    case Paper.LETTER_LANDSCAPE:
+    case SheetSize.LetterLandscape:
       return { width: letter.height, height: letter.width };
-    case Paper.LETTER_PORTRAIT:
+    case SheetSize.LetterPortait:
       return letter;
-    case Paper.A4_PORTRAIT:
+    case SheetSize.A4Portrait:
       return a4;
-    case Paper.A4_LANDSCAPE:
+    case SheetSize.A4Landscape:
       return { width: a4.height, height: a4.width };
     default:
+      throw Error(`Can't get dimensions for unknown paper size: ${this.paper}`);
     }
-    return { width, height };
   }
 
-  get spreadSize() {
+  get spreadSize(): { width: string, height: string } {
     const w = parseLength(this.size.width);
     return {
       height: this.size.height,

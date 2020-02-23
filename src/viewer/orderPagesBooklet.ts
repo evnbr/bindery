@@ -1,4 +1,5 @@
-import { Page, PageMaker } from '../book';
+import { Page } from '../book';
+import { PageMaker } from '../types';
 
 const orderPagesBooklet = (pages: Page[], makePage: PageMaker) => {
   while (pages.length % 4 !== 0) {

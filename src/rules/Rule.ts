@@ -1,8 +1,15 @@
+import {
+  RuleOptionBreakPosition,
+  RuleOptionFlowPosition,
+  RuleOptionPageRotation,
+} from '../types';
+
 export interface RuleOptions {
   name?: string;
-  position?: 'before' | 'after' | 'both' | 'avoid';
-  continue?: 'next' | 'left' | 'right' | 'same';
-  rotate?: 'none' | 'inward' | 'outward' | 'clockwise' | 'counterclockwise';
+  selector?: string;
+  position?: RuleOptionBreakPosition;
+  continue?: RuleOptionFlowPosition;
+  rotate?: RuleOptionPageRotation;
   pageNumberOffset?: number
 }
 

@@ -1,16 +1,16 @@
 /* global BINDERY_VERSION */
 import Bindery from './bindery';
 import rules from './rules';
-import { Mode, Paper, Layout, Marks } from './constants';
+import { ViewerMode, SheetSize, SheetLayout, PageMarks } from './constants';
 import '../src/main.scss';
 
 declare const BINDERY_VERSION: string;
 
 const constants = {
-    View: Mode,
-    Paper,
-    Layout,
-    Marks,
+    View: ViewerMode,
+    Paper: SheetSize,
+    Layout: SheetLayout,
+    Marks: PageMarks,
     version: BINDERY_VERSION,
 }
 

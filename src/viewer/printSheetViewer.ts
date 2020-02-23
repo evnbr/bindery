@@ -1,6 +1,6 @@
 import { createEl, classes } from '../dom-utils';
 import { Page } from '../book';
-import { Layout } from '../constants';
+import { SheetLayout } from '../constants';
 
 import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
 import padPages from './padPages';
@@ -13,10 +13,10 @@ const onePageSpread = (...children: HTMLElement[]) => {
   return createEl('.spread-wrapper', children);
 }
 
-const renderPrintLayout = (bookPages: Page[], doubleSided: boolean, layout: number) => {
-  const isTwoUp = layout !== Layout.PAGES;
-  const isSpreads = layout === Layout.SPREADS;
-  const isBooklet = layout === Layout.BOOKLET;
+const renderPrintSheetViewer = (bookPages: Page[], doubleSided: boolean, layout: SheetLayout) => {
+  const isTwoUp = layout !== SheetLayout.PAGES;
+  const isSpreads = layout === SheetLayout.SPREADS;
+  const isBooklet = layout === SheetLayout.BOOKLET;
 
   let pages = bookPages;
   if (isSpreads) pages = padPages(pages, () => new Page());
@@ -56,4 +56,4 @@ const renderPrintLayout = (bookPages: Page[], doubleSided: boolean, layout: numb
   return printLayout;
 };
 
-export default renderPrintLayout;
+export { renderPrintSheetViewer };

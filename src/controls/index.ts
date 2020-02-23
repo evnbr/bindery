@@ -1,30 +1,50 @@
 import { prefixer } from '../dom-utils';
-import { Mode, Paper, Layout, Marks } from '../constants';
+
+
+import {
+  ViewerMode,
+  SheetLayout,
+  SheetSize,
+  PageMarks
+} from '../constants';
+
 import {
   dropdown,
   option,
   btnMain,
   row,
   div,
+  enumDropdown,
 } from './components';
 
 interface ControlsInitialState {
-  paper: number;
-  marks: number;
-  mode: number;
-  layout: number;
-}
-interface ControlsActions {
-  setMode: (newVal: any) => void;
-  setLayout: (newVal: any) => void;
-  setPaper: (newVal: any) => void;
-  setMarks: (newVal: any) => void;
-  getPageSize: () => { width: number, height: number };
+  paper: SheetSize;
+  marks: PageMarks;
+  mode: ViewerMode;
+  layout: SheetLayout;
 }
 
+interface ControlsActions {
+  setMode: (newVal: ViewerMode) => void;
+  setLayout: (newVal: SheetLayout) => void;
+  setPaper: (newVal: SheetSize) => void;
+  setMarks: (newVal: PageMarks) => void;
+  getPageSize: () => { width: string, height: string };
+}
+
+const sizeLabels: [ SheetSize, string ][] = [
+  [ SheetSize.Auto, 'Auto' ],
+  [ SheetSize.AutoBleed, 'Auto + Bleed' ],
+  [ SheetSize.AutoMarks, 'Auto + Marks' ],
+  [ SheetSize.LetterPortait, 'Letter Portrait' ],
+  [ SheetSize.LetterLandscape, 'Auto' ],
+  [ SheetSize.A4Portrait, 'A4 Portrait' ],
+  [ SheetSize.A4Portrait, 'A4 Landscape' ],
+];
 
 // TODO: This is not a particularly robust check.
 const supportsCustomPageSize = !!window.hasOwnProperty('chrome');
+
 
 class Controls {
   element: HTMLElement;
@@ -37,10 +57,10 @@ class Controls {
     let marksSelect: HTMLElement;
 
     const print = () => {
-      actions.setMode(Mode.PRINT);
+      actions.setMode(ViewerMode.Print);
 
       const sel = viewSelect.querySelector('select')!;
-      sel.value = `${Mode.PRINT}`;
+      sel.value = ViewerMode.Print;
       sel.dispatchEvent(new Event('change'));
 
       setTimeout(window.print, 10);
@@ -48,19 +68,13 @@ class Controls {
 
     const printBtn = btnMain({ onclick: print }, 'Print');
 
-    const paperSizes = (supportsCustomPageSize ? [
-      option({ value: Paper.AUTO }, 'Auto'),
-      option({ value: Paper.AUTO_BLEED }, 'Auto + Bleed'),
-      option({ value: Paper.AUTO_MARKS }, 'Auto + Marks'),
-      option({ value: Paper.LETTER_PORTRAIT }, 'Letter Portrait'),
-      option({ value: Paper.LETTER_LANDSCAPE }, 'Letter Landscape'),
-      option({ value: Paper.A4_PORTRAIT }, 'A4 Portrait'),
-      option({ value: Paper.A4_LANDSCAPE }, 'A4 Landscape'),
-    ] : [
-      option({ value: Paper.LETTER_PORTRAIT, selected: true }, 'Default Page Size *'),
+    const sheetSizes = (supportsCustomPageSize ? sizeLabels.map((entry) => {
+      return option({ value: entry[0]}, entry[1]);
+    }) : [
+      option({ value: 'letter-portrait', selected: true }, 'Default Page Size *'),
       option({ disabled: true }, 'Only Chrome supports custom page sizes. Set in your browser\'s print dialog instead.'),
     ]).map((opt) => {
-      if (parseInt(opt.value, 10) === initialState.paper) { opt.selected = true; }
+      if (opt.value === initialState.paper) { opt.selected = true; }
       return opt;
     });
 
@@ -68,94 +82,80 @@ class Controls {
       if (!supportsCustomPageSize) return;
       const size = actions.getPageSize();
       const sizeName = `${size.width} × ${size.height}`;
-      paperSizes[0].textContent = `${sizeName}`;
-      paperSizes[1].textContent = `${sizeName} + Bleed`;
-      paperSizes[2].textContent = `${sizeName} + Marks`;
+      sheetSizes[0].textContent = `${sizeName}`;
+      sheetSizes[1].textContent = `${sizeName} + Bleed`;
+      sheetSizes[2].textContent = `${sizeName} + Marks`;
     };
     updateSheetSizeNames();
 
     const updatePaper = (e: Event) => {
       const sel = e.target as HTMLSelectElement
-      const newVal = parseInt(sel.value, 10);
+      const newVal = sel.value as SheetSize;
       actions.setPaper(newVal);
-      if (newVal === Paper.AUTO || newVal === Paper.AUTO_BLEED) {
+      if (newVal === 'auto' || newVal === 'auto-bleed') {
         marksSelect.classList.add(prefixer('hidden-select'));
       } else {
         marksSelect.classList.remove(prefixer('hidden-select'));
       }
     };
 
-    const sheetSizeSelect = dropdown({ onchange: updatePaper }, paperSizes);
+    const paperSelect = dropdown({ onchange: updatePaper }, sheetSizes);
 
-    const layoutSelect = dropdown(
-      {
-        onchange: (e: Event) => {
-          const target = e.target as HTMLSelectElement;
-          actions.setLayout(target.value);
-          updateSheetSizeNames();
-        }
-      },
-      [
-        option({ value: Layout.PAGES }, '1 Page / Sheet'),
-        option({ value: Layout.SPREADS }, '1 Spread / Sheet'),
-        option({ value: Layout.BOOKLET }, 'Booklet Sheets'),
-      ].map((opt) => {
-        if (parseInt(opt.value, 10) === initialState.layout) { opt.selected = true; }
-        return opt;
-      })
+    const sheetLayoutDropdown = row([enumDropdown([
+        [ SheetLayout.PAGES, '1 Page / Sheet' ],
+        [ SheetLayout.SPREADS, '1 Spread / Sheet' ],
+        [ SheetLayout.BOOKLET, 'Booklet Sheets' ],
+      ],
+      initialState.layout,
+      (newLayout) => {
+        actions.setLayout(newLayout);
+        updateSheetSizeNames();
+      }
+    )]);
+
+    marksSelect = enumDropdown([
+        [ PageMarks.None , 'No Marks' ],
+        [ PageMarks.Crop, 'Crop Marks' ],
+        [ PageMarks.Bleed, 'Bleed Marks' ],
+        [ PageMarks.Both, 'Crop and Bleed' ],
+      ],
+      initialState.marks,
+      (newMarks) => {
+        actions.setMarks(newMarks);
+      }
     );
-    const arrangement = row([layoutSelect]);
-
-    marksSelect = dropdown(
-      {
-        onchange: (e: Event) => {
-          const target = e.target as HTMLSelectElement;
-          actions.setMarks(target.value);
-        }
-      },
-      [
-        option({ value: Marks.NONE }, 'No Marks'),
-        option({ value: Marks.CROP, selected: true }, 'Crop Marks'),
-        option({ value: Marks.BLEED }, 'Bleed Marks'),
-        option({ value: Marks.BOTH }, 'Crop and Bleed'),
-      ].map((opt) => {
-        if (parseInt(opt.value, 10) === initialState.marks) { opt.selected = true; }
-        return opt;
-      })
-    );
-    if (supportsCustomPageSize) {
-      marksSelect.classList.add(prefixer('hidden-select'));
-    }
-    const marks = row([marksSelect]);
-    const sheetSize = row([sheetSizeSelect]);
-
 
     this.setDone = () => {};
     this.setInProgress = () => {};
 
     printBtn.classList.add(prefixer('btn-print'));
-    const options = row([arrangement, sheetSize, marks]);
+    const options = row([
+      sheetLayoutDropdown,
+      row([paperSelect]),
+      row([marksSelect])
+    ]);
     options.classList.add(prefixer('print-options'));
 
-    viewSelect = dropdown(
-      { onchange: (e: Event) => {
-          const target = e.target as HTMLSelectElement;
-          actions.setMode(target.value);
-        },
-      },
-      [
-        option({ value: Mode.PREVIEW }, 'Grid'),
-        option({ value: Mode.FLIPBOOK }, 'Flipbook'),
-        option({ value: Mode.PRINT }, 'Print Preview'),
-      ].map((opt) => {
-        if (parseInt(opt.value, 10) === initialState.mode) { opt.selected = true; }
-        return opt;
-      })
+
+    viewSelect = enumDropdown([
+        [ ViewerMode.Preview, 'Grid'],
+        [ ViewerMode.Flipbook, 'Flipbook'],
+        [ ViewerMode.Print, 'Print Preview']
+      ],
+      initialState.mode,
+      (newMode) => {
+        actions.setMode(newMode);
+      }
     );
+
     const viewRow = row([viewSelect]);
     viewRow.classList.add(prefixer('view-row'));
 
-    this.element = div(prefixer('controls'), [viewRow, options, printBtn]);
+    this.element = div(prefixer('controls'), [
+      viewRow,
+      options,
+      printBtn
+    ]);
   }
 
 }

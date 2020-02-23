@@ -1,5 +1,5 @@
 import Rule, { RuleOptions } from './Rule';
-import { validate, T } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
 import { Book } from '../book';
 
 class PageBreak extends Rule {
@@ -11,11 +11,11 @@ class PageBreak extends Rule {
     this.continue = options.continue || 'next';
     this.position = options.position || 'before';
 
-    validate(options, {
+    validateRuntimeOptions(options, {
       name: 'PageBreak',
-      selector: T.string,
-      continue: T.enum('next', 'left', 'right'),
-      position: T.enum('before', 'after', 'both', 'avoid'),
+      selector: RuntimeTypes.string,
+      continue: RuntimeTypes.enum('next', 'left', 'right'),
+      position: RuntimeTypes.enum('before', 'after', 'both', 'avoid'),
     });
   }
   get avoidSplit() {
