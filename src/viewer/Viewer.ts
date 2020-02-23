@@ -166,8 +166,8 @@ class Viewer {
   }
 
   setMarks(newVal: PageMarks) {
-    this.isShowingCropMarks = (newVal === PageMarks.Crop || newVal === PageMarks.Both);
-    this.isShowingBleedMarks = (newVal === PageMarks.Bleed || newVal === PageMarks.Both);
+    this.isShowingCropMarks = (newVal === PageMarks.CROP || newVal === PageMarks.BOTH);
+    this.isShowingBleedMarks = (newVal === PageMarks.BLEED || newVal === PageMarks.BOTH);
   }
 
   displayError(title: string, text: string) {

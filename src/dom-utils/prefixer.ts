@@ -1,12 +1,12 @@
 //
 // prefix classes
-const prefix = '📖-';
+import { classPrefix } from '../constants';
 
 const prefixer = (str: string) => {
   if (str[0] === '.') {
-    return `.${prefix}${str.substr(1)}`;
+    return `.${classPrefix}${str.substr(1)}`;
   }
-  return `${prefix}${str}`;
+  return `${classPrefix}${str}`;
 };
 
 export default prefixer;

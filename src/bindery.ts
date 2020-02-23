@@ -79,7 +79,7 @@ class Bindery {
     this.pageSetup = new PageSetup(opts.pageSetup, opts.printSetup);
 
     const startLayout = opts.printSetup ? opts.printSetup.layout || SheetLayout.PAGES : SheetLayout.PAGES;
-    const startMarks = opts.printSetup ? opts.printSetup.marks || PageMarks.Crop : PageMarks.Crop;
+    const startMarks = opts.printSetup ? opts.printSetup.marks || PageMarks.CROP : PageMarks.CROP;
     this.viewer = new Viewer({
       pageSetup: this.pageSetup,
       mode: opts.view || ViewerMode.PREVIEW,

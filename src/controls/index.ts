@@ -101,7 +101,7 @@ class Controls {
 
     const paperSelect = dropdown({ onchange: updatePaper }, sheetSizes);
 
-    const sheetLayoutDropdown = row([enumDropdown([
+    const sheetLayoutDropdown = row(null, enumDropdown([
         [ SheetLayout.PAGES, '1 Page / Sheet' ],
         [ SheetLayout.SPREADS, '1 Spread / Sheet' ],
         [ SheetLayout.BOOKLET, 'Booklet Sheets' ],
@@ -111,13 +111,13 @@ class Controls {
         actions.setLayout(newLayout);
         updateSheetSizeNames();
       }
-    )]);
+    ));
 
     marksSelect = enumDropdown([
-        [ PageMarks.None , 'No Marks' ],
-        [ PageMarks.Crop, 'Crop Marks' ],
-        [ PageMarks.Bleed, 'Bleed Marks' ],
-        [ PageMarks.Both, 'Crop and Bleed' ],
+        [ PageMarks.NONE , 'No Marks' ],
+        [ PageMarks.CROP, 'Crop Marks' ],
+        [ PageMarks.BLEED, 'Bleed Marks' ],
+        [ PageMarks.BOTH, 'Crop and Bleed' ],
       ],
       initialState.marks,
       (newMarks) => {
@@ -129,13 +129,12 @@ class Controls {
     this.setInProgress = () => {};
 
     printBtn.classList.add(prefixer('btn-print'));
-    const options = row([
+    const printOptions = row(
+      prefixer('print-options'),
       sheetLayoutDropdown,
-      row([paperSelect]),
-      row([marksSelect])
-    ]);
-    options.classList.add(prefixer('print-options'));
-
+      row(null, paperSelect),
+      row(null, marksSelect)
+    );
 
     viewSelect = enumDropdown([
         [ ViewerMode.PREVIEW, 'Grid'],
@@ -148,14 +147,13 @@ class Controls {
       }
     );
 
-    const viewRow = row([viewSelect]);
-    viewRow.classList.add(prefixer('view-row'));
+    const viewRow = row(prefixer('view-row'), viewSelect);
 
-    this.element = div(prefixer('controls'), [
+    this.element = div(prefixer('controls'), 
       viewRow,
-      options,
+      printOptions,
       printBtn
-    ]);
+    );
   }
 
 }

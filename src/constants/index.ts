@@ -1,14 +1,14 @@
 export enum SheetLayout {
-    PAGES = 1,
-    SPREADS = 2,
-    BOOKLET = 3,
+    PAGES = 'pages',
+    SPREADS = 'spreads',
+    BOOKLET = 'booklet',
 }
 
 export enum PageMarks {
-    None,
-    Crop,
-    Bleed,
-    Both,
+    NONE,
+    CROP,
+    BLEED,
+    BOTH,
 }
 
 export enum SheetSize {

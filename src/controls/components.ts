@@ -1,26 +1,28 @@
 import { div, button, select, option, DomAttributes } from './dom';
-import { prefixer, createEl } from '../dom-utils';
+import { prefixer } from '../dom-utils';
 
-const row = (children: HTMLElement[]) => createEl('row', children);
+const row = (cls: string | null, ...children: HTMLElement[]) => {
+  return div(`${cls} ${prefixer('row')}`, ...children);
+}
 
 // Button
-const btn = (attrs: DomAttributes, txt: string) => {
-  return button(`${prefixer('control')} ${prefixer('btn')}`, attrs, txt);
+const btn = (attrs: DomAttributes, label: string) => {
+  return button(`${prefixer('control')} ${prefixer('btn')}`, attrs, label);
 }
-const btnMain = (attrs: DomAttributes, txt: string) => {
-  return button(`${prefixer('control')} ${prefixer('btn')} ${prefixer('btn-main')}`, attrs, txt);
+const btnMain = (attrs: DomAttributes, label: string) => {
+  return button(`${prefixer('control')} ${prefixer('btn')} ${prefixer('btn-main')}`, attrs, label);
 }
 
 const dropdown = (attrs: DomAttributes, options: HTMLOptionElement[]) => {
-  const selectVal = createEl('select-val', []);
+  const selectVal = div('select-val', 'Value');
   selectVal.textContent = 'Value';
-  const selectEl = select(prefixer('select'), attrs, options);
+  const selectEl = select(prefixer('select'), attrs, ...options);
   const updateVal = () => {
     selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
   };
   selectEl.addEventListener('change', updateVal);
   updateVal();
-  return createEl('.select-wrap.control', [selectVal, selectEl]);
+  return div(`${prefixer('select-wrap')} ${prefixer('control')}`, selectVal, selectEl);
 };
 
 interface Stringable {

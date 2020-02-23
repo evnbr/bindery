@@ -5,7 +5,7 @@ const pageOpts = {
   size: { width: '4in', height: '6in' },
 };
 const printOpts = {
-  paper: SheetSize.AutoMarks,
+  paper: SheetSize.AUTO_MARKS,
   bleed: '8pt',
 };
 const pageSetup = new PageSetup(pageOpts, printOpts);
@@ -24,23 +24,23 @@ test('stylesheet is added to head', () => {
 
 test('sheetSize works', () => {
   pageSetup.printTwoUp = false;
-  pageSetup.paper = Paper.AUTO;
+  pageSetup.paper = SheetSize.AUTO;
   expect(pageSetup.sheetSize).toEqual({ width: '4in', height: '6in' });
 
-  pageSetup.paper = Paper.LETTER_PORTRAIT;
+  pageSetup.paper = SheetSize.LETTER_PORTRAIT;
   expect(pageSetup.sheetSize).toEqual({ width: '8.5in', height: '11in' });
 
-  pageSetup.paper = Paper.A4_LANDSCAPE;
+  pageSetup.paper = SheetSize.A4_LANDSCAPE;
   expect(pageSetup.sheetSize).toEqual({ width: '297mm', height: '210mm' });
 
   pageSetup.printTwoUp = true;
-  pageSetup.paper = Paper.AUTO;
+  pageSetup.paper = SheetSize.AUTO;
   expect(pageSetup.sheetSize).toEqual({ width: '8in', height: '6in' });
 });
 
 test('displaySize works', () => {
   pageSetup.printTwoUp = true;
-  pageSetup.paper = Paper.AUTO;
+  pageSetup.paper = SheetSize.AUTO;
   expect(pageSetup.displaySize).toEqual({ width: '8in', height: '6in', bleed: '8pt' });
 
   pageSetup.printTwoUp = false;
