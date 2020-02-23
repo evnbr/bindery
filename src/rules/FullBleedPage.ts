@@ -1,5 +1,5 @@
 import OutOfFlow from './OutOfFlow';
-import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { createEl } from '../dom-utils';
 import { Book } from '../book';
 import { RuleOptions } from './Rule';

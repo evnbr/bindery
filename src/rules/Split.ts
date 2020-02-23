@@ -1,5 +1,5 @@
 import Rule from './Rule';
-import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 
 class Split extends Rule {
   toNext: string | null = null;

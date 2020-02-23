@@ -3,7 +3,7 @@ import { formatAsRanges } from '../utils';
 import { Book, Page, pageNumbersForTest } from '../book';
 
 import { shallowEqual, throttleTime } from '../utils';
-import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { prefixer } from '../dom-utils';
 import { RuleOptions } from './Rule';
 

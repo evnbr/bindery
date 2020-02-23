@@ -1,5 +1,5 @@
 import Rule, { RuleOptions } from './Rule';
-import { validateRuntimeOptions, RuntimeTypes } from '../option-checker';
+import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { Book } from '../book';
 
 class PageBreak extends Rule {
