@@ -1,5 +1,5 @@
 import { isLength } from '../utils';
-import validateRuntimeOptions from './validate';
+import validateRuntimeOptions from './validateRuntimeOptions';
 
 const isObj  = (val: any) => typeof val === 'object';
 const isFunc = (val: any) => typeof val === 'function';

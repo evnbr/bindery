@@ -1,4 +1,4 @@
-import validate from './validate';
+import validate from './validateRuntimeOptions';
 import T from './RuntimeTypes';
 
 const kIsFunc = { k: T.func };

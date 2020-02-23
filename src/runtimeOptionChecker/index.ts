@@ -1,4 +1,4 @@
-import validateRuntimeOptions from './validate';
-import RuntimeTypes from './runtimeTypes';
+import validateRuntimeOptions from './validateRuntimeOptions';
+import RuntimeTypes from './RuntimeTypes';
 
 export { validateRuntimeOptions, RuntimeTypes };
