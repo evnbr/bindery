@@ -1,6 +1,6 @@
 import Rule, { RuleOptions } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
-import { createEl } from '../dom-utils';
+import { div } from '../dom';
 import { Page } from '../book';
 
 // Options:
@@ -18,7 +18,7 @@ class RunningHeader extends Rule {
   }
   eachPage(page: Page) {
     if (!page.runningHeader) {
-      const elmt = createEl('.running-header');
+      const elmt = div('.running-header');
       page.element.appendChild(elmt);
       page.runningHeader = elmt;
     }

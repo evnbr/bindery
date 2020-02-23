@@ -4,7 +4,7 @@ import { Book, Page, pageNumbersForTest } from '../book';
 
 import { shallowEqual, throttleTime } from '../utils';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
-import { prefixer } from '../dom-utils';
+import { prefixer } from '../dom';
 import { RuleOptions } from './Rule';
 
 // Compatible with ids that start with numbers

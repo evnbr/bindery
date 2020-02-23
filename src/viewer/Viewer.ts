@@ -1,7 +1,7 @@
 import { Page, Book } from '../book';
 import Controls from '../controls';
 import { ViewerMode, PageMarks, SheetSize, SheetLayout } from '../constants';
-import { classes, allModeClasses, classForMode, createEl } from '../dom-utils';
+import { classes, allModeClasses, classForMode, div } from '../dom';
 import { throttleFrame, throttleTime } from '../utils';
 import { renderGridViewer } from './gridViewer';
 import { renderPrintSheetViewer } from './printSheetViewer';
@@ -16,8 +16,8 @@ const throttleRender = throttleTime(100);
 const throttleResize = throttleTime(50);
 const document = window.document;
 
-const makeSpread = (pgs: HTMLElement[]) => {
-  return createEl('.spread-wrapper.spread-centered.spread-size', pgs);
+const pageSpread = (...pgs: HTMLElement[]) => {
+  return div('.spread-wrapper.spread-centered.spread-size', ...pgs);
 }
 
 interface ViewerOptions {
@@ -48,10 +48,10 @@ class Viewer {
   constructor({ pageSetup, mode, layout, marks }: ViewerOptions) {
     this.pageSetup = pageSetup;
 
-    this.progressBar = createEl('progress-bar');
-    this.content = createEl('zoom-content');
-    this.scaler = createEl('zoom-scaler', [this.content]);
-    this.element = createEl('root', [this.progressBar, this.scaler]);
+    this.progressBar = div('.progress-bar');
+    this.content = div('.zoom-content');
+    this.scaler = div('.zoom-scaler', this.content);
+    this.element = div('.root', this.progressBar, this.scaler);
 
     this.doubleSided = true;
     this.sheetLayout = layout;
@@ -285,7 +285,7 @@ class Viewer {
         this.lastSpreadInProgress.appendChild(page.element);
         return;
       }
-      this.lastSpreadInProgress = makeSpread([page.element]);
+      this.lastSpreadInProgress = pageSpread(page.element);
       if (i === 0 && sideBySide) {
         const spacer = new Page();
         spacer.element.style.visibility = 'hidden';

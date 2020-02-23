@@ -1,13 +1,13 @@
 import { Page } from '../book';
-import { prefixer, createEl } from '../dom-utils';
+import { prefixer, div } from '../dom';
 import padPages from './padPages';
 
 const renderFlipbookViewer = (bookPages: Page[], doubleSided: boolean) => {
   const pages = padPages(bookPages, () => new Page());
 
   const flipLayout = document.createDocumentFragment();
-  const sizer = createEl('.spread-size.flip-sizer');
-  const flapHolder = createEl('.spread-size.flap-holder');
+  const sizer = div('.spread-size.flip-sizer');
+  const flapHolder = div('.spread-size.flap-holder');
   sizer.appendChild(flapHolder);
   flipLayout.appendChild(sizer);
 
@@ -40,7 +40,7 @@ const renderFlipbookViewer = (bookPages: Page[], doubleSided: boolean) => {
   for (let i = 1; i < pages.length - 1; i += (doubleSided ? 2 : 1)) {
     leafIndex += 1;
     const li = leafIndex;
-    const flap = createEl('.page3d');
+    const flap = div('.page3d');
     flap.addEventListener('click', () => {
       const newLeaf = li - 1;
       setLeaf(newLeaf);
@@ -54,7 +54,7 @@ const renderFlipbookViewer = (bookPages: Page[], doubleSided: boolean) => {
       flap.classList.add(prefixer('doubleSided'));
       leftPage = pages[i + 1].element;
     } else {
-      leftPage = createEl('.page');
+      leftPage = div('.page');
     }
     leftPage.classList.add(prefixer('page3d-back'));
     flap.appendChild(leftPage);

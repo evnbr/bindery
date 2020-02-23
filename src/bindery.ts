@@ -10,7 +10,7 @@ import makeBook from './makeBook';
 import Viewer from './viewer';
 import rules from './rules';
 import { validateRuntimeOptions, RuntimeTypes } from './runtimeOptionChecker';
-import { parseHTML } from './dom-utils';
+import { parseHTML } from './dom';
 import { Book } from './book';
 import Rule from './rules/Rule';
 

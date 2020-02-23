@@ -1,6 +1,6 @@
 import Replace from './Replace';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
-import { createEl } from '../dom-utils';
+import { div } from '../dom';
 import { Book } from '../book';
 import { RuleOptions } from './Rule';
 import { PageMaker } from '../types';
@@ -24,7 +24,7 @@ class Footnote extends Replace {
   afterAdd(element: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker, overflowCallback: Function) {
     const number = book.currentPage.footer.children.length + 1;
 
-    const footnote = createEl('.footnote');
+    const footnote = div('.footnote');
     const contents = this.render(element, number);
     if (contents instanceof HTMLElement) footnote.appendChild(contents);
     else footnote.innerHTML = contents;

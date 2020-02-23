@@ -1,7 +1,7 @@
 import { classes, classForMode, allModeClasses } from './classes';
 import prefixer from './prefixer';
 import safeMeasure from './safeMeasure';
-import createEl from './createEl';
+export * from './dom';
 
 const doc = window.document;
 
@@ -25,4 +25,4 @@ const parseHTML = (text: string, selector?: string) => {
   return selector ? wrapper.querySelector(selector) : wrapper;
 };
 
-export { prefixer, classes, classForMode, allModeClasses, createEl, stylesheet, safeMeasure, parseHTML };
+export { prefixer, classes, classForMode, allModeClasses, stylesheet, safeMeasure, parseHTML };

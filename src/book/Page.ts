@@ -1,5 +1,5 @@
 import { Region } from 'regionize';
-import { safeMeasure, createEl, classes } from '../dom-utils';
+import { safeMeasure, div, classes } from '../dom';
 
 class Page {
   flow: Region;
@@ -21,10 +21,14 @@ class Page {
   avoidReorder = false; // used by 2-page spreads
 
   constructor() {
-    this.flow = new Region(createEl('flow-box'));
-    this.footer = createEl('footer');
-    this.background = createEl('page-background');
-    this.element = createEl('page', [this.background, this.flow.element, this.footer]);
+    this.flow = new Region(div('flow-box'));
+    this.footer = div('footer');
+    this.background = div('page-background');
+    this.element = div('page',
+      this.background,
+      this.flow.element,
+      this.footer
+    );
   }
 
   static isSizeValid() {

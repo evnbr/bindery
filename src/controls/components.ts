@@ -1,4 +1,4 @@
-import { div, button, select, option, DomAttributes } from './dom';
+import { div, button, select, option, DomAttributes } from '../dom';
 
 const row = (cls: string | null, ...children: HTMLElement[]) => {
   return div(`${cls}.row`, ...children);

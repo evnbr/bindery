@@ -1,4 +1,4 @@
-import { createEl, classes } from '../dom-utils';
+import { div, classes } from '../dom';
 import { Page } from '../book';
 import { SheetLayout } from '../constants';
 
@@ -7,13 +7,13 @@ import padPages from './padPages';
 import orderPagesBooklet from './orderPagesBooklet';
 
 const twoPageSpread = (...children: HTMLElement[]) => {
-  return createEl('.spread-wrapper', children);
+  return div('.spread-wrapper', ...children);
 }
 const onePageSpread = (...children: HTMLElement[]) => {
-  return createEl('.spread-wrapper', children);
+  return div('.spread-wrapper', ...children);
 }
 
-const renderPrintSheetViewer = (bookPages: Page[], doubleSided: boolean, layout: SheetLayout) => {
+const renderPrintSheetViewer = (bookPages: Page[], _doubleSided: boolean, layout: SheetLayout) => {
   const isTwoUp = layout !== SheetLayout.PAGES;
   const isSpreads = layout === SheetLayout.SPREADS;
   const isBooklet = layout === SheetLayout.BOOKLET;
@@ -28,7 +28,7 @@ const renderPrintSheetViewer = (bookPages: Page[], doubleSided: boolean, layout:
   const spread = isTwoUp ? twoPageSpread : onePageSpread;
 
   const printSheet = (...children: HTMLElement[]) => {
-    return createEl('print-sheet', [spread(...children)]);
+    return div('.print-sheet', spread(...children));
   }
 
   if (isTwoUp) {
@@ -39,8 +39,8 @@ const renderPrintSheetViewer = (bookPages: Page[], doubleSided: boolean, layout:
         spreadMarks.appendChild(meta);
       }
       const sheet = printSheet(
-        createEl('.page-bleed-clip.page-bleed-clip-left', [pages[i].element]),
-        createEl('.page-bleed-clip.page-bleed-clip-right', [pages[i + 1].element]),
+        div('.page-bleed-clip.page-bleed-clip-left', pages[i].element),
+        div('.page-bleed-clip.page-bleed-clip-right', pages[i + 1].element),
         spreadMarks);
       sheet.classList.add(classes.sheetSpread);
       printLayout.appendChild(sheet);

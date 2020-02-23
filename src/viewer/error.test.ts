@@ -1,5 +1,5 @@
 import error from './error';
-import { prefixer } from '../dom-utils';
+import { prefixer } from '../dom';
 
 global.BINDERY_VERSION = 'v0';
 const el = error('Title', 'Desc');

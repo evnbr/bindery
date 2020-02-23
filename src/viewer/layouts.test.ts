@@ -1,5 +1,7 @@
-import { flipLayout, gridLayout, printLayout } from './index';
-import { Layout } from '../constants';
+import { renderGridViewer } from './gridViewer';
+import { renderPrintSheetViewer } from './printSheetViewer';
+import { renderFlipbookViewer } from './flipbookViewer';
+import { SheetLayout } from '../constants';
 
 const pages = [
   { element: document.createElement('div') },
@@ -9,31 +11,31 @@ const pages = [
 ];
 
 test('creates two-up grid layout', () => {
-  const grid = gridLayout(pages, true);
+  const grid = renderGridViewer(pages, true);
   expect(grid instanceof DocumentFragment).toBe(true);
 });
 
 test('creates one-up grid layout', () => {
-  const grid = gridLayout(pages, false);
+  const grid = renderGridViewer(pages, false);
   expect(grid instanceof DocumentFragment).toBe(true);
 });
 
 test('creates flip layout', () => {
-  const flip = flipLayout(pages, true);
+  const flip = renderFlipbookViewer(pages, true);
   expect(flip instanceof DocumentFragment).toBe(true);
 });
 
 test('creates print single layout', () => {
-  const print = printLayout(pages, Layout.PAGES);
+  const print = renderPrintSheetViewer(pages, false, SheetLayout.PAGES);
   expect(print instanceof DocumentFragment).toBe(true);
 });
 
 test('creates print spread layout', () => {
-  const print = printLayout(pages, Layout.SPREADS);
+  const print = renderPrintSheetViewer(pages, false, SheetLayout.SPREADS);
   expect(print instanceof DocumentFragment).toBe(true);
 });
 
 test('creates print booklet layout', () => {
-  const print = printLayout(pages, Layout.BOOKLET);
+  const print = renderPrintSheetViewer(pages, false, SheetLayout.BOOKLET);
   expect(print instanceof DocumentFragment).toBe(true);
 });

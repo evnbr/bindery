@@ -1,4 +1,4 @@
-import { stylesheet } from '../dom-utils';
+import { stylesheet } from '../dom';
 import { parseLength } from '../utils';
 
 import defaultPageSetup from './defaultPageSetup';

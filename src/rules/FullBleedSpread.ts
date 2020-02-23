@@ -1,6 +1,6 @@
 import OutOfFlow from './OutOfFlow';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
-import { prefixer, createEl } from '../dom-utils';
+import { prefixer, div } from '../dom';
 import { Book } from '../book';
 import { RuleOptions } from './Rule';
 import { PageMaker } from '../types';
@@ -41,20 +41,20 @@ class FullBleedSpread extends OutOfFlow {
 
     if (this.rotate !== 'none') {
       [leftPage, rightPage].forEach((page) => {
-        const rotateContainer = createEl(`.rotate-container.spread-size-rotated.rotate-spread-${this.rotate}`);
-        rotateContainer.appendChild(page.background);
-        page.element.appendChild(rotateContainer);
+        const rotateContainer = div(`.rotate-container.spread-size-rotated.rotate-spread-${this.rotate}`);
+        rotateContainer.append(page.background);
+        page.element.append(rotateContainer);
       });
     }
 
-    leftPage.background.appendChild(elmt);
+    leftPage.background.append(elmt);
     leftPage.element.classList.add(prefixer('spread'));
     leftPage.setPreference('left');
     leftPage.isOutOfFlow = this.continue === 'same';
     leftPage.avoidReorder = true;
     leftPage.hasOutOfFlowContent = true;
 
-    rightPage.background.appendChild(elmt.cloneNode(true));
+    rightPage.background.append(elmt.cloneNode(true));
     rightPage.element.classList.add(prefixer('spread'));
     rightPage.setPreference('right');
     rightPage.isOutOfFlow = this.continue === 'same';

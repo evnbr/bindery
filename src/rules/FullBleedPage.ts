@@ -1,6 +1,6 @@
 import OutOfFlow from './OutOfFlow';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
-import { createEl } from '../dom-utils';
+import { div } from '../dom';
 import { Book } from '../book';
 import { RuleOptions } from './Rule';
 import { PageMaker } from '../types';
@@ -38,7 +38,7 @@ class FullBleedPage extends OutOfFlow {
       book.addPage(newPage);
     }
     if (this.rotate !== 'none') {
-      const rotateContainer = createEl(`.rotate-container.page-size-rotated.rotate-${this.rotate}`);
+      const rotateContainer = div(`.rotate-container.page-size-rotated.rotate-${this.rotate}`);
       rotateContainer.appendChild(newPage.background);
       newPage.element.appendChild(rotateContainer);
     }

@@ -1,12 +1,12 @@
 import { Page } from '../book';
-import { createEl } from '../dom-utils';
+import { div } from '../dom';
 import padPages from './padPages';
 
 const twoPageSpread = (...children: HTMLElement[]) => {
-  return createEl('.spread-wrapper.spread-centered.spread-size', children);
+  return div('.spread-wrapper.spread-centered.spread-size', ...children);
 }
 const onePageSpread = (...children: HTMLElement[]) => {
-  return createEl('.spread-wrapper.spread-centered.page-size', children);
+  return div('.spread-wrapper.spread-centered.page-size', ...children);
 }
 
 const renderGridViewer = (bookPages: Page[], isTwoUp: boolean) => {

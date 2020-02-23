@@ -1,4 +1,4 @@
-import { prefixer } from '../dom-utils';
+import { prefixer } from '../dom';
 
 
 import {

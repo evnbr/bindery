@@ -1,4 +1,4 @@
-import { classes } from '../dom-utils';
+import { classes } from '../dom';
 import Rule from '../rules/Rule';
 import Split from '../rules/Split';
 import dedupe from './dedupeRules';
