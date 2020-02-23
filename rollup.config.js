@@ -12,7 +12,7 @@ import pkg from './package.json';
 
 const extend = (a, b) => Object.assign({}, a, b);
 
-const classPrefix = 'bindery-';
+const classPrefix = '📖-';
 
 const baseConfig = {
   input: 'build/index.js',
