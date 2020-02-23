@@ -11,7 +11,7 @@ import {
 import {
   dropdown,
   option,
-  btnMain,
+  btn,
   row,
   div,
   enumDropdown,
@@ -66,7 +66,7 @@ class Controls {
       setTimeout(window.print, 10);
     };
 
-    const printBtn = btnMain({ onclick: print }, 'Print');
+    const printBtn = btn('.btn-print.btn-main', { onclick: print }, 'Print');
 
     const sheetSizes = (supportsCustomPageSize ? sizeLabels.map((entry) => {
       return option({ value: entry[0]}, entry[1]);
@@ -92,11 +92,8 @@ class Controls {
       const sel = e.target as HTMLSelectElement
       const newVal = sel.value as SheetSize;
       actions.setPaper(newVal);
-      if (newVal === 'auto' || newVal === 'auto-bleed') {
-        marksSelect.classList.add(prefixer('hidden-select'));
-      } else {
-        marksSelect.classList.remove(prefixer('hidden-select'));
-      }
+      const hideMarksSelect = newVal === 'auto' || newVal === 'auto-bleed';
+      marksSelect.classList.toggle(prefixer('hidden-select'), hideMarksSelect);
     };
 
     const paperSelect = dropdown({ onchange: updatePaper }, sheetSizes);
@@ -128,9 +125,7 @@ class Controls {
     this.setDone = () => {};
     this.setInProgress = () => {};
 
-    printBtn.classList.add(prefixer('btn-print'));
-    const printOptions = row(
-      prefixer('print-options'),
+    const printOptions = row('.print-options',
       sheetLayoutDropdown,
       row(null, paperSelect),
       row(null, marksSelect)
@@ -147,9 +142,9 @@ class Controls {
       }
     );
 
-    const viewRow = row(prefixer('view-row'), viewSelect);
+    const viewRow = row('.view-row', viewSelect);
 
-    this.element = div(prefixer('controls'), 
+    this.element = div('.controls', 
       viewRow,
       printOptions,
       printBtn

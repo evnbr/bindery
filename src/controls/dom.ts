@@ -1,3 +1,5 @@
+import { prefixer } from '../dom-utils';
+
 const isElement = (node: any) => node.nodeType === Node.ELEMENT_NODE;
 const isObj = (val: any) => typeof val === 'object';
 const isFunc = (val: any) => typeof val === 'function';
@@ -9,9 +11,9 @@ interface DomAttributes {
   value?: string,
 }
 
-const h = (tagName: string, cls: string | null, attrs: DomAttributes, ...children: (string | HTMLElement)[]) => {
+const h = (tagName: string, classNames: string | null, attrs: DomAttributes, ...children: (string | HTMLElement)[]) => {
   const el = document.createElement(tagName);
-  if (cls) el.className = cls;
+  if (classNames) el.className = classNames.split('.').filter((txt) => txt !== '').map(prefixer).join(' ');;
   if (attrs) for (const k in attrs) {
     // @ts-ignore TODO replace with hyperscript anyways
     const v = attrs[k];

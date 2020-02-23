@@ -1,28 +1,24 @@
 import { div, button, select, option, DomAttributes } from './dom';
-import { prefixer } from '../dom-utils';
 
 const row = (cls: string | null, ...children: HTMLElement[]) => {
-  return div(`${cls} ${prefixer('row')}`, ...children);
+  return div(`${cls}.row`, ...children);
 }
 
 // Button
-const btn = (attrs: DomAttributes, label: string) => {
-  return button(`${prefixer('control')} ${prefixer('btn')}`, attrs, label);
-}
-const btnMain = (attrs: DomAttributes, label: string) => {
-  return button(`${prefixer('control')} ${prefixer('btn')} ${prefixer('btn-main')}`, attrs, label);
+const btn = (cls: string | null, attrs: DomAttributes, label: string) => {
+  return button(`.control.btn${cls}`, attrs, label);
 }
 
 const dropdown = (attrs: DomAttributes, options: HTMLOptionElement[]) => {
-  const selectVal = div('select-val', 'Value');
+  const selectVal = div('.select-val', 'Value');
   selectVal.textContent = 'Value';
-  const selectEl = select(prefixer('select'), attrs, ...options);
+  const selectEl = select('.select', attrs, ...options);
   const updateVal = () => {
     selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
   };
   selectEl.addEventListener('change', updateVal);
   updateVal();
-  return div(`${prefixer('select-wrap')} ${prefixer('control')}`, selectVal, selectEl);
+  return div('.select-wrap.control', selectVal, selectEl);
 };
 
 interface Stringable {
@@ -60,7 +56,6 @@ const enumDropdown = <ChoiceType extends Stringable>(
 export {
   row,
   btn,
-  btnMain,
   dropdown,
   option,
   div,
