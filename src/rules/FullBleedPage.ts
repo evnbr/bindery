@@ -14,8 +14,8 @@ class FullBleedPage extends OutOfFlow {
   continue!: string;
   
   constructor(options: RuleOptions) {
-    options.continue = options.continue || 'same';
-    options.rotate = options.rotate || 'none';
+    options.continue = options.continue ?? 'same';
+    options.rotate = options.rotate ?? 'none';
     super(options);
     validateRuntimeOptions(options, {
       name: 'FullBleedPage',

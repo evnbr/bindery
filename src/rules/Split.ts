@@ -12,8 +12,8 @@ class Split extends Rule {
 
   constructor(options: SplitRuleOptions) {
     super(options);
-    this.toNext = options.toNext
-    this.fromPrevious = options.fromPrevious
+    this.toNext = options.toNext;
+    this.fromPrevious = options.fromPrevious;
 
     validateRuntimeOptions(options, {
       name: 'Split',

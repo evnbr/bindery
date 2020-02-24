@@ -7,7 +7,7 @@ const safeMeasure = (el: HTMLElement, measureCallback: () => any) => {
   if (!measureArea) measureArea = document.body.appendChild(div('.measure-area'));
   if (measureArea.firstElementChild !== el) {
     measureArea.innerHTML = '';
-    measureArea.appendChild(el);
+    measureArea.append(el);
   }
   const result = measureCallback();
   return result;

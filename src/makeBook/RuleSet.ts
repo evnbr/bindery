@@ -63,7 +63,7 @@ class RuleSet {
 
   constructor(rules: Rule[]) {
     const offsetRule = rules.find(isOffsetRule);
-    this.pageNumberOffset = offsetRule ? offsetRule.pageNumberOffset : 0;
+    this.pageNumberOffset = offsetRule?.pageNumberOffset ?? 0;
 
     // Rules for pages
     this.pageRules = rules.filter(isPageRule);

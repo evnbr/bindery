@@ -8,7 +8,7 @@ const validateRuntimeOptions = (opts: OptionSet, validOpts: OptionSet) => {
 
   Object.keys(opts).forEach((k) => {
     if (!validOpts[k]) {
-      const setName = validOpts.name ? `'${validOpts.name}'` : 'This option';
+      const setName = validOpts.name ?? 'This option';
       throw Error(`Unknown option in ${setName}: '${k}'`);
     }
     const val = opts[k];

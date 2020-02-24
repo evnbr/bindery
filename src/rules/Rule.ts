@@ -20,7 +20,7 @@ export class Rule {
   [key: string]: any
 
   constructor(options: RuleOptions) {
-    this.name = options.name ? options.name : 'Unnamed Bindery Rule';
+    this.name = options.name ?? 'Unnamed Bindery Rule';
     this.selector = '';
 
     Object.keys(options).forEach((key) => {

@@ -40,7 +40,7 @@ export default [
     selector: '[book-pages-with-text]',
     replace: replacer,
     createTest: (element: HTMLElement) => {
-      const text = element.getAttribute('book-pages-with-text') || '';
+      const text = element.getAttribute('book-pages-with-text') ?? '';
       const term = text.toLowerCase().trim();
       return (pageElement: HTMLElement) => { 
         const pageText = pageElement.textContent || '';
@@ -53,7 +53,7 @@ export default [
     selector: '[book-pages-with-selector]',
     replace: replacer,
     createTest: (element: HTMLElement) => {
-      const txt = element.getAttribute('book-pages-with-selector') || '';
+      const txt = element.getAttribute('book-pages-with-selector') ?? '';
       const selector = txt.trim();
       return (pageElement: HTMLElement) => {
         return pageElement.querySelector(selector);
@@ -65,10 +65,10 @@ export default [
     selector: '[book-pages-with]',
     replace: replacer,
     createTest: (element: HTMLElement) => {
-      const text = element.textContent || '';
+      const text = element.textContent ?? '';
       const term = text.toLowerCase().trim();
       return (pageElement: HTMLElement) => {
-        const pageText = pageElement.textContent || '';
+        const pageText = pageElement.textContent ?? '';
         return pageText.toLowerCase().includes(term);
       };
     },

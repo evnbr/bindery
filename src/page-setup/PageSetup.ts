@@ -32,12 +32,12 @@ class PageSetup {
   markLength: string;
 
   constructor(opts: PageSetupOptions = {}, printOpts: PrintSetupOptions = {}) {
-    this.size = opts.size || defaultPageSetup.size;
-    this.margin = opts.margin || defaultPageSetup.margin;
+    this.size = opts.size ?? defaultPageSetup.size;
+    this.margin = opts.margin ?? defaultPageSetup.margin;
     this.markLength = '12pt';
 
     this.paper = supportsCustomPageSize ? (printOpts.paper || SheetSize.AUTO) : SheetSize.AUTO_MARKS;
-    this.bleed = printOpts.bleed || defaultPageSetup.bleed;
+    this.bleed = printOpts.bleed ?? defaultPageSetup.bleed;
     this.printTwoUp = !!printOpts.layout && (printOpts.layout !== SheetLayout.PAGES);
   }
 

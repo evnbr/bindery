@@ -52,9 +52,6 @@ class Bindery {
   constructor(opts: BinderyOptions = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
-    this.autorun = opts.autorun ?? true;
-    this.autoupdate = opts.autoupdate ?? false;
-
     validateRuntimeOptions(opts, {
       name: 'makeBook',
       autorun: RuntimeTypes.bool,
@@ -76,14 +73,16 @@ class Bindery {
       rules: RuntimeTypes.array,
     });
 
+    this.autorun = opts.autorun ?? true;
+    this.autoupdate = opts.autoupdate ?? false;
     this.pageSetup = new PageSetup(opts.pageSetup, opts.printSetup);
 
-    const startLayout = opts.printSetup ? opts.printSetup.layout || SheetLayout.PAGES : SheetLayout.PAGES;
-    const startMarks = opts.printSetup ? opts.printSetup.marks || SheetMarks.CROP : SheetMarks.CROP;
+    const startLayout = opts.printSetup?.layout ?? SheetLayout.PAGES;
+    const startMarks = opts.printSetup?.marks ?? SheetMarks.CROP;
 
     this.viewer = new Viewer({
       pageSetup: this.pageSetup,
-      mode: opts.view || ViewerMode.PREVIEW,
+      mode: opts.view ?? ViewerMode.PREVIEW,
       marks: startMarks,
       layout: startLayout,
     });
@@ -99,23 +98,21 @@ class Bindery {
     }
 
     this.rules = defaultRules;
-    this.rules.push(new Rule({ pageNumberOffset: opts.pageNumberOffset || 0 }));
-    if (opts.rules) {
-      opts.rules.forEach((rule) => {
-        if (rule instanceof rules.Rule) {
-          this.rules.push(rule);
-        } else {
-          throw Error(`Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`);
-        }
-      });  
-    }
+    this.rules.push(new Rule({ pageNumberOffset: opts.pageNumberOffset ?? 0 }));
+    opts.rules?.forEach((rule) => {
+      if (rule instanceof rules.Rule) {
+        this.rules.push(rule);
+      } else {
+        throw Error(`Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`);
+      }
+    });  
 
     if (this.autorun) this.makeBook(opts.content);
   }
 
   // Convenience constructor
   static makeBook(opts: BinderyOptions = {}) {
-    opts.autorun = opts.autorun ? opts.autorun : true;
+    opts.autorun = opts.autorun ?? true;
     return new Bindery(opts);
   }
 

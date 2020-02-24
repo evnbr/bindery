@@ -204,8 +204,7 @@ class Viewer {
 
   hide() {
     // TODO this doesn't work if the target is an existing node
-    if (!this.element.parentNode) return;
-    this.element.parentNode.removeChild(this.element);
+    this.element.parentNode?.removeChild(this.element);
     this.isViewing = false;
   }
 
@@ -258,7 +257,7 @@ class Viewer {
     this.book = book;
     this.progress = estimatedProgress;
 
-    if (!document || !document.scrollingElement) return;
+    if (!document.scrollingElement) return;
     
     const scroller = document.scrollingElement as HTMLElement;
     // don't rerender if preview is out of view
@@ -282,7 +281,7 @@ class Viewer {
     book.pages.forEach((page: Page, i: number) => {
       if (this.content.contains(page.element) && page.element.parentNode !== this.content) return;
       if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
-        this.lastSpreadInProgress.appendChild(page.element);
+        this.lastSpreadInProgress.append(page.element);
         return;
       }
       this.lastSpreadInProgress = pageSpread(page.element);
@@ -294,7 +293,7 @@ class Viewer {
           this.lastSpreadInProgress.firstElementChild
         );
       }
-      this.content.appendChild(this.lastSpreadInProgress);
+      this.content.append(this.lastSpreadInProgress);
     });
 
     if (needsZoomUpdate) this.scaleToFit();
@@ -320,7 +319,7 @@ class Viewer {
   }
 
   set scrollPercent(newVal) {
-    if (!document || !document.scrollingElement) return;
+    if (!document.scrollingElement) return;
     const el = document.scrollingElement;
     el.scrollTop = el.scrollHeight * newVal;
   }

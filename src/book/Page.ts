@@ -56,7 +56,7 @@ class Page {
   }
 
   get suppressErrors() {
-    return this.suppress || false;
+    return this.suppress ?? false;
   }
 
   set suppressErrors(newVal) {

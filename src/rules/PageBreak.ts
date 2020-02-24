@@ -8,8 +8,8 @@ class PageBreak extends Rule {
 
   constructor(options: RuleOptions) {
     super(options);
-    this.continue = options.continue || 'next';
-    this.position = options.position || 'before';
+    this.continue = options.continue ?? 'next';
+    this.position = options.position ?? 'before';
 
     validateRuntimeOptions(options, {
       name: 'PageBreak',
