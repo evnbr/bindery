@@ -2,15 +2,15 @@
 
 // main
 import PageSetup from './page-setup';
-import { ViewerMode, SheetSize, SheetLayout, PageMarks } from './constants';
+import { ViewerMode, SheetSize, SheetLayout, SheetMarks } from './constants';
 import defaultRules from './defaults';
 
 // components
 import makeBook from './makeBook';
+import { getContentAsElement } from './makeBook/getContent';
 import Viewer from './viewer';
 import rules from './rules';
 import { validateRuntimeOptions, RuntimeTypes } from './runtimeOptionChecker';
-import { parseHTML } from './dom';
 import { Book } from './book';
 import Rule from './rules/Rule';
 
@@ -25,7 +25,7 @@ declare const BINDERY_VERSION: string;
 
 interface PrintSetup {
   layout: SheetLayout
-  marks: PageMarks,
+  marks: SheetMarks,
 }
 
 interface BinderyOptions {
@@ -52,8 +52,8 @@ class Bindery {
   constructor(opts: BinderyOptions = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
-    this.autorun = opts.autorun || true;
-    this.autoupdate = opts.autoupdate || false;
+    this.autorun = opts.autorun ?? true;
+    this.autoupdate = opts.autoupdate ?? false;
 
     validateRuntimeOptions(opts, {
       name: 'makeBook',
@@ -70,7 +70,7 @@ class Bindery {
         name: 'printSetup',
         bleed: RuntimeTypes.length,
         layout: RuntimeTypes.enum(...vals(SheetLayout)),
-        marks: RuntimeTypes.enum(...vals(PageMarks)),
+        marks: RuntimeTypes.enum(...vals(SheetMarks)),
         paper: RuntimeTypes.enum(...vals(SheetSize)),
       }),
       rules: RuntimeTypes.array,
@@ -79,17 +79,20 @@ class Bindery {
     this.pageSetup = new PageSetup(opts.pageSetup, opts.printSetup);
 
     const startLayout = opts.printSetup ? opts.printSetup.layout || SheetLayout.PAGES : SheetLayout.PAGES;
-    const startMarks = opts.printSetup ? opts.printSetup.marks || PageMarks.CROP : PageMarks.CROP;
+    const startMarks = opts.printSetup ? opts.printSetup.marks || SheetMarks.CROP : SheetMarks.CROP;
+
     this.viewer = new Viewer({
       pageSetup: this.pageSetup,
       mode: opts.view || ViewerMode.PREVIEW,
       marks: startMarks,
       layout: startLayout,
     });
+
     if (!opts.content) {
       this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
       throw Error('Bindery: You must include a source element or selector');
     }
+
     if (opts.ControlsComponent) {
       this.viewer.displayError('Controls are now included', 'Please remove the controls component');
       throw Error('Bindery: controls are now included');
@@ -97,12 +100,17 @@ class Bindery {
 
     this.rules = defaultRules;
     this.rules.push(new Rule({ pageNumberOffset: opts.pageNumberOffset || 0 }));
-    if (opts.rules) this.addRules(opts.rules);
+    if (opts.rules) {
+      opts.rules.forEach((rule) => {
+        if (rule instanceof rules.Rule) {
+          this.rules.push(rule);
+        } else {
+          throw Error(`Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`);
+        }
+      });  
+    }
 
-    this.getContentAsElement(opts.content).then((el) => {
-      this.content = el;
-      if (el && this.autorun) this.makeBook();
-    });
+    if (this.autorun) this.makeBook(opts.content);
   }
 
   // Convenience constructor
@@ -111,60 +119,19 @@ class Bindery {
     return new Bindery(opts);
   }
 
-  async getContentAsElement(content: any): Promise<HTMLElement> {
-    if (content instanceof HTMLElement) return content;
-    if (typeof content === 'string') {
-      const el = document.querySelector(content);
-      if (!(el instanceof HTMLElement)) {
-        this.viewer.displayError('Content not specified', `Could not find element that matches selector "${content}"`);
-        console.error(`Bindery: Could not find element that matches selector "${content}"`);
-      }
-      return el as HTMLElement;
-    }
-    if (typeof content === 'object' && content.url) {
-      return this.fetchContent(content.url, content.selector);
-    }
-    throw Error('Bindery: Source must be an element or selector');
-  }
-
-  async fetchContent(url: string, selector?: string) {
-    const response = await fetch(url);
-    if (response.status !== 200) {
-      this.viewer.displayError(`${response.status}`, `Could not find file at "${url}"`);
-      throw Error(`Bindery: Could not find file at "${url}"`);
-    }
-    const fetchedContent = await response.text();
-    const el = parseHTML(fetchedContent, selector);
-    if (!(el instanceof HTMLElement)) {
-      this.viewer.displayError(
-        'Source not specified',
-        `Could not find element that matches selector "${selector}"`
-      );
-      throw Error(`Bindery: Could not find element that matches selector "${selector}"`);
-    }
-    return el;
-  }
-
   cancel() {
     this.viewer.hide();
     if (this.content) this.content.style.display = '';
   }
 
-  addRules(newRules: any[]) {
-    newRules.forEach((rule) => {
-      if (rule instanceof rules.Rule) {
-        this.rules.push(rule);
-      } else {
-        throw Error(`Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`);
-      }
-    });
-  }
-
-  async makeBook() {
-    if (!this.content) {
+  async makeBook(contentDescription: any): Promise<Book> {
+    try {
+      this.content = await getContentAsElement(contentDescription)
+    } catch(e) {
       this.viewer.show();
-      console.error('No content');
-      return null;
+      this.viewer.displayError('', e.message);
+      // throw e;
+      return undefined;
     }
 
     this.content.style.display = '';
@@ -177,8 +144,11 @@ class Bindery {
     this.pageSetup.updateStyleVars();
     this.viewer.isInProgress = true;
 
+    const onProgress = (currentBook: Book, progress: number) => {
+      this.viewer.updateProgress(currentBook, progress);
+    }
+
     try {
-      const onProgress = (current: Book, progress: number) => this.viewer.updateProgress(current, progress);
       const book = await makeBook(content, this.rules, onProgress);
       this.viewer.progress = 1;
       this.layoutInProgress = false;
@@ -190,8 +160,8 @@ class Bindery {
       this.layoutInProgress = false;
       this.viewer.isInProgress = false;
       this.viewer.displayError('Layout couldn\'t complete', e.message);
-      console.error(e);
-      return null;
+      // throw e;
+      return undefined;
     }
   }
 }

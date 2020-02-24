@@ -93,14 +93,14 @@ test('Doesnt throw with valid Rule', () => {
 });
 
 
-test('Displays error when page doesnt validate', async () => {
+test('Displays error when page is too small', async () => {
   mockReasonableSize = () => false;
 
   const div = document.createElement('div');
-  const bindery = new Bindery({ content: div });
+  const bindery = new Bindery({ autorun: false, content: div });
   await wait10(); // TODO: hack because content not ready?
-  const book = await bindery.makeBook();
-  expect(book).toBeNull();
+  const book = await bindery.makeBook(div);
+  expect(book).toBe(undefined);
   expect(bindery.viewer.isViewing).toBe(true);
   expect(bindery.viewer.error instanceof HTMLElement).toBe(true);
   expect(bindery.viewer.element.contains(bindery.viewer.error)).toBe(true);
@@ -110,9 +110,9 @@ test('Creates book when there\'s content', async () => {
   mockReasonableSize = () => true;
 
   const div = document.createElement('div');
-  const bindery = new Bindery({ content: div });
+  const bindery = new Bindery({ autorun: false, content: div });
   await wait10(); // TODO: hack because content not ready?
-  const book = await bindery.makeBook();
+  const book = await bindery.makeBook(div);
   expect(book).toBeTruthy();
   expect(book.pageCount > 0).toBe(true);
 });
