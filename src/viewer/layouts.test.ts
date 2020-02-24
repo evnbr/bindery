@@ -1,5 +1,5 @@
 import { renderGridViewer } from './gridViewer';
-import { renderPrintSheetViewer } from './printSheetViewer';
+import { renderSheetViewer } from './sheetViewer';
 import { renderFlipbookViewer } from './flipbookViewer';
 import { SheetLayout } from '../constants';
 
@@ -26,16 +26,16 @@ test('creates flip layout', () => {
 });
 
 test('creates print single layout', () => {
-  const print = renderPrintSheetViewer(pages, false, SheetLayout.PAGES);
+  const print = renderSheetViewer(pages, false, SheetLayout.PAGES);
   expect(print instanceof DocumentFragment).toBe(true);
 });
 
 test('creates print spread layout', () => {
-  const print = renderPrintSheetViewer(pages, false, SheetLayout.SPREADS);
+  const print = renderSheetViewer(pages, false, SheetLayout.SPREADS);
   expect(print instanceof DocumentFragment).toBe(true);
 });
 
 test('creates print booklet layout', () => {
-  const print = renderPrintSheetViewer(pages, false, SheetLayout.BOOKLET);
+  const print = renderSheetViewer(pages, false, SheetLayout.BOOKLET);
   expect(print instanceof DocumentFragment).toBe(true);
 });

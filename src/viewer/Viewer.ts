@@ -1,10 +1,10 @@
 import { Page, Book } from '../book';
 import Controls from '../controls';
-import { ViewerMode, PageMarks, SheetSize, SheetLayout } from '../constants';
+import { ViewerMode, SheetMarks, SheetSize, SheetLayout } from '../constants';
 import { classes, allModeClasses, classForMode, div } from '../dom';
 import { throttleFrame, throttleTime } from '../utils';
 import { renderGridViewer } from './gridViewer';
-import { renderPrintSheetViewer } from './printSheetViewer';
+import { renderSheetViewer } from './sheetViewer';
 import { renderFlipbookViewer } from './flipbookViewer';
 
 import errorView from './error';
@@ -24,7 +24,7 @@ interface ViewerOptions {
   pageSetup: PageSetup;
   mode: ViewerMode;
   layout: SheetLayout;
-  marks: PageMarks;
+  marks: SheetMarks;
 }
 
 class Viewer {
@@ -165,9 +165,9 @@ class Viewer {
     this.render();
   }
 
-  setMarks(newVal: PageMarks) {
-    this.isShowingCropMarks = (newVal === PageMarks.CROP || newVal === PageMarks.BOTH);
-    this.isShowingBleedMarks = (newVal === PageMarks.BLEED || newVal === PageMarks.BOTH);
+  setMarks(newVal: SheetMarks) {
+    this.isShowingCropMarks = (newVal === SheetMarks.CROP || newVal === SheetMarks.BOTH);
+    this.isShowingBleedMarks = (newVal === SheetMarks.BLEED || newVal === SheetMarks.BOTH);
   }
 
   displayError(title: string, text: string) {
@@ -240,7 +240,7 @@ class Viewer {
   renderFunctionFor(mode: ViewerMode) {
     if (mode === ViewerMode.PREVIEW) return renderGridViewer;
     else if (mode === ViewerMode.FLIPBOOK) return renderFlipbookViewer;
-    else if (mode === ViewerMode.PRINT) return renderPrintSheetViewer;
+    else if (mode === ViewerMode.PRINT) return renderSheetViewer;
     throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
   }
 

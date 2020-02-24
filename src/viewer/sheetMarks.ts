@@ -4,12 +4,12 @@ const directions = ['top', 'bottom', 'left', 'right'];
 const bleedMarks = () => directions.map(dir => div(`.mark-bleed-${dir}`));
 const cropMarks = () => directions.map(dir => div(`.mark-crop-${dir}`));
 
-const printMarksSingle = () => div('.page-size.print-mark-wrap',
+const pageSheetMarks = () => div('.page-size.print-mark-wrap',
   ...cropMarks(), 
   ...bleedMarks(),
 );
 
-const printMarksSpread = () => div('.spread-size.print-mark-wrap',
+const spreadSheetMarks = () => div('.spread-size.print-mark-wrap',
   div('.mark-crop-fold'), 
   ...cropMarks(), 
   ...bleedMarks(),
@@ -22,7 +22,7 @@ const bookletMeta = (i: number, len: number) => {
 };
 
 export {
-  printMarksSingle,
-  printMarksSpread,
+  pageSheetMarks,
+  spreadSheetMarks,
   bookletMeta,
 };

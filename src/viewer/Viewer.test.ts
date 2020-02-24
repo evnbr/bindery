@@ -1,5 +1,5 @@
 import Viewer from './Viewer';
-import { ViewerMode, SheetLayout, PageMarks } from '../constants';
+import { ViewerMode, SheetLayout, SheetMarks } from '../constants';
 
 global.requestAnimationFrame = func => func();
 global.BINDERY_VERSION = 'Test Version';
@@ -21,7 +21,7 @@ const viewer = new Viewer({
   pageSetup,
   mode: ViewerMode.PREVIEW,
   layout: SheetLayout.PAGES,
-  marks: PageMarks.BOTH,
+  marks: SheetMarks.BOTH,
   ControlsComponent: ControlsStub,
 });
 

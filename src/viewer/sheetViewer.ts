@@ -2,7 +2,7 @@ import { div, classes } from '../dom';
 import { Page } from '../book';
 import { SheetLayout } from '../constants';
 
-import { printMarksSingle, printMarksSpread, bookletMeta } from './printMarks';
+import { pageSheetMarks, spreadSheetMarks, bookletMeta } from './sheetMarks';
 import padPages from './padPages';
 import orderPagesBooklet from './orderPagesBooklet';
 
@@ -13,7 +13,7 @@ const onePageSpread = (...children: HTMLElement[]) => {
   return div('.spread-wrapper', ...children);
 }
 
-const renderPrintSheetViewer = (bookPages: Page[], _doubleSided: boolean, layout: SheetLayout) => {
+const renderSheetViewer = (bookPages: Page[], _doubleSided: boolean, layout: SheetLayout) => {
   const isTwoUp = layout !== SheetLayout.PAGES;
   const isSpreads = layout === SheetLayout.SPREADS;
   const isBooklet = layout === SheetLayout.BOOKLET;
@@ -24,7 +24,7 @@ const renderPrintSheetViewer = (bookPages: Page[], _doubleSided: boolean, layout
 
   const printLayout = document.createDocumentFragment();
 
-  const marks = isTwoUp ? printMarksSpread : printMarksSingle;
+  const marks = isTwoUp ? spreadSheetMarks : pageSheetMarks;
   const spread = isTwoUp ? twoPageSpread : onePageSpread;
 
   const printSheet = (...children: HTMLElement[]) => {
@@ -56,4 +56,4 @@ const renderPrintSheetViewer = (bookPages: Page[], _doubleSided: boolean, layout
   return printLayout;
 };
 
-export { renderPrintSheetViewer };
+export { renderSheetViewer };

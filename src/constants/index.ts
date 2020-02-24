@@ -8,7 +8,7 @@ export enum SheetLayout {
     BOOKLET = 'booklet',
 }
 
-export enum PageMarks {
+export enum SheetMarks {
     NONE,
     CROP,
     BLEED,

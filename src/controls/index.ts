@@ -5,7 +5,7 @@ import {
   ViewerMode,
   SheetLayout,
   SheetSize,
-  PageMarks
+  SheetMarks
 } from '../constants';
 
 import {
@@ -19,7 +19,7 @@ import {
 
 interface ControlsInitialState {
   paper: SheetSize;
-  marks: PageMarks;
+  marks: SheetMarks;
   mode: ViewerMode;
   layout: SheetLayout;
 }
@@ -28,7 +28,7 @@ interface ControlsActions {
   setMode: (newVal: ViewerMode) => void;
   setLayout: (newVal: SheetLayout) => void;
   setPaper: (newVal: SheetSize) => void;
-  setMarks: (newVal: PageMarks) => void;
+  setMarks: (newVal: SheetMarks) => void;
   getPageSize: () => { width: string, height: string };
 }
 
@@ -111,10 +111,10 @@ class Controls {
     ));
 
     marksSelect = enumDropdown([
-        [ PageMarks.NONE , 'No Marks' ],
-        [ PageMarks.CROP, 'Crop Marks' ],
-        [ PageMarks.BLEED, 'Bleed Marks' ],
-        [ PageMarks.BOTH, 'Crop and Bleed' ],
+        [ SheetMarks.NONE , 'No Marks' ],
+        [ SheetMarks.CROP, 'Crop Marks' ],
+        [ SheetMarks.BLEED, 'Bleed Marks' ],
+        [ SheetMarks.BOTH, 'Crop and Bleed' ],
       ],
       initialState.marks,
       (newMarks) => {

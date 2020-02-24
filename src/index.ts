@@ -1,7 +1,7 @@
 /* global BINDERY_VERSION */
 import Bindery from './bindery';
 import rules from './rules';
-import { ViewerMode, SheetSize, SheetLayout, PageMarks } from './constants';
+import { ViewerMode, SheetSize, SheetLayout, SheetMarks } from './constants';
 import '../src/main.scss';
 
 declare const BINDERY_VERSION: string;
@@ -10,7 +10,7 @@ const constants = {
     View: ViewerMode,
     Paper: SheetSize,
     Layout: SheetLayout,
-    Marks: PageMarks,
+    Marks: SheetMarks,
     version: BINDERY_VERSION,
 }
 
