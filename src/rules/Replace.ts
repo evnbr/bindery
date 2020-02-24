@@ -1,4 +1,4 @@
-import Rule, { RuleOptions } from './Rule';
+import { Rule, RuleOptions } from './Rule';
 import { Book } from '../book';
 import { PageMaker } from '../types';
 

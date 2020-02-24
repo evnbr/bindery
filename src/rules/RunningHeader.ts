@@ -1,4 +1,4 @@
-import Rule, { RuleOptions } from './Rule';
+import { Rule, RuleOptions } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { div } from '../dom';
 import { Page } from '../book';

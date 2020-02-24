@@ -14,7 +14,7 @@ export interface RuleOptions {
 }
 
 
-export default class Rule {
+export class Rule {
   name: string;
   selector: string;
   [key: string]: any

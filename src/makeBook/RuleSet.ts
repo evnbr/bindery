@@ -1,5 +1,5 @@
 import { classes } from '../dom';
-import Rule from '../rules/Rule';
+import { Rule } from '../rules/Rule';
 import Split from '../rules/Split';
 import dedupe from './dedupeRules';
 import recoverFromRule from './recoverFromRule';

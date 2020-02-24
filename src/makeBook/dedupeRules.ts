@@ -1,7 +1,7 @@
 import FullBleedPage from '../rules/FullBleedPage';
 import FullBleedSpread from '../rules/FullBleedSpread';
 import PageBreak from '../rules/PageBreak';
-import Rule from '../rules/Rule';
+import { Rule } from '../rules/Rule';
 
 const isSpread = (rule: Rule) => rule instanceof FullBleedSpread;
 const isPage = (rule: Rule) => rule instanceof FullBleedPage;

@@ -12,7 +12,7 @@ import Viewer from './viewer';
 import rules from './rules';
 import { validateRuntimeOptions, RuntimeTypes } from './runtimeOptionChecker';
 import { Book } from './book';
-import Rule from './rules/Rule';
+import { Rule } from './rules/Rule';
 
 const vals = (obj: { [key: string]: any}) => {
   return Object.keys(obj).map(k => obj[k]);
@@ -124,7 +124,7 @@ class Bindery {
     if (this.content) this.content.style.display = '';
   }
 
-  async makeBook(contentDescription: any): Promise<Book> {
+  async makeBook(contentDescription: any): Promise<Book | undefined> {
     try {
       this.content = await getContentAsElement(contentDescription)
     } catch(e) {

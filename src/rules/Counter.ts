@@ -1,4 +1,4 @@
-import Rule, { RuleOptions } from './Rule';
+import { Rule, RuleOptions } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 
 interface CounterRuleOptions extends RuleOptions {
@@ -18,9 +18,9 @@ class Counter extends Rule {
     this.selector = '*';
     this.counterValue = 0;
 
-    this.incrementEl = options.incrementEl || '';
-    this.resetEl = options.resetEl || '';
-    this.replaceEl = options.replaceEl || '';
+    this.incrementEl = options.incrementEl ?? '';
+    this.resetEl = options.resetEl ?? '';
+    this.replaceEl = options.replaceEl ?? '';
   
 
     validateRuntimeOptions(options, {

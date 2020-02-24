@@ -6,7 +6,7 @@ import PageReference from './PageReference';
 import PageBreak from './PageBreak';
 import RunningHeader from './RunningHeader';
 import Replace from './Replace';
-import Rule from './Rule';
+import { Rule } from './Rule';
 import Split from './Split';
 
 export default {

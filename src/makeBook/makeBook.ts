@@ -2,7 +2,7 @@ import { flowIntoRegions } from 'regionize';
 import { RegionGetter } from 'regionize/dist/types/types';
 
 import { Book, Page, annotatePages } from '../book';
-import Rule from '../rules/Rule';
+import { Rule } from '../rules/Rule';
 
 // paginate
 import RuleSet from './RuleSet';
