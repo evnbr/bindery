@@ -1,19 +1,12 @@
-import annotatePages from './annotatePages';
+import Page from './Page';
+import { annotatePages } from './annotatePages';
+import { h } from '../dom';
 
+const pageStub = () => new Page();
 
-const create = (tag, txt) => {
-  const el = document.createElement(tag);
-  el.textContent = txt;
-  return el;
-};
-
-const pageStub = () => ({
-  element: create('div'),
-  setLeftRight: () => {},
-});
-const h1 = txt => create('h1', txt);
-const h2 = txt => create('h2', txt);
-const h3 = txt => create('h3', txt);
+const h1 = txt => h('h1', null, null, txt);
+const h2 = txt => h('h2', null, null, txt);
+const h3 = txt => h('h3', null, null, txt);
 
 const pages = [
   pageStub(),

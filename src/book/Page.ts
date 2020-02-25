@@ -1,5 +1,26 @@
 import { Region } from 'regionize';
 import { safeMeasure, div, classes } from '../dom';
+import { HierarchyEntry } from '../types';
+
+class HierarchyToHeadingAdapter {
+  getHierarchy: (() => HierarchyEntry[]);
+
+  constructor(getter: (() => HierarchyEntry[])) {
+    // console.warn('Deprecated');
+    this.getHierarchy = getter;
+  }
+
+  textFor(sel: string): string | undefined {
+    return this.getHierarchy()?.find((entry) => entry?.selector === sel)?.text;
+  }
+
+  get h1() { return this.textFor('h1'); }
+  get h2() { return this.textFor('h2'); }
+  get h3() { return this.textFor('h3'); }
+  get h4() { return this.textFor('h4'); }
+  get h5() { return this.textFor('h5'); }
+  get h6() { return this.textFor('h6'); }
+}
 
 class Page {
   flow: Region;
@@ -10,7 +31,8 @@ class Page {
 
   side?: string;
   number?: number;
-  heading: { [key: string]: any } = {}; // used by running headers
+  heading: HierarchyToHeadingAdapter; // used by running headers
+  hierarchy: HierarchyEntry[] = [];
 
   suppress = false;
   hasOutOfFlowContent = false;
@@ -29,6 +51,8 @@ class Page {
       this.flow.element,
       this.footer
     );
+
+    this.heading = new HierarchyToHeadingAdapter(() => this.hierarchy);
   }
 
   static isSizeValid() {

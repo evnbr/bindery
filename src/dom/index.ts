@@ -15,7 +15,7 @@ const addStylesheet = (id: string): HTMLStyleElement => {
 
 // Fetch or create stylesheet with id
 const stylesheet = (id: string): HTMLStyleElement => {
-  return doc.querySelector(`#${id}`) || addStylesheet(id);
+  return doc.querySelector(`#${id}`) ?? addStylesheet(id);
 }
 
 // Parse html from text

@@ -1,10 +1,11 @@
 import { Page } from '../book';
+import { HierarchyEntry } from '../types';
 
-const annotatePages = (pages: Page[], offset: number) => {
+export const annotatePagesNumbers = (pages: Page[], offset: number) => {
   // ———
   // NUMBERING
 
-  // TODO: Pass in facingpages options
+  // TODO: Pass in facingpages as an option?
   const facingPages = true;
   if (facingPages) {
     pages.forEach((page, i) => {
@@ -14,7 +15,9 @@ const annotatePages = (pages: Page[], offset: number) => {
   } else {
     pages.forEach((page) => { page.setLeftRight('right'); });
   }
+}
 
+export const annotatePagesHierarchy = (pages: Page[], headerSelectorHierarchy: string[]) => {
   // ———
   // RUNNING HEADERS
 
@@ -22,27 +25,44 @@ const annotatePages = (pages: Page[], offset: number) => {
   // This should be a hierarchical list of selectors.
   // Every time one is selected, it annotates all following pages
   // and clears any subselectors.
-  // TODO: Make this configurable
-  const headers = { h1: '', h2: '', h3: '', h4: '', h5: '', h6: '' };
-  const headingKeys = Object.keys(headers) as (keyof typeof headers)[];
+
+  let currentHierarchy: HierarchyEntry[] = [];
 
   pages.forEach((page) => {
-    page.heading = {};
-    headingKeys.forEach((tagName, i) => {
-      const element = page.element.querySelector(tagName);
-      if (element && element.textContent) {
-        headers[tagName] = element.textContent;
+    const pageHierarchy: HierarchyEntry[] = [];
+
+    headerSelectorHierarchy.forEach((selector, i) => {
+      const element = page.element.querySelector(selector);
+
+      // A new header level starts on this page
+      if (element) {
+        currentHierarchy[i] = {
+          selector: selector,
+          text: element.textContent ?? '',
+          el: element,
+        };
         
-        // clear remainder
-        headingKeys.forEach((tag, j) => {
-          if (j > i) headers[tag] = '';
-        });
+        // Clear any lower headers in the hierarchy
+        currentHierarchy = currentHierarchy.slice(0, i + 1);
+
+        // headerSelectorHierarchy.forEach((lowerSelector, j) => {
+        //   if (j > i) {
+        //     currentHeaders[j] = { selector: lowerSelector, text: '', el: undefined };
+        //   }
+        // });
       }
-      if (headers[tagName] !== '') {
-        page.heading[tagName] = headers[tagName];
+
+      // Always decorate this page with current header state.
+      if (currentHierarchy[i]) {
+        pageHierarchy[i] = currentHierarchy[i];
       }
     });
+
+    page.hierarchy = pageHierarchy;
   });
 };
 
-export default annotatePages;
+export const annotatePages = (pages: Page[], offset: number) => {
+  annotatePagesNumbers(pages, offset)
+  annotatePagesHierarchy(pages, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+}

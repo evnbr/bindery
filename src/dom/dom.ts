@@ -49,4 +49,4 @@ const option = (attrs: DomAttributes, label: string) => {
   return h('option', null, attrs, label) as HTMLOptionElement;
 }
 
-export { div, button, select, option, DomAttributes };
+export { h, div, button, select, option, DomAttributes };
