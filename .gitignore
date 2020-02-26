@@ -2,8 +2,9 @@
 
 node_modules/
 dist/
+build/
 coverage/
-docs/bindery_dev_build/
+docs/bindery_local_build.js
 
 *.sketch
 *.map

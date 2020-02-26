@@ -1,6 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import minify from 'rollup-plugin-babel-minify';
+import { terser } from 'rollup-plugin-terser';
 
 import sass from 'rollup-plugin-sass';
 import postcss from 'postcss';
@@ -12,22 +12,31 @@ import pkg from './package.json';
 
 const extend = (a, b) => Object.assign({}, a, b);
 
+const classPrefix = '📖-';
+
 const baseConfig = {
-  input: 'src/index.js',
+  input: 'build/index.js',
 };
 
 const baseOutput = {
   name: 'Bindery',
-  intro: `const BINDERY_VERSION = 'v${pkg.version}'`,
+  intro: `
+const BINDERY_VERSION = 'v${pkg.version}';
+const BINDERY_CLASS_PREFIX = '${classPrefix}';
+  `,
   banner: `/* 📖 Bindery v${pkg.version} */`,
 };
 
-const sassPlugin = () => sass({
+const sassPlugin = ({ shouldMinify } = {}) => sass({
   insert: true,
-  processor: css => postcss([
-    prefixer('📖-'),
-    cssnano(),
-  ]).process(css).then(result => result.css),
+  processor: (css) => postcss(
+    shouldMinify ? [
+      prefixer(classPrefix),
+      cssnano(),
+    ] : [
+      prefixer(classPrefix),
+    ],
+  ).process(css).then((result) => result.css),
 });
 
 export default [
@@ -55,9 +64,9 @@ export default [
     plugins: [
       resolve(),
       commonjs(),
-      sassPlugin(),
-      minify({
-        comments: false,
+      sassPlugin({ shouldMinify: true }),
+      terser({
+        ecma: 2018,
       }),
     ],
   }),
