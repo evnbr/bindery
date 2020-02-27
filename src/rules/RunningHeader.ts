@@ -13,7 +13,7 @@ class RunningHeader extends Rule {
     super(options);
     validateRuntimeOptions(options, {
       name: 'RunningHeader',
-      render: RuntimeTypes.func
+      render: RuntimeTypes.func,
     });
   }
   eachPage(page: Page) {

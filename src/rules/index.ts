@@ -40,5 +40,5 @@ export default {
   },
   createRule(options: {}) {
     return new Rule(options);
-  }
+  },
 };

@@ -11,7 +11,7 @@ const replacer = new Replace({
   replace: el => {
     el.textContent = 'I was replaced';
     return el;
-  }
+  },
 });
 
 const next = jest.fn();

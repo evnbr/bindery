@@ -40,52 +40,52 @@ const isEnum = (cases: string[]) => {
 
 const lengthChecker = {
   name: 'length (string with absolute units)',
-  check: isLength
+  check: isLength,
 };
 
 const RuntimeTypes = {
   any: {
     name: 'any',
-    check: () => true
+    check: () => true,
   },
   enum(...cases: string[]) {
     return {
       name: `(${cases.map(c => `"${c}"`).join(' | ')})`,
-      check: isEnum(cases)
+      check: isEnum(cases),
     };
   },
   shapeExact: (template: {}) => ({
     name: `exactly ({${Object.keys(template).join(', ')}})`,
-    check: isShapeExact(template)
+    check: isShapeExact(template),
   }),
   shape: (template: {}) => ({
     name: `shape ({${Object.keys(template).join(', ')}})`,
-    check: isShape(template)
+    check: isShape(template),
   }),
   string: {
     name: 'string',
-    check: isStr
+    check: isStr,
   },
   length: lengthChecker,
   number: {
     name: 'number',
-    check: isNum
+    check: isNum,
   },
   bool: {
     name: 'bool',
-    check: isBool
+    check: isBool,
   },
   func: {
     name: 'func',
-    check: isFunc
+    check: isFunc,
   },
   obj: {
     name: 'object',
-    check: isObj
+    check: isObj,
   },
   array: {
     name: 'array',
-    check: isArr
+    check: isArr,
   },
   margin: {
     name: 'margin ({ top, inner, outer, bottom })',
@@ -94,17 +94,17 @@ const RuntimeTypes = {
       top: lengthChecker,
       inner: lengthChecker,
       outer: lengthChecker,
-      bottom: lengthChecker
-    })
+      bottom: lengthChecker,
+    }),
   },
   size: {
     name: 'size ({ width, height })',
     check: isShapeExact({
       name: 'size',
       width: lengthChecker,
-      height: lengthChecker
-    })
-  }
+      height: lengthChecker,
+    }),
+  },
 };
 
 export default RuntimeTypes;

@@ -9,6 +9,6 @@ export default function(title: string, text: string) {
     '.error',
     div('.error-title', title),
     div('.error-text', text),
-    div('.error-footer', `Bindery ${BINDERY_VERSION}`)
+    div('.error-footer', `Bindery ${BINDERY_VERSION}`),
   );
 }

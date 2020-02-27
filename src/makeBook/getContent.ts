@@ -2,7 +2,7 @@ import { parseHTML } from '../dom';
 
 const fetchContent = async (
   url: string,
-  selector?: string
+  selector?: string,
 ): Promise<HTMLElement> => {
   const response = await fetch(url);
   if (response.status !== 200) {
@@ -12,14 +12,14 @@ const fetchContent = async (
   const el = parseHTML(fetchedContent, selector);
   if (!(el instanceof HTMLElement)) {
     throw Error(
-      `Could not find element that matches selector "${selector}" in response from ${url}`
+      `Could not find element that matches selector "${selector}" in response from ${url}`,
     );
   }
   return el;
 };
 
 export const getContentAsElement = async (
-  content: any
+  content: any,
 ): Promise<HTMLElement> => {
   if (content instanceof HTMLElement) return content;
   if (typeof content === 'string') {

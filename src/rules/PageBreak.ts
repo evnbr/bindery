@@ -15,7 +15,7 @@ class PageBreak extends Rule {
       name: 'PageBreak',
       selector: RuntimeTypes.string,
       continue: RuntimeTypes.enum('next', 'left', 'right'),
-      position: RuntimeTypes.enum('before', 'after', 'both', 'avoid')
+      position: RuntimeTypes.enum('before', 'after', 'both', 'avoid'),
     });
   }
   get avoidSplit() {

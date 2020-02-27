@@ -20,7 +20,7 @@ class FullBleedSpread extends OutOfFlow {
       name: 'FullBleedSpread',
       selector: RuntimeTypes.string,
       continue: RuntimeTypes.enum('next', 'same', 'left', 'right'),
-      rotate: RuntimeTypes.enum('none', 'clockwise', 'counterclockwise')
+      rotate: RuntimeTypes.enum('none', 'clockwise', 'counterclockwise'),
     });
   }
   createOutOfFlowPages(elmt: HTMLElement, book: Book, makeNewPage: PageMaker) {
@@ -42,7 +42,7 @@ class FullBleedSpread extends OutOfFlow {
     if (this.rotate !== 'none') {
       [leftPage, rightPage].forEach(page => {
         const rotateContainer = div(
-          `.rotate-container.spread-size-rotated.rotate-spread-${this.rotate}`
+          `.rotate-container.spread-size-rotated.rotate-spread-${this.rotate}`,
         );
         rotateContainer.append(page.background);
         page.element.append(rotateContainer);

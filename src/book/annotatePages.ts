@@ -21,7 +21,7 @@ export const annotatePagesNumbers = (pages: Page[], offset: number) => {
 
 export const annotatePagesHierarchy = (
   pages: Page[],
-  headerSelectorHierarchy: string[]
+  headerSelectorHierarchy: string[],
 ) => {
   // ———
   // RUNNING HEADERS
@@ -44,7 +44,7 @@ export const annotatePagesHierarchy = (
         currentHierarchy[i] = {
           selector: selector,
           text: element.textContent ?? '',
-          el: element
+          el: element,
         };
 
         // Clear any lower headers in the hierarchy

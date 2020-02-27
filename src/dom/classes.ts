@@ -22,7 +22,7 @@ const classes = {
   sheetRight: 'print-sheet-right',
 
   toNext: 'continues',
-  fromPrev: 'continuation'
+  fromPrev: 'continuation',
 };
 
 Object.keys(classes).forEach(k => {
@@ -34,7 +34,7 @@ Object.keys(classes).forEach(k => {
 const allModeClasses = [
   classes.viewPreview,
   classes.viewPrint,
-  classes.viewFlip
+  classes.viewFlip,
 ];
 
 const classForMode = (mode: ViewerMode): string => {

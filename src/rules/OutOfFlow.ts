@@ -23,7 +23,7 @@ class OutOfFlow extends Rule {
     elmt: HTMLElement,
     book: Book,
     continueOnNewPage: Function,
-    makeNewPage: PageMaker
+    makeNewPage: PageMaker,
   ) {
     this.createOutOfFlowPages(elmt, book, makeNewPage);
 

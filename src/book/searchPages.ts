@@ -2,7 +2,7 @@ import Page from './Page';
 
 const pageNumbersForTest = (
   pages: Page[],
-  test: (el: HTMLElement) => boolean
+  test: (el: HTMLElement) => boolean,
 ): number[] => {
   return pages
     .filter(pg => !!pg.number)

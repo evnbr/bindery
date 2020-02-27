@@ -11,7 +11,7 @@ import { RegionGetter } from 'regionize/dist/types/types';
 const recoverFromRule = (
   el: HTMLElement,
   book: Book,
-  nextRegion: RegionGetter
+  nextRegion: RegionGetter,
 ) => {
   let removed = el;
   const parent = el.parentNode as HTMLElement;

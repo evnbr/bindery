@@ -10,7 +10,7 @@ import { PageMaker } from '../types';
 const giveUp = (rule: Rule, el: HTMLElement) => {
   console.warn(
     `Couldn't apply ${rule.name}, caused overflows twice when adding: `,
-    el
+    el,
   );
 };
 
@@ -115,7 +115,7 @@ class RuleSet {
   }
   finishEveryPage(book: Book) {
     this.pageRules.forEach(rule =>
-      book.pages.forEach(pg => rule.eachPage(pg, book))
+      book.pages.forEach(pg => rule.eachPage(pg, book)),
     );
   }
 
@@ -124,12 +124,12 @@ class RuleSet {
     element: HTMLElement,
     book: Book,
     continueOnNewPage: RegionGetter,
-    makeNewPage: PageMaker
+    makeNewPage: PageMaker,
   ) {
     let addedElement = element;
 
     const matchingRules = this.beforeAddRules.filter(rule =>
-      addedElement.matches(rule.selector)
+      addedElement.matches(rule.selector),
     );
 
     matchingRules.forEach(rule => {
@@ -137,7 +137,7 @@ class RuleSet {
         addedElement,
         book,
         continueOnNewPage,
-        makeNewPage
+        makeNewPage,
       );
     });
     return addedElement;
@@ -147,14 +147,14 @@ class RuleSet {
     originalElement: HTMLElement,
     book: Book,
     continueOnNewPage: RegionGetter,
-    makeNewPage: PageMaker
+    makeNewPage: PageMaker,
   ) {
     let addedElement = originalElement;
 
     const attemptRecovery = (el: HTMLElement) =>
       recoverFromRule(el, book, continueOnNewPage);
     const matchingRules = this.afterAddRules.filter(rule =>
-      addedElement.matches(rule.selector)
+      addedElement.matches(rule.selector),
     );
     const uniqueRules = dedupe(matchingRules) as AfterAddRule[];
 
@@ -162,7 +162,7 @@ class RuleSet {
       const retry = (el: HTMLElement) => {
         attemptRecovery(el);
         return rule.afterAdd(el, book, continueOnNewPage, makeNewPage, () =>
-          giveUp(rule, el)
+          giveUp(rule, el),
         );
       };
       addedElement = rule.afterAdd(
@@ -170,7 +170,7 @@ class RuleSet {
         book,
         continueOnNewPage,
         makeNewPage,
-        retry
+        retry,
       );
     });
     return addedElement;

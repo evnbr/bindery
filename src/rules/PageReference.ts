@@ -37,7 +37,7 @@ class PageReference extends Replace {
       name: 'PageReference',
       selector: RuntimeTypes.string,
       replace: RuntimeTypes.func,
-      createTest: RuntimeTypes.func
+      createTest: RuntimeTypes.func,
     });
     this.references = [];
     const throttle = throttleTime(10);
@@ -61,13 +61,13 @@ class PageReference extends Replace {
   createReference(
     book: Book,
     test: TestFunction,
-    elmt: HTMLElement
+    elmt: HTMLElement,
   ): PageReferenceInstance {
     const ref = {
       test,
       template: elmt,
       element: elmt,
-      value: null
+      value: null,
     } as PageReferenceInstance;
     this.references.push(ref);
     const currentResults = pageNumbersForTest(book.pages, test);

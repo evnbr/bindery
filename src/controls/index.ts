@@ -24,7 +24,7 @@ const sizeLabels: [SheetSize, string][] = [
   [SheetSize.LETTER_PORTRAIT, 'Letter Portrait'],
   [SheetSize.LETTER_LANDSCAPE, 'Auto'],
   [SheetSize.A4_PORTRAIT, 'A4 Portrait'],
-  [SheetSize.A4_PORTRAIT, 'A4 Landscape']
+  [SheetSize.A4_PORTRAIT, 'A4 Landscape'],
 ];
 
 // TODO: This is not a particularly robust check.
@@ -58,12 +58,12 @@ class Controls {
       : [
           option(
             { value: 'letter-portrait', selected: true },
-            'Default Page Size *'
+            'Default Page Size *',
           ),
           option(
             { disabled: true },
-            "Only Chrome supports custom page sizes. Set in your browser's print dialog instead."
-          )
+            "Only Chrome supports custom page sizes. Set in your browser's print dialog instead.",
+          ),
         ]
     ).map(opt => {
       if (opt.value === initialState.paper) {
@@ -98,14 +98,14 @@ class Controls {
         [
           [SheetLayout.PAGES, '1 Page / Sheet'],
           [SheetLayout.SPREADS, '1 Spread / Sheet'],
-          [SheetLayout.BOOKLET, 'Booklet Sheets']
+          [SheetLayout.BOOKLET, 'Booklet Sheets'],
         ],
         initialState.layout,
         newLayout => {
           actions.setLayout(newLayout);
           updateSheetSizeNames();
-        }
-      )
+        },
+      ),
     );
 
     marksSelect = enumDropdown(
@@ -113,12 +113,12 @@ class Controls {
         [SheetMarks.NONE, 'No Marks'],
         [SheetMarks.CROP, 'Crop Marks'],
         [SheetMarks.BLEED, 'Bleed Marks'],
-        [SheetMarks.BOTH, 'Crop and Bleed']
+        [SheetMarks.BOTH, 'Crop and Bleed'],
       ],
       initialState.marks,
       newMarks => {
         actions.setMarks(newMarks);
-      }
+      },
     );
 
     this.setDone = () => {};
@@ -128,19 +128,19 @@ class Controls {
       '.print-options',
       sheetLayoutDropdown,
       row(null, paperSelect),
-      row(null, marksSelect)
+      row(null, marksSelect),
     );
 
     viewSelect = enumDropdown(
       [
         [ViewerMode.PREVIEW, 'Grid'],
         [ViewerMode.FLIPBOOK, 'Flipbook'],
-        [ViewerMode.PRINT, 'Print Preview']
+        [ViewerMode.PRINT, 'Print Preview'],
       ],
       initialState.mode,
       newMode => {
         actions.setMode(newMode);
-      }
+      },
     );
 
     const viewRow = row('.view-row', viewSelect);

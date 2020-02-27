@@ -14,7 +14,7 @@ const pages = [
   pageStub(),
   pageStub(),
   pageStub(),
-  pageStub()
+  pageStub(),
 ];
 
 pages[0].element.appendChild(h1('1'));

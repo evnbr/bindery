@@ -8,7 +8,7 @@ describe('Split rules are called as expected', () => {
   const ruleSet = new RuleSet([
     { selector: 'div', didSplit: didSplit1 },
     { selector: '.test', didSplit: didSplit2 },
-    { selector: null, didSplit: didSplit3 }
+    { selector: null, didSplit: didSplit3 },
   ]);
 
   test('div detected', () => {
@@ -42,7 +42,7 @@ describe('After add rules are called as expected', () => {
 
   const ruleSet = new RuleSet([
     { selector: 'div', afterAdd: afterAdd1 },
-    { selector: '.test', afterAdd: afterAdd2 }
+    { selector: '.test', afterAdd: afterAdd2 },
   ]);
 
   test('div detected', () => {
@@ -53,7 +53,7 @@ describe('After add rules are called as expected', () => {
       null,
       null,
       null,
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(afterAdd2).not.toBeCalled();
     expect(newEl).toBe(replacedEl);
@@ -68,14 +68,14 @@ describe('After add rules are called as expected', () => {
       null,
       null,
       null,
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(afterAdd2).toBeCalledWith(
       replacedEl,
       null,
       null,
       null,
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(newEl).toBe(replacedAgainEl);
   });
@@ -91,7 +91,7 @@ describe('Before add rules are called as expected', () => {
 
   const ruleSet = new RuleSet([
     { selector: 'div', beforeAdd: beforeAdd1 },
-    { selector: '.test', beforeAdd: beforeAdd2 }
+    { selector: '.test', beforeAdd: beforeAdd2 },
   ]);
 
   test('div detected', () => {

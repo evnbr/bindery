@@ -28,12 +28,12 @@ interface Stringable {
 const enumDropdown = <ChoiceType extends Stringable>(
   entries: [ChoiceType, string][],
   initialValue: ChoiceType,
-  changeHandler: (a: ChoiceType) => any
+  changeHandler: (a: ChoiceType) => any,
 ): HTMLElement => {
   const eventHandler = (e: Event) => {
     const rawVal = (e.target as HTMLSelectElement).value;
     const chosenEntry = entries.filter(
-      entry => entry[0].toString() === rawVal
+      entry => entry[0].toString() === rawVal,
     )[0];
     if (chosenEntry) {
       changeHandler(chosenEntry[0]);
@@ -50,7 +50,7 @@ const enumDropdown = <ChoiceType extends Stringable>(
         el.selected = true;
       }
       return el;
-    })
+    }),
   );
 };
 

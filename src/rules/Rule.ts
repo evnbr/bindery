@@ -1,7 +1,7 @@
 import {
   RuleOptionBreakPosition,
   RuleOptionFlowPosition,
-  RuleOptionPageRotation
+  RuleOptionPageRotation,
 } from '../types';
 
 export interface RuleOptions {

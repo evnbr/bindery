@@ -16,7 +16,7 @@ const onePageSpread = (...children: HTMLElement[]) => {
 const renderSheetViewer = (
   bookPages: Page[],
   _doubleSided: boolean,
-  layout: SheetLayout
+  layout: SheetLayout,
 ) => {
   const isTwoUp = layout !== SheetLayout.PAGES;
   const isSpreads = layout === SheetLayout.SPREADS;
@@ -45,7 +45,7 @@ const renderSheetViewer = (
       const sheet = printSheet(
         div('.page-bleed-clip.page-bleed-clip-left', pages[i].element),
         div('.page-bleed-clip.page-bleed-clip-right', pages[i + 1].element),
-        spreadMarks
+        spreadMarks,
       );
       sheet.classList.add(classes.sheetSpread);
       printLayout.appendChild(sheet);

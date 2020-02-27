@@ -14,7 +14,7 @@ const extend = (a, b) => Object.assign({}, a, b);
 const classPrefix = '📖-';
 
 const baseConfig = {
-  input: 'build/index.js'
+  input: 'build/index.js',
 };
 
 const baseOutput = {
@@ -23,7 +23,7 @@ const baseOutput = {
 const BINDERY_VERSION = 'v${pkg.version}';
 const BINDERY_CLASS_PREFIX = '${classPrefix}';
   `,
-  banner: `/* 📖 Bindery v${pkg.version} */`
+  banner: `/* 📖 Bindery v${pkg.version} */`,
 };
 
 const sassPlugin = ({ shouldMinify } = {}) =>
@@ -33,10 +33,10 @@ const sassPlugin = ({ shouldMinify } = {}) =>
       postcss(
         shouldMinify
           ? [prefixer(classPrefix), cssnano()]
-          : [prefixer(classPrefix)]
+          : [prefixer(classPrefix)],
       )
         .process(css)
-        .then(result => result.css)
+        .then(result => result.css),
   });
 
 export default [
@@ -45,9 +45,9 @@ export default [
     output: extend(baseOutput, {
       file: pkg.browser,
       format: 'umd',
-      sourcemap: true
+      sourcemap: true,
     }),
-    plugins: [resolve(), commonjs(), sassPlugin()]
+    plugins: [resolve(), commonjs(), sassPlugin()],
   }),
 
   // minified browser-friendly build
@@ -55,25 +55,25 @@ export default [
     output: extend(baseOutput, {
       file: 'dist/bindery.min.js',
       format: 'iife',
-      sourcemap: true
+      sourcemap: true,
     }),
     plugins: [
       resolve(),
       commonjs(),
       sassPlugin({ shouldMinify: true }),
       terser({
-        ecma: 2018
-      })
-    ]
+        ecma: 2018,
+      }),
+    ],
   }),
 
   // CommonJS (for Node) and ES module (for bundlers) build.
   extend(baseConfig, {
     output: [
       extend(baseOutput, { file: pkg.main, format: 'cjs' }),
-      extend(baseOutput, { file: pkg.module, format: 'es' })
+      extend(baseOutput, { file: pkg.module, format: 'es' }),
     ],
     external: ['regionize'],
-    plugins: [resolve(), sassPlugin()]
-  })
+    plugins: [resolve(), sassPlugin()],
+  }),
 ];

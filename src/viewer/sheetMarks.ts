@@ -12,7 +12,7 @@ const spreadSheetMarks = () =>
     '.spread-size.print-mark-wrap',
     div('.mark-crop-fold'),
     ...cropMarks(),
-    ...bleedMarks()
+    ...bleedMarks(),
   );
 
 const bookletMeta = (i: number, len: number) => {
@@ -20,7 +20,7 @@ const bookletMeta = (i: number, len: number) => {
   const sheetIndex = Math.round((i + 1) / 4) + 1;
   return div(
     '.print-meta',
-    `Sheet ${sheetIndex} of ${len / 4}: ${isFront ? 'Outside' : 'Inside'}`
+    `Sheet ${sheetIndex} of ${len / 4}: ${isFront ? 'Outside' : 'Inside'}`,
   );
 };
 

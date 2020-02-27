@@ -76,7 +76,7 @@ class Viewer {
         paper: this.pageSetup.paper,
         layout: this.sheetLayout,
         mode: this.mode,
-        marks
+        marks,
       },
       {
         // Actions
@@ -84,8 +84,8 @@ class Viewer {
         setPaper: this.setSheetSize.bind(this),
         setLayout: this.setLayout.bind(this),
         setMarks: this.setMarks.bind(this),
-        getPageSize: () => this.pageSetup.displaySize
-      }
+        getPageSize: () => this.pageSetup.displaySize,
+      },
     );
     this.element.appendChild(this.controls.element);
 
@@ -304,7 +304,7 @@ class Viewer {
         spacer.element.style.visibility = 'hidden';
         this.lastSpreadInProgress.insertBefore(
           spacer.element,
-          this.lastSpreadInProgress.firstElementChild
+          this.lastSpreadInProgress.firstElementChild,
         );
       }
       this.content.append(this.lastSpreadInProgress);

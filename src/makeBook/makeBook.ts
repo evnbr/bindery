@@ -11,7 +11,7 @@ import estimateFor from './estimateProgress';
 const makeBook = async (
   content: HTMLElement,
   rules: Rule[],
-  updateProgress: Function
+  updateProgress: Function,
 ) => {
   if (!Page.isSizeValid()) throw Error('Page is too small');
 
@@ -61,26 +61,26 @@ const makeBook = async (
 
   const beforeAdd = (
     elementToAdd: HTMLElement,
-    continueInNextRegion: RegionGetter
+    continueInNextRegion: RegionGetter,
   ) => {
     ruleSet.applyBeforeAddRules(
       elementToAdd,
       book,
       continueInNextRegion,
-      makeNewPage
+      makeNewPage,
     );
   };
 
   const afterAdd = (
     addedElement: HTMLElement,
-    continueInNextRegion: RegionGetter
+    continueInNextRegion: RegionGetter,
   ) => {
     estimator.increment();
     return ruleSet.applyAfterAddRules(
       addedElement,
       book,
       continueInNextRegion,
-      makeNewPage
+      makeNewPage,
     );
   };
 
@@ -96,7 +96,7 @@ const makeBook = async (
     beforeAdd,
     afterAdd,
     shouldTraverse: ruleSet.shouldTraverse,
-    didWaitFor: t => estimator.addWaitTime(t)
+    didWaitFor: t => estimator.addWaitTime(t),
   });
 
   book.updatePageOrder();

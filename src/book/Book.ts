@@ -28,7 +28,7 @@ class Book {
   validate() {
     if (this.pageCount > MAXIMUM_PAGE_LIMIT) {
       throw Error(
-        'Bindery: Maximum page count exceeded. Suspected runaway layout.'
+        'Bindery: Maximum page count exceeded. Suspected runaway layout.',
       );
     }
   }

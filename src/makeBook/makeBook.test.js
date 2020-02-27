@@ -5,7 +5,7 @@ global.performance = {
   now: () => {
     time += 1;
     return time;
-  }
+  },
 };
 
 const mockDoc = document;
@@ -33,7 +33,7 @@ const mockRegion = function() {
       if (newPath.length > 0) content.appendChild(newPath[0]);
     },
     hasOverflowed,
-    isReasonableSize: true
+    isReasonableSize: true,
   };
   return instance;
 };
@@ -91,7 +91,7 @@ test('Splits a single div over many pages (10char overflow)', async () => {
     false,
     false,
     false,
-    false
+    false,
   ]);
 });
 
@@ -118,7 +118,7 @@ test('Split elements over many pages (100char overflow)', async () => {
   expect(book.pages.map(pg => pg.element.textContent.length > 100)).toEqual([
     false,
     false,
-    false
+    false,
   ]);
 });
 
@@ -177,6 +177,6 @@ test('Spreads elements over many pages without splitting any (100char overflow)'
   expect(book.pages.map(pg => pg.element.textContent.length > 100)).toEqual([
     false,
     false,
-    false
+    false,
   ]);
 });

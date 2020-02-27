@@ -15,8 +15,8 @@ const book = {
     { element: createEl('div'), number: 0 },
     { element: createEl('div'), number: 1 },
     { element: createEl('div'), number: 2 },
-    { element: createEl('div'), number: 3 }
-  ]
+    { element: createEl('div'), number: 3 },
+  ],
 };
 
 test('TOC placeholder gets created if target is not yet in the book', () => {

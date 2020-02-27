@@ -27,7 +27,7 @@ class Counter extends Rule {
       replaceEl: RuntimeTypes.string,
       resetEl: RuntimeTypes.string,
       incrementEl: RuntimeTypes.string,
-      replace: RuntimeTypes.func
+      replace: RuntimeTypes.func,
     });
   }
   setup() {

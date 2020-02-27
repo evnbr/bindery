@@ -9,5 +9,5 @@ export {
   throttleTime,
   formatAsRanges,
   isLength,
-  parseLength
+  parseLength,
 };

@@ -18,7 +18,7 @@ const leftPages = [
   { alwaysLeft: true },
   { alwaysLeft: true },
   { alwaysLeft: true },
-  { alwaysLeft: true }
+  { alwaysLeft: true },
 ];
 
 test('Adds new pages when left/right conflicts', () => {
@@ -30,7 +30,7 @@ const leftRightPages = [
   { alwaysRight: true },
   { alwaysLeft: true },
   { alwaysRight: true },
-  { alwaysLeft: true }
+  { alwaysLeft: true },
 ];
 
 test("Doesn't add padding when left/right works out", () => {
@@ -44,7 +44,7 @@ const outOfFlowPages = [
   { num: 3, alwaysLeft: true, isOutOfFlow: true },
   { num: 4, alwaysRight: true, isOutOfFlow: true },
   { num: 5 },
-  { num: 6 }
+  { num: 6 },
 ];
 const outOfFlowPagesIntended = [
   { num: 1 },
@@ -52,13 +52,13 @@ const outOfFlowPagesIntended = [
   { num: 5 },
   { num: 3, alwaysLeft: true, isOutOfFlow: true },
   { num: 4, alwaysRight: true, isOutOfFlow: true },
-  { num: 6 }
+  { num: 6 },
 ];
 
 test('Moves outOfFlow pages rather than adding padding', () => {
   // expect(orderPages(outOfFlowPages, newPageMock)).toHaveLength(outOfFlowPages.length);
   expect(orderPages(outOfFlowPages, newPageMock)).toEqual(
-    outOfFlowPagesIntended
+    outOfFlowPagesIntended,
   );
   expect(newPageMock).not.toBeCalled();
 });

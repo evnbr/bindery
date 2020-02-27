@@ -5,6 +5,6 @@ export default {
     inner: '24pt',
     outer: '24pt',
     bottom: '40pt',
-    top: '48pt'
-  }
+    top: '48pt',
+  },
 };

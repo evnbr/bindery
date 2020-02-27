@@ -32,5 +32,5 @@ export {
   allModeClasses,
   stylesheet,
   safeMeasure,
-  parseHTML
+  parseHTML,
 };

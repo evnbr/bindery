@@ -17,7 +17,7 @@ class Footnote extends Replace {
       name: 'Footnote',
       selector: RuntimeTypes.string,
       replace: RuntimeTypes.func,
-      render: RuntimeTypes.func
+      render: RuntimeTypes.func,
     });
   }
   afterAdd(
@@ -25,7 +25,7 @@ class Footnote extends Replace {
     book: Book,
     continueOnNewPage: Function,
     makeNewPage: PageMaker,
-    overflowCallback: Function
+    overflowCallback: Function,
   ) {
     const number = book.currentPage.footer.children.length + 1;
 
@@ -44,7 +44,7 @@ class Footnote extends Replace {
       (overflowEl: HTMLElement) => {
         book.currentPage.footer.removeChild(footnote);
         return overflowCallback(overflowEl);
-      }
+      },
     );
   }
   createReplacement(book: Book, element: HTMLElement) {
@@ -54,7 +54,7 @@ class Footnote extends Replace {
   replace(element: HTMLElement, number: number) {
     element.insertAdjacentHTML(
       'beforeend',
-      `<sup class="bindery-sup">${number}</sup>`
+      `<sup class="bindery-sup">${number}</sup>`,
     );
     return element;
   }

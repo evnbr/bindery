@@ -16,13 +16,13 @@ class Replace extends Rule {
     book: Book,
     continueOnNewPage: Function,
     makeNewPage: PageMaker,
-    overflowCallback: Function
+    overflowCallback: Function,
   ) {
     const parent = element.parentNode;
     if (!parent) {
       console.error(element);
       throw Error(
-        `Bindery.Replace({ selector: '${this.selector}' }).afterAdd called on element that hasn't been added.`
+        `Bindery.Replace({ selector: '${this.selector}' }).afterAdd called on element that hasn't been added.`,
       );
     }
     const defensiveClone = element.cloneNode(true) as HTMLElement;
@@ -43,7 +43,7 @@ class Replace extends Rule {
   replace(element: HTMLElement, info?: any) {
     element.insertAdjacentHTML(
       'beforeend',
-      '<sup class="bindery-sup">Default Replacement</sup>'
+      '<sup class="bindery-sup">Default Replacement</sup>',
     );
     return element;
   }

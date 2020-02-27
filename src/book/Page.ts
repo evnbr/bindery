@@ -106,7 +106,7 @@ class Page {
     if (suspect) {
       console.warn(
         'Bindery: Content overflows, probably due to a style set on:',
-        suspect
+        suspect,
       );
       if (suspect.parentNode) {
         suspect.parentNode.removeChild(suspect);
@@ -121,7 +121,7 @@ class Page {
     console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
     if (!this.suppressErrors && !this.flow.suppressErrors && !allowOverflow) {
       throw Error(
-        'Bindery: Moved to new page when last one is still overflowing'
+        'Bindery: Moved to new page when last one is still overflowing',
       );
     }
   }

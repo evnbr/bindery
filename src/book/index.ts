@@ -4,7 +4,7 @@ import orderPages from './orderPages';
 import {
   annotatePages,
   annotatePagesHierarchy,
-  annotatePagesNumbers
+  annotatePagesNumbers,
 } from './annotatePages';
 import { pageNumbersForTest, pageNumbersForSelector } from './searchPages';
 
@@ -16,5 +16,5 @@ export {
   annotatePagesHierarchy,
   annotatePagesNumbers,
   pageNumbersForTest,
-  pageNumbersForSelector
+  pageNumbersForSelector,
 };

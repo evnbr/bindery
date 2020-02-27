@@ -2,11 +2,11 @@ import { SheetSize } from '../constants';
 import PageSetup from './PageSetup';
 
 const pageOpts = {
-  size: { width: '4in', height: '6in' }
+  size: { width: '4in', height: '6in' },
 };
 const printOpts = {
   paper: SheetSize.AUTO_MARKS,
-  bleed: '8pt'
+  bleed: '8pt',
 };
 const pageSetup = new PageSetup(pageOpts, printOpts);
 
@@ -44,13 +44,13 @@ test('displaySize works', () => {
   expect(pageSetup.displaySize).toEqual({
     width: '8in',
     height: '6in',
-    bleed: '8pt'
+    bleed: '8pt',
   });
 
   pageSetup.printTwoUp = false;
   expect(pageSetup.displaySize).toEqual({
     width: '4in',
     height: '6in',
-    bleed: '8pt'
+    bleed: '8pt',
   });
 });

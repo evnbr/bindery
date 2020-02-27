@@ -5,7 +5,7 @@ const {
   PageReference,
   Footnote,
   FullBleedPage,
-  FullBleedSpread
+  FullBleedSpread,
 } = rules;
 
 const replacer = (element: HTMLElement, number: number) => {
@@ -20,33 +20,33 @@ export default [
   PageBreak({
     selector: '[book-page-break="after"][book-page-continue="right"]',
     position: 'after',
-    continue: 'right'
+    continue: 'right',
   }),
   PageBreak({
     selector: '[book-page-break="after"][book-page-continue="left"]',
     position: 'after',
-    continue: 'left'
+    continue: 'left',
   }),
   PageBreak({
     selector: '[book-page-break="after"][book-page-continue="next"]',
     position: 'after',
-    continue: 'next'
+    continue: 'next',
   }),
 
   PageBreak({
     selector: '[book-page-break="before"][book-page-continue="right"]',
     position: 'before',
-    continue: 'right'
+    continue: 'right',
   }),
   PageBreak({
     selector: '[book-page-break="before"][book-page-continue="left"]',
     position: 'before',
-    continue: 'left'
+    continue: 'left',
   }),
   PageBreak({
     selector: '[book-page-break="before"][book-page-continue="next"]',
     position: 'before',
-    continue: 'next'
+    continue: 'next',
   }),
 
   FullBleedPage({ selector: '[book-full-bleed="page"]' }),
@@ -57,7 +57,7 @@ export default [
     render: (element: HTMLElement, number: number) => {
       const txt = element.getAttribute('book-footnote-text');
       return `<i>${number}</i>${txt}`;
-    }
+    },
   }),
 
   PageReference({
@@ -70,7 +70,7 @@ export default [
         const pageText = pageElement.textContent || '';
         return pageText.toLowerCase().includes(term);
       };
-    }
+    },
   }),
 
   PageReference({
@@ -82,7 +82,7 @@ export default [
       return (pageElement: HTMLElement) => {
         return pageElement.querySelector(selector);
       };
-    }
+    },
   }),
 
   PageReference({
@@ -95,6 +95,6 @@ export default [
         const pageText = pageElement.textContent ?? '';
         return pageText.toLowerCase().includes(term);
       };
-    }
-  })
+    },
+  }),
 ];

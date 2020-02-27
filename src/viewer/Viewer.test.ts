@@ -9,12 +9,12 @@ const ControlsStub = function() {
     element: document.createElement('div'),
     setDone: () => {},
     updateProgress: () => {},
-    setInProgress: () => {}
+    setInProgress: () => {},
   };
 };
 
 const pageSetup = {
-  updateStyleVars: () => null
+  updateStyleVars: () => null,
 };
 
 const viewer = new Viewer({
@@ -22,7 +22,7 @@ const viewer = new Viewer({
   mode: ViewerMode.PREVIEW,
   layout: SheetLayout.PAGES,
   marks: SheetMarks.BOTH,
-  ControlsComponent: ControlsStub
+  ControlsComponent: ControlsStub,
 });
 
 const mockPage = () => {
@@ -32,7 +32,7 @@ const mockPage = () => {
 const currentPage = mockPage();
 const book = {
   pages: [mockPage(), mockPage(), mockPage(), currentPage],
-  currentPage
+  currentPage,
 };
 
 test('creates viewer', () => {
@@ -51,13 +51,13 @@ test('updateProgress() adds pages when called multiple times', () => {
 
   const partialBook = {
     pages: [mockPage(), currentPage],
-    currentPage
+    currentPage,
   };
   viewer.updateProgress(partialBook, 0.1);
   viewer.renderProgress(partialBook, 0.5);
 
   const didAdd2 = partialBook.pages.map(pg =>
-    viewer.element.contains(pg.element)
+    viewer.element.contains(pg.element),
   );
   expect(didAdd2).toEqual([true, true]);
   expect(viewer.isInProgress).toBe(true);
@@ -67,7 +67,7 @@ test('updateProgress() adds pages when called multiple times', () => {
   viewer.renderProgress(partialBook, 0.5);
 
   const didAdd4 = partialBook.pages.map(pg =>
-    viewer.element.contains(pg.element)
+    viewer.element.contains(pg.element),
   );
   expect(didAdd4).toEqual([true, true, true, true]);
   expect(viewer.isInProgress).toBe(true);

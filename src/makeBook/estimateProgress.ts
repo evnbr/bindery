@@ -22,10 +22,10 @@ const estimateFor = (content: HTMLElement) => {
       const layout = total - timeWaiting;
       console.log(
         `📖 Layout ready in ${sec(layout)}s (plus ${sec(
-          timeWaiting
-        )}s waiting for images)`
+          timeWaiting,
+        )}s waiting for images)`,
       );
-    }
+    },
   };
 };
 

@@ -20,7 +20,7 @@ class Split extends Rule {
       selector: RuntimeTypes.string,
       toNext: RuntimeTypes.string,
       fromPrevious: RuntimeTypes.string,
-      didSplit: RuntimeTypes.func
+      didSplit: RuntimeTypes.func,
     });
   }
 

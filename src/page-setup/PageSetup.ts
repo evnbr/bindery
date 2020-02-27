@@ -67,14 +67,14 @@ class PageSetup {
           width: `calc(${width} + ${
             this.printTwoUp ? doubleBleed : this.bleed
           })`,
-          height: `calc(${height} + ${doubleBleed})`
+          height: `calc(${height} + ${doubleBleed})`,
         };
       case SheetSize.AUTO_MARKS:
         return {
           width: `calc(${width} + ${
             this.printTwoUp ? doubleMarks : singleMarks
           })`,
-          height: `calc(${height} + ${doubleMarks})`
+          height: `calc(${height} + ${doubleMarks})`,
         };
       case SheetSize.LETTER_LANDSCAPE:
         return { width: letter.height, height: letter.width };
@@ -86,7 +86,7 @@ class PageSetup {
         return { width: a4.height, height: a4.width };
       default:
         throw Error(
-          `Can't get dimensions for unknown paper size: ${this.paper}`
+          `Can't get dimensions for unknown paper size: ${this.paper}`,
         );
     }
   }
@@ -95,7 +95,7 @@ class PageSetup {
     const w = parseLength(this.size.width);
     return {
       height: this.size.height,
-      width: `${w.val * 2}${w.unit}`
+      width: `${w.val * 2}${w.unit}`,
     };
   }
 
@@ -113,7 +113,7 @@ class PageSetup {
       'margin-top': this.margin.top,
       'margin-bottom': this.margin.bottom,
       bleed: this.bleed,
-      'mark-length': this.markLength
+      'mark-length': this.markLength,
     };
     const cssStr = Object.entries(cssVariables)
       .map(([k, v]) => {

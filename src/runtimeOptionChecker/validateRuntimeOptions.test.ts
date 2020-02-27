@@ -76,25 +76,25 @@ test('Handles enums', () => {
 });
 
 const kIsShape = {
-  k: T.shape({ height: T.length, name: T.string })
+  k: T.shape({ height: T.length, name: T.string }),
 };
 
 test('Handles shapes', () => {
   expect(
     validate(
       {
-        k: { height: '12px', name: 'example' }
+        k: { height: '12px', name: 'example' },
       },
-      kIsShape
-    )
+      kIsShape,
+    ),
   ).toBe(true);
 
   expect(() => {
     validate(
       {
-        k: { height: '12px', title: 'example' }
+        k: { height: '12px', title: 'example' },
       },
-      kIsShape
+      kIsShape,
     );
   }).toThrow();
 });
@@ -109,11 +109,11 @@ describe('Margins', () => {
             top: '12px',
             inner: '12px',
             outer: '12px',
-            bottom: '12px'
-          }
+            bottom: '12px',
+          },
         },
-        kIsMargin
-      )
+        kIsMargin,
+      ),
     ).toBe(true);
   });
 
@@ -121,9 +121,9 @@ describe('Margins', () => {
     expect(() => {
       validate(
         {
-          k: 'margins?'
+          k: 'margins?',
         },
-        kIsMargin
+        kIsMargin,
       );
     }).toThrow();
   });
@@ -136,10 +136,10 @@ describe('Margins', () => {
             top: '12px',
             inner: 12,
             outer: '12px',
-            bottom: '12px'
-          }
+            bottom: '12px',
+          },
         },
-        kIsMargin
+        kIsMargin,
       );
     }).toThrow();
   });
@@ -150,10 +150,10 @@ describe('Margins', () => {
         {
           k: {
             top: '12px',
-            bottom: '12px'
-          }
+            bottom: '12px',
+          },
         },
-        kIsMargin
+        kIsMargin,
       );
     }).toThrow();
   });
@@ -167,10 +167,10 @@ describe('Margins', () => {
             clockwise: '12px',
             inner: '12px',
             outer: '12px',
-            bottom: '12px'
-          }
+            bottom: '12px',
+          },
         },
-        kIsMargin
+        kIsMargin,
       );
     }).toThrow();
   });
@@ -184,11 +184,11 @@ describe('Sizes', () => {
         {
           k: {
             width: '12px',
-            height: '12px'
-          }
+            height: '12px',
+          },
         },
-        kIsSize
-      )
+        kIsSize,
+      ),
     ).toBe(true);
   });
 
@@ -198,10 +198,10 @@ describe('Sizes', () => {
         {
           k: {
             width: '12px',
-            height: 12
-          }
+            height: 12,
+          },
         },
-        kIsSize
+        kIsSize,
       );
     }).toThrow();
   });
@@ -213,10 +213,10 @@ describe('Sizes', () => {
           k: {
             width: '12px',
             height: '12px',
-            depth: '12px'
-          }
+            depth: '12px',
+          },
         },
-        kIsSize
+        kIsSize,
       );
     }).toThrow();
   });

@@ -17,7 +17,7 @@ const validateRuntimeOptions = (opts: OptionSet, validOpts: OptionSet) => {
       const optName = validOpts.name ? `${validOpts.name}.${k}` : k;
       const valName = JSON.stringify(val);
       throw Error(
-        `Invalid value for '${optName}': ${valName} is not a ${type.name}.`
+        `Invalid value for '${optName}': ${valName} is not a ${type.name}.`,
       );
     }
   });

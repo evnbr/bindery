@@ -13,7 +13,7 @@ describe('Finds page numbers', () => {
       pageStub(0, 'okay'),
       pageStub(1, 'here'),
       pageStub(2, 'here'),
-      pageStub(3, 'okay')
+      pageStub(3, 'okay'),
     ];
 
     const test = el => el.textContent.includes('here');
@@ -25,7 +25,7 @@ describe('Finds page numbers', () => {
       pageStub(0, 'okay', document.createElement('div')),
       pageStub(1, 'here', document.createElement('div')),
       pageStub(2, 'here', document.createElement('p')),
-      pageStub(3, 'okay', document.createElement('p'))
+      pageStub(3, 'okay', document.createElement('p')),
     ];
 
     expect(pageNumbersForSelector(pages, 'p')).toEqual([2, 3]);

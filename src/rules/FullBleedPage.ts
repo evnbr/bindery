@@ -25,8 +25,8 @@ class FullBleedPage extends OutOfFlow {
         'inward',
         'outward',
         'clockwise',
-        'counterclockwise'
-      )
+        'counterclockwise',
+      ),
     });
   }
 
@@ -44,7 +44,7 @@ class FullBleedPage extends OutOfFlow {
     }
     if (this.rotate !== 'none') {
       const rotateContainer = div(
-        `.rotate-container.page-size-rotated.rotate-${this.rotate}`
+        `.rotate-container.page-size-rotated.rotate-${this.rotate}`,
       );
       rotateContainer.appendChild(newPage.background);
       newPage.element.appendChild(rotateContainer);
