@@ -58,8 +58,8 @@
     "collectCoverage": true,
     "collectCoverageFrom": [
       "**/src/**.{js,jsx}",
-      "!**/node_modules/**",
-      "!**/vendor/**"
+      "**/src/**.{ts,tsx}",
+      "!**/node_modules/**"
     ]
   },
   "keywords": [
