@@ -12,7 +12,7 @@ const pageStub = () => ({
   background: createEl('div'),
   footer: createEl('div'),
   isEmpty: false,
-  hasOverflowed: () => false,
+  hasOverflowed: () => false
 });
 
 test('Adds footnotes', () => {
@@ -39,7 +39,7 @@ test('Adds footnotes', () => {
 test('Custom footnotes are rendered', () => {
   const footnote = new Footnote({
     selector: 'a',
-    render: (el, num) => createEl('div', `${num}: ${el.getAttribute('href')}`),
+    render: (el, num) => createEl('div', `${num}: ${el.getAttribute('href')}`)
   });
   const bookStub = { currentPage: pageStub() };
   const el = createEl('a', 'Click here');

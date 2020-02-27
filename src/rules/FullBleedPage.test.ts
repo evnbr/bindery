@@ -13,9 +13,8 @@ const pageStub = n => ({
   background: createEl('div'),
   number: n,
   isEmpty: false,
-  setPreference: () => {},
+  setPreference: () => {}
 });
-
 
 const spread = new FullBleedPage({ selector: 'figure' });
 
@@ -53,7 +52,10 @@ test('Blank page gets reused', () => {
 });
 
 test('Pages get placed in rotate container', () => {
-  const rotatedSpread = new FullBleedPage({ rotate: 'clockwise', selector: 'figure' });
+  const rotatedSpread = new FullBleedPage({
+    rotate: 'clockwise',
+    selector: 'figure'
+  });
 
   const book = new Book();
   book.addPage(pageStub(0));
@@ -69,5 +71,7 @@ test('Pages get placed in rotate container', () => {
   expect(book.currentPage.flow.element.contains(el)).toBe(false);
   expect(book.currentPage.background.contains(el)).toBe(true);
   expect(book.pages.length).toBe(2);
-  expect(book.currentPage.background.parentNode.parentNode).toBe(book.currentPage.element);
+  expect(book.currentPage.background.parentNode.parentNode).toBe(
+    book.currentPage.element
+  );
 });

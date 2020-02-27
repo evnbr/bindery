@@ -8,10 +8,10 @@ const createEl = (tag, txt) => {
 
 const replacer = new Replace({
   selector: 'p',
-  replace: (el) => {
+  replace: el => {
     el.textContent = 'I was replaced';
     return el;
-  },
+  }
 });
 
 const next = jest.fn();
@@ -34,7 +34,7 @@ test('Replaces test element', () => {
   expect(next).not.toBeCalled();
 });
 
-test('Doesn\'t replace element if it overflows', () => {
+test("Doesn't replace element if it overflows", () => {
   const book = { currentPage: { hasOverflowed: () => true } };
   const page = createEl('div');
   const original = createEl('p', 'I am original');
@@ -50,7 +50,7 @@ test('Doesn\'t replace element if it overflows', () => {
   expect(next).not.toBeCalled();
 });
 
-test('Throws if element hasn\'t been added to a parent', () => {
+test("Throws if element hasn't been added to a parent", () => {
   const original = createEl('p', 'I am original');
   expect(() => {
     replacer.afterAdd(original, {}, next, newPage, overflow);

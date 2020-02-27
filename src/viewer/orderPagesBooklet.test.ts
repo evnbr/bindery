@@ -11,7 +11,7 @@ test('Orders 8', () => {
     pageStub(),
     pageStub(),
     pageStub(),
-    pageStub(),
+    pageStub()
   ];
 
   const ordered = orderPagesBooklet(pages, pageStub);
@@ -31,18 +31,12 @@ test('Orders 8', () => {
 
     // inside
     pages[3],
-    pages[4],
+    pages[4]
   ]);
 });
 
 test('Adds pages to end when not divisible by 4', () => {
-  const pages = [
-    pageStub(),
-    pageStub(),
-    pageStub(),
-    pageStub(),
-    pageStub(),
-  ];
+  const pages = [pageStub(), pageStub(), pageStub(), pageStub(), pageStub()];
 
   const ordered = orderPagesBooklet(pages, pageStub);
 

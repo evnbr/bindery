@@ -8,7 +8,11 @@ import { Rule } from '../rules/Rule';
 import RuleSet from './RuleSet';
 import estimateFor from './estimateProgress';
 
-const makeBook = async (content: HTMLElement, rules: Rule[], updateProgress: Function) => {
+const makeBook = async (
+  content: HTMLElement,
+  rules: Rule[],
+  updateProgress: Function
+) => {
   if (!Page.isSizeValid()) throw Error('Page is too small');
 
   const estimator = estimateFor(content);
@@ -55,13 +59,29 @@ const makeBook = async (content: HTMLElement, rules: Rule[], updateProgress: Fun
     return true;
   };
 
-  const beforeAdd = (elementToAdd: HTMLElement, continueInNextRegion: RegionGetter) => {
-    ruleSet.applyBeforeAddRules(elementToAdd, book, continueInNextRegion, makeNewPage);
+  const beforeAdd = (
+    elementToAdd: HTMLElement,
+    continueInNextRegion: RegionGetter
+  ) => {
+    ruleSet.applyBeforeAddRules(
+      elementToAdd,
+      book,
+      continueInNextRegion,
+      makeNewPage
+    );
   };
 
-  const afterAdd = (addedElement: HTMLElement, continueInNextRegion: RegionGetter) => {
+  const afterAdd = (
+    addedElement: HTMLElement,
+    continueInNextRegion: RegionGetter
+  ) => {
     estimator.increment();
-    return ruleSet.applyAfterAddRules(addedElement, book, continueInNextRegion, makeNewPage);
+    return ruleSet.applyAfterAddRules(
+      addedElement,
+      book,
+      continueInNextRegion,
+      makeNewPage
+    );
   };
 
   // init
@@ -76,7 +96,7 @@ const makeBook = async (content: HTMLElement, rules: Rule[], updateProgress: Fun
     beforeAdd,
     afterAdd,
     shouldTraverse: ruleSet.shouldTraverse,
-    didWaitFor: t => estimator.addWaitTime(t),
+    didWaitFor: t => estimator.addWaitTime(t)
   });
 
   book.updatePageOrder();
@@ -86,6 +106,5 @@ const makeBook = async (content: HTMLElement, rules: Rule[], updateProgress: Fun
   estimator.end();
   return book;
 };
-
 
 export default makeBook;

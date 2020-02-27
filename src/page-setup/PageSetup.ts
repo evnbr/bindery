@@ -22,7 +22,6 @@ interface PrintSetupOptions {
   layout?: SheetLayout;
 }
 
-
 class PageSetup {
   size: any;
   margin: any;
@@ -36,12 +35,15 @@ class PageSetup {
     this.margin = opts.margin ?? defaultPageSetup.margin;
     this.markLength = '12pt';
 
-    this.paper = supportsCustomPageSize ? (printOpts.paper || SheetSize.AUTO) : SheetSize.AUTO_MARKS;
+    this.paper = supportsCustomPageSize
+      ? printOpts.paper || SheetSize.AUTO
+      : SheetSize.AUTO_MARKS;
     this.bleed = printOpts.bleed ?? defaultPageSetup.bleed;
-    this.printTwoUp = !!printOpts.layout && (printOpts.layout !== SheetLayout.PAGES);
+    this.printTwoUp =
+      !!printOpts.layout && printOpts.layout !== SheetLayout.PAGES;
   }
 
-  get displaySize(): { width: string, height: string, bleed: string } {
+  get displaySize(): { width: string; height: string; bleed: string } {
     const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
     const bleed = this.bleed;
@@ -49,7 +51,7 @@ class PageSetup {
     return { width, height, bleed };
   }
 
-  get sheetSize(): { width: string, height: string } {
+  get sheetSize(): { width: string; height: string } {
     const width = this.printTwoUp ? this.spreadSize.width : this.size.width;
     const height = this.size.height;
 
@@ -58,36 +60,42 @@ class PageSetup {
     const singleMarks = `${this.bleed} + ${this.markLength}`;
 
     switch (this.paper) {
-    case SheetSize.AUTO:
-      return { width, height };
-    case SheetSize.AUTO_BLEED:
-      return {
-        width: `calc(${width} + ${this.printTwoUp ? doubleBleed : this.bleed})`,
-        height: `calc(${height} + ${doubleBleed})`,
-      };
-    case SheetSize.AUTO_MARKS:
-      return {
-        width: `calc(${width} + ${this.printTwoUp ? doubleMarks : singleMarks})`,
-        height: `calc(${height} + ${doubleMarks})`,
-      };
-    case SheetSize.LETTER_LANDSCAPE:
-      return { width: letter.height, height: letter.width };
-    case SheetSize.LETTER_PORTRAIT:
-      return letter;
-    case SheetSize.A4_PORTRAIT:
-      return a4;
-    case SheetSize.A4_LANDSCAPE:
-      return { width: a4.height, height: a4.width };
-    default:
-      throw Error(`Can't get dimensions for unknown paper size: ${this.paper}`);
+      case SheetSize.AUTO:
+        return { width, height };
+      case SheetSize.AUTO_BLEED:
+        return {
+          width: `calc(${width} + ${
+            this.printTwoUp ? doubleBleed : this.bleed
+          })`,
+          height: `calc(${height} + ${doubleBleed})`
+        };
+      case SheetSize.AUTO_MARKS:
+        return {
+          width: `calc(${width} + ${
+            this.printTwoUp ? doubleMarks : singleMarks
+          })`,
+          height: `calc(${height} + ${doubleMarks})`
+        };
+      case SheetSize.LETTER_LANDSCAPE:
+        return { width: letter.height, height: letter.width };
+      case SheetSize.LETTER_PORTRAIT:
+        return letter;
+      case SheetSize.A4_PORTRAIT:
+        return a4;
+      case SheetSize.A4_LANDSCAPE:
+        return { width: a4.height, height: a4.width };
+      default:
+        throw Error(
+          `Can't get dimensions for unknown paper size: ${this.paper}`
+        );
     }
   }
 
-  get spreadSize(): { width: string, height: string } {
+  get spreadSize(): { width: string; height: string } {
     const w = parseLength(this.size.width);
     return {
       height: this.size.height,
-      width: `${w.val * 2}${w.unit}`,
+      width: `${w.val * 2}${w.unit}`
     };
   }
 
@@ -104,12 +112,14 @@ class PageSetup {
       'margin-outer': this.margin.outer,
       'margin-top': this.margin.top,
       'margin-bottom': this.margin.bottom,
-      'bleed': this.bleed,
-      'mark-length': this.markLength,
+      bleed: this.bleed,
+      'mark-length': this.markLength
     };
-    const cssStr = Object.entries(cssVariables).map(([k, v]) => {
-      return `--bindery-${k}: ${v};`
-    }).join('');
+    const cssStr = Object.entries(cssVariables)
+      .map(([k, v]) => {
+        return `--bindery-${k}: ${v};`;
+      })
+      .join('');
 
     const rootRule = `:root { ${cssStr} }`;
     const pageRule = `@page { size: ${sheet.width} ${sheet.height}; }`;

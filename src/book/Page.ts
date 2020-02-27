@@ -3,23 +3,35 @@ import { safeMeasure, div, classes } from '../dom';
 import { HierarchyEntry } from '../types';
 
 class HierarchyToHeadingAdapter {
-  getHierarchy: (() => HierarchyEntry[]);
+  getHierarchy: () => HierarchyEntry[];
 
-  constructor(getter: (() => HierarchyEntry[])) {
+  constructor(getter: () => HierarchyEntry[]) {
     // console.warn('Deprecated');
     this.getHierarchy = getter;
   }
 
   textFor(sel: string): string | undefined {
-    return this.getHierarchy()?.find((entry) => entry?.selector === sel)?.text;
+    return this.getHierarchy()?.find(entry => entry?.selector === sel)?.text;
   }
 
-  get h1() { return this.textFor('h1'); }
-  get h2() { return this.textFor('h2'); }
-  get h3() { return this.textFor('h3'); }
-  get h4() { return this.textFor('h4'); }
-  get h5() { return this.textFor('h5'); }
-  get h6() { return this.textFor('h6'); }
+  get h1() {
+    return this.textFor('h1');
+  }
+  get h2() {
+    return this.textFor('h2');
+  }
+  get h3() {
+    return this.textFor('h3');
+  }
+  get h4() {
+    return this.textFor('h4');
+  }
+  get h5() {
+    return this.textFor('h5');
+  }
+  get h6() {
+    return this.textFor('h6');
+  }
 }
 
 class Page {
@@ -46,11 +58,7 @@ class Page {
     this.flow = new Region(div('flow-box'));
     this.footer = div('footer');
     this.background = div('page-background');
-    this.element = div('page',
-      this.background,
-      this.flow.element,
-      this.footer
-    );
+    this.element = div('page', this.background, this.flow.element, this.footer);
 
     this.heading = new HierarchyToHeadingAdapter(() => this.hierarchy);
   }
@@ -96,7 +104,10 @@ class Page {
     if (!this.hasOverflowed()) return;
     const suspect = this.flow.currentElement;
     if (suspect) {
-      console.warn('Bindery: Content overflows, probably due to a style set on:', suspect);
+      console.warn(
+        'Bindery: Content overflows, probably due to a style set on:',
+        suspect
+      );
       if (suspect.parentNode) {
         suspect.parentNode.removeChild(suspect);
       }
@@ -109,7 +120,9 @@ class Page {
     if (!this.hasOverflowed()) return;
     console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
     if (!this.suppressErrors && !this.flow.suppressErrors && !allowOverflow) {
-      throw Error('Bindery: Moved to new page when last one is still overflowing');
+      throw Error(
+        'Bindery: Moved to new page when last one is still overflowing'
+      );
     }
   }
 

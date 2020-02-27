@@ -1,5 +1,5 @@
-import { Book } from "../book";
-import { RegionGetter } from "regionize/dist/types/types";
+import { Book } from '../book';
+import { RegionGetter } from 'regionize/dist/types/types';
 
 // TODO:
 // While this does catch overflows, it is pretty hacky to move the entire node to the next page.
@@ -8,7 +8,11 @@ import { RegionGetter } from "regionize/dist/types/types";
 // which means footnotes will get left on previous page.
 // - 3. if it is a large paragraph, it will leave a large gap. the
 // ideal approach would be to only need to invalidate the last line of text.
-const recoverFromRule = (el: HTMLElement, book: Book, nextRegion: RegionGetter) => {
+const recoverFromRule = (
+  el: HTMLElement,
+  book: Book,
+  nextRegion: RegionGetter
+) => {
   let removed = el;
   const parent = el.parentNode as HTMLElement;
   if (!parent) {
@@ -34,6 +38,5 @@ const recoverFromRule = (el: HTMLElement, book: Book, nextRegion: RegionGetter) 
   newRegion.currentElement.appendChild(removed);
   if (popped) newRegion.path.push(popped);
 };
-
 
 export default recoverFromRule;

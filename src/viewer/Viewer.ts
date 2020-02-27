@@ -18,7 +18,7 @@ const document = window.document;
 
 const pageSpread = (...pgs: HTMLElement[]) => {
   return div('.spread-wrapper.spread-centered.spread-size', ...pgs);
-}
+};
 
 interface ViewerOptions {
   pageSetup: PageSetup;
@@ -71,18 +71,20 @@ class Viewer {
     });
 
     this.controls = new Controls(
-      { // Initial props
+      {
+        // Initial props
         paper: this.pageSetup.paper,
         layout: this.sheetLayout,
         mode: this.mode,
-        marks,
+        marks
       },
-      { // Actions
+      {
+        // Actions
         setMode: this.setMode.bind(this),
         setPaper: this.setSheetSize.bind(this),
         setLayout: this.setLayout.bind(this),
         setMarks: this.setMarks.bind(this),
-        getPageSize: () => this.pageSetup.displaySize,
+        getPageSize: () => this.pageSetup.displaySize
       }
     );
     this.element.appendChild(this.controls.element);
@@ -151,7 +153,9 @@ class Viewer {
     this.render();
 
     this.scaleToFit();
-    setTimeout(() => { this.scaleToFit(); }, 300);
+    setTimeout(() => {
+      this.scaleToFit();
+    }, 300);
   }
 
   setLayout(newVal: SheetLayout) {
@@ -166,8 +170,10 @@ class Viewer {
   }
 
   setMarks(newVal: SheetMarks) {
-    this.isShowingCropMarks = (newVal === SheetMarks.CROP || newVal === SheetMarks.BOTH);
-    this.isShowingBleedMarks = (newVal === SheetMarks.BLEED || newVal === SheetMarks.BOTH);
+    this.isShowingCropMarks =
+      newVal === SheetMarks.CROP || newVal === SheetMarks.BOTH;
+    this.isShowingBleedMarks =
+      newVal === SheetMarks.BLEED || newVal === SheetMarks.BOTH;
   }
 
   displayError(title: string, text: string) {
@@ -258,7 +264,7 @@ class Viewer {
     this.progress = estimatedProgress;
 
     if (!document.scrollingElement) return;
-    
+
     const scroller = document.scrollingElement as HTMLElement;
     // don't rerender if preview is out of view
     const scrollTop = scroller.scrollTop;
@@ -274,13 +280,21 @@ class Viewer {
     const needsZoomUpdate = !this.content.firstElementChild;
 
     const sideBySide =
-      this.mode === ViewerMode.PREVIEW
-      || (this.mode === ViewerMode.PRINT && this.sheetLayout !== SheetLayout.PAGES);
+      this.mode === ViewerMode.PREVIEW ||
+      (this.mode === ViewerMode.PRINT &&
+        this.sheetLayout !== SheetLayout.PAGES);
     const limit = sideBySide ? 2 : 1;
 
     book.pages.forEach((page: Page, i: number) => {
-      if (this.content.contains(page.element) && page.element.parentNode !== this.content) return;
-      if (this.lastSpreadInProgress && this.lastSpreadInProgress.children.length < limit) {
+      if (
+        this.content.contains(page.element) &&
+        page.element.parentNode !== this.content
+      )
+        return;
+      if (
+        this.lastSpreadInProgress &&
+        this.lastSpreadInProgress.children.length < limit
+      ) {
         this.lastSpreadInProgress.append(page.element);
         return;
       }

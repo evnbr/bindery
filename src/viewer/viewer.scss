@@ -75,49 +75,49 @@
     border-bottom: 1px solid magenta;
   }
 
-   .print-sheet {
-     margin: 0 auto;
-   }
+  .print-sheet {
+    margin: 0 auto;
+  }
 
-   .error {
-     font: 16px / 1.4 $system;
-     padding: 15vh 15vw;
-     z-index: 999;
-     position: fixed;
-     top: 0;
-     left: 0;
-     right: 0;
-     bottom: 0;
-     background: rgba(244, 244, 244, 0.7);
+  .error {
+    font: 16px / 1.4 $system;
+    padding: 15vh 15vw;
+    z-index: 999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(244, 244, 244, 0.7);
 
-     &-title {
-       font-size: 1.5em;
-       margin-bottom: 16px;
-     }
-     &-text {
-       margin-bottom: 16px;
-       white-space: pre-line;
-     }
-     &-footer {
-       opacity: 0.5;
-       font-size: 0.66em;
-       text-transform: uppercase;
-       letter-spacing: 0.02em;
-     }
-   }
+    &-title {
+      font-size: 1.5em;
+      margin-bottom: 16px;
+    }
+    &-text {
+      margin-bottom: 16px;
+      white-space: pre-line;
+    }
+    &-footer {
+      opacity: 0.5;
+      font-size: 0.66em;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+  }
 
-   .show-bleed .print-sheet {
-     background: white;
-     outline: 1px solid rgba(0,0,0,0.1);
-     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
-     margin: 20px auto;
-   }
+  .show-bleed .print-sheet {
+    background: white;
+    outline: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+    margin: 20px auto;
+  }
 }
 
 @media screen {
   .page {
     background: white;
-    box-shadow: 0 0 0 0.5px rgba(0,0,0,0.3);
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 
     .show-bleed & {
@@ -179,7 +179,6 @@
   transform-origin: top left;
   transform-style: preserve-3d;
   height: calc(100vh - 120px); // adjust scrollheight on scaled down
-
 }
 
 .print-sheet {

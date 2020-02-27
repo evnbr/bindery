@@ -5,8 +5,8 @@
 }
 
 $btn-pad: 4px 10px;
-$btn-hover: rgba(0,0,0,0.04);
-$btn-active: rgba(0,0,0,0.08);
+$btn-hover: rgba(0, 0, 0, 0.04);
+$btn-active: rgba(0, 0, 0, 0.08);
 
 .controls {
   font: 14px / 1.4 $system;
@@ -134,7 +134,7 @@ $btn-active: rgba(0,0,0,0.08);
   position: relative;
 
   &:after {
-    content: "";
+    content: '';
     position: absolute;
     right: 9px;
     top: 12px;
@@ -142,7 +142,7 @@ $btn-active: rgba(0,0,0,0.08);
     border-right: 1px solid;
     padding: 0px;
     border: 4px solid transparent;
-    border-top-color: currentColor;    
+    border-top-color: currentColor;
   }
 
   &:hover {
@@ -170,7 +170,7 @@ $btn-active: rgba(0,0,0,0.08);
   opacity: 0;
 
   -webkit-appearance: none;
-  -moz-appearance:none;
+  -moz-appearance: none;
   padding: $btn-pad;
   color: black;
   border: transparent;
@@ -217,7 +217,6 @@ $btn-active: rgba(0,0,0,0.08);
   box-shadow: none;
 }
 
-
 @media screen and (max-width: 960px) {
   .in-progress {
     .controls {
@@ -261,5 +260,4 @@ $btn-active: rgba(0,0,0,0.08);
   .hidden-select {
     display: none;
   }
-
 }

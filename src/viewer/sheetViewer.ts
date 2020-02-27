@@ -8,12 +8,16 @@ import orderPagesBooklet from './orderPagesBooklet';
 
 const twoPageSpread = (...children: HTMLElement[]) => {
   return div('.spread-wrapper', ...children);
-}
+};
 const onePageSpread = (...children: HTMLElement[]) => {
   return div('.spread-wrapper', ...children);
-}
+};
 
-const renderSheetViewer = (bookPages: Page[], _doubleSided: boolean, layout: SheetLayout) => {
+const renderSheetViewer = (
+  bookPages: Page[],
+  _doubleSided: boolean,
+  layout: SheetLayout
+) => {
   const isTwoUp = layout !== SheetLayout.PAGES;
   const isSpreads = layout === SheetLayout.SPREADS;
   const isBooklet = layout === SheetLayout.BOOKLET;
@@ -29,7 +33,7 @@ const renderSheetViewer = (bookPages: Page[], _doubleSided: boolean, layout: She
 
   const printSheet = (...children: HTMLElement[]) => {
     return div('.print-sheet', spread(...children));
-  }
+  };
 
   if (isTwoUp) {
     for (let i = 0; i < pages.length; i += 2) {
@@ -41,12 +45,13 @@ const renderSheetViewer = (bookPages: Page[], _doubleSided: boolean, layout: She
       const sheet = printSheet(
         div('.page-bleed-clip.page-bleed-clip-left', pages[i].element),
         div('.page-bleed-clip.page-bleed-clip-right', pages[i + 1].element),
-        spreadMarks);
+        spreadMarks
+      );
       sheet.classList.add(classes.sheetSpread);
       printLayout.appendChild(sheet);
     }
   } else {
-    pages.forEach((pg) => {
+    pages.forEach(pg => {
       const sheet = printSheet(pg.element, marks());
       sheet.classList.add(pg.isLeft ? classes.sheetLeft : classes.sheetRight);
       printLayout.appendChild(sheet);

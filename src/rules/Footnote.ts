@@ -5,7 +5,6 @@ import { Book } from '../book';
 import { RuleOptions } from './Rule';
 import { PageMaker } from '../types';
 
-
 // Options:
 // selector: String
 // replace: function (HTMLElement, number) => HTMLElement
@@ -18,10 +17,16 @@ class Footnote extends Replace {
       name: 'Footnote',
       selector: RuntimeTypes.string,
       replace: RuntimeTypes.func,
-      render: RuntimeTypes.func,
+      render: RuntimeTypes.func
     });
   }
-  afterAdd(element: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker, overflowCallback: Function) {
+  afterAdd(
+    element: HTMLElement,
+    book: Book,
+    continueOnNewPage: Function,
+    makeNewPage: PageMaker,
+    overflowCallback: Function
+  ) {
     const number = book.currentPage.footer.children.length + 1;
 
     const footnote = div('.footnote');
@@ -31,20 +36,29 @@ class Footnote extends Replace {
 
     book.currentPage.footer.appendChild(footnote);
 
-    return super.afterAdd(element, book, continueOnNewPage, makeNewPage, (overflowEl: HTMLElement) => {
-      book.currentPage.footer.removeChild(footnote);
-      return overflowCallback(overflowEl);
-    });
+    return super.afterAdd(
+      element,
+      book,
+      continueOnNewPage,
+      makeNewPage,
+      (overflowEl: HTMLElement) => {
+        book.currentPage.footer.removeChild(footnote);
+        return overflowCallback(overflowEl);
+      }
+    );
   }
   createReplacement(book: Book, element: HTMLElement) {
     const number = book.currentPage.footer.children.length;
     return this.replace(element, number);
   }
   replace(element: HTMLElement, number: number) {
-    element.insertAdjacentHTML('beforeend', `<sup class="bindery-sup">${number}</sup>`);
+    element.insertAdjacentHTML(
+      'beforeend',
+      `<sup class="bindery-sup">${number}</sup>`
+    );
     return element;
   }
-  render(element: HTMLElement, number: number): (string | HTMLElement) {
+  render(element: HTMLElement, number: number): string | HTMLElement {
     return `<sup>${number}</sup> Default footnote (<a href='/bindery/docs/#footnote'>Learn how to change it</a>)`;
   }
 }

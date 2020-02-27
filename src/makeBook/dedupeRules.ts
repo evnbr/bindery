@@ -7,7 +7,8 @@ const isSpread = (rule: Rule) => rule instanceof FullBleedSpread;
 const isPage = (rule: Rule) => rule instanceof FullBleedPage;
 const isBreak = (rule: Rule) => rule instanceof PageBreak;
 
-const isFullPageRule = (rule: Rule) => isSpread(rule) || isPage(rule) || isBreak(rule);
+const isFullPageRule = (rule: Rule) =>
+  isSpread(rule) || isPage(rule) || isBreak(rule);
 
 const dedupe = (inputRules: Rule[]): Rule[] => {
   const conflictRules = inputRules.filter(isFullPageRule);

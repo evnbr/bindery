@@ -7,7 +7,7 @@ const pages = [
   { element: document.createElement('div') },
   { element: document.createElement('div') },
   { element: document.createElement('div') },
-  { element: document.createElement('div') },
+  { element: document.createElement('div') }
 ];
 
 test('creates two-up grid layout', () => {

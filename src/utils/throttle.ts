@@ -42,5 +42,4 @@ const throttleTime = (ms: number) => {
   return inner;
 };
 
-
 export { throttleFrame, throttleTime };

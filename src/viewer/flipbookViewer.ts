@@ -31,13 +31,15 @@ const renderFlipbookViewer = (bookPages: Page[], doubleSided: boolean) => {
 
     flaps.forEach((flap, i, arr) => {
       // + 0.5 so left and right are even
-      const z = (arr.length - Math.abs((i - newLeaf) + 0.5)) * zScale;
-      flap.style.transform = `translate3d(${(i < newLeaf) ? 4 : 0}px,0,${z}px) rotateY(${(i < newLeaf) ? -180 : 0}deg)`;
+      const z = (arr.length - Math.abs(i - newLeaf + 0.5)) * zScale;
+      flap.style.transform = `translate3d(${
+        i < newLeaf ? 4 : 0
+      }px,0,${z}px) rotateY(${i < newLeaf ? -180 : 0}deg)`;
     });
   };
 
   let leafIndex = 0;
-  for (let i = 1; i < pages.length - 1; i += (doubleSided ? 2 : 1)) {
+  for (let i = 1; i < pages.length - 1; i += doubleSided ? 2 : 1) {
     leafIndex += 1;
     const li = leafIndex;
     const flap = div('.page3d');

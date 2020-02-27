@@ -8,7 +8,10 @@ import { RegionGetter } from 'regionize/dist/types/types';
 import { PageMaker } from '../types';
 
 const giveUp = (rule: Rule, el: HTMLElement) => {
-  console.warn(`Couldn't apply ${rule.name}, caused overflows twice when adding: `, el);
+  console.warn(
+    `Couldn't apply ${rule.name}, caused overflows twice when adding: `,
+    el
+  );
 };
 
 interface PageRule extends Rule {
@@ -32,25 +35,24 @@ interface DidSplitRule extends Rule {
   didSplit: (a: HTMLElement, b: HTMLElement) => void;
 }
 
-function isPageRule (rule: Rule): rule is PageRule {
+function isPageRule(rule: Rule): rule is PageRule {
   return rule.eachPage;
 }
-function isBeforeAddRule (rule: Rule): rule is BeforeAddRule {
+function isBeforeAddRule(rule: Rule): rule is BeforeAddRule {
   return !!rule.selector && rule.beforeAdd;
 }
-function isAfterAddRule (rule: Rule): rule is AfterAddRule {
+function isAfterAddRule(rule: Rule): rule is AfterAddRule {
   return !!rule.selector && rule.afterAdd;
 }
-function isOffsetRule (rule: Rule): rule is OffsetRule {
+function isOffsetRule(rule: Rule): rule is OffsetRule {
   return rule.pageNumberOffset;
 }
-function isDidSplitRule (rule: Rule): rule is DidSplitRule {
+function isDidSplitRule(rule: Rule): rule is DidSplitRule {
   return !!rule.selector && rule.didSplit;
 }
-function isAvoidSplitRule (rule: Rule): rule is AvoidSplitRule {
+function isAvoidSplitRule(rule: Rule): rule is AvoidSplitRule {
   return !!rule.selector && rule.avoidSplit;
 }
-
 
 class RuleSet {
   pageNumberOffset: number;
@@ -73,7 +75,9 @@ class RuleSet {
     this.afterAddRules = rules.filter(isAfterAddRule);
 
     // Rules for layout
-    this.selectorsNotToSplit = rules.filter(isAvoidSplitRule).map(r => r.selector);
+    this.selectorsNotToSplit = rules
+      .filter(isAvoidSplitRule)
+      .map(r => r.selector);
     this.didSplitRules = rules.filter(isDidSplitRule);
 
     // setup
@@ -81,9 +85,13 @@ class RuleSet {
 
     this.applySplitRules = this.applySplitRules.bind(this);
 
-    const allSelectors = rules.map(r => r.selector).filter(sel => !!sel).join(', ');
+    const allSelectors = rules
+      .map(r => r.selector)
+      .filter(sel => !!sel)
+      .join(', ');
     if (allSelectors) {
-      const shouldTraverse = (el: HTMLElement) => !!el.querySelector(allSelectors);
+      const shouldTraverse = (el: HTMLElement) =>
+        !!el.querySelector(allSelectors);
       this.shouldTraverse = shouldTraverse.bind(this);
     } else {
       this.shouldTraverse = () => false;
@@ -94,9 +102,11 @@ class RuleSet {
     original.classList.add(classes.toNext);
     clone.classList.add(classes.fromPrev);
 
-    this.didSplitRules.filter(r => original.matches(r.selector)).forEach((rule) => {
-      rule.didSplit(original, clone);
-    });
+    this.didSplitRules
+      .filter(r => original.matches(r.selector))
+      .forEach(rule => {
+        rule.didSplit(original, clone);
+      });
   }
 
   // Rules for pages
@@ -104,34 +114,64 @@ class RuleSet {
     this.pageRules.forEach(rule => rule.eachPage(pg, book));
   }
   finishEveryPage(book: Book) {
-    this.pageRules.forEach(rule => book.pages.forEach(pg => rule.eachPage(pg, book)));
+    this.pageRules.forEach(rule =>
+      book.pages.forEach(pg => rule.eachPage(pg, book))
+    );
   }
 
   // Rules for elements
-  applyBeforeAddRules(element: HTMLElement, book: Book, continueOnNewPage: RegionGetter, makeNewPage: PageMaker) {
+  applyBeforeAddRules(
+    element: HTMLElement,
+    book: Book,
+    continueOnNewPage: RegionGetter,
+    makeNewPage: PageMaker
+  ) {
     let addedElement = element;
 
-    const matchingRules = this.beforeAddRules.filter(rule => addedElement.matches(rule.selector));
+    const matchingRules = this.beforeAddRules.filter(rule =>
+      addedElement.matches(rule.selector)
+    );
 
-    matchingRules.forEach((rule) => {
-      addedElement = rule.beforeAdd(addedElement, book, continueOnNewPage, makeNewPage);
+    matchingRules.forEach(rule => {
+      addedElement = rule.beforeAdd(
+        addedElement,
+        book,
+        continueOnNewPage,
+        makeNewPage
+      );
     });
     return addedElement;
   }
 
-  applyAfterAddRules(originalElement: HTMLElement, book: Book, continueOnNewPage: RegionGetter, makeNewPage: PageMaker) {
+  applyAfterAddRules(
+    originalElement: HTMLElement,
+    book: Book,
+    continueOnNewPage: RegionGetter,
+    makeNewPage: PageMaker
+  ) {
     let addedElement = originalElement;
 
-    const attemptRecovery = (el: HTMLElement) => recoverFromRule(el, book, continueOnNewPage);
-    const matchingRules = this.afterAddRules.filter(rule => addedElement.matches(rule.selector));
+    const attemptRecovery = (el: HTMLElement) =>
+      recoverFromRule(el, book, continueOnNewPage);
+    const matchingRules = this.afterAddRules.filter(rule =>
+      addedElement.matches(rule.selector)
+    );
     const uniqueRules = dedupe(matchingRules) as AfterAddRule[];
 
-    uniqueRules.forEach((rule) => {
+    uniqueRules.forEach(rule => {
       const retry = (el: HTMLElement) => {
         attemptRecovery(el);
-        return rule.afterAdd(el, book, continueOnNewPage, makeNewPage, () => giveUp(rule, el));
+        return rule.afterAdd(el, book, continueOnNewPage, makeNewPage, () =>
+          giveUp(rule, el)
+        );
       };
-      addedElement = rule.afterAdd(addedElement, book, continueOnNewPage, makeNewPage, retry);
+      addedElement = rule.afterAdd(
+        addedElement,
+        book,
+        continueOnNewPage,
+        makeNewPage,
+        retry
+      );
     });
     return addedElement;
   }

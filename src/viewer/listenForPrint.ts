@@ -1,12 +1,12 @@
 const isCommandP = (e: KeyboardEvent) => {
   return (e.ctrlKey || e.metaKey) && e.keyCode === 80;
-}
+};
 
 // Automatically switch into print mode
 const listenForPrint = (beforePrint: Function) => {
   if (window.matchMedia) {
     const mediaQueryList = window.matchMedia('print');
-    mediaQueryList.addListener((mql) => {
+    mediaQueryList.addListener(mql => {
       if (mql.matches) {
         // before print
         beforePrint();
@@ -15,7 +15,7 @@ const listenForPrint = (beforePrint: Function) => {
       }
     });
   }
-  document.body.addEventListener('keydown', (e) => {
+  document.body.addEventListener('keydown', e => {
     if (isCommandP(e)) {
       e.preventDefault();
       beforePrint();

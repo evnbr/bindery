@@ -10,14 +10,19 @@ export const annotatePagesNumbers = (pages: Page[], offset: number) => {
   if (facingPages) {
     pages.forEach((page, i) => {
       page.number = offset + i + 1;
-      page.setLeftRight((i % 2 === 0) ? 'right' : 'left');
+      page.setLeftRight(i % 2 === 0 ? 'right' : 'left');
     });
   } else {
-    pages.forEach((page) => { page.setLeftRight('right'); });
+    pages.forEach(page => {
+      page.setLeftRight('right');
+    });
   }
-}
+};
 
-export const annotatePagesHierarchy = (pages: Page[], headerSelectorHierarchy: string[]) => {
+export const annotatePagesHierarchy = (
+  pages: Page[],
+  headerSelectorHierarchy: string[]
+) => {
   // ———
   // RUNNING HEADERS
 
@@ -28,7 +33,7 @@ export const annotatePagesHierarchy = (pages: Page[], headerSelectorHierarchy: s
 
   let currentHierarchy: HierarchyEntry[] = [];
 
-  pages.forEach((page) => {
+  pages.forEach(page => {
     const pageHierarchy: HierarchyEntry[] = [];
 
     headerSelectorHierarchy.forEach((selector, i) => {
@@ -39,9 +44,9 @@ export const annotatePagesHierarchy = (pages: Page[], headerSelectorHierarchy: s
         currentHierarchy[i] = {
           selector: selector,
           text: element.textContent ?? '',
-          el: element,
+          el: element
         };
-        
+
         // Clear any lower headers in the hierarchy
         currentHierarchy = currentHierarchy.slice(0, i + 1);
 
@@ -63,6 +68,6 @@ export const annotatePagesHierarchy = (pages: Page[], headerSelectorHierarchy: s
 };
 
 export const annotatePages = (pages: Page[], offset: number) => {
-  annotatePagesNumbers(pages, offset)
-  annotatePagesHierarchy(pages, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-}
+  annotatePagesNumbers(pages, offset);
+  annotatePagesHierarchy(pages, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
+};

@@ -22,28 +22,32 @@ const classes = {
   sheetRight: 'print-sheet-right',
 
   toNext: 'continues',
-  fromPrev: 'continuation',
+  fromPrev: 'continuation'
 };
 
-Object.keys(classes).forEach((k) => {
+Object.keys(classes).forEach(k => {
   const key = k as keyof typeof classes;
   const val = classes[key];
   classes[key] = prefix(val);
 });
 
-const allModeClasses = [classes.viewPreview, classes.viewPrint, classes.viewFlip];
+const allModeClasses = [
+  classes.viewPreview,
+  classes.viewPrint,
+  classes.viewFlip
+];
 
 const classForMode = (mode: ViewerMode): string => {
   switch (mode) {
-    case ViewerMode.PREVIEW: return classes.viewPreview;
-    case ViewerMode.PRINT: return classes.viewPrint;
-    case ViewerMode.FLIPBOOK: return classes.viewFlip;
-    default: throw Error (`Getting class for unknown mode: ${mode}`);
+    case ViewerMode.PREVIEW:
+      return classes.viewPreview;
+    case ViewerMode.PRINT:
+      return classes.viewPrint;
+    case ViewerMode.FLIPBOOK:
+      return classes.viewFlip;
+    default:
+      throw Error(`Getting class for unknown mode: ${mode}`);
   }
-}
-
-export {
-  classes,
-  allModeClasses,
-  classForMode
 };
+
+export { classes, allModeClasses, classForMode };

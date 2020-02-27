@@ -1,5 +1,5 @@
 import { PageMaker } from '../types';
-import { Page } from "../book";
+import { Page } from '../book';
 
 const indexOfNextReorderablePage = (pages: Page[], startIndex: number) => {
   for (let i = startIndex; i < pages.length; i += 1) {

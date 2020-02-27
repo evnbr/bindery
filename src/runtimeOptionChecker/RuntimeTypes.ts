@@ -1,14 +1,15 @@
 import { isLength } from '../utils';
 import validateRuntimeOptions from './validateRuntimeOptions';
 
-const isObj  = (val: any) => typeof val === 'object';
+const isObj = (val: any) => typeof val === 'object';
 const isFunc = (val: any) => typeof val === 'function';
 const isBool = (val: any) => typeof val === 'boolean';
-const isStr  = (val: any) => typeof val === 'string';
-const isNum  = (val: any) => typeof val === 'number';
-const isArr  = (val: any) => Array.isArray(val);
+const isStr = (val: any) => typeof val === 'string';
+const isNum = (val: any) => typeof val === 'number';
+const isArr = (val: any) => Array.isArray(val);
 
-const hasProp = (obj: {}, k: string) => Object.prototype.hasOwnProperty.call(obj, k);
+const hasProp = (obj: {}, k: string) =>
+  Object.prototype.hasOwnProperty.call(obj, k);
 
 const hasSameKeys = (opts: {}, required: {}) => {
   const keys = Object.keys(required).filter(k => k !== 'name');
@@ -18,71 +19,73 @@ const hasSameKeys = (opts: {}, required: {}) => {
 const isShape = (template: {}) => {
   return (input: any) => {
     return isObj(input) && validateRuntimeOptions(input, template);
-  }
-}
+  };
+};
 
 const isShapeExact = (template: {}) => {
   return (input: any) => {
-    return isObj(input)
-    && hasSameKeys(input, template)
-    && validateRuntimeOptions(input, template);
-  }
-}
+    return (
+      isObj(input) &&
+      hasSameKeys(input, template) &&
+      validateRuntimeOptions(input, template)
+    );
+  };
+};
 
 const isEnum = (cases: string[]) => {
   return (str: string) => {
     return cases.includes(str);
-  }
-}
+  };
+};
 
 const lengthChecker = {
   name: 'length (string with absolute units)',
-  check: isLength,
+  check: isLength
 };
 
 const RuntimeTypes = {
   any: {
     name: 'any',
-    check: () => true,
+    check: () => true
   },
   enum(...cases: string[]) {
     return {
       name: `(${cases.map(c => `"${c}"`).join(' | ')})`,
-      check: isEnum(cases),
+      check: isEnum(cases)
     };
   },
   shapeExact: (template: {}) => ({
     name: `exactly ({${Object.keys(template).join(', ')}})`,
-    check: isShapeExact(template),
+    check: isShapeExact(template)
   }),
   shape: (template: {}) => ({
     name: `shape ({${Object.keys(template).join(', ')}})`,
-    check: isShape(template),
+    check: isShape(template)
   }),
   string: {
     name: 'string',
-    check: isStr,
+    check: isStr
   },
   length: lengthChecker,
   number: {
     name: 'number',
-    check: isNum,
+    check: isNum
   },
   bool: {
     name: 'bool',
-    check: isBool,
+    check: isBool
   },
   func: {
     name: 'func',
-    check: isFunc,
+    check: isFunc
   },
   obj: {
     name: 'object',
-    check: isObj,
+    check: isObj
   },
   array: {
     name: 'array',
-    check: isArr,
+    check: isArr
   },
   margin: {
     name: 'margin ({ top, inner, outer, bottom })',
@@ -91,16 +94,16 @@ const RuntimeTypes = {
       top: lengthChecker,
       inner: lengthChecker,
       outer: lengthChecker,
-      bottom: lengthChecker,
-    }),
+      bottom: lengthChecker
+    })
   },
   size: {
     name: 'size ({ width, height })',
     check: isShapeExact({
       name: 'size',
       width: lengthChecker,
-      height: lengthChecker,
-    }),
+      height: lengthChecker
+    })
   }
 };
 

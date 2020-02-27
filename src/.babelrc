@@ -1,15 +1,14 @@
 {
   "env": {
     "test": {
-      "presets": [
-        [
-          "@babel/preset-env",
-        ]
-      ],
+      "presets": [["@babel/preset-env"]],
       "plugins": [
-        ["@babel/plugin-transform-runtime", {
-          "regenerator": true
-        }],
+        [
+          "@babel/plugin-transform-runtime",
+          {
+            "regenerator": true
+          }
+        ]
       ]
     },
     "development": {
@@ -21,9 +20,7 @@
           }
         ]
       ],
-      "plugins": [
-        "external-helpers"
-      ]
+      "plugins": ["external-helpers"]
     }
   }
 }

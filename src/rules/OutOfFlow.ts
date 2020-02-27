@@ -19,7 +19,12 @@ class OutOfFlow extends Rule {
     elmt.setAttribute('data-ignore-overflow', 'true');
     return elmt;
   }
-  afterAdd(elmt: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker) {
+  afterAdd(
+    elmt: HTMLElement,
+    book: Book,
+    continueOnNewPage: Function,
+    makeNewPage: PageMaker
+  ) {
     this.createOutOfFlowPages(elmt, book, makeNewPage);
 
     // Catches cases when we didn't need to create a new page. but unclear

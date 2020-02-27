@@ -2,8 +2,8 @@ import { Rule, RuleOptions } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 
 interface SplitRuleOptions extends RuleOptions {
-  toNext?: string
-  fromPrevious?: string
+  toNext?: string;
+  fromPrevious?: string;
 }
 
 class Split extends Rule {
@@ -20,7 +20,7 @@ class Split extends Rule {
       selector: RuntimeTypes.string,
       toNext: RuntimeTypes.string,
       fromPrevious: RuntimeTypes.string,
-      didSplit: RuntimeTypes.func,
+      didSplit: RuntimeTypes.func
     });
   }
 

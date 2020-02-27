@@ -10,10 +10,10 @@ import { RuleOptions } from './Rule';
 // Compatible with ids that start with numbers
 const startsWithNumber = (sel: string) => {
   return sel.length > 2 && sel[0] === '#' && /^\d+$/.test(sel[1]);
-}
+};
 const safeIDSel = (sel: string) => {
-  return (startsWithNumber(sel) ? `[id="${sel.replace('#', '')}"]` : sel);
-}
+  return startsWithNumber(sel) ? `[id="${sel.replace('#', '')}"]` : sel;
+};
 
 declare type TestFunction = (el: HTMLElement) => boolean;
 
@@ -37,11 +37,11 @@ class PageReference extends Replace {
       name: 'PageReference',
       selector: RuntimeTypes.string,
       replace: RuntimeTypes.func,
-      createTest: RuntimeTypes.func,
+      createTest: RuntimeTypes.func
     });
     this.references = [];
     const throttle = throttleTime(10);
-    this.throttledUpdate = (book) => {
+    this.throttledUpdate = book => {
       throttle(() => this.updatePageReferences(book.pages));
     };
   }
@@ -58,12 +58,16 @@ class PageReference extends Replace {
     return ref.element;
   }
 
-  createReference(book: Book, test: TestFunction, elmt: HTMLElement): PageReferenceInstance {
+  createReference(
+    book: Book,
+    test: TestFunction,
+    elmt: HTMLElement
+  ): PageReferenceInstance {
     const ref = {
       test,
       template: elmt,
       element: elmt,
-      value: null,
+      value: null
     } as PageReferenceInstance;
     this.references.push(ref);
     const currentResults = pageNumbersForTest(book.pages, test);
@@ -74,7 +78,8 @@ class PageReference extends Replace {
 
   render(ref: PageReferenceInstance, newValue: number[]) {
     if (!newValue || shallowEqual(ref.value, newValue)) return;
-    if (!Array.isArray(newValue)) throw Error('Page search returned unexpected result');
+    if (!Array.isArray(newValue))
+      throw Error('Page search returned unexpected result');
 
     const isResolved = newValue.length > 0;
     const pageRanges = isResolved ? formatAsRanges(newValue) : '⌧';
@@ -94,13 +99,13 @@ class PageReference extends Replace {
     const selector = safeIDSel(href);
     return (el: HTMLElement) => {
       return !!el.querySelector(selector);
-    }
+    };
   }
 
   updatePageReferences(pages: Page[]) {
     // querySelector first, then rerender
-    const results = this.references.map((ref) => {
-      return { ref, data: pageNumbersForTest(pages, ref.test) }
+    const results = this.references.map(ref => {
+      return { ref, data: pageNumbersForTest(pages, ref.test) };
     });
 
     results.forEach(({ ref, data }) => this.render(ref, data));

@@ -21,14 +21,13 @@ class Counter extends Rule {
     this.incrementEl = options.incrementEl ?? '';
     this.resetEl = options.resetEl ?? '';
     this.replaceEl = options.replaceEl ?? '';
-  
 
     validateRuntimeOptions(options, {
       name: 'Counter',
       replaceEl: RuntimeTypes.string,
       resetEl: RuntimeTypes.string,
       incrementEl: RuntimeTypes.string,
-      replace: RuntimeTypes.func,
+      replace: RuntimeTypes.func
     });
   }
   setup() {

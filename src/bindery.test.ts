@@ -2,13 +2,14 @@ import Bindery from './bindery';
 import Rules from './rules';
 
 global.BINDERY_VERSION = 'Test Version';
-global.console = { // to cleanup test console
+global.console = {
+  // to cleanup test console
   log: () => {},
-  error: () => {},
+  error: () => {}
 };
 global.fetch = async () => ({
   status: 200,
-  text: () => '<div id="content">Test Content<div>',
+  text: () => '<div id="content">Test Content<div>'
 });
 
 const wait10 = () => new Promise(resolve => setTimeout(resolve, 10));
@@ -18,7 +19,7 @@ const mockEl = (name = 'div') => mockDoc.createElement(name);
 const mockOverflow = el => el.textContent.length > 10;
 let mockReasonableSize = () => true;
 
-const mockRegion = function () {
+const mockRegion = function() {
   const box = mockEl();
   const content = mockEl();
   box.classList.add('box');
@@ -30,20 +31,21 @@ const mockRegion = function () {
     element: box,
     content,
     get currentElement() {
-      return instance.path.length < 1 ? content : instance.path[instance.path.length - 1];
+      return instance.path.length < 1
+        ? content
+        : instance.path[instance.path.length - 1];
     },
-    setPath: (newPath) => {
+    setPath: newPath => {
       instance.path = newPath;
       if (newPath.length > 0) content.appendChild(newPath[0]);
     },
     hasOverflowed,
     get isReasonableSize() {
       return mockReasonableSize();
-    },
+    }
   };
   return instance;
 };
-
 
 jest.unmock('regionize');
 const regionize = require('regionize');
@@ -65,33 +67,32 @@ test('Sets up content for div', async () => {
 });
 
 test('Sets up content from url', async () => {
-  const bindery = new Bindery({ content: { url: 'fakeurl', selector: '#content' } });
+  const bindery = new Bindery({
+    content: { url: 'fakeurl', selector: '#content' }
+  });
   await wait10(); // TODO: hack because content not ready?
   expect(bindery.content instanceof HTMLElement).toBe(true);
 });
-
 
 test('Throws with invalid Rule', () => {
   expect(() => {
     const bindery = new Bindery({
       content: document.createElement('div'),
-      rules: [{ k: 'Not instance of Rule' }],
+      rules: [{ k: 'Not instance of Rule' }]
     });
     bindery.cancel();
   }).toThrow();
 });
 
-
 test('Doesnt throw with valid Rule', () => {
   expect(() => {
     const bindery = new Bindery({
       content: document.createElement('div'),
-      rules: [Rules.PageBreak({})],
+      rules: [Rules.PageBreak({})]
     });
     bindery.cancel();
   }).not.toThrow();
 });
-
 
 test('Displays error when page is too small', async () => {
   mockReasonableSize = () => false;
@@ -106,7 +107,7 @@ test('Displays error when page is too small', async () => {
   expect(bindery.viewer.element.contains(bindery.viewer.error)).toBe(true);
 });
 
-test('Creates book when there\'s content', async () => {
+test("Creates book when there's content", async () => {
   mockReasonableSize = () => true;
 
   const div = document.createElement('div');

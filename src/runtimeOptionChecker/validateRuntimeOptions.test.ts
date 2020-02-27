@@ -76,77 +76,102 @@ test('Handles enums', () => {
 });
 
 const kIsShape = {
-  k: T.shape({ height: T.length, name: T.string }),
+  k: T.shape({ height: T.length, name: T.string })
 };
 
 test('Handles shapes', () => {
-  expect(validate({
-    k: { height: '12px', name: 'example' },
-  }, kIsShape)).toBe(true);
+  expect(
+    validate(
+      {
+        k: { height: '12px', name: 'example' }
+      },
+      kIsShape
+    )
+  ).toBe(true);
 
   expect(() => {
-    validate({
-      k: { height: '12px', title: 'example' },
-    }, kIsShape);
+    validate(
+      {
+        k: { height: '12px', title: 'example' }
+      },
+      kIsShape
+    );
   }).toThrow();
 });
 
 const kIsMargin = { k: T.margin };
 describe('Margins', () => {
   test('Handles margins', () => {
-    expect(validate({
-      k: {
-        top: '12px',
-        inner: '12px',
-        outer: '12px',
-        bottom: '12px',
-      },
-    }, kIsMargin)).toBe(true);
+    expect(
+      validate(
+        {
+          k: {
+            top: '12px',
+            inner: '12px',
+            outer: '12px',
+            bottom: '12px'
+          }
+        },
+        kIsMargin
+      )
+    ).toBe(true);
   });
 
   test('Rejects non-objects', () => {
     expect(() => {
-      validate({
-        k: 'margins?',
-      }, kIsMargin);
+      validate(
+        {
+          k: 'margins?'
+        },
+        kIsMargin
+      );
     }).toThrow();
   });
 
   test('Reject non-length side', () => {
     expect(() => {
-      validate({
-        k: {
-          top: '12px',
-          inner: 12,
-          outer: '12px',
-          bottom: '12px',
+      validate(
+        {
+          k: {
+            top: '12px',
+            inner: 12,
+            outer: '12px',
+            bottom: '12px'
+          }
         },
-      }, kIsMargin);
+        kIsMargin
+      );
     }).toThrow();
   });
 
   test('Reject margins with missing sides', () => {
     expect(() => {
-      validate({
-        k: {
-          top: '12px',
-          bottom: '12px',
+      validate(
+        {
+          k: {
+            top: '12px',
+            bottom: '12px'
+          }
         },
-      }, kIsMargin);
+        kIsMargin
+      );
     }).toThrow();
   });
 
   test('Reject margins with extra side', () => {
     expect(() => {
-      validate({
-        k: {
-          top: '12px',
-          clockwise: '12px',
-          inner: '12px',
-          outer: '12px',
-          bottom: '12px',
+      validate(
+        {
+          k: {
+            top: '12px',
+            clockwise: '12px',
+            inner: '12px',
+            outer: '12px',
+            bottom: '12px'
+          }
         },
-      }, kIsMargin);
+        kIsMargin
+      );
     }).toThrow();
   });
 });
@@ -154,34 +179,45 @@ describe('Margins', () => {
 const kIsSize = { k: T.size };
 describe('Sizes', () => {
   test('Handles sizes', () => {
-    expect(validate({
-      k: {
-        width: '12px',
-        height: '12px',
-      },
-    }, kIsSize)).toBe(true);
+    expect(
+      validate(
+        {
+          k: {
+            width: '12px',
+            height: '12px'
+          }
+        },
+        kIsSize
+      )
+    ).toBe(true);
   });
 
   test('Reject non-length side', () => {
     expect(() => {
-      validate({
-        k: {
-          width: '12px',
-          height: 12,
+      validate(
+        {
+          k: {
+            width: '12px',
+            height: 12
+          }
         },
-      }, kIsSize);
+        kIsSize
+      );
     }).toThrow();
   });
 
   test('Reject extra side', () => {
     expect(() => {
-      validate({
-        k: {
-          width: '12px',
-          height: '12px',
-          depth: '12px',
+      validate(
+        {
+          k: {
+            width: '12px',
+            height: '12px',
+            depth: '12px'
+          }
         },
-      }, kIsSize);
+        kIsSize
+      );
     }).toThrow();
   });
 });

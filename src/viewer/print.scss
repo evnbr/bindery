@@ -15,7 +15,7 @@
   }
 
   .print-sheet {
-    contain: layout;   /* prevent margin collapse */
+    contain: layout; /* prevent margin collapse */
     margin: 0 auto;
     page-break-after: always;
   }

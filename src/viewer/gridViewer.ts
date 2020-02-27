@@ -4,10 +4,10 @@ import padPages from './padPages';
 
 const twoPageSpread = (...children: HTMLElement[]) => {
   return div('.spread-wrapper.spread-centered.spread-size', ...children);
-}
+};
 const onePageSpread = (...children: HTMLElement[]) => {
   return div('.spread-wrapper.spread-centered.page-size', ...children);
-}
+};
 
 const renderGridViewer = (bookPages: Page[], isTwoUp: boolean) => {
   const pages = isTwoUp ? padPages(bookPages, () => new Page()) : bookPages;
@@ -19,7 +19,7 @@ const renderGridViewer = (bookPages: Page[], isTwoUp: boolean) => {
       gridLayout.appendChild(wrap);
     }
   } else {
-    pages.forEach((pg) => {
+    pages.forEach(pg => {
       const wrap = onePageSpread(pg.element);
       gridLayout.appendChild(wrap);
     });

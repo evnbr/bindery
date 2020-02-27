@@ -1,6 +1,6 @@
 import padPages from './padPages';
 
-const makePage = function () {
+const makePage = function() {
   return { element: document.createElement('div') };
 };
 

@@ -1,16 +1,18 @@
 import makeBook from './makeBook';
 
 let time = 0;
-global.performance = { now: () => {
-  time += 1;
-  return time;
-} };
+global.performance = {
+  now: () => {
+    time += 1;
+    return time;
+  }
+};
 
 const mockDoc = document;
 const mockEl = (name = 'div') => mockDoc.createElement(name);
 let mockOverflow = el => el.textContent.length > 10;
 
-const mockRegion = function () {
+const mockRegion = function() {
   const box = mockEl();
   const content = mockEl();
   box.classList.add('box');
@@ -22,24 +24,24 @@ const mockRegion = function () {
     element: box,
     content,
     get currentElement() {
-      return instance.path.length < 1 ? content : instance.path[instance.path.length - 1];
+      return instance.path.length < 1
+        ? content
+        : instance.path[instance.path.length - 1];
     },
-    setPath: (newPath) => {
+    setPath: newPath => {
       instance.path = newPath;
       if (newPath.length > 0) content.appendChild(newPath[0]);
     },
     hasOverflowed,
-    isReasonableSize: true,
+    isReasonableSize: true
   };
   return instance;
 };
-
 
 jest.unmock('regionize');
 const regionize = require('regionize');
 
 regionize.Region = mockRegion;
-
 
 // jest.mock('regionize', function MockRegionize() {
 //   return {
@@ -47,7 +49,6 @@ regionize.Region = mockRegion;
 //     Region: mockRegion,
 //   };
 // });
-
 
 test('Creates book, preserves content order (10char overflow)', async () => {
   const a = mockEl('div');
@@ -65,7 +66,8 @@ test('Creates book, preserves content order (10char overflow)', async () => {
 
   const allText = book.pages
     .map(pg => pg.flow.content.textContent)
-    .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+    .join('')
+    .replace(/\s+/g, ''); // whitespace not guaranteed to persist
 
   expect(allText).toBe('Acontent.Bcontent.Ccontent.');
 });
@@ -80,11 +82,17 @@ test('Splits a single div over many pages (10char overflow)', async () => {
 
   const allText = book.pages
     .map(pg => pg.flow.content.textContent)
-    .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+    .join('')
+    .replace(/\s+/g, ''); // whitespace not guaranteed to persist
   expect(allText).toBe('Acontent.Bcontent.Ccontent.');
 
-  expect(book.pages.map(pg => pg.hasOverflowed()))
-    .toEqual([false, false, false, false, false]);
+  expect(book.pages.map(pg => pg.hasOverflowed())).toEqual([
+    false,
+    false,
+    false,
+    false,
+    false
+  ]);
 });
 
 test('Split elements over many pages (100char overflow)', async () => {
@@ -104,10 +112,14 @@ test('Split elements over many pages (100char overflow)', async () => {
 
   const actualText = book.pages
     .map(pg => pg.flow.content.textContent)
-    .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+    .join('')
+    .replace(/\s+/g, ''); // whitespace not guaranteed to persist
   expect(actualText).toBe(expectedText);
-  expect(book.pages.map(pg => pg.element.textContent.length > 100))
-    .toEqual([false, false, false]);
+  expect(book.pages.map(pg => pg.element.textContent.length > 100)).toEqual([
+    false,
+    false,
+    false
+  ]);
 });
 
 test('Split elements over many pages (5children overflow)', async () => {
@@ -121,7 +133,7 @@ test('Split elements over many pages (5children overflow)', async () => {
     content.appendChild(e);
   }
 
-  mockOverflow = (el) => {
+  mockOverflow = el => {
     const count = (el.querySelectorAll('*') || []).length;
     return count > 5;
   };
@@ -130,7 +142,8 @@ test('Split elements over many pages (5children overflow)', async () => {
 
   const actualText = book.pages
     .map(pg => pg.flow.content.textContent)
-    .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+    .join('')
+    .replace(/\s+/g, ''); // whitespace not guaranteed to persist
   expect(actualText).toBe(expectedText);
 });
 
@@ -158,8 +171,12 @@ test('Spreads elements over many pages without splitting any (100char overflow)'
 
   const actualText = book.pages
     .map(pg => pg.flow.content.textContent)
-    .join('').replace(/\s+/g, ''); // whitespace not guaranteed to persist
+    .join('')
+    .replace(/\s+/g, ''); // whitespace not guaranteed to persist
   expect(actualText).toBe(expectedText);
-  expect(book.pages.map(pg => pg.element.textContent.length > 100))
-    .toEqual([false, false, false]);
+  expect(book.pages.map(pg => pg.element.textContent.length > 100)).toEqual([
+    false,
+    false,
+    false
+  ]);
 });

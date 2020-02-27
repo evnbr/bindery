@@ -26,7 +26,7 @@ li.continuation {
 
 .footer {
   margin-top: 8pt;
-  margin-bottom: var(--bindery-margin-bottom);;
+  margin-bottom: var(--bindery-margin-bottom);
   flex: 0 1 auto;
   z-index: 2;
 }
@@ -65,7 +65,8 @@ li.continuation {
   font-size: 0.667em;
 }
 
-.running-header, .footer {
+.running-header,
+.footer {
   font-size: 10pt;
 }
 

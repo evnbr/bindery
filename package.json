@@ -33,6 +33,7 @@
     "node-sass": "^4.13.1",
     "postcss": "^7.0.27",
     "postcss-class-prefix": "^0.3.0",
+    "prettier": "1.19.1",
     "rollup": "^1.31.1",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",

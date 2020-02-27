@@ -7,7 +7,7 @@ const createEl = tag => document.createElement(tag);
 const counter = new Counter({
   replaceEl: 'span',
   resetEl: 'h1',
-  incrementEl: 'p',
+  incrementEl: 'p'
 });
 counter.setup();
 

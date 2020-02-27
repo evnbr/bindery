@@ -14,18 +14,19 @@ import { validateRuntimeOptions, RuntimeTypes } from './runtimeOptionChecker';
 import { Book } from './book';
 import { Rule } from './rules/Rule';
 
-const vals = (obj: { [key: string]: any}) => {
+const vals = (obj: { [key: string]: any }) => {
   return Object.keys(obj).map(k => obj[k]);
 };
-const nextFrame = () => new Promise((resolve) => {
-  requestAnimationFrame(t => resolve(t));
-});
+const nextFrame = () =>
+  new Promise(resolve => {
+    requestAnimationFrame(t => resolve(t));
+  });
 
 declare const BINDERY_VERSION: string;
 
 interface PrintSetup {
-  layout: SheetLayout
-  marks: SheetMarks,
+  layout: SheetLayout;
+  marks: SheetMarks;
 }
 
 interface BinderyOptions {
@@ -61,16 +62,16 @@ class Bindery {
       pageSetup: RuntimeTypes.shape({
         name: 'pageSetup',
         margin: RuntimeTypes.margin,
-        size: RuntimeTypes.size,
+        size: RuntimeTypes.size
       }),
       printSetup: RuntimeTypes.shape({
         name: 'printSetup',
         bleed: RuntimeTypes.length,
         layout: RuntimeTypes.enum(...vals(SheetLayout)),
         marks: RuntimeTypes.enum(...vals(SheetMarks)),
-        paper: RuntimeTypes.enum(...vals(SheetSize)),
+        paper: RuntimeTypes.enum(...vals(SheetSize))
       }),
-      rules: RuntimeTypes.array,
+      rules: RuntimeTypes.array
     });
 
     this.autorun = opts.autorun ?? true;
@@ -84,28 +85,36 @@ class Bindery {
       pageSetup: this.pageSetup,
       mode: opts.view ?? ViewerMode.PREVIEW,
       marks: startMarks,
-      layout: startLayout,
+      layout: startLayout
     });
 
     if (!opts.content) {
-      this.viewer.displayError('Content not specified', 'You must include a source element, selector, or url');
+      this.viewer.displayError(
+        'Content not specified',
+        'You must include a source element, selector, or url'
+      );
       throw Error('Bindery: You must include a source element or selector');
     }
 
     if (opts.ControlsComponent) {
-      this.viewer.displayError('Controls are now included', 'Please remove the controls component');
+      this.viewer.displayError(
+        'Controls are now included',
+        'Please remove the controls component'
+      );
       throw Error('Bindery: controls are now included');
     }
 
     this.rules = defaultRules;
     this.rules.push(new Rule({ pageNumberOffset: opts.pageNumberOffset ?? 0 }));
-    opts.rules?.forEach((rule) => {
+    opts.rules?.forEach(rule => {
       if (rule instanceof rules.Rule) {
         this.rules.push(rule);
       } else {
-        throw Error(`Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`);
+        throw Error(
+          `Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`
+        );
       }
-    });  
+    });
 
     if (this.autorun) this.makeBook(opts.content);
   }
@@ -123,8 +132,8 @@ class Bindery {
 
   async makeBook(contentDescription: any): Promise<Book | undefined> {
     try {
-      this.content = await getContentAsElement(contentDescription)
-    } catch(e) {
+      this.content = await getContentAsElement(contentDescription);
+    } catch (e) {
       this.viewer.show();
       this.viewer.displayError('', e.message);
       // throw e;
@@ -143,7 +152,7 @@ class Bindery {
 
     const onProgress = (currentBook: Book, progress: number) => {
       this.viewer.updateProgress(currentBook, progress);
-    }
+    };
 
     try {
       const book = await makeBook(content, this.rules, onProgress);
@@ -156,7 +165,7 @@ class Bindery {
     } catch (e) {
       this.layoutInProgress = false;
       this.viewer.isInProgress = false;
-      this.viewer.displayError('Layout couldn\'t complete', e.message);
+      this.viewer.displayError("Layout couldn't complete", e.message);
       // throw e;
       return undefined;
     }

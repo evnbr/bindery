@@ -12,7 +12,6 @@ test('Page leftright', () => {
   expect(page.element.className.includes('left')).toBe(true);
   expect(page.element.className.includes('right')).toBe(false);
 
-
   page.setLeftRight('right');
   expect(page.isLeft).toBe(false);
   expect(page.isRight).toBe(true);
@@ -29,7 +28,6 @@ test('Page setPreference', () => {
   expect(page.alwaysLeft).toBe(false);
   expect(page.alwaysRight).toBe(true);
 });
-
 
 describe('Page isEmpty', () => {
   test('no content', () => {

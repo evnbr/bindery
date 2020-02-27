@@ -6,10 +6,7 @@ import {
   annotatePagesHierarchy,
   annotatePagesNumbers
 } from './annotatePages';
-import {
-  pageNumbersForTest,
-  pageNumbersForSelector
-} from './searchPages';
+import { pageNumbersForTest, pageNumbersForSelector } from './searchPages';
 
 export {
   Book,

@@ -5,7 +5,7 @@ const {
   PageReference,
   Footnote,
   FullBleedPage,
-  FullBleedSpread,
+  FullBleedSpread
 } = rules;
 
 const replacer = (element: HTMLElement, number: number) => {
@@ -17,13 +17,37 @@ export default [
   PageBreak({ selector: '[book-page-break="both"]', position: 'both' }),
   PageBreak({ selector: '[book-page-break="avoid"]', position: 'avoid' }),
 
-  PageBreak({ selector: '[book-page-break="after"][book-page-continue="right"]', position: 'after', continue: 'right' }),
-  PageBreak({ selector: '[book-page-break="after"][book-page-continue="left"]', position: 'after', continue: 'left' }),
-  PageBreak({ selector: '[book-page-break="after"][book-page-continue="next"]', position: 'after', continue: 'next' }),
+  PageBreak({
+    selector: '[book-page-break="after"][book-page-continue="right"]',
+    position: 'after',
+    continue: 'right'
+  }),
+  PageBreak({
+    selector: '[book-page-break="after"][book-page-continue="left"]',
+    position: 'after',
+    continue: 'left'
+  }),
+  PageBreak({
+    selector: '[book-page-break="after"][book-page-continue="next"]',
+    position: 'after',
+    continue: 'next'
+  }),
 
-  PageBreak({ selector: '[book-page-break="before"][book-page-continue="right"]', position: 'before', continue: 'right' }),
-  PageBreak({ selector: '[book-page-break="before"][book-page-continue="left"]', position: 'before', continue: 'left' }),
-  PageBreak({ selector: '[book-page-break="before"][book-page-continue="next"]', position: 'before', continue: 'next' }),
+  PageBreak({
+    selector: '[book-page-break="before"][book-page-continue="right"]',
+    position: 'before',
+    continue: 'right'
+  }),
+  PageBreak({
+    selector: '[book-page-break="before"][book-page-continue="left"]',
+    position: 'before',
+    continue: 'left'
+  }),
+  PageBreak({
+    selector: '[book-page-break="before"][book-page-continue="next"]',
+    position: 'before',
+    continue: 'next'
+  }),
 
   FullBleedPage({ selector: '[book-full-bleed="page"]' }),
   FullBleedSpread({ selector: '[book-full-bleed="spread"]' }),
@@ -33,7 +57,7 @@ export default [
     render: (element: HTMLElement, number: number) => {
       const txt = element.getAttribute('book-footnote-text');
       return `<i>${number}</i>${txt}`;
-    },
+    }
   }),
 
   PageReference({
@@ -42,11 +66,11 @@ export default [
     createTest: (element: HTMLElement) => {
       const text = element.getAttribute('book-pages-with-text') ?? '';
       const term = text.toLowerCase().trim();
-      return (pageElement: HTMLElement) => { 
+      return (pageElement: HTMLElement) => {
         const pageText = pageElement.textContent || '';
         return pageText.toLowerCase().includes(term);
-      }
-    },
+      };
+    }
   }),
 
   PageReference({
@@ -57,8 +81,8 @@ export default [
       const selector = txt.trim();
       return (pageElement: HTMLElement) => {
         return pageElement.querySelector(selector);
-      }
-    },
+      };
+    }
   }),
 
   PageReference({
@@ -71,6 +95,6 @@ export default [
         const pageText = pageElement.textContent ?? '';
         return pageText.toLowerCase().includes(term);
       };
-    },
-  }),
+    }
+  })
 ];

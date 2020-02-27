@@ -11,11 +11,19 @@ class Replace extends Rule {
     super(options);
     this.name = 'Replace';
   }
-  afterAdd(element: HTMLElement, book: Book, continueOnNewPage: Function, makeNewPage: PageMaker, overflowCallback: Function) {
+  afterAdd(
+    element: HTMLElement,
+    book: Book,
+    continueOnNewPage: Function,
+    makeNewPage: PageMaker,
+    overflowCallback: Function
+  ) {
     const parent = element.parentNode;
     if (!parent) {
       console.error(element);
-      throw Error(`Bindery.Replace({ selector: '${this.selector}' }).afterAdd called on element that hasn't been added.`);
+      throw Error(
+        `Bindery.Replace({ selector: '${this.selector}' }).afterAdd called on element that hasn't been added.`
+      );
     }
     const defensiveClone = element.cloneNode(true) as HTMLElement;
     const replacement = this.createReplacement(book, defensiveClone);
@@ -33,7 +41,10 @@ class Replace extends Rule {
     return this.replace(element);
   }
   replace(element: HTMLElement, info?: any) {
-    element.insertAdjacentHTML('beforeend', '<sup class="bindery-sup">Default Replacement</sup>');
+    element.insertAdjacentHTML(
+      'beforeend',
+      '<sup class="bindery-sup">Default Replacement</sup>'
+    );
     return element;
   }
 }

@@ -16,7 +16,7 @@ const addStylesheet = (id: string): HTMLStyleElement => {
 // Fetch or create stylesheet with id
 const stylesheet = (id: string): HTMLStyleElement => {
   return doc.querySelector(`#${id}`) ?? addStylesheet(id);
-}
+};
 
 // Parse html from text
 const parseHTML = (text: string, selector?: string) => {
@@ -25,4 +25,12 @@ const parseHTML = (text: string, selector?: string) => {
   return selector ? wrapper.querySelector(selector) : wrapper;
 };
 
-export { prefixer, classes, classForMode, allModeClasses, stylesheet, safeMeasure, parseHTML };
+export {
+  prefixer,
+  classes,
+  classForMode,
+  allModeClasses,
+  stylesheet,
+  safeMeasure,
+  parseHTML
+};

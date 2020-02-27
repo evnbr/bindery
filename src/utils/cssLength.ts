@@ -11,7 +11,7 @@ const parseLength = (str: string) => {
   }
   return {
     val: Number(matches[1]),
-    unit: matches[3],
+    unit: matches[3]
   };
 };
 

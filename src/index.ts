@@ -7,12 +7,12 @@ import '../src/main.scss';
 declare const BINDERY_VERSION: string;
 
 const constants = {
-    View: ViewerMode,
-    Paper: SheetSize,
-    Layout: SheetLayout,
-    Marks: SheetMarks,
-    version: BINDERY_VERSION,
-}
+  View: ViewerMode,
+  Paper: SheetSize,
+  Layout: SheetLayout,
+  Marks: SheetMarks,
+  version: BINDERY_VERSION
+};
 
 const BinderyWithRules = Object.assign(Bindery, rules, constants);
 
