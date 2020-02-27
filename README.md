@@ -1,6 +1,5 @@
 # Bindery.js
 
-
 [![npm](https://img.shields.io/npm/v/bindery.svg)](https://www.npmjs.com/package/bindery)
 [![Build Status](https://travis-ci.org/evnbr/bindery.svg?branch=master)](https://travis-ci.org/evnbr/bindery)
 [![codecov](https://codecov.io/gh/evnbr/bindery/branch/master/graph/badge.svg)](https://codecov.io/gh/evnbr/bindery)
@@ -12,7 +11,7 @@
 [Examples](https://evanbrooks.info/bindery/examples) ·
 [About](https://evanbrooks.info/bindery/about)
 
-*Bindery.js* is a library for designing printable books with HTML and CSS.
+_Bindery.js_ is a library for designing printable books with HTML and CSS.
 
 At its simplest, Bindery flows content over multiple pages. From there, the designer can create elements that depend on that flow, like running headers, footnotes, tables of contents, and indexes. Bindery also provides print options like bleed, crop marks, and booklet ordering.
 
@@ -36,7 +35,6 @@ You can also install bindery from [npm](https://www.npmjs.com/package/bindery), 
 ```
 npm install --save bindery
 ```
-
 
 ### Using Rules
 
