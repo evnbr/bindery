@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help improve bindery
+about: Is something not working as expected? Let me know so I can improve bindery
 title: ''
 labels: ''
 assignees: ''
