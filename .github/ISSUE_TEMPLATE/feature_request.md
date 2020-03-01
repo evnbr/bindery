@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Does bindery not support a feature for the book you're making? Have an idea to make bindery's API easier to use? Suggest an idea for this project.
 title: ''
 labels: ''
 assignees: ''
