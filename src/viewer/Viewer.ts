@@ -89,6 +89,7 @@ class Viewer {
         layout: this.sheetLayout,
         mode: this.mode,
         marks: this.marks,
+        pageSize: this.pageSetup.displaySize,
       },
       {
         // Actions
@@ -96,7 +97,6 @@ class Viewer {
         setPaper: this.setSheetSize.bind(this),
         setLayout: this.setLayout.bind(this),
         setMarks: this.setMarks.bind(this),
-        getPageSize: () => this.pageSetup.displaySize,
       },
     );
   }

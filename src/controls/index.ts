@@ -14,6 +14,7 @@ interface ControlsState {
   marks: SheetMarks;
   mode: ViewerMode;
   layout: SheetLayout;
+  pageSize: { width: string; height: string };
 }
 
 interface ControlsActions {
@@ -21,14 +22,13 @@ interface ControlsActions {
   setLayout: (newVal: SheetLayout) => void;
   setPaper: (newVal: SheetSize) => void;
   setMarks: (newVal: SheetMarks) => void;
-  getPageSize: () => { width: string; height: string };
 }
 
 const renderPrintOptions = (state: ControlsState, actions: ControlsActions) => {
   const shouldShowMarks =
     state.paper !== SheetSize.AUTO && state.paper !== SheetSize.AUTO_BLEED;
 
-  const sizeLabels = getSheetSizeLabels(actions.getPageSize());
+  const sizeLabels = getSheetSizeLabels(state.pageSize);
 
   return row(
     '.print-options',
