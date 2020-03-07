@@ -1,6 +1,6 @@
 import { div, button, select, option, DomAttributes } from '../dom';
 
-const row = (cls: string | null, ...children: HTMLElement[]) => {
+const row = (cls: string | null, ...children: (HTMLElement | string)[]) => {
   return div(`${cls}.row`, ...children);
 };
 
@@ -11,13 +11,8 @@ const btn = (cls: string | null, attrs: DomAttributes, label: string) => {
 
 const dropdown = (attrs: DomAttributes, options: HTMLOptionElement[]) => {
   const selectVal = div('.select-val', 'Value');
-  selectVal.textContent = 'Value';
   const selectEl = select('.select', attrs, ...options);
-  const updateVal = () => {
-    selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
-  };
-  selectEl.addEventListener('change', updateVal);
-  updateVal();
+  selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
   return div('.select-wrap.control', selectVal, selectEl);
 };
 

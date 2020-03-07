@@ -37,8 +37,9 @@ class Viewer {
   element: HTMLElement;
   error?: HTMLElement;
 
-  doubleSided: boolean;
+  isDoubleSided: boolean;
   sheetLayout: SheetLayout;
+  marks: SheetMarks;
   mode: ViewerMode;
   currentLeaf: number;
   controls: Controls;
@@ -53,10 +54,10 @@ class Viewer {
     this.scaler = div('.zoom-scaler', this.content);
     this.element = div('.root', this.progressBar, this.scaler);
 
-    this.doubleSided = true;
+    this.isDoubleSided = true;
     this.sheetLayout = layout;
 
-    this.setMarks(marks);
+    this.marks = marks;
     this.mode = mode;
     this.element.classList.add(classes.viewPreview);
     this.currentLeaf = 0;
@@ -70,13 +71,24 @@ class Viewer {
       throttleResize(() => this.scaleToFit());
     });
 
-    this.controls = new Controls(
+    this.controls = new Controls();
+    this.updateControls();
+    this.element.appendChild(this.controls.element);
+
+    this.isInProgress = true;
+
+    this.setMarks(marks);
+    this.show();
+  }
+
+  updateControls() {
+    this.controls.update(
       {
         // Initial props
         paper: this.pageSetup.paper,
         layout: this.sheetLayout,
         mode: this.mode,
-        marks,
+        marks: this.marks,
       },
       {
         // Actions
@@ -87,16 +99,12 @@ class Viewer {
         getPageSize: () => this.pageSetup.displaySize,
       },
     );
-    this.element.appendChild(this.controls.element);
-
-    this.isInProgress = true;
-
-    this.show();
   }
 
   setMode(newMode: ViewerMode) {
     if (newMode === this.mode) return;
     this.mode = newMode;
+    this.updateControls();
     this.render();
   }
 
@@ -106,7 +114,6 @@ class Viewer {
 
   set isInProgress(newVal) {
     this.element.classList.toggle(classes.inProgress, newVal);
-    if (newVal && this.controls) this.controls.setInProgress();
   }
 
   get isTwoUp() {
@@ -170,6 +177,9 @@ class Viewer {
   }
 
   setMarks(newVal: SheetMarks) {
+    this.marks = newVal;
+    this.updateControls();
+
     this.isShowingCropMarks =
       newVal === SheetMarks.CROP || newVal === SheetMarks.BOTH;
     this.isShowingBleedMarks =
@@ -218,6 +228,7 @@ class Viewer {
     if (newBook) this.book = newBook;
     if (!this.book) return;
     this.show();
+    this.updateControls();
 
     this.element.classList.remove(...allModeClasses);
     this.element.classList.add(classForMode(this.mode));
@@ -225,14 +236,13 @@ class Viewer {
 
     const prevScroll = this.scrollPercent;
 
-    if (this.controls) this.controls.setDone();
     this.progress = 1;
 
     window.requestAnimationFrame(() => {
       if (!this.book) throw Error('Book missing');
       const pages = this.book.pages.slice();
       const render = this.renderFunctionFor(this.mode);
-      const fragment = render(pages, this.doubleSided, this.sheetLayout);
+      const fragment = render(pages, this.isDoubleSided, this.sheetLayout);
       this.content.innerHTML = '';
       this.content.appendChild(fragment);
       if (!this.hasRendered) this.hasRendered = true;

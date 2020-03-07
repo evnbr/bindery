@@ -48,16 +48,6 @@ $btn-active: rgba(0, 0, 0, 0.08);
   user-select: none;
 }
 
-.print-options {
-  display: none;
-  .view-print & {
-    display: flex;
-  }
-  .in-progress & {
-    display: none;
-  }
-}
-
 .controls .btn {
   -webkit-appearance: none;
   cursor: pointer;
