@@ -15,6 +15,7 @@ const ControlsStub = function() {
 
 const pageSetup = {
   updateStyleVars: () => null,
+  displaySize: { width: 'testValue', height: 'testValue' },
 };
 
 const viewer = new Viewer({
