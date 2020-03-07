@@ -35,8 +35,8 @@ const renderPrintOptions = (state: ControlsState, actions: ControlsActions) => {
     row(null, enumDropdown(layoutLabels, state.layout, actions.setLayout)),
     row(null, enumDropdown(sizeLabels, state.paper, actions.setPaper)),
     shouldShowMarks
-      ? ''
-      : row(null, enumDropdown(marksLabels, state.marks, actions.setMarks)),
+      ? row(null, enumDropdown(marksLabels, state.marks, actions.setMarks))
+      : '',
   );
 };
 
