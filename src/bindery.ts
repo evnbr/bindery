@@ -48,7 +48,6 @@ class Bindery {
   content!: HTMLElement;
   pageSetup: PageSetup;
   rules: Rule[];
-  layoutInProgress: boolean = false;
 
   constructor(opts: BinderyOptions = {}) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
@@ -62,16 +61,16 @@ class Bindery {
       pageSetup: RuntimeTypes.shape({
         name: 'pageSetup',
         margin: RuntimeTypes.margin,
-        size: RuntimeTypes.size
+        size: RuntimeTypes.size,
       }),
       printSetup: RuntimeTypes.shape({
         name: 'printSetup',
         bleed: RuntimeTypes.length,
         layout: RuntimeTypes.enum(...vals(SheetLayout)),
         marks: RuntimeTypes.enum(...vals(SheetMarks)),
-        paper: RuntimeTypes.enum(...vals(SheetSize))
+        paper: RuntimeTypes.enum(...vals(SheetSize)),
       }),
-      rules: RuntimeTypes.array
+      rules: RuntimeTypes.array,
     });
 
     this.autorun = opts.autorun ?? true;
@@ -85,13 +84,13 @@ class Bindery {
       pageSetup: this.pageSetup,
       mode: opts.view ?? ViewerMode.PREVIEW,
       marks: startMarks,
-      layout: startLayout
+      layout: startLayout,
     });
 
     if (!opts.content) {
       this.viewer.displayError(
         'Content not specified',
-        'You must include a source element, selector, or url'
+        'You must include a source element, selector, or url',
       );
       throw Error('Bindery: You must include a source element or selector');
     }
@@ -99,7 +98,7 @@ class Bindery {
     if (opts.ControlsComponent) {
       this.viewer.displayError(
         'Controls are now included',
-        'Please remove the controls component'
+        'Please remove the controls component',
       );
       throw Error('Bindery: controls are now included');
     }
@@ -111,7 +110,7 @@ class Bindery {
         this.rules.push(rule);
       } else {
         throw Error(
-          `Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`
+          `Bindery: The following is not an instance of Bindery.Rule and will be ignored: ${rule}`,
         );
       }
     });
@@ -144,11 +143,10 @@ class Bindery {
     const content = this.content.cloneNode(true) as HTMLElement;
     this.content.style.display = 'none';
 
-    this.layoutInProgress = true;
     this.viewer.clear(); // In case we're updating an existing layout
     this.viewer.show();
     this.pageSetup.updateStyleVars();
-    this.viewer.isInProgress = true;
+    this.viewer.setInProgress(true);
 
     const onProgress = (currentBook: Book, progress: number) => {
       this.viewer.updateProgress(currentBook, progress);
@@ -156,15 +154,13 @@ class Bindery {
 
     try {
       const book = await makeBook(content, this.rules, onProgress);
-      this.viewer.progress = 1;
-      this.layoutInProgress = false;
+      this.viewer.setProgressAmount(1);
       await nextFrame();
       this.viewer.render(book);
-      this.viewer.isInProgress = false;
+      this.viewer.setInProgress(false);
       return book;
     } catch (e) {
-      this.layoutInProgress = false;
-      this.viewer.isInProgress = false;
+      this.viewer.setInProgress(false);
       this.viewer.displayError("Layout couldn't complete", e.message);
       // throw e;
       return undefined;
