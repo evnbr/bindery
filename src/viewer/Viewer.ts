@@ -6,6 +6,11 @@ import { throttleFrame, throttleTime } from '../utils';
 import { renderGridViewer } from './gridViewer';
 import { renderSheetViewer } from './sheetViewer';
 import { renderFlipbookViewer } from './flipbookViewer';
+import {
+  scrollToBottom,
+  scrollToPercent,
+  getScrollAsPercent,
+} from './scrollUtils';
 
 import errorView from './error';
 import listenForPrint from './listenForPrint';
@@ -49,10 +54,18 @@ class Viewer {
   constructor({ pageSetup, mode, layout, marks }: ViewerOptions) {
     this.pageSetup = pageSetup;
 
+    this.controls = new Controls();
+    this.updateControls();
+
     this.progressBar = div('.progress-bar');
     this.content = div('.zoom-content');
     this.scaler = div('.zoom-scaler', this.content);
-    this.element = div('.root', this.progressBar, this.scaler);
+    this.element = div(
+      '.root',
+      this.progressBar,
+      this.controls.element,
+      this.scaler,
+    );
 
     this.isDoubleSided = true;
     this.sheetLayout = layout;
@@ -71,12 +84,7 @@ class Viewer {
       throttleResize(() => this.scaleToFit());
     });
 
-    this.controls = new Controls();
-    this.updateControls();
-    this.element.appendChild(this.controls.element);
-
-    this.isInProgress = true;
-
+    this.setInProgress(true);
     this.setMarks(marks);
     this.show();
   }
@@ -112,7 +120,7 @@ class Viewer {
     return this.element.classList.contains(classes.inProgress);
   }
 
-  set isInProgress(newVal) {
+  setInProgress(newVal: boolean) {
     this.element.classList.toggle(classes.inProgress, newVal);
   }
 
@@ -120,27 +128,15 @@ class Viewer {
     return this.sheetLayout !== SheetLayout.PAGES;
   }
 
-  get isShowingCropMarks() {
-    return this.element.classList.contains(classes.showCrop);
-  }
-
-  set isShowingCropMarks(newVal) {
+  setShowingCropMarks(newVal: boolean) {
     this.element.classList.toggle(classes.showCrop, newVal);
   }
 
-  get isShowingBleedMarks() {
-    return this.element.classList.contains(classes.showBleedMarks);
-  }
-
-  set isShowingBleedMarks(newVal) {
+  setShowingBleedMarks(newVal: boolean) {
     this.element.classList.toggle(classes.showBleedMarks, newVal);
   }
 
-  get isShowingBleed() {
-    return this.element.classList.contains(classes.showBleed);
-  }
-
-  set isShowingBleed(newVal) {
+  setShowingBleed(newVal: boolean) {
     this.element.classList.toggle(classes.showBleed, newVal);
   }
 
@@ -180,10 +176,12 @@ class Viewer {
     this.marks = newVal;
     this.updateControls();
 
-    this.isShowingCropMarks =
-      newVal === SheetMarks.CROP || newVal === SheetMarks.BOTH;
-    this.isShowingBleedMarks =
-      newVal === SheetMarks.BLEED || newVal === SheetMarks.BOTH;
+    this.setShowingCropMarks(
+      newVal === SheetMarks.CROP || newVal === SheetMarks.BOTH,
+    );
+    this.setShowingBleedMarks(
+      newVal === SheetMarks.BLEED || newVal === SheetMarks.BOTH,
+    );
   }
 
   displayError(title: string, text: string) {
@@ -191,19 +189,12 @@ class Viewer {
     if (!this.error) {
       this.error = errorView(title, text);
       this.element.appendChild(this.error);
-      this.scrollToBottom();
+      scrollToBottom();
       if (this.book) {
         const flow = this.book.currentPage.flow;
         if (flow) flow.currentElement.style.outline = '3px solid red';
       }
     }
-  }
-
-  scrollToBottom() {
-    const scroll = document.scrollingElement as HTMLElement;
-    if (!scroll) return;
-    const scrollMax = scroll.scrollHeight - scroll.offsetHeight;
-    scroll.scrollTop = scrollMax;
   }
 
   clear() {
@@ -232,11 +223,11 @@ class Viewer {
 
     this.element.classList.remove(...allModeClasses);
     this.element.classList.add(classForMode(this.mode));
-    this.isShowingBleed = this.mode === ViewerMode.PRINT;
+    this.setShowingBleed(this.mode === ViewerMode.PRINT);
 
-    const prevScroll = this.scrollPercent;
+    const prevScroll = getScrollAsPercent();
 
-    this.progress = 1;
+    this.setProgressAmount(1);
 
     window.requestAnimationFrame(() => {
       if (!this.book) throw Error('Book missing');
@@ -244,9 +235,9 @@ class Viewer {
       const render = this.renderFunctionFor(this.mode);
       const fragment = render(pages, this.isDoubleSided, this.sheetLayout);
       this.content.innerHTML = '';
-      this.content.appendChild(fragment);
+      this.content.append(fragment);
       if (!this.hasRendered) this.hasRendered = true;
-      else this.scrollPercent = prevScroll;
+      else scrollToPercent(prevScroll);
 
       this.scaleToFit();
     });
@@ -259,7 +250,7 @@ class Viewer {
     throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
   }
 
-  set progress(newVal: number) {
+  setProgressAmount(newVal: number) {
     if (newVal < 1) {
       throttleProgressBar(() => {
         this.progressBar.style.transform = `scaleX(${newVal})`;
@@ -271,12 +262,12 @@ class Viewer {
 
   updateProgress(book: Book, estimatedProgress: number) {
     this.book = book;
-    this.progress = estimatedProgress;
+    this.setProgressAmount(estimatedProgress);
 
     if (!document.scrollingElement) return;
 
     const scroller = document.scrollingElement as HTMLElement;
-    // don't rerender if preview is out of view
+    // don't bother rerendering if preview is out of view
     const scrollTop = scroller.scrollTop;
     const scrollH = scroller.scrollHeight;
     const h = scroller.offsetHeight;
@@ -325,27 +316,15 @@ class Viewer {
 
   scaleToFit() {
     if (!this.content.firstElementChild) return;
-    const prevScroll = this.scrollPercent;
+    const prevScroll = getScrollAsPercent();
     this.scaler.style.transform = `scale(${this.scaleThatFits})`;
-    this.scrollPercent = prevScroll;
+    scrollToPercent(prevScroll);
   }
 
   get scaleThatFits() {
     const viewerW = this.scaler.getBoundingClientRect().width;
     const contentW = this.content.getBoundingClientRect().width;
     return Math.min(1, viewerW / contentW);
-  }
-
-  get scrollPercent() {
-    if (!document || !document.scrollingElement) return 0;
-    const el = document.scrollingElement;
-    return el.scrollTop / el.scrollHeight;
-  }
-
-  set scrollPercent(newVal) {
-    if (!document.scrollingElement) return;
-    const el = document.scrollingElement;
-    el.scrollTop = el.scrollHeight * newVal;
   }
 }
 

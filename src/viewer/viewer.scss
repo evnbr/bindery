@@ -15,11 +15,7 @@
     background: var(--bindery-ui-bg);
     z-index: 99;
     position: relative;
-    padding-top: 40px;
     min-height: 100vh;
-    .view-flip & {
-      padding-top: 0;
-    }
   }
 
   .progress-bar {
@@ -41,7 +37,7 @@
   .zoom-content {
     padding: 10px;
     background: var(--bindery-ui-bg);
-    position: absolute;
+    // position: absolute;
     left: 0;
     right: 0;
     margin: auto;
@@ -178,7 +174,7 @@
 .zoom-scaler {
   transform-origin: top left;
   transform-style: preserve-3d;
-  height: calc(100vh - 120px); // adjust scrollheight on scaled down
+  // height: calc(100vh - 120px); // adjust scrollheight on scaled down
 }
 
 .print-sheet {
