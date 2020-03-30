@@ -1,12 +1,10 @@
 ---
 layout: page
-title:  Learn
+title: Learn
 permalink: /learn/
 order: 0
 inBook: true
 ---
-
-# Learn
 
 ### Getting Started
 
@@ -17,15 +15,13 @@ include the script tag with your content, and you're ready to go.
 <div id="content">
   <!-- The contents of your book -->
 </div>
-
-<script src="https://unpkg.com/bindery/"></script>
+<script src="https://unpkg.com/bindery@2.3.0/"></script>
 <script>
   Bindery.makeBook({ content: '#content' });
 </script>
 ```
 
 You can also install bindery from [npm](https://www.npmjs.com/package/bindery), or download directly.
-
 
 ```
 npm install --save bindery
@@ -36,7 +32,6 @@ npm install --save bindery
     ↓ Download bindery.min.js
   </a>
 </div>
-
 
 ### Styling
 
@@ -75,16 +70,17 @@ For example, if you're using [Jekyll](https://jekyllrb.com/),
 it might look something like this.
 
 ```html
-{% raw %}<section id="content">
+{% raw %}
+<section id="content">
   {% for post in site.posts %}
-      <h2>{{ post.title | escape }}</h2>
-      <div class="post-content">
-        {{ post.content | markdownify }}
-      </div>
+  <h2>{{ post.title | escape }}</h2>
+  <div class="post-content">
+    {{ post.content | markdownify }}
+  </div>
   {% endfor %}
-</section>{% endraw %}
+</section>
+{% endraw %}
 ```
-
 
 ### Rules
 
@@ -120,7 +116,6 @@ pass in your own function. You can use whatever other tools or
 libraries you like, as long as you return
 an HTML element or line of text.
 
-
 ```js
 let linksAsFootnotes = Bindery.Footnote({
   selector: 'p > a',
@@ -150,10 +145,10 @@ let myCustomFootnote = Bindery.Footnote({
   selector: 'p > a',
   render: (element, number) => {
     let myFootnote = document.createElement('div');
-    myFootnote.classList.add('note')
+    myFootnote.classList.add('note');
     myFootnote.textContent = `${number}: Link to ${element.href}`;
     return myFootnote;
-  }
+  },
 });
 ```
 
@@ -171,14 +166,12 @@ let myCustomFootnote = Bindery.Footnote({
 });
 ```
 
-
-
 ### Next Steps
 
 To learn more about available rules and options, check out the [documentation](/bindery/docs)
-or [view some examples](/bindery/examples).
+or [view some examples](/bindery/gallery).
 
 <div class="home-btns">
   <a class="btn" href="/bindery/docs" class="btn">View Docs →</a>
-  <a class="btn" href="/bindery/examples" class="btn">View Examples →</a>
+  <a class="btn" href="/bindery/gallery" class="btn">View Examples →</a>
 </div>

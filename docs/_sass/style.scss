@@ -36,10 +36,10 @@ html {
 
 body {
   -webkit-text-size-adjust: 100%;
-  -webkit-font-feature-settings: "kern" 1;
-     -moz-font-feature-settings: "kern" 1;
-       -o-font-feature-settings: "kern" 1;
-          font-feature-settings: "kern" 1;
+  -webkit-font-feature-settings: 'kern' 1;
+  -moz-font-feature-settings: 'kern' 1;
+  -o-font-feature-settings: 'kern' 1;
+  font-feature-settings: 'kern' 1;
   font-kerning: normal;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -56,7 +56,6 @@ em {
 //   font: 24px / 1.4 $serif;
 // }
 
-
 .sc {
   // font-feature-settings: "smcp";
   text-transform: uppercase;
@@ -67,7 +66,8 @@ em {
   margin: 1.5rem 0;
 }
 
-.btn, .post-content .btn {
+.btn,
+.post-content .btn {
   font: 0.6rem/1.4 $system;
   display: inline-block;
   padding: 0.4rem 0.9rem;
@@ -116,26 +116,31 @@ a {
 li {
   // margin-left: 1rem;
   // list-style: square;
-  margin-left: 1.5rem;
-  list-style: none;
-  text-indent: -1.5rem;
+  margin-left: 1.2rem;
+  padding-left: 0.3rem;
+  // list-style: none;
+  // text-indent: -1.5rem;
 }
 
 .post-content a {
   // color: $accent;
   text-shadow: 2px 0 0 white, -2px 0 0 white, 0 2px 0 white;
-  background-image: linear-gradient(to bottom, black 50%,rgba(0,0,0,0) 50%);
+  background-image: linear-gradient(to bottom, black 50%, rgba(0, 0, 0, 0) 50%);
   background-repeat: repeat-x;
-  background-size: 2px .06em;
+  background-size: 2px 0.06em;
   background-position: 0 1.22em;
   &:hover {
     color: $accent;
-    background-image: linear-gradient(to bottom, $accent 50%,rgba(0,0,0,0) 50%);
+    background-image: linear-gradient(
+      to bottom,
+      $accent 50%,
+      rgba(0, 0, 0, 0) 50%
+    );
   }
 }
 
-
-.page-content, .site-footer {
+.page-content,
+.site-footer {
   margin: 0 5%;
   // max-width: 45rem;
   // padding: 0 1rem;
@@ -168,7 +173,6 @@ li {
   padding-bottom: 4rem;
 }
 
-
 .nav-item {
   display: inline-block;
   position: relative;
@@ -196,7 +200,6 @@ li {
   }
 }
 
-
 .scroll-back {
   display: none;
   position: fixed;
@@ -206,7 +209,7 @@ li {
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s;
-  transform: scale(0.7) ;
+  transform: scale(0.7);
   .docs-scrolled & {
     transform: translate3d(0, 0, 0);
     opacity: 1;
@@ -292,7 +295,7 @@ li {
   right: 0;
   bottom: 0;
   z-index: 88;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
   pointer-events: none;
   opacity: 0;
   transition: all 0.2s;
@@ -345,12 +348,20 @@ li {
     background: transparent;
   }
 }
+.grid a {
+  flex-direction: row;
+  align-items: top;
+}
+.grid figure {
+  width: 5.5rem;
+  height: 4rem;
+  padding-bottom: 0;
+}
 
 .docs-content ul li {
   margin: 0 0 1rem 1.5rem;
   position: relative;
 }
-
 
 .docs-content li li {
   margin: 0;
@@ -361,7 +372,6 @@ li {
     margin-right: 0.5em;
   }
 }
-
 
 .docs-content > ul > li:not(.📖-continuation) > code:first-child {
   // color: #008080;
@@ -381,7 +391,6 @@ li {
   left: -$docs-options-inset;
 }
 
-
 .docs-nav-group {
   // position: relative;
   margin-bottom: 1rem;
@@ -394,7 +403,6 @@ li {
   // font-style: italic;
   // text-transform: uppercase;
 }
-
 
 .docs-nav-subitem {
   // font-weight: 400;
@@ -481,7 +489,6 @@ body {
   margin-top: 1.8rem;
 }
 
-
 .docs-content h3 {
   font-style: italic;
   position: relative;
@@ -516,25 +523,28 @@ blockquote {
 /**
  * Code formatting
  */
-pre, code {
+pre,
+code {
   line-height: 1.2rem;
   font-family: $mono;
   letter-spacing: -0.015em;
   font-size: 0.7rem;
 }
 
-p code, li code {
+p code,
+li code {
   font-size: 0.8rem;
 }
 @media (max-width: 512px) {
-  .btn, .post-content .btn {
+  .btn,
+  .post-content .btn {
     // display: block;
   }
 }
 
 @media (max-width: $narrow) {
   html {
-    font-size: 20px;
+    font-size: 19px;
     letter-spacing: 0.01em;
   }
   .site-nav {
@@ -550,18 +560,24 @@ p code, li code {
   .docs-nav-group {
     width: 50%;
   }
+  .grid figure {
+    width: 4.2rem;
+    height: 3.5rem;
+    margin-right: 1em;
+  }
   div pre.highlight {
     border-radius: 0;
     padding: 1em 5%;
     box-shadow: none;
     margin: 0.5rem -5%;
   }
-  .btn, .post-content .btn {
+  .btn,
+  .post-content .btn {
     font-size: 0.7rem;
     margin-right: 0.2rem;
     margin-bottom: 0.2rem;
     margin-top: 0.25rem;
-  }  
+  }
 }
 
 @mixin sideBySide {
@@ -580,15 +596,6 @@ p code, li code {
   .site-header {
     margin-top: 2rem;
   }
-  .grid a {
-    flex-direction: row;
-    align-items: center;
-  }
-  .grid figure {
-    width: 8rem;
-    height: 6rem;
-    padding-bottom: 0;
-  }
   .code-compare {
     display: flex;
     flex-flow: wrap;
@@ -600,7 +607,6 @@ p code, li code {
     }
   }
 }
-
 
 @media (max-width: $wide-enough-for-side-nav) {
   .page-content {
@@ -651,7 +657,7 @@ p code, li code {
 @media (min-width: $wide-enough-for-side-nav) {
   .logo {
     position: absolute;
-    left: -3.6rem;  
+    left: -3.6rem;
   }
   .docs-toc-btn {
     display: none;
@@ -679,14 +685,14 @@ p code, li code {
     left: -3rem;
     top: 0.55rem;
   }
-
 }
 
 .highlight {
   height: 100%;
 }
 
-.highlight pre, pre.highlight {
+.highlight pre,
+pre.highlight {
   padding: 1rem 1.5rem;
   background: #f8f8f8;
   border-radius: 8px;
@@ -704,7 +710,7 @@ p code, li code {
     margin-bottom: 0;
   }
 }
-  
+
 div.highlighter-rouge {
   margin: 1.5rem 0;
 }
@@ -782,7 +788,8 @@ html.book {
     display: flex;
   }
 
-  .📖-running-header, .📖-footer {
+  .📖-running-header,
+  .📖-footer {
     font: 0.6rem / 1.5 $mono;
   }
   .site-header {
@@ -812,7 +819,7 @@ html.book {
     margin-top: 0;
   }
   .highlighter-rouge {
-    margin-top: 1.5rem
+    margin-top: 1.5rem;
   }
   .highlighter-rouge:first-child .highlight {
     // margin-top: 0;
@@ -823,7 +830,8 @@ html.book {
     font-size: 0.8rem;
     /*display: none;*/
   }
-  .docs-content, .post-content {
+  .docs-content,
+  .post-content {
     margin: 0;
     padding: 0;
   }
@@ -851,7 +859,5 @@ sup {
   letter-spacing: -0.015em;
 }
 
-
-
 // Import partials.
-@import "syntax-highlighting";
+@import 'syntax-highlighting';

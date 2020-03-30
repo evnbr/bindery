@@ -1,14 +1,11 @@
 ---
 layout: grid
-title:  Books
-permalink: /books/
+title: Gallery
+permalink: /gallery/
+redirect_from: /books/
 order: 3
 inBook: true
 ---
-
-# Books
-
-### Gallery
 
 <ul class="grid responsive-grid">
 {% for ex in site.data.examples.gallery %}
@@ -27,7 +24,7 @@ inBook: true
 {% endfor %}
 </ul>
 
-### Examples
+### Getting started
 
 <ul class="grid responsive-grid">
 {% for ex in site.data.examples.simple %}
@@ -45,4 +42,3 @@ inBook: true
   </li>
 {% endfor %}
 </ul>
-

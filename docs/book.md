@@ -1,5 +1,5 @@
 ---
 layout: book
-title:  Book
+title: Book
 permalink: /book/
 ---

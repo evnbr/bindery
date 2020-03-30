@@ -1,34 +1,33 @@
 ---
 layout: page
-title:  About
+title: About
 permalink: /about/
 order: 4
 inBook: true
 ---
 
-# About
+- Github: Report bugs, make suggestions, or lend a hand
+  <a href="https://github.com/evnbr/bindery">on Github</a>.
+- Twitter: Follow <a href="https://twitter.com">@bindery_js</a> on twitter for updates.
 
 ### History
 
 Bindery.js 1.0 was developed in Spring 2014 for [for/with/in](http://htmloutput.risd.gd),
-a publication from participants in the graphic design course *HTML Output* at [RISD](http://risd.edu). It was based on the [much-maligned](https://alistapart.com/blog/post/css-regions-considered-harmful), [now abandoned](https://arstechnica.com/information-technology/2014/01/google-plans-to-dump-adobe-css-tech-to-make-blink-fast-not-rich) CSS Regions spec, using [a polyfill](https://github.com/FremyCompany/css-regions-polyfill). [Catherine Leigh Schmidt](http://cath.land) and [Lukas WinklerPrins](http://ltwp.net) produced a Jekyll theme called [Baby Bindery](https://github.com/thedesignoffice/babybindery) for the [Design Office](http://thedesignoffice.org/) based on this initial version.
+a publication from participants in the graphic design course _HTML Output_ at [RISD](http://risd.edu). It was based on the [much-maligned](https://alistapart.com/blog/post/css-regions-considered-harmful), [now abandoned](https://arstechnica.com/information-technology/2014/01/google-plans-to-dump-adobe-css-tech-to-make-blink-fast-not-rich) CSS Regions spec, using [a polyfill](https://github.com/FremyCompany/css-regions-polyfill). [Catherine Leigh Schmidt](http://cath.land) and [Lukas WinklerPrins](http://ltwp.net) produced a Jekyll theme called [Baby Bindery](https://github.com/thedesignoffice/babybindery) for the [Design Office](http://thedesignoffice.org/) based on this initial version.
 
-Bindery.js 2.0 has been developed since February 2017 by [Evan Brooks](https://evanbrooks.info). It has been rewritten from scratch to be smaller, faster, more flexible, and more robust.  With thanks to [John Caserta](http://johncaserta.com/) and [Teddy Bradford](https://teddybradford.com/) for contributions and feedback.
+Bindery.js 2.0 has been developed since February 2017 by [Evan Brooks](https://evanbrooks.info). It has been rewritten from scratch to be smaller, faster, more flexible, and more robust. With thanks to [John Caserta](http://johncaserta.com/) and [Teddy Bradford](https://teddybradford.com/) for contributions and feedback.
 
-Report bugs, make suggestions, or lend a hand
-  <a href="https://github.com/evnbr/bindery">on Github</a>.
+### Principles
 
-### What bindery is not
-
-1. *InDesign*— Bindery is intended for people who are interested in creating layouts
-with HTML and CSS. It's not a graphical user interface.
-2. *A PDF generator*— Bindery relies on your browser's PDF output. If you want to adjust a PDF setting, your browser must support it.
-3. *[LaTeX](https://www.latex-project.org)*— LaTeX is a markup language and typesetting system popular in the scientific community. Bindery is intended for everyone who knows HTML and CSS (or is learning), and wants to apply that to print.
-4. A CSS Polyfill— [CSS Regions](https://www.w3.org/TR/css-regions-1) was an ill-fated Adobe-led spec to support magazine-like layouts on the web. A polyfill for Regions is [available here](https://github.com/FremyCompany/css-regions-polyfill). [CSS Paged Media, Level 3](https://drafts.csswg.org/css-page-3/) and [CSS Generated Content ](https://www.w3.org/TR/css-gcpm-3/) are drafts of web standards to support print features in browsers, but haven't been adopted. See [paged.js](https://www.pagedmedia.org/paged-js/) for a polyfill. Bindery doesn't try to polyfill your CSS, and generates page content more flexibly using HTML and javascript.
+1. _Programmatic over precise_: Bindery is intended for people who are interested in creating layouts
+   with systems and rules. It's not a direct-manipulation tool like InDesign.
+2. _Built for today_: Bindery's makes it easy to get started with HTML and CSS, but further customization requires javascript. That could change if browser makers adopt new standards like [CSS Paged Media Level 3](https://drafts.csswg.org/css-page-3/) and [CSS Generated Content ](https://www.w3.org/TR/css-gcpm-3/).
+3. _Don't reinvent the wheel_: Bindery relies on your browser's PDF generation. If you want to adjust a PDF setting, your browser must support it— different browsers and platforms may have different options.
 
 <div class="colophon-wrap" markdown="1">
 
 ### Colophon
+
 Text is set in [Tiempos Headline](https://klim.co.nz/retail-fonts/tiempos-headline) by [Klim Type](https://klim.co.nz), and
 code samples are set in [Input Mono](http://input.fontbureau.com) by [David Jonathan Ross](https://djr.com).
 

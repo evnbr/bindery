@@ -35,25 +35,22 @@ simple:
     desc: Customize the color of background and buttons
     id: 11_custom_controls
     thumb: controls.png
+  - title: How to make a book with HTML & CSS
+    desc: These docs as a book
+    url: /bindery/book
+    thumb: docs.png
 
 gallery:
-  - title: John Caserta
-    desc: Book and site to document projects, writing, and teaching
-    url: http://johncaserta.com/
-    credit: John Caserta, 2017
-    thumb: jc.gif
-  - title: Cita Press
-    desc: A feminist indie press publishing public-domain books written by women
-    url: https://citapress.org/
-    credit: Juliana Castro, 2017
-    thumb: cita.gif
-  - title: Let’s try listening again
-    desc: Catalog for the 13th annual A.I.R. Biennial
-    url: https://letstrylisteningagain.org/
-    credit: Lukas Eigler-Harding, 2019
-    thumb: listen.png
-  - title: Automatic Book
-    desc: Workshop at Hochschule der Bildenden Künste Saar 
+  - title: print.are.na
+    desc: Generate a book from an Are.na channel
+    url: https://print.are.na/
+    credit: Mindy Seu, Charles Broskoski, Ekene Ijeoma, 2020
+  - title: Sustainable Graphic Design
+    desc: Collected thinking on design and the environment
+    url: https://gd314-sgd.github.io/publication/
+    credit: Members of Sustainable Design, MICA Fall 2019
+  - title: Automatic Book Workshop
+    desc: At Hochschule der Bildenden Künste Saar
     url: https://www.jacobheftmann.com/teaching/automatic-book-workshop
     credit: Jacob Heftmann, 2019
     thumb: automatic.gif
@@ -62,13 +59,23 @@ gallery:
     url: https://bindery-demo.smvi.co/
     credit: Jacob Heftmann, 2019
     thumb: every.gif
-  - title: How to make a book with HTML & CSS
-    desc: These docs as a book
-    credit: Evan Brooks, 2019
-    url: /bindery/book
-    thumb: docs.png
+  - title: Let’s try listening again
+    desc: Catalog for the 13th annual A.I.R. Biennial
+    url: https://letstrylisteningagain.org/
+    credit: Lukas Eigler-Harding, 2019
+    thumb: listen.png
+  - title: Cita Press
+    desc: Feminist indie press publishing public-domain books by women
+    url: https://citapress.org/
+    credit: Juliana Castro, 2017
+    thumb: cita.gif
+  - title: John Caserta
+    desc: Book and site to document projects, writing, and teaching
+    url: http://johncaserta.com/
+    credit: John Caserta, 2017
+    thumb: jc.gif
   - title: for/with/in
-    desc: Book and site to explore the web browser as a design tool 
+    desc: Book and site to explore the web browser as a design tool
     url: http://htmloutput.risd.gd/
     credit: Members of HTML Output, RISD Fall 2014
     thumb: forwithin.jpg
