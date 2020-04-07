@@ -2,7 +2,7 @@
   {% assign pages_list = (site.pages | sort: 'order') %}
 
   <div class="site-title">
-    <a href="{{ "/" | relative_url }}">
+    <a class="btn-logo" href="{{ "/" | relative_url }}">
       <div class="logo"></div>
       <!-- {{ site.title | escape }} -->
     </a>
@@ -23,6 +23,10 @@
       {% endfor %}
     </nav>
   
+    <div class="site-nav-right">
+      <a class="btn" href="/bindery/book">Make book</a>
+    </div>
+
   </div>
 
   <!-- <a class="btn make-book" href="/bindery/book">Make Book</a> -->

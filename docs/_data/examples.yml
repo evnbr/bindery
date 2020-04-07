@@ -31,10 +31,6 @@ simple:
     id: 4_custom_rules
     desc: Dynamic background and font size, fore-edge graphics
     thumb: custom.png
-  - title: Controls
-    desc: Customize the color of background and buttons
-    id: 11_custom_controls
-    thumb: controls.png
   - title: How to make a book with HTML & CSS
     desc: These docs as a book
     url: /bindery/book
@@ -44,6 +40,7 @@ gallery:
   - title: print.are.na
     desc: Generate a book from an Are.na channel
     url: https://print.are.na/
+    thumb: arena.png
     credit: Mindy Seu, Charles Broskoski, Ekene Ijeoma, 2020
   - title: Sustainable Graphic Design
     desc: Collected thinking on design and the environment
@@ -79,5 +76,3 @@ gallery:
     url: http://htmloutput.risd.gd/
     credit: Members of HTML Output, RISD Fall 2014
     thumb: forwithin.jpg
-  - title: Add yours?
-    url: https://github.com/evnbr/bindery/blob/master/docs/_data/examples.yml
