@@ -1,6 +1,7 @@
 import { Rule } from './Rule';
 import { Book } from '../book';
 import { PageMaker } from '../types';
+import { RegionGetter } from 'regionize/dist/types/types';
 
 class OutOfFlow extends Rule {
   continue?: string;
@@ -22,14 +23,14 @@ class OutOfFlow extends Rule {
   afterAdd(
     elmt: HTMLElement,
     book: Book,
-    continueOnNewPage: Function,
+    continueOnNewPage: RegionGetter,
     makeNewPage: PageMaker,
   ) {
     this.createOutOfFlowPages(elmt, book, makeNewPage);
 
     // Catches cases when we didn't need to create a new page. but unclear
     if (this.continue !== 'same' || book.currentPage.hasOutOfFlowContent) {
-      continueOnNewPage(true);
+      continueOnNewPage();
       if (this.continue === 'left' || this.continue === 'right') {
         book.currentPage.setPreference(this.continue);
       }
