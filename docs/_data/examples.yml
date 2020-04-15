@@ -1,3 +1,45 @@
+gallery:
+  - title: print.are.na
+    desc: Generate a book from an Are.na channel
+    url: https://print.are.na/
+    thumb: arena.png
+    credit: Mindy Seu, Charles Broskoski, Ekene Ijeoma, 2020
+  - title: MICA Sustainable Graphic Design
+    desc: Collected thinking on design and the environment
+    url: https://gd314-sgd.github.io/publication/
+    thumb: mica.png
+    credit: Members of Sustainable Design, MICA Fall 2019
+  - title: Automatic Book Workshop
+    desc: At Hochschule der Bildenden Künste Saar
+    url: https://www.jacobheftmann.com/teaching/automatic-book-workshop
+    credit: Jacob Heftmann, 2019
+    thumb: automatic.gif
+  - title: Every Photo
+    desc: A book generated from a Small Victories feed
+    url: https://bindery-demo.smvi.co/
+    credit: Jacob Heftmann, 2019
+    thumb: every.gif
+  - title: Let’s try listening again
+    desc: Catalog for the 13th annual A.I.R. Biennial
+    url: https://letstrylisteningagain.org/
+    credit: Lukas Eigler-Harding, 2019
+    thumb: listen.png
+  - title: Cita Press
+    desc: Feminist indie press publishing public-domain books by women
+    url: https://citapress.org/
+    credit: Juliana Castro, 2017
+    thumb: cita.gif
+  - title: John Caserta
+    desc: Book and site to document projects, writing, and teaching
+    url: http://johncaserta.com/
+    credit: John Caserta, 2017
+    thumb: jc.gif
+  - title: for/with/in
+    desc: Book and site to explore the web browser as a design tool
+    url: http://htmloutput.risd.gd/
+    credit: Members of HTML Output, RISD Fall 2014
+    thumb: forwithin.jpg
+
 simple:
   - title: Getting Started
     id: 2_content_on_separate_page
@@ -35,44 +77,3 @@ simple:
     desc: These docs as a book
     url: /bindery/book
     thumb: docs.png
-
-gallery:
-  - title: print.are.na
-    desc: Generate a book from an Are.na channel
-    url: https://print.are.na/
-    thumb: arena.png
-    credit: Mindy Seu, Charles Broskoski, Ekene Ijeoma, 2020
-  - title: Sustainable Graphic Design
-    desc: Collected thinking on design and the environment
-    url: https://gd314-sgd.github.io/publication/
-    credit: Members of Sustainable Design, MICA Fall 2019
-  - title: Automatic Book Workshop
-    desc: At Hochschule der Bildenden Künste Saar
-    url: https://www.jacobheftmann.com/teaching/automatic-book-workshop
-    credit: Jacob Heftmann, 2019
-    thumb: automatic.gif
-  - title: Every Photo
-    desc: A book generated from a Small Victories feed
-    url: https://bindery-demo.smvi.co/
-    credit: Jacob Heftmann, 2019
-    thumb: every.gif
-  - title: Let’s try listening again
-    desc: Catalog for the 13th annual A.I.R. Biennial
-    url: https://letstrylisteningagain.org/
-    credit: Lukas Eigler-Harding, 2019
-    thumb: listen.png
-  - title: Cita Press
-    desc: Feminist indie press publishing public-domain books by women
-    url: https://citapress.org/
-    credit: Juliana Castro, 2017
-    thumb: cita.gif
-  - title: John Caserta
-    desc: Book and site to document projects, writing, and teaching
-    url: http://johncaserta.com/
-    credit: John Caserta, 2017
-    thumb: jc.gif
-  - title: for/with/in
-    desc: Book and site to explore the web browser as a design tool
-    url: http://htmloutput.risd.gd/
-    credit: Members of HTML Output, RISD Fall 2014
-    thumb: forwithin.jpg
