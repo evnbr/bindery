@@ -243,20 +243,15 @@ li {
 }
 
 .docs-nav {
-  // font: 0.7rem / 1.5 $mono;
   display: flex;
   flex-flow: wrap;
   font-weight: 400;
   background: white;
   z-index: 99;
-  h1 {
-    width: 100%;
-    margin-top: 0;
-  }
+  margin-bottom: 1.5rem;
   a {
     position: relative;
     background: transparent !important;
-    opacity: 0.4;
     &:hover {
       opacity: 1;
     }
@@ -358,7 +353,7 @@ li {
 
 .docs-nav-group {
   margin-bottom: 0.5rem;
-  width: 7rem;
+  width: 9rem;
   max-width: 50%;
   padding-top: 0.5rem;
   padding-right: 1rem;
@@ -527,13 +522,6 @@ li code {
     box-shadow: none;
     margin: 0.5rem -5%;
   }
-  // .btn,
-  // .post-content .btn {
-  //   font-size: 0.7rem;
-  //   margin-right: 0.2rem;
-  //   margin-bottom: 0.2rem;
-  //   margin-top: 0.25rem;
-  // }
 }
 
 @mixin sideBySide {
@@ -598,6 +586,9 @@ li code {
     flex-flow: column;
     h1 {
       margin-top: 1.2rem;
+    }
+    a {
+      opacity: 0.4;
     }
   }
   .docs-nav-group {
@@ -711,6 +702,10 @@ html.book {
     display: block;
     margin: auto;
     margin-bottom: 1rem;
+    position: relative;
+    left: unset;
+    width: 40px;
+    height: 40px;
   }
   h1 {
     display: none;

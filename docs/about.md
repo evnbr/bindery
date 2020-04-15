@@ -8,7 +8,7 @@ inBook: true
 
 ### Approach
 
-Bindery is intended for anyone new to web design, and shouldn't require any javascript knowledge. If you need help, or something seems unclear in the documentation, feel free to [open an issue](https://github.com/evnbr/bindery/issues/new/choose) on Github or ask [@bindery_js](https://twitter.com/bindery_js) on twitter.
+Bindery is intended for anyone new to web design. The documentation doesn't assume you know javascript, and you don't need a module bundler or build step to get started. If you need help, or something seems unclear in the documentation, feel free to [open an issue](https://github.com/evnbr/bindery/issues/new/choose) on Github or ask [@bindery_js](https://twitter.com/bindery_js) on twitter.
 
 Bindery relies on your browser's PDF generation. If you want to adjust a PDF setting, your browser must support it— different browsers and platforms may have different options.
 
