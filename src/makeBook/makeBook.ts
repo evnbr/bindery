@@ -59,7 +59,7 @@ const makeBook = async (
     return true;
   };
 
-  const beforeAdd = (
+  const beforeAdd = async (
     elementToAdd: HTMLElement,
     continueInNextRegion: RegionGetter,
   ) => {
@@ -71,7 +71,7 @@ const makeBook = async (
     );
   };
 
-  const afterAdd = (
+  const afterAdd = async (
     addedElement: HTMLElement,
     continueInNextRegion: RegionGetter,
   ) => {

@@ -15,7 +15,7 @@
     "url": "git://github.com/evnbr/bindery.git"
   },
   "dependencies": {
-    "regionize": "^0.1.4"
+    "regionize": "^0.1.6"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.8.3",

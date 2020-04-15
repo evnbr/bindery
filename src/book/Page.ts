@@ -97,7 +97,7 @@ class Page {
   }
 
   get isEmpty() {
-    return !this.hasOutOfFlowContent && this.flow.isEmpty;
+    return !this.hasOutOfFlowContent && this.flow.isEmpty();
   }
 
   validate() {
