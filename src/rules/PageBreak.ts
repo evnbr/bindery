@@ -31,7 +31,7 @@ class PageBreak extends Rule {
         continueOnNewPage();
       }
       if (this.continue !== 'next') {
-        book.currentPage.setPreference(this.continue);
+        book.currentPage.setState({ preferredSide: this.continue });
       }
     }
     return elmt;
@@ -40,7 +40,7 @@ class PageBreak extends Rule {
     if (this.position === 'after' || this.position === 'both') {
       continueOnNewPage();
       if (this.continue !== 'next') {
-        book.currentPage.setPreference(this.continue);
+        book.currentPage.setState({ preferredSide: this.continue });
       }
     }
     return elmt;

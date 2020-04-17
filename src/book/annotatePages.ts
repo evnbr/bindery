@@ -4,19 +4,12 @@ import { HierarchyEntry } from '../types';
 export const annotatePagesNumbers = (pages: Page[], offset: number) => {
   // ———
   // NUMBERING
-
-  // TODO: Pass in facingpages as an option?
-  const facingPages = true;
-  if (facingPages) {
-    pages.forEach((page, i) => {
-      page.number = offset + i + 1;
-      page.setLeftRight(i % 2 === 0 ? 'right' : 'left');
+  pages.forEach((page, i) => {
+    page.setState({
+      number: offset + i + 1,
+      side: i % 2 === 0 ? 'right' : 'left',
     });
-  } else {
-    pages.forEach(page => {
-      page.setLeftRight('right');
-    });
-  }
+  });
 };
 
 export const annotatePagesHierarchy = (
@@ -49,12 +42,6 @@ export const annotatePagesHierarchy = (
 
         // Clear any lower headers in the hierarchy
         currentHierarchy = currentHierarchy.slice(0, i + 1);
-
-        // headerSelectorHierarchy.forEach((lowerSelector, j) => {
-        //   if (j > i) {
-        //     currentHeaders[j] = { selector: lowerSelector, text: '', el: undefined };
-        //   }
-        // });
       }
 
       // Always decorate this page with current header state.
@@ -63,7 +50,7 @@ export const annotatePagesHierarchy = (
       }
     });
 
-    page.hierarchy = pageHierarchy;
+    page.setState({ hierarchy: pageHierarchy });
   });
 };
 

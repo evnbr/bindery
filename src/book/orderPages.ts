@@ -4,7 +4,7 @@ import { Page } from '../book';
 const indexOfNextReorderablePage = (pages: Page[], startIndex: number) => {
   for (let i = startIndex; i < pages.length; i += 1) {
     const pg = pages[i];
-    if (!pg.isOutOfFlow && !pg.avoidReorder) return i;
+    if (!pg.state.isOutOfFlow && !pg.state.avoidReorder) return i;
   }
   return null;
 };
@@ -19,8 +19,11 @@ const orderPages = (pages: Page[], makeNewPage: PageMaker) => {
     const page = orderedPages[i];
     const isLeft = i % 2 !== 0;
 
-    if ((isLeft && page.alwaysRight) || (!isLeft && page.alwaysLeft)) {
-      if (page.isOutOfFlow) {
+    if (
+      (isLeft && page.state.preferredSide == 'right') ||
+      (!isLeft && page.state.preferredSide == 'left')
+    ) {
+      if (page.state.isOutOfFlow) {
         // If the page is 'out of flow', we'd prefer not to add a blank page.
         // Instead it floats backwards in the book, pulling the next
         // in-flow page forward. If several 'out of flow' pages

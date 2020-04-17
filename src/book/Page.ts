@@ -1,38 +1,20 @@
 import { Region } from 'regionize';
 import { safeMeasure, div, classes } from '../dom';
-import { HierarchyEntry } from '../types';
+import { HierarchyToHeadingAdapter } from './HierarchyToHeadingAdapter';
+import { PageModel } from './PageModel';
 
-class HierarchyToHeadingAdapter {
-  getHierarchy: () => HierarchyEntry[];
-
-  constructor(getter: () => HierarchyEntry[]) {
-    // console.warn('Deprecated');
-    this.getHierarchy = getter;
-  }
-
-  textFor(sel: string): string | undefined {
-    return this.getHierarchy()?.find(entry => entry?.selector === sel)?.text;
-  }
-
-  get h1() {
-    return this.textFor('h1');
-  }
-  get h2() {
-    return this.textFor('h2');
-  }
-  get h3() {
-    return this.textFor('h3');
-  }
-  get h4() {
-    return this.textFor('h4');
-  }
-  get h5() {
-    return this.textFor('h5');
-  }
-  get h6() {
-    return this.textFor('h6');
-  }
-}
+const createInitialPageModel = (): PageModel => {
+  return {
+    heading: new HierarchyToHeadingAdapter(), // used by running headers
+    isOutOfFlow: false,
+    avoidReorder: false,
+    footnotes: [],
+    hierarchy: [],
+    isLeft: false,
+    hasOutOfFlowContent: false,
+    suppressOverflowError: false,
+  };
+};
 
 class Page {
   flow: Region;
@@ -41,26 +23,37 @@ class Page {
   element: HTMLElement;
   runningHeader?: HTMLElement; // used by running header. TODO: only supports one
 
-  side?: string;
-  number?: number;
-  heading: HierarchyToHeadingAdapter; // used by running headers
-  hierarchy: HierarchyEntry[] = [];
-
   suppress = false;
-  hasOutOfFlowContent = false;
-  alwaysLeft = false;
-  alwaysRight = false;
 
-  isOutOfFlow = false; // used by spreads
-  avoidReorder = false; // used by 2-page spreads
+  private _state: PageModel = createInitialPageModel();
 
   constructor() {
     this.flow = new Region(div('flow-box'));
     this.footer = div('footer');
     this.background = div('page-background');
     this.element = div('page', this.background, this.flow.element, this.footer);
+  }
 
-    this.heading = new HierarchyToHeadingAdapter(() => this.hierarchy);
+  setState(updates: Partial<PageModel>) {
+    const newState: PageModel = {
+      ...this.state,
+      ...updates,
+    };
+    newState.isLeft = newState.side === 'left';
+    newState.heading.hierarchy = newState.hierarchy;
+    this._state = newState;
+
+    // TODO
+    this.element.classList.toggle(classes.leftPage, this.state.isLeft);
+    this.element.classList.toggle(classes.rightPage, !this.state.isLeft);
+    this.element.classList.toggle(
+      classes.isOverflowing,
+      this.state.suppressOverflowError,
+    );
+  }
+
+  get state(): Readonly<PageModel> {
+    return this._state;
   }
 
   static isSizeValid() {
@@ -68,36 +61,8 @@ class Page {
     return safeMeasure(testPage.element, () => testPage.flow.isReasonableSize);
   }
 
-  setLeftRight(dir: string) {
-    this.side = dir;
-    this.element.classList.toggle(classes.leftPage, this.isLeft);
-    this.element.classList.toggle(classes.rightPage, !this.isLeft);
-  }
-  get isLeft() {
-    return this.side === 'left';
-  }
-
-  get isRight() {
-    return this.side === 'right';
-  }
-
-  setPreference(dir: 'left' | 'right') {
-    const preferLeft = dir === 'left';
-    this.alwaysLeft = preferLeft;
-    this.alwaysRight = !preferLeft;
-  }
-
-  get suppressErrors() {
-    return this.suppress ?? false;
-  }
-
-  set suppressErrors(newVal) {
-    this.suppress = newVal;
-    this.element.classList.toggle(classes.isOverflowing, newVal);
-  }
-
   get isEmpty() {
-    return !this.hasOutOfFlowContent && this.flow.isEmpty();
+    return !this.state.hasOutOfFlowContent && this.flow.isEmpty();
   }
 
   validate() {
@@ -118,8 +83,15 @@ class Page {
 
   validateEnd(allowOverflow: boolean) {
     if (!this.hasOverflowed()) return;
-    console.warn(`Bindery: Page ~${this.number} is overflowing`, this.element);
-    if (!this.suppressErrors && !this.flow.suppressErrors && !allowOverflow) {
+    console.warn(
+      `Bindery: Page ~${this.state.number} is overflowing`,
+      this.element,
+    );
+    if (
+      !this.state.suppressOverflowError &&
+      !this.flow.suppressErrors &&
+      !allowOverflow
+    ) {
       throw Error(
         'Bindery: Moved to new page when last one is still overflowing',
       );

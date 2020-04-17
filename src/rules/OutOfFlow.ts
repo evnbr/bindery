@@ -29,10 +29,13 @@ class OutOfFlow extends Rule {
     this.createOutOfFlowPages(elmt, book, makeNewPage);
 
     // Catches cases when we didn't need to create a new page. but unclear
-    if (this.continue !== 'same' || book.currentPage.hasOutOfFlowContent) {
+    if (
+      this.continue !== 'same' ||
+      book.currentPage.state.hasOutOfFlowContent
+    ) {
       continueOnNewPage();
       if (this.continue === 'left' || this.continue === 'right') {
-        book.currentPage.setPreference(this.continue);
+        book.currentPage.setState({ preferredSide: this.continue });
       }
     }
 

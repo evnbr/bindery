@@ -53,7 +53,9 @@ const renderSheetViewer = (
   } else {
     pages.forEach(pg => {
       const sheet = printSheet(pg.element, marks());
-      sheet.classList.add(pg.isLeft ? classes.sheetLeft : classes.sheetRight);
+      sheet.classList.add(
+        pg.state.isLeft ? classes.sheetLeft : classes.sheetRight,
+      );
       printLayout.appendChild(sheet);
     });
   }

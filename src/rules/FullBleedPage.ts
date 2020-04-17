@@ -50,7 +50,7 @@ class FullBleedPage extends OutOfFlow {
       newPage.element.appendChild(rotateContainer);
     }
     newPage.background.appendChild(elmt);
-    newPage.hasOutOfFlowContent = true;
+    newPage.setState({ hasOutOfFlowContent: true });
   }
 }
 

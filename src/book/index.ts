@@ -7,6 +7,7 @@ import {
   annotatePagesNumbers,
 } from './annotatePages';
 import { pageNumbersForTest, pageNumbersForSelector } from './searchPages';
+import { PageModel } from './PageModel';
 
 export {
   Book,
@@ -17,4 +18,5 @@ export {
   annotatePagesNumbers,
   pageNumbersForTest,
   pageNumbersForSelector,
+  PageModel,
 };

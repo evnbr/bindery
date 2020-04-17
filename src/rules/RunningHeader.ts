@@ -1,7 +1,7 @@
 import { Rule, RuleOptions } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { div } from '../dom';
-import { Page } from '../book';
+import { Page, PageModel } from '../book';
 
 // Options:
 // selector: String
@@ -22,10 +22,10 @@ class RunningHeader extends Rule {
       page.element.appendChild(elmt);
       page.runningHeader = elmt;
     }
-    page.runningHeader.innerHTML = this.render(page);
+    page.runningHeader.innerHTML = this.render(page.state);
   }
-  render(page: Page) {
-    return `${page.number}`;
+  render(pageState: Readonly<PageModel>) {
+    return `${pageState.number}`;
   }
 }
 
