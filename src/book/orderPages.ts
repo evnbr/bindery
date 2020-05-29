@@ -9,8 +9,8 @@ const indexOfNextReorderablePage = (pages: Page[], startIndex: number) => {
   return null;
 };
 
-// Given an array of pages with alwaysLeft, alwaysRight, and isOutOfFlow
-// properties, orders them so that alwaysLeft and alwaysRight are true.
+// Given an array of pages with preferredSide and isOutOfFlow
+// properties, orders them so that preferredSide is true.
 
 const orderPages = (pages: Page[], makeNewPage: PageMaker) => {
   const orderedPages = pages.slice();

@@ -19,10 +19,11 @@ const createInitialPageModel = (): PageModel => {
 class Page {
   flow: Region;
   footer: HTMLElement;
-  background: HTMLElement;
-  element: HTMLElement;
-  runningHeader?: HTMLElement; // used by running header. TODO: only supports one
+  private background: HTMLElement;
+  private element: HTMLElement;
+  private runningHeader?: HTMLElement; // used by running header. TODO: only supports one
 
+  private _needsUpdate = true;
   suppress = false;
 
   private _state: PageModel = createInitialPageModel();
@@ -43,13 +44,18 @@ class Page {
     newState.heading.hierarchy = newState.hierarchy;
     this._state = newState;
 
-    // TODO
+    this._needsUpdate = true;
+  }
+
+  private performUpdate() {
     this.element.classList.toggle(classes.leftPage, this.state.isLeft);
     this.element.classList.toggle(classes.rightPage, !this.state.isLeft);
     this.element.classList.toggle(
       classes.isOverflowing,
       this.state.suppressOverflowError,
     );
+
+    this._needsUpdate = false;
   }
 
   get state(): Readonly<PageModel> {
@@ -99,6 +105,13 @@ class Page {
   }
 
   hasOverflowed() {
+    if (this._needsUpdate) {
+      this.performUpdate();
+      console.log('preformeed');
+    } else {
+      console.log('skipped');
+    }
+
     return safeMeasure(this.element, () => this.flow.hasOverflowed());
   }
 }
