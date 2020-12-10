@@ -4,6 +4,11 @@ gallery:
     url: https://print.are.na/
     thumb: arena.png
     credit: Mindy Seu, Charles Broskoski, Ekene Ijeoma, 2020
+  - title: VSCO Zine
+    desc: Create a zine from a VSCO profile.
+    url: https://vsco-zine.herokuapp.com/
+    thumb: vsco.png
+    credit: Trudy Painter, 2020
   - title: MICA Sustainable Graphic Design
     desc: Collected thinking on design and the environment
     url: https://gd314-sgd.github.io/publication/
