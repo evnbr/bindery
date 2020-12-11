@@ -1,7 +1,7 @@
 # Bindery.js
 
 [![npm](https://img.shields.io/npm/v/bindery.svg)](https://www.npmjs.com/package/bindery)
-[![Build Status](https://travis-ci.org/evnbr/bindery.svg?branch=master)](https://travis-ci.org/evnbr/bindery)
+[![Build Status](https://travis-ci.com/evnbr/bindery.svg?branch=master)](https://travis-ci.org/evnbr/bindery)
 [![codecov](https://codecov.io/gh/evnbr/bindery/branch/master/graph/badge.svg)](https://codecov.io/gh/evnbr/bindery)
 [![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/bindery.svg)](https://www.npmjs.com/package/bindery)
 
