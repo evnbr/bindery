@@ -1,13 +1,19 @@
-import { Rule, RuleOptions } from './Rule';
+import { Rule } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { Book } from '../book';
 import { RegionGetter } from 'regionize/dist/types/types';
+
+export interface PageBreakRuleOptions {
+  selector: string;
+  continue: 'next' | 'left' | 'right' | 'same';
+  position: 'before' | 'after' | 'both' | 'avoid';
+}
 
 class PageBreak extends Rule {
   continue: 'next' | 'left' | 'right';
   position: 'before' | 'after' | 'both' | 'avoid';
 
-  constructor(options: RuleOptions) {
+  constructor(options: Partial<PageBreakRuleOptions>) {
     super(options);
     if (options.continue == 'same') {
       throw Error("Can't continue on the same pager after a Page Break ");

@@ -1,15 +1,16 @@
-import { Rule, RuleOptions } from './Rule';
+import { Rule } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { div } from '../dom';
 import { Page } from '../book';
 
-// Options:
-// selector: String
-// render: function (Page) => HTMLElement
+export interface RunningHeaderRuleOptions {
+  selector: string
+  render: (page: Page) => HTMLElement
+}
 // TODO selectorHierarchy: [ String ], ie [ 'h1', 'h2', 'h3.chapter' ]
 
 class RunningHeader extends Rule {
-  constructor(options: RuleOptions = {}) {
+  constructor(options: Partial<RunningHeaderRuleOptions>) {
     super(options);
     validateRuntimeOptions(options, {
       name: 'RunningHeader',

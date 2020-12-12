@@ -2,17 +2,19 @@ import OutOfFlow from './OutOfFlow';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { div } from '../dom';
 import { Book } from '../book';
-import { RuleOptions } from './Rule';
 import { PageMaker } from '../types';
 
-// Options:
-// selector: String
+export interface FullBleedPageRuleOptions {
+  selector: string;
+  continue: 'next' | 'same' | 'left' | 'right';
+  rotate: 'none' | 'inward' | 'outward' | 'clockwise' | 'counterclockwise';
+}
 
 class FullBleedPage extends OutOfFlow {
   rotate!: string;
   continue!: string;
 
-  constructor(options: RuleOptions) {
+  constructor(options: Partial<FullBleedPageRuleOptions>) {
     options.continue = options.continue ?? 'same';
     options.rotate = options.rotate ?? 'none';
     super(options);

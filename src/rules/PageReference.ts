@@ -24,14 +24,17 @@ interface PageReferenceInstance {
   test: TestFunction;
 }
 
-// Options:
-// selector: String
-// replace: function (HTMLElement, number) => HTMLElement
+export interface PageReferenceRuleOptions {
+  selector: string,
+  replace: (element: HTMLElement) => HTMLElement,
+  createTest: (element: HTMLElement) => (page: Page) => boolean,
+}
+
 class PageReference extends Replace {
   references: PageReferenceInstance[];
   throttledUpdate: (book: Book) => void;
 
-  constructor(options: RuleOptions) {
+  constructor(options: Partial<PageReferenceRuleOptions>) {
     super(options);
     validateRuntimeOptions(options, {
       name: 'PageReference',
