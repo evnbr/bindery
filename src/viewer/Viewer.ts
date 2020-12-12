@@ -19,7 +19,6 @@ import PageSetup from '../page-setup';
 const throttleProgressBar = throttleFrame();
 const throttleRender = throttleTime(100);
 const throttleResize = throttleTime(50);
-const document = window.document;
 
 const pageSpread = (...pgs: HTMLElement[]) => {
   return div('.spread-wrapper.spread-centered.spread-size', ...pgs);
@@ -141,11 +140,11 @@ class Viewer {
   }
 
   get isViewing() {
-    return document.body.classList.contains(classes.isViewing);
+    return window.document.body.classList.contains(classes.isViewing);
   }
 
   set isViewing(newVal) {
-    document.body.classList.toggle(classes.isViewing, newVal);
+    window.document.body.classList.toggle(classes.isViewing, newVal);
   }
 
   setSheetSize(newVal: SheetSize) {
@@ -205,7 +204,7 @@ class Viewer {
 
   show() {
     if (this.element.parentNode) return;
-    document.body.appendChild(this.element);
+    window.document.body.appendChild(this.element);
     this.isViewing = true;
   }
 
@@ -264,9 +263,9 @@ class Viewer {
     this.book = book;
     this.setProgressAmount(estimatedProgress);
 
-    if (!document.scrollingElement) return;
+    if (!window.document.scrollingElement) return;
 
-    const scroller = document.scrollingElement as HTMLElement;
+    const scroller = window.document.scrollingElement as HTMLElement;
     // don't bother rerendering if preview is out of view
     const scrollTop = scroller.scrollTop;
     const scrollH = scroller.scrollHeight;

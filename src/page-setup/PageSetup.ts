@@ -8,7 +8,7 @@ const letter = Object.freeze({ width: '8.5in', height: '11in' });
 const a4 = Object.freeze({ width: '210mm', height: '297mm' });
 
 // Not a really reliable way to know this
-const supportsCustomPageSize = !!window.hasOwnProperty('chrome');
+const supportsCustomPageSize = () => !!window.hasOwnProperty('chrome');
 
 // TODO: Refactor type checks for CSS lengths etc
 interface PageSetupOptions {
@@ -35,7 +35,7 @@ class PageSetup {
     this.margin = opts.margin ?? defaultPageSetup.margin;
     this.markLength = '12pt';
 
-    this.paper = supportsCustomPageSize
+    this.paper = supportsCustomPageSize()
       ? printOpts.paper || SheetSize.AUTO
       : SheetSize.AUTO_MARKS;
     this.bleed = printOpts.bleed ?? defaultPageSetup.bleed;
