@@ -1,7 +1,7 @@
 import { ViewerMode, SheetLayout, SheetSize, SheetMarks } from '../constants';
 
 // TODO: This is not a particularly robust check.
-const supportsCustomSheetSize = !!window.hasOwnProperty('chrome');
+const supportsCustomSheetSize = () => !!window.hasOwnProperty('chrome');
 
 const getSheetSizeLabels = (pageSize: {
   width: string;
@@ -9,7 +9,7 @@ const getSheetSizeLabels = (pageSize: {
 }): [SheetSize, string][] => {
   const sizeName = `${pageSize.width} × ${pageSize.height}`;
 
-  if (!supportsCustomSheetSize) {
+  if (!supportsCustomSheetSize()) {
     return [
       [SheetSize.LETTER_PORTRAIT, 'Default Page Size *'],
       [
