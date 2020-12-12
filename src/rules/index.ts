@@ -1,44 +1,46 @@
-import Counter from './Counter';
-import FullBleedSpread from './FullBleedSpread';
-import FullBleedPage from './FullBleedPage';
-import Footnote from './Footnote';
-import PageReference from './PageReference';
-import PageBreak from './PageBreak';
-import RunningHeader from './RunningHeader';
-import Replace from './Replace';
-import { Rule } from './Rule';
-import Split from './Split';
+import Counter, { CounterRuleOptions } from './Counter';
+import FullBleedSpread, {
+  FullBleedSpreadPageRuleOptions,
+} from './FullBleedSpread';
+import FullBleedPage, { FullBleedPageRuleOptions } from './FullBleedPage';
+import Footnote, { FootnoteRuleOptions } from './Footnote';
+import PageReference, { PageReferenceRuleOptions } from './PageReference';
+import PageBreak, { PageBreakRuleOptions } from './PageBreak';
+import RunningHeader, { RunningHeaderRuleOptions } from './RunningHeader';
+import Replace, { ReplaceRuleOptions } from './Replace';
+import { Rule, RuleOptions } from './Rule';
+import Split, { SplitRuleOptions } from './Split';
 
 export default {
   Rule,
-  Split(options: {}) {
+  Split(options: Partial<SplitRuleOptions>) {
     return new Split(options);
   },
-  Counter(options: {}) {
+  Counter(options: Partial<CounterRuleOptions>) {
     return new Counter(options);
   },
-  FullBleedPage(options: {}) {
+  FullBleedPage(options: Partial<FullBleedPageRuleOptions>) {
     return new FullBleedPage(options);
   },
-  Footnote(options: {}) {
+  Footnote(options: Partial<FootnoteRuleOptions>) {
     return new Footnote(options);
   },
-  RunningHeader(options: {}) {
+  RunningHeader(options: Partial<RunningHeaderRuleOptions>) {
     return new RunningHeader(options);
   },
-  Replace(options: {}) {
+  Replace(options: Partial<ReplaceRuleOptions>) {
     return new Replace(options);
   },
-  FullBleedSpread(options: {}) {
+  FullBleedSpread(options: Partial<FullBleedSpreadPageRuleOptions>) {
     return new FullBleedSpread(options);
   },
-  PageBreak(options: {}) {
+  PageBreak(options: Partial<PageBreakRuleOptions>) {
     return new PageBreak(options);
   },
-  PageReference(options: {}) {
+  PageReference(options: Partial<PageReferenceRuleOptions>) {
     return new PageReference(options);
   },
-  createRule(options: {}) {
+  createRule(options: Partial<RuleOptions>) {
     return new Rule(options);
   },
 };

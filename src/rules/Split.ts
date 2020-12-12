@@ -1,16 +1,18 @@
 import { Rule, RuleOptions } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 
-interface SplitRuleOptions extends RuleOptions {
-  toNext?: string;
-  fromPrevious?: string;
+export interface SplitRuleOptions extends RuleOptions {
+  selector: string;
+  toNext: string;
+  fromPrevious: string;
+  didSplit: (a: HTMLElement, b: HTMLElement) => void;
 }
 
 class Split extends Rule {
   toNext?: string;
   fromPrevious?: string;
 
-  constructor(options: SplitRuleOptions) {
+  constructor(options: Partial<SplitRuleOptions>) {
     super(options);
     this.toNext = options.toNext;
     this.fromPrevious = options.fromPrevious;

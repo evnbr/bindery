@@ -1,17 +1,17 @@
 import Replace from './Replace';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { div } from '../dom';
-import { Book } from '../book';
-import { RuleOptions } from './Rule';
+import { Book, Page } from '../book';
 import { PageMaker } from '../types';
 
-// Options:
-// selector: String
-// replace: function (HTMLElement, number) => HTMLElement
-// render: function (Page) => HTMLElement
+export interface FootnoteRuleOptions {
+  selector: string;
+  replace: (element: HTMLElement) => HTMLElement;
+  render: (page: Page) => HTMLElement;
+}
 
 class Footnote extends Replace {
-  constructor(options: RuleOptions) {
+  constructor(options: Partial<FootnoteRuleOptions>) {
     super(options);
     validateRuntimeOptions(options, {
       name: 'Footnote',

@@ -1,13 +1,14 @@
-import { Rule, RuleOptions } from './Rule';
+import { Rule } from './Rule';
 import { Book } from '../book';
 import { PageMaker } from '../types';
 
-// Options:
-// selector: String
-// replace: function (HTMLElement) => HTMLElement
+export interface ReplaceRuleOptions {
+  selector: string
+  replace: (element: HTMLElement) => HTMLElement
+}
 
 class Replace extends Rule {
-  constructor(options: RuleOptions) {
+  constructor(options: Partial<ReplaceRuleOptions>) {
     super(options);
     this.name = 'Replace';
   }

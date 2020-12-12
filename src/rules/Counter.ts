@@ -1,10 +1,11 @@
 import { Rule, RuleOptions } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 
-interface CounterRuleOptions extends RuleOptions {
-  incrementEl?: string;
-  resetEl?: string;
-  replaceEl?: string;
+export interface CounterRuleOptions extends RuleOptions {
+  incrementEl: string;
+  resetEl: string;
+  replaceEl: string;
+  replace: (element: HTMLElement) => HTMLElement
 }
 
 class Counter extends Rule {
@@ -13,7 +14,7 @@ class Counter extends Rule {
   resetEl: string;
   replaceEl: string;
 
-  constructor(options: CounterRuleOptions) {
+  constructor(options: Partial<CounterRuleOptions>) {
     super(options);
     this.selector = '*';
     this.counterValue = 0;

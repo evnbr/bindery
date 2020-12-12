@@ -5,7 +5,7 @@ import RunningHeader from './RunningHeader';
 const pageStub = () => ({ element: document.createElement('div') });
 
 test('Renders page number by default', () => {
-  const runningHeader = new RunningHeader();
+  const runningHeader = new RunningHeader({});
   const pg = pageStub();
 
   pg.number = 2;
