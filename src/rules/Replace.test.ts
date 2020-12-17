@@ -1,6 +1,6 @@
 import Replace from './Replace';
 
-const createEl = (tag, txt) => {
+const createEl = (tag, txt?) => {
   const el = document.createElement(tag);
   if (txt) el.textContent = txt;
   return el;

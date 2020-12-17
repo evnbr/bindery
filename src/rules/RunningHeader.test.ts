@@ -2,7 +2,11 @@ import RunningHeader from './RunningHeader';
 
 // const render = jest.fn();
 
-const pageStub = () => ({ element: document.createElement('div') });
+const pageStub = () => ({
+  element: document.createElement('div'),
+  number: undefined,
+  runningHeader: undefined,
+});
 
 test('Renders page number by default', () => {
   const runningHeader = new RunningHeader();
