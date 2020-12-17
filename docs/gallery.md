@@ -33,7 +33,11 @@ inBook: true
   <li>
       <figure style="background-image: url(/bindery/assets/thumbs/{{ ex.thumb }});"></figure>
       <div class="grid-label">
+        {% if ex.id %}
           <a href="/bindery/examples/{{ ex.id }}">{{ ex.title | escape }}</a>
+        {% else %}
+          <a href="{{ ex.url }}">{{ ex.title | escape }}</a>
+        {% endif %}
         <p>{{ ex.desc | escape }}</p>
         <div class="credit">{{ ex.credit | escape }}</div>
       </div>
