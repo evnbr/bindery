@@ -8,7 +8,7 @@ const {
   FullBleedSpread,
 } = rules;
 
-const replacer = (element: HTMLElement, number: number) => {
+const replacer = (element: HTMLElement, number: string | number) => {
   element.textContent = `${number}`;
   return element;
 };
@@ -80,7 +80,7 @@ export default [
       const txt = element.getAttribute('book-pages-with-selector') ?? '';
       const selector = txt.trim();
       return (pageElement: HTMLElement) => {
-        return pageElement.querySelector(selector);
+        return !!pageElement.querySelector(selector);
       };
     },
   }),

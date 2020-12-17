@@ -5,7 +5,6 @@ import { Book, Page, pageNumbersForTest } from '../book';
 import { shallowEqual, throttleTime } from '../utils';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { prefixer } from '../dom';
-import { RuleOptions } from './Rule';
 
 // Compatible with ids that start with numbers
 const startsWithNumber = (sel: string) => {
@@ -18,16 +17,16 @@ const safeIDSel = (sel: string) => {
 declare type TestFunction = (el: HTMLElement) => boolean;
 
 interface PageReferenceInstance {
-  value: any;
+  previousMatches: number[] | undefined;
   element: HTMLElement;
   template: HTMLElement;
-  test: TestFunction;
+  testFunction: TestFunction;
 }
 
 export interface PageReferenceRuleOptions {
   selector: string,
-  replace: (element: HTMLElement) => HTMLElement,
-  createTest: (element: HTMLElement) => (page: Page) => boolean,
+  replace: (element: HTMLElement, number: string | number) => HTMLElement,
+  createTest: (element: HTMLElement) => TestFunction,
 }
 
 class PageReference extends Replace {
@@ -63,37 +62,41 @@ class PageReference extends Replace {
 
   createReference(
     book: Book,
-    test: TestFunction,
+    testFunction: TestFunction,
     elmt: HTMLElement,
   ): PageReferenceInstance {
-    const ref = {
-      test,
+    const ref: PageReferenceInstance = {
+      testFunction,
       template: elmt,
       element: elmt,
-      value: null,
-    } as PageReferenceInstance;
+      previousMatches: undefined,
+    };
     this.references.push(ref);
-    const currentResults = pageNumbersForTest(book.pages, test);
+    const currentResults = pageNumbersForTest(book.pages, testFunction);
 
     this.render(ref, currentResults); // Replace element immediately, to make sure it'll fit
     return ref;
   }
 
-  render(ref: PageReferenceInstance, newValue: number[]) {
-    if (!newValue || shallowEqual(ref.value, newValue)) return;
-    if (!Array.isArray(newValue))
-      throw Error('Page search returned unexpected result');
+  render(ref: PageReferenceInstance, matchingPageNumbers: number[]) {
+    if (ref.previousMatches && shallowEqual(ref.previousMatches, matchingPageNumbers)) {
+      return;
+    }
 
-    const isResolved = newValue.length > 0;
-    const pageRanges = isResolved ? formatAsRanges(newValue) : '⌧';
+    if (!Array.isArray(matchingPageNumbers)) {
+      throw Error('Page search returned unexpected result');
+    }
+
+    const hasFoundPage = matchingPageNumbers.length > 0;
+    const pageRanges = hasFoundPage ? formatAsRanges(matchingPageNumbers) : '⌧';
 
     const template = ref.template.cloneNode(true) as HTMLElement;
     const newRender = this.replace(template, pageRanges);
-    if (!isResolved) newRender.classList.add(prefixer('placeholder-num'));
+    if (!hasFoundPage) newRender.classList.add(prefixer('placeholder-num'));
     ref.element.parentNode!.replaceChild(newRender, ref.element);
 
     ref.element = newRender;
-    ref.value = newValue;
+    ref.previousMatches = matchingPageNumbers;
   }
 
   createTest(element: HTMLElement): TestFunction | null {
@@ -108,13 +111,13 @@ class PageReference extends Replace {
   updatePageReferences(pages: Page[]) {
     // querySelector first, then rerender
     const results = this.references.map(ref => {
-      return { ref, data: pageNumbersForTest(pages, ref.test) };
+      return { ref, matchingPageNumbers: pageNumbersForTest(pages, ref.testFunction) };
     });
 
-    results.forEach(({ ref, data }) => this.render(ref, data));
+    results.forEach(({ ref, matchingPageNumbers }) => this.render(ref, matchingPageNumbers));
   }
 
-  replace(template: HTMLElement, number: string) {
+  replace(template: HTMLElement, number: string | number) {
     template.insertAdjacentHTML('beforeend', `, <span>${number}</span>`);
     return template;
   }

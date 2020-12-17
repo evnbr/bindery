@@ -4,7 +4,7 @@ import { PageMaker } from '../types';
 
 export interface ReplaceRuleOptions {
   selector: string
-  replace: (element: HTMLElement) => HTMLElement
+  replace: (element: HTMLElement, info?: any) => HTMLElement
 }
 
 class Replace extends Rule {

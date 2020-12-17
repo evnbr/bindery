@@ -7,7 +7,7 @@ import { PageMaker } from '../types';
 export interface FootnoteRuleOptions {
   selector: string;
   replace: (element: HTMLElement) => HTMLElement;
-  render: (page: Page) => HTMLElement;
+  render: (originalElement: HTMLElement, number: number) => string | HTMLElement;
 }
 
 class Footnote extends Replace {
@@ -58,7 +58,7 @@ class Footnote extends Replace {
     );
     return element;
   }
-  render(element: HTMLElement, number: number): string | HTMLElement {
+  render(originalElement: HTMLElement, number: number): string | HTMLElement {
     return `<sup>${number}</sup> Default footnote (<a href='/bindery/docs/#footnote'>Learn how to change it</a>)`;
   }
 }
