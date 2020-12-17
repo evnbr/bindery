@@ -10,7 +10,7 @@ export interface RunningHeaderRuleOptions {
 // TODO selectorHierarchy: [ String ], ie [ 'h1', 'h2', 'h3.chapter' ]
 
 class RunningHeader extends Rule {
-  constructor(options: Partial<RunningHeaderRuleOptions>) {
+  constructor(options: Partial<RunningHeaderRuleOptions> = {}) {
     super(options);
     validateRuntimeOptions(options, {
       name: 'RunningHeader',
