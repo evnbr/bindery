@@ -32,10 +32,10 @@ const renderPrintOptions = (state: ControlsState, actions: ControlsActions) => {
 
   return row(
     '.print-options',
-    row(null, enumDropdown(layoutLabels, state.layout, actions.setLayout)),
-    row(null, enumDropdown(sizeLabels, state.paper, actions.setPaper)),
+    row(null, enumDropdown('bindery-choose-layout', layoutLabels, state.layout, actions.setLayout)),
+    row(null, enumDropdown('bindery-choose-paper', sizeLabels, state.paper, actions.setPaper)),
     shouldShowMarks
-      ? row(null, enumDropdown(marksLabels, state.marks, actions.setMarks))
+      ? row(null, enumDropdown('bindery-choose-marks', marksLabels, state.marks, actions.setMarks))
       : '',
   );
 };
@@ -46,7 +46,13 @@ class Controls {
   update(state: ControlsState, actions: ControlsActions) {
     const oldElement = this.element;
     const newElement = this.render(state, actions);
+
+    const focusedId = document.hasFocus() ? document.activeElement?.id : undefined;
+
     oldElement.replaceWith(newElement);
+
+    if (focusedId) document.getElementById(focusedId)?.focus();
+
     this.element = newElement;
   }
 
@@ -60,7 +66,7 @@ class Controls {
 
     return div(
       '.controls',
-      row('.view-row', enumDropdown(modeLabels, state.mode, actions.setMode)),
+      row('.view-row', enumDropdown('bindery-choose-view', modeLabels, state.mode, actions.setMode)),
       shouldShowPrint ? renderPrintOptions(state, actions) : '',
       btn('.btn-print.btn-main', { onclick: print }, 'Print'),
     );
