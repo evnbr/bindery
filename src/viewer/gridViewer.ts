@@ -25,7 +25,9 @@ const renderGridViewer = (bookPages: Page[], isTwoUp: boolean) => {
     });
   }
 
-  return gridLayout;
+  return {
+    element: gridLayout,
+  };
 };
 
 export { renderGridViewer };

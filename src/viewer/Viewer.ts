@@ -31,9 +31,18 @@ interface ViewerOptions {
   marks: SheetMarks;
 }
 
+interface ViewerResult {
+  element: DocumentFragment;
+  next?: () => void;
+  previous?: () => void;
+}
+
+type ViewerFactory = (pages: Page[], isDoubleSided: boolean, sheetLayout: SheetLayout) => ViewerResult;
+
 class Viewer {
   book?: Book;
   pageSetup: PageSetup;
+  currentResult?: ViewerResult;
 
   progressBar: HTMLElement;
   content: HTMLElement;
@@ -77,6 +86,21 @@ class Viewer {
     listenForPrint(() => {
       this.mode = ViewerMode.PRINT;
       this.render();
+    });
+
+    document.body.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowLeft':
+          const prev = this.currentResult?.previous;
+          if (prev) prev();
+          break;
+        case 'ArrowRight':
+          const next = this.currentResult?.next;
+          if (next) next();
+          break;
+        default:
+            break;
+      }  
     });
 
     window.addEventListener('resize', () => {
@@ -231,10 +255,11 @@ class Viewer {
     window.requestAnimationFrame(() => {
       if (!this.book) throw Error('Book missing');
       const pages = this.book.pages.slice();
-      const render = this.renderFunctionFor(this.mode);
-      const fragment = render(pages, this.isDoubleSided, this.sheetLayout);
+      const result = this.factoryFor(this.mode)(pages, this.isDoubleSided, this.sheetLayout);
+      this.currentResult = result;
       this.content.innerHTML = '';
-      this.content.append(fragment);
+      this.content.append(result.element);
+      
       if (!this.hasRendered) this.hasRendered = true;
       else scrollToPercent(prevScroll);
 
@@ -242,7 +267,7 @@ class Viewer {
     });
   }
 
-  renderFunctionFor(mode: ViewerMode) {
+  factoryFor(mode: ViewerMode): ViewerFactory {
     if (mode === ViewerMode.PREVIEW) return renderGridViewer;
     else if (mode === ViewerMode.FLIPBOOK) return renderFlipbookViewer;
     else if (mode === ViewerMode.PRINT) return renderSheetViewer;

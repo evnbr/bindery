@@ -58,7 +58,9 @@ const renderSheetViewer = (
     });
   }
 
-  return printLayout;
+  return {
+    element: printLayout,
+  };
 };
 
 export { renderSheetViewer };
