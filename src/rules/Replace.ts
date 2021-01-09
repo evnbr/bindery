@@ -1,10 +1,10 @@
 import { Rule } from './Rule';
 import { Book } from '../book';
-import { PageMaker } from '../types';
+import { PageMaker, CSSSelector } from '../types';
 
 export interface ReplaceRuleOptions {
-  selector: string
-  replace: (element: HTMLElement, info?: any) => HTMLElement
+  selector: CSSSelector;
+  replace: (element: HTMLElement, info?: any) => HTMLElement;
 }
 
 class Replace extends Rule {

@@ -1,18 +1,20 @@
 import { Rule, RuleOptions } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
+import { CSSSelector } from '../types';
+
 
 export interface CounterRuleOptions extends RuleOptions {
-  incrementEl: string;
-  resetEl: string;
-  replaceEl: string;
+  incrementEl: CSSSelector;
+  resetEl: CSSSelector;
+  replaceEl: CSSSelector;
   replace: (element: HTMLElement) => HTMLElement
 }
 
 class Counter extends Rule {
   counterValue: number;
-  incrementEl: string;
-  resetEl: string;
-  replaceEl: string;
+  incrementEl: CSSSelector;
+  resetEl: CSSSelector;
+  replaceEl: CSSSelector;
 
   constructor(options: Partial<CounterRuleOptions>) {
     super(options);

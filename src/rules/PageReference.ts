@@ -5,12 +5,14 @@ import { Book, Page, pageNumbersForTest } from '../book';
 import { shallowEqual, throttleTime } from '../utils';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { prefixer } from '../dom';
+import { CSSSelector } from '../types';
+
 
 // Compatible with ids that start with numbers
-const startsWithNumber = (sel: string) => {
+const startsWithNumber = (sel: CSSSelector) => {
   return sel.length > 2 && sel[0] === '#' && /^\d+$/.test(sel[1]);
 };
-const safeIDSel = (sel: string) => {
+const safeIDSel = (sel: CSSSelector) => {
   return startsWithNumber(sel) ? `[id="${sel.replace('#', '')}"]` : sel;
 };
 
@@ -24,7 +26,7 @@ interface PageReferenceInstance {
 }
 
 export interface PageReferenceRuleOptions {
-  selector: string,
+  selector: CSSSelector,
   replace: (element: HTMLElement, number: string | number) => HTMLElement,
   createTest: (element: HTMLElement) => TestFunction,
 }

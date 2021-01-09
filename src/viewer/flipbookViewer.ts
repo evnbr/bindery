@@ -1,8 +1,8 @@
 import { Page } from '../book';
-import { prefixer, div } from '../dom';
+import { prefixer, div, ElementWrapper } from '../dom';
 import padPages from './padPages';
 
-const renderFlipbookViewer = (bookPages: Page[], doubleSided: boolean) => {
+const renderFlipbookViewer = (bookPages: ElementWrapper[], doubleSided: boolean) => {
   const pages = padPages(bookPages, () => new Page());
 
   const flipLayout = document.createDocumentFragment();

@@ -1,11 +1,11 @@
 import Replace from './Replace';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { div } from '../dom';
-import { Book, Page } from '../book';
-import { PageMaker } from '../types';
+import { Book } from '../book';
+import { PageMaker, CSSSelector } from '../types';
 
 export interface FootnoteRuleOptions {
-  selector: string;
+  selector: CSSSelector;
   replace: (element: HTMLElement) => HTMLElement;
   render: (originalElement: HTMLElement, number: number) => string | HTMLElement;
 }

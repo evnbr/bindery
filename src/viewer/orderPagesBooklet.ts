@@ -1,13 +1,12 @@
-import { Page } from '../book';
-import { PageMaker } from '../types';
+import { ElementWrapper } from '../dom';
 
-const orderPagesBooklet = (pages: Page[], makePage: PageMaker) => {
+const orderPagesBooklet = <T extends ElementWrapper>(pages: T[], makePage: () => T) => {
   while (pages.length % 4 !== 0) {
     const spacerPage = makePage();
     spacerPage.element.style.visibility = 'hidden';
     pages.push(spacerPage);
   }
-  const bookletOrder: Page[] = [];
+  const bookletOrder: T[] = [];
   const len = pages.length;
 
   for (let i = 0; i < len / 2; i += 2) {

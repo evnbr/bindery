@@ -47,7 +47,6 @@ class Viewer {
   progressBar: HTMLElement;
   content: HTMLElement;
   scaler: HTMLElement;
-  zoomHolder: HTMLElement;
   element: HTMLElement;
   error?: HTMLElement;
 
@@ -213,7 +212,7 @@ class Viewer {
     this.show();
     if (!this.error) {
       this.error = errorView(title, text);
-      this.element.appendChild(this.error);
+      this.element.append(this.error);
       scrollToBottom();
       if (this.book) {
         const flow = this.book.currentPage.flow;

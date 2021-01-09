@@ -1,11 +1,6 @@
 import prefixer from './prefixer';
 
-const isElement = (node: any) => node.nodeType === Node.ELEMENT_NODE;
-const isObj = (val: any) => typeof val === 'object';
-const isFunc = (val: any) => typeof val === 'function';
-const isStr = (val: any) => typeof val === 'string';
-
-interface DomAttributes {
+export interface DomAttributes {
   id: String;
   onchange: (e: Event) => any;
   onclick: (e: Event) => any;
@@ -14,11 +9,24 @@ interface DomAttributes {
   disabled: any;
 }
 
-const h = (
+export interface ElementWrapper {
+  element: HTMLElement
+}
+
+type Appendable = string | HTMLElement | ElementWrapper;
+
+const isElement = (node: any) => node.nodeType === Node.ELEMENT_NODE;
+const isObj = (val: any) => typeof val === 'object';
+const isFunc = (val: any) => typeof val === 'function';
+const isStr = (val: any) => typeof val === 'string';
+
+const isElementWrapper = (val: any): val is ElementWrapper => !!val.element && isElement(val.element);
+
+export const h = (
   tagName: string,
   classNames: string | null,
   attrs: Partial<DomAttributes>,
-  ...children: (string | HTMLElement)[]
+  ...children: (Appendable)[]
 ) => {
   const el = document.createElement(tagName);
   if (classNames)
@@ -35,19 +43,23 @@ const h = (
       if (isFunc(v)) el[k] = v;
       else el.setAttribute(k, v);
     }
-  if (children) el.append(...children);
+  if (children) {
+    el.append(...children.map(item => {
+      return isElementWrapper(item) ? item.element : item;
+    }));
+  }
   return el;
 };
 
-const div = (cls: string, ...children: (string | HTMLElement)[]) => {
+export const div = (cls: string, ...children: Appendable[]) => {
   return h('div', cls, {}, ...children) as HTMLDivElement;
 };
 
-const button = (cls: string, attrs: Partial<DomAttributes>, label: string) => {
+export const button = (cls: string, attrs: Partial<DomAttributes>, label: string) => {
   return h('button', cls, attrs, label) as HTMLButtonElement;
 };
 
-const select = (
+export const select = (
   cls: string,
   attrs: Partial<DomAttributes>,
   ...optionElements: HTMLOptionElement[]
@@ -55,8 +67,6 @@ const select = (
   return h('select', cls, attrs, ...optionElements) as HTMLSelectElement;
 };
 
-const option = (attrs: Partial<DomAttributes>, label: string) => {
+export const option = (attrs: Partial<DomAttributes>, label: string) => {
   return h('option', null, attrs, label) as HTMLOptionElement;
 };
-
-export { h, div, button, select, option, DomAttributes };
