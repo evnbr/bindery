@@ -47,12 +47,20 @@
   },
   "scripts": {
     "build": "tsc",
-    "package": "rollup -c",
-    "postbuild": "npm run package && npm run clean && npm run movetodocs",
+    "postbuild": "npm run package:prod && npm run clean",
+
+    "dev": "tsc",
+    "postdev": "npm run package:dev && npm run clean",
+
+    "package:dev": "rollup -c --environment BUILD:dev",
+    "package:prod": "rollup -c --environment BUILD:prod",
+
     "test": "jest",
     "test-ci": "npm run coverage && ./node_modules/.bin/codecov",
+
     "clean": "rimraf build",
-    "movetodocs": "cp dist/bindery.umd.js docs/bindery_local_build.js",
+    "postclean": "cp dist/bindery.umd.js docs/bindery_local_build.js",
+
     "coverage": "jest --coverage",
     "docs": "cd docs && jekyll serve"
   },
