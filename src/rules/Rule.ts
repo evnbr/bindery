@@ -14,7 +14,7 @@ export interface RuleOptions {
   pageNumberOffset: number;
 }
 
-export abstract class Rule {
+export class Rule {
   name: string;
   selector: CSSSelector;
   [key: string]: any;

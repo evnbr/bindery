@@ -20,7 +20,7 @@ const isObj = (val: any) => typeof val === 'object';
 const isFunc = (val: any) => typeof val === 'function';
 const isStr = (val: any) => typeof val === 'string';
 
-const isElementWrapper = (val: any): val is ElementWrapper => !!val.element && isElement(val.element);
+const isElementWrapper = (val: any): val is ElementWrapper => val?.element && isElement(val.element);
 
 export const h = (
   tagName: string,
