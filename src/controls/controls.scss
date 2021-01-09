@@ -177,15 +177,11 @@ $btn-active: rgba(0, 0, 0, 0.08);
 }
 
 @media screen and (max-width: 960px) {
-  .in-progress {
+  .view-print, .view-preview {
     .controls {
-      background: transparent;
-      box-shadow: none;
+      background: var(--bindery-ui-bg);
+      flex-direction: column;  
     }
-  }
-  .controls {
-    background: var(--bindery-ui-bg);
-    flex-direction: column;
   }
 }
 

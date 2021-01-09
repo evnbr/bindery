@@ -31,22 +31,23 @@ interface ViewerOptions {
   marks: SheetMarks;
 }
 
-interface ViewerResult {
+interface RenderedViewer {
   element: DocumentFragment;
+  contentSizer?: HTMLElement;
   next?: () => void;
   previous?: () => void;
 }
 
-type ViewerFactory = (pages: Page[], isDoubleSided: boolean, sheetLayout: SheetLayout) => ViewerResult;
-
 class Viewer {
   book?: Book;
   pageSetup: PageSetup;
-  currentResult?: ViewerResult;
+
+  currentResult?: RenderedViewer;
 
   progressBar: HTMLElement;
   content: HTMLElement;
   scaler: HTMLElement;
+  zoomHolder: HTMLElement;
   element: HTMLElement;
   error?: HTMLElement;
 
@@ -68,6 +69,7 @@ class Viewer {
     this.progressBar = div('.progress-bar');
     this.content = div('.zoom-content');
     this.scaler = div('.zoom-scaler', this.content);
+
     this.element = div(
       '.root',
       this.progressBar,
@@ -99,7 +101,7 @@ class Viewer {
           if (next) next();
           break;
         default:
-            break;
+          break;
       }  
     });
 
@@ -241,6 +243,7 @@ class Viewer {
   render(newBook?: Book) {
     if (newBook) this.book = newBook;
     if (!this.book) return;
+
     this.show();
     this.updateControls();
 
@@ -253,13 +256,11 @@ class Viewer {
     this.setProgressAmount(1);
 
     window.requestAnimationFrame(() => {
-      if (!this.book) throw Error('Book missing');
-      const pages = this.book.pages.slice();
-      const result = this.factoryFor(this.mode)(pages, this.isDoubleSided, this.sheetLayout);
+      const result = this.renderViewMode();
       this.currentResult = result;
       this.content.innerHTML = '';
       this.content.append(result.element);
-      
+
       if (!this.hasRendered) this.hasRendered = true;
       else scrollToPercent(prevScroll);
 
@@ -267,11 +268,20 @@ class Viewer {
     });
   }
 
-  factoryFor(mode: ViewerMode): ViewerFactory {
-    if (mode === ViewerMode.PREVIEW) return renderGridViewer;
-    else if (mode === ViewerMode.FLIPBOOK) return renderFlipbookViewer;
-    else if (mode === ViewerMode.PRINT) return renderSheetViewer;
-    throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
+  renderViewMode(): RenderedViewer {
+    if (!this.book) throw Error('Book missing');
+    const pages = this.book.pages.slice();
+
+    switch (this.mode) {
+      case ViewerMode.PREVIEW:
+        return renderGridViewer(pages, this.isDoubleSided);
+      case ViewerMode.FLIPBOOK:
+        return renderFlipbookViewer(pages, this.isDoubleSided);
+      case ViewerMode.PRINT:
+        return renderSheetViewer(pages, this.isDoubleSided, this.sheetLayout);
+      default:
+        throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
+    }
   }
 
   setProgressAmount(newVal: number) {
@@ -341,14 +351,36 @@ class Viewer {
   scaleToFit() {
     if (!this.content.firstElementChild) return;
     const prevScroll = getScrollAsPercent();
-    this.scaler.style.transform = `scale(${this.scaleThatFits})`;
+    const { xScale, yScale } = this.scaleThatFits();
+
+    const scale = this.mode === ViewerMode.FLIPBOOK
+      ? Math.min(1, xScale, yScale)
+      : Math.min(1, xScale);
+
+    this.scaler.style.transform = `scale(${scale})`;
+
     scrollToPercent(prevScroll);
   }
 
-  get scaleThatFits() {
-    const viewerW = this.scaler.getBoundingClientRect().width;
-    const contentW = this.content.getBoundingClientRect().width;
-    return Math.min(1, viewerW / contentW);
+  scaleThatFits(): { xScale: number, yScale: number } {
+    const contentEl = this.currentResult?.contentSizer ?? this.content;
+
+    const availableSize = {
+      width: window.innerWidth,
+      height: window.innerHeight - 40, // toolbar
+    };
+
+    // Note use of offsetWidth rather than getBoundingClientRect
+    // so we can calculate using untransformed/unscaled dimensions
+    const contentSize = {
+      width: contentEl.offsetWidth,
+      height: contentEl.offsetHeight,
+    }
+
+    const xScale = availableSize.width / contentSize.width;
+    const yScale = availableSize.height / contentSize.height;
+
+    return { xScale, yScale };
   }
 }
 

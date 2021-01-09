@@ -37,15 +37,9 @@
   .zoom-content {
     padding: 10px;
     background: var(--bindery-ui-bg);
-    // position: absolute;
-    left: 0;
-    right: 0;
     margin: auto;
     .view-preview & {
       min-width: calc(20px + var(--bindery-spread-width));
-    }
-    .view-flip & {
-      min-width: calc(1.1 * var(--bindery-spread-width));
     }
     .view-print & {
       min-width: calc(20px + var(--bindery-sheet-width));
@@ -174,7 +168,6 @@
 .zoom-scaler {
   transform-origin: top left;
   transform-style: preserve-3d;
-  // height: calc(100vh - 120px); // adjust scrollheight on scaled down
 }
 
 .print-sheet {

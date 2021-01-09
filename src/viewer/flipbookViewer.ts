@@ -6,7 +6,7 @@ const renderFlipbookViewer = (bookPages: Page[], doubleSided: boolean) => {
   const pages = padPages(bookPages, () => new Page());
 
   const flipLayout = document.createDocumentFragment();
-  const sizer = div('.spread-size.flip-sizer');
+  const sizer = div('.flipbook-sizer');
   const flapHolder = div('.spread-size.flap-holder');
   sizer.append(flapHolder);
   flipLayout.append(sizer);
@@ -77,6 +77,7 @@ const renderFlipbookViewer = (bookPages: Page[], doubleSided: boolean) => {
   setLeaf(0);
   return {
     element: flipLayout,
+    contentSizer: sizer,
     next: () => setLeaf(currentLeaf + 1),
     previous: () => setLeaf(currentLeaf - 1),
   }

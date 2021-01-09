@@ -1,25 +1,53 @@
-.view-flip .zoom-scaler {
-  transform-origin: center left;
+.root.view-flip {
+  max-height: 100vh;
+}
+
+@mixin pinned-absolute {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+}
+
+.view-flip {
+  .zoom-holder {
+    @include pinned-absolute();
+    display: block;
+  }
+
+  .zoom-scaler {
+    @include pinned-absolute();
+    transform-origin: center;
+
+    width: 0;
+    height: 0;
+  }
+
+  .zoom-content {
+    min-width: 0; //calc(1.1 * var(--bindery-spread-width));
+  }
 }
 
 .flap-holder {
   perspective: 5000px;
   transform-style: preserve-3d;
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  margin: auto;
-  transform-style: preserve-3d;
+  @include pinned-absolute();
 }
 
-.flip-sizer {
-  position: relative;
-  margin: auto;
-  padding: 0 20px;
-  box-sizing: content-box;
-  height: 90vh !important;
+.flipbook-sizer {
+  // Larger than a spread to accomadate the 3d effect
+  --bindery-flipbook-width: calc(var(--bindery-spread-width) * 1.15);
+  --bindery-flipbook-height: calc(var(--bindery-page-height) * 1.05);
+
+  position: absolute;
+
+  width: var(--bindery-flipbook-width);
+  height: var(--bindery-flipbook-height);
+
+  top: calc(var(--bindery-flipbook-height) * -0.5);
+  left: calc(var(--bindery-flipbook-width) * -0.5);
 }
 
 .page3d {
