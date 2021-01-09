@@ -5,11 +5,11 @@ const row = (cls: string | null, ...children: (HTMLElement | string)[]) => {
 };
 
 // Button
-const btn = (cls: string | null, attrs: DomAttributes, label: string) => {
+const btn = (cls: string | null, attrs: Partial<DomAttributes>, label: string) => {
   return button(`.control.btn${cls}`, attrs, label);
 };
 
-const dropdown = (attrs: DomAttributes, options: HTMLOptionElement[]) => {
+const dropdown = (attrs: Partial<DomAttributes>, options: HTMLOptionElement[]) => {
   const selectVal = div('.select-val', 'Value');
   const selectEl = select('.select', attrs, ...options);
   selectVal.textContent = selectEl.options[selectEl.selectedIndex].text;
@@ -21,6 +21,7 @@ interface Stringable {
 }
 
 const enumDropdown = <ChoiceType extends Stringable>(
+  id: string,
   entries: [ChoiceType, string][],
   initialValue: ChoiceType,
   changeHandler: (a: ChoiceType) => any,
@@ -38,7 +39,7 @@ const enumDropdown = <ChoiceType extends Stringable>(
   };
 
   return dropdown(
-    { onchange: eventHandler },
+    { onchange: eventHandler, id },
     entries.map(entry => {
       const el = option({ value: entry[0] }, entry[1]);
       if (entry[0] === initialValue) {

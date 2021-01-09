@@ -3,7 +3,7 @@ import { Book } from '../book';
 import { PageMaker } from '../types';
 import { RegionGetter } from 'regionize/dist/types/types';
 
-class OutOfFlow extends Rule {
+abstract class OutOfFlow extends Rule {
   continue?: string;
 
   constructor(options: {}) {
@@ -17,6 +17,7 @@ class OutOfFlow extends Rule {
     // Avoid breaking inside this element. Once it's completely added,
     // it will moved onto the background layer.
 
+    // TODO: this should be handled inside regionize
     elmt.setAttribute('data-ignore-overflow', 'true');
     return elmt;
   }

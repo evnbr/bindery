@@ -9,7 +9,7 @@ import cssnano from 'cssnano';
 
 import pkg from './package.json';
 
-const extend = (a, b) => Object.assign({}, a, b);
+const extend = (a, b) => ({ ...a, ...b });
 
 const classPrefix = '📖-';
 
@@ -26,54 +26,55 @@ const BINDERY_CLASS_PREFIX = '${classPrefix}';
   banner: `/* 📖 Bindery v${pkg.version} */`,
 };
 
-const sassPlugin = ({ shouldMinify } = {}) =>
-  sass({
-    insert: true,
-    processor: css =>
-      postcss(
-        shouldMinify
-          ? [prefixer(classPrefix), cssnano()]
-          : [prefixer(classPrefix)],
-      )
-        .process(css)
-        .then(result => result.css),
-  });
+const sassPlugin = ({ shouldMinify } = {}) => sass({
+  insert: true,
+  processor: (css) =>
+    postcss(
+      shouldMinify
+        ? [prefixer(classPrefix), cssnano()]
+        : [prefixer(classPrefix)],
+    )
+      .process(css)
+      .then(result => result.css),
+});
 
-export default [
-  // browser-friendly UMD build
-  extend(baseConfig, {
-    output: extend(baseOutput, {
-      file: pkg.browser,
-      format: 'umd',
-      sourcemap: true,
+// browser-friendly UMD build
+const umd = extend(baseConfig, {
+  output: extend(baseOutput, {
+    file: pkg.browser,
+    format: 'umd',
+    sourcemap: true,
+  }),
+  plugins: [resolve(), commonjs(), sassPlugin()],
+});
+
+// minified browser-friendly build
+const mini = extend(baseConfig, {
+  output: extend(baseOutput, {
+    file: 'dist/bindery.min.js',
+    format: 'iife',
+    sourcemap: true,
+  }),
+  plugins: [
+    resolve(),
+    commonjs(),
+    sassPlugin({ shouldMinify: true }),
+    terser({
+      ecma: 2018,
     }),
-    plugins: [resolve(), commonjs(), sassPlugin()],
-  }),
+  ],
+});
 
-  // minified browser-friendly build
-  extend(baseConfig, {
-    output: extend(baseOutput, {
-      file: 'dist/bindery.min.js',
-      format: 'iife',
-      sourcemap: true,
-    }),
-    plugins: [
-      resolve(),
-      commonjs(),
-      sassPlugin({ shouldMinify: true }),
-      terser({
-        ecma: 2018,
-      }),
-    ],
-  }),
+// CommonJS (for Node) and ES module (for bundlers) build.
+const modules = extend(baseConfig, {
+  output: [
+    extend(baseOutput, { file: pkg.main, format: 'cjs' }),
+    extend(baseOutput, { file: pkg.module, format: 'es' }),
+  ],
+  external: ['regionize'],
+  plugins: [resolve(), sassPlugin()],
+});
 
-  // CommonJS (for Node) and ES module (for bundlers) build.
-  extend(baseConfig, {
-    output: [
-      extend(baseOutput, { file: pkg.main, format: 'cjs' }),
-      extend(baseOutput, { file: pkg.module, format: 'es' }),
-    ],
-    external: ['regionize'],
-    plugins: [resolve(), sassPlugin()],
-  }),
-];
+const outputs = process.env.BUILD === 'production' ? [umd, mini, modules] : umd;
+
+export default outputs;

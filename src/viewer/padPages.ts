@@ -1,7 +1,6 @@
-import { Page } from '../book';
-import { PageMaker } from '../types';
+import type { ElementWrapper } from '../dom';
 
-const padPages = (pages: Page[], makePage: PageMaker) => {
+const padPages = <T extends ElementWrapper>(pages: T[], makePage: () => T) => {
   if (pages.length % 2 !== 0) {
     const pg = makePage();
     pages.push(pg);

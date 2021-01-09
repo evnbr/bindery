@@ -4,6 +4,7 @@
 import PageSetup from './page-setup';
 import { ViewerMode, SheetSize, SheetLayout, SheetMarks } from './constants';
 import defaultRules from './defaults';
+import type { BookContent } from './types';
 
 // components
 import makeBook from './makeBook';
@@ -32,8 +33,7 @@ interface PrintSetup {
 interface BinderyOptions {
   autoupdate?: boolean;
   autorun?: boolean;
-  ControlsComponent?: any;
-  content?: HTMLElement;
+  content: BookContent;
   pageNumberOffset?: number;
   printSetup?: PrintSetup;
   pageSetup?: {};
@@ -49,7 +49,7 @@ class Bindery {
   pageSetup: PageSetup;
   rules: Rule[];
 
-  constructor(opts: BinderyOptions = {}) {
+  constructor(opts: BinderyOptions) {
     console.log(`📖 Bindery ${BINDERY_VERSION}`);
 
     validateRuntimeOptions(opts, {
@@ -95,7 +95,7 @@ class Bindery {
       throw Error('Bindery: You must include a source element or selector');
     }
 
-    if (opts.ControlsComponent) {
+    if (opts.hasOwnProperty('ControlsComponent')) {
       this.viewer.displayError(
         'Controls are now included',
         'Please remove the controls component',
@@ -119,7 +119,7 @@ class Bindery {
   }
 
   // Convenience constructor
-  static makeBook(opts: BinderyOptions = {}) {
+  static makeBook(opts: BinderyOptions) {
     opts.autorun = opts.autorun ?? true;
     return new Bindery(opts);
   }
@@ -129,7 +129,7 @@ class Bindery {
     if (this.content) this.content.style.display = '';
   }
 
-  async makeBook(contentDescription: any): Promise<Book | undefined> {
+  async makeBook(contentDescription: BookContent): Promise<Book | undefined> {
     try {
       this.content = await getContentAsElement(contentDescription);
     } catch (e) {

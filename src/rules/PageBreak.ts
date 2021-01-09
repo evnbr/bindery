@@ -2,9 +2,10 @@ import { Rule } from './Rule';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { Book } from '../book';
 import { RegionGetter } from 'regionize/dist/types/types';
+import { CSSSelector } from '../types';
 
 export interface PageBreakRuleOptions {
-  selector: string;
+  selector: CSSSelector;
   continue: 'next' | 'left' | 'right' | 'same';
   position: 'before' | 'after' | 'both' | 'avoid';
 }

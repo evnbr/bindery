@@ -3,4 +3,4 @@ node_js:
   - 'node'
 install:
   - npm install
-script: npm run test-ci
+script: npm run test:ci

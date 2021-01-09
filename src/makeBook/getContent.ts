@@ -1,9 +1,7 @@
+import type { BookContent } from '../types';
 import { parseHTML } from '../dom';
 
-const fetchContent = async (
-  url: string,
-  selector?: string,
-): Promise<HTMLElement> => {
+const fetchContent = async (url: string, selector?: string): Promise<HTMLElement> => {
   const response = await fetch(url);
   if (response.status !== 200) {
     throw Error(`Response ${response.status}: Could not load file at "${url}"`);
@@ -18,9 +16,7 @@ const fetchContent = async (
   return el;
 };
 
-export const getContentAsElement = async (
-  content: any,
-): Promise<HTMLElement> => {
+export const getContentAsElement = async (content: BookContent): Promise<HTMLElement> => {
   if (content instanceof HTMLElement) return content;
   if (typeof content === 'string') {
     const el = document.querySelector(content);

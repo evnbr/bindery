@@ -4,7 +4,7 @@ import { div } from '../dom';
 
 declare const BINDERY_VERSION: string;
 
-export default function(title: string, text: string) {
+export default (title: string, text: string) => {
   return div(
     '.error',
     div('.error-title', title),

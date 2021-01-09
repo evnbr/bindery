@@ -2,6 +2,7 @@ import {
   RuleOptionBreakPosition,
   RuleOptionFlowPosition,
   RuleOptionPageRotation,
+  CSSSelector,
 } from '../types';
 
 export interface RuleOptions {
@@ -15,7 +16,7 @@ export interface RuleOptions {
 
 export class Rule {
   name: string;
-  selector: string;
+  selector: CSSSelector;
   [key: string]: any;
 
   constructor(options: Partial<RuleOptions>) {

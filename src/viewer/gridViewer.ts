@@ -1,5 +1,5 @@
 import { Page } from '../book';
-import { div } from '../dom';
+import { div, ElementWrapper } from '../dom';
 import padPages from './padPages';
 
 const twoPageSpread = (...children: HTMLElement[]) => {
@@ -9,7 +9,7 @@ const onePageSpread = (...children: HTMLElement[]) => {
   return div('.spread-wrapper.spread-centered.page-size', ...children);
 };
 
-const renderGridViewer = (bookPages: Page[], isTwoUp: boolean) => {
+const renderGridViewer = (bookPages: ElementWrapper[], isTwoUp: boolean) => {
   const pages = isTwoUp ? padPages(bookPages, () => new Page()) : bookPages;
 
   const gridLayout = document.createDocumentFragment();
@@ -25,7 +25,9 @@ const renderGridViewer = (bookPages: Page[], isTwoUp: boolean) => {
     });
   }
 
-  return gridLayout;
+  return {
+    element: gridLayout,
+  };
 };
 
 export { renderGridViewer };

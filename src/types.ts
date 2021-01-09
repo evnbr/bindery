@@ -1,5 +1,11 @@
 import { Page } from './book';
 
+export type CSSSelector = string;
+
+interface RemoteBookContent { url: string, selector?: CSSSelector };
+
+export type BookContent = HTMLElement | CSSSelector | RemoteBookContent;
+
 export type PageMaker = () => Page;
 
 export type RuleOptionBreakPosition = 'before' | 'after' | 'both' | 'avoid';

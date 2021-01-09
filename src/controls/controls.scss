@@ -8,6 +8,21 @@ $btn-pad: 4px 8px;
 $btn-hover: rgba(0, 0, 0, 0.04);
 $btn-active: rgba(0, 0, 0, 0.08);
 
+@mixin withHover {
+  &:hover {
+    background: $btn-hover;
+  }
+
+  &:active {
+    background: $btn-active;
+  }
+}
+
+@mixin focusState {
+  outline: 0;
+  box-shadow: 0 0 0 1px var(--bindery-ui-bg), 0 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
 .controls {
   font: 14px / 1.4 $system;
   display: none;
@@ -54,13 +69,8 @@ $btn-active: rgba(0, 0, 0, 0.08);
   margin-right: 8px;
   text-decoration: none;
 
-  &:hover {
-    background: $btn-hover;
-  }
+  @include withHover;
 
-  &:active {
-    background: $btn-active;
-  }
   &:last-child {
     margin-right: 0;
   }
@@ -92,6 +102,10 @@ $btn-active: rgba(0, 0, 0, 0.08);
     background: black;
     opacity: 1;
   }
+
+  &:focus {
+    @include focusState;
+  }
 }
 
 .view-row {
@@ -122,6 +136,7 @@ $btn-active: rgba(0, 0, 0, 0.08);
   position: relative;
 
   &:after {
+    // Draw dropdown
     content: '';
     position: absolute;
     right: 9px;
@@ -133,11 +148,10 @@ $btn-active: rgba(0, 0, 0, 0.08);
     border-top-color: currentColor;
   }
 
-  &:hover {
-    background-color: $btn-hover;
-  }
-  &:active {
-    background-color: $btn-hover;
+  @include withHover;
+
+  &:focus-within {
+    @include focusState;
   }
 }
 
@@ -163,15 +177,11 @@ $btn-active: rgba(0, 0, 0, 0.08);
 }
 
 @media screen and (max-width: 960px) {
-  .in-progress {
+  .view-print, .view-preview {
     .controls {
-      background: transparent;
-      box-shadow: none;
+      background: var(--bindery-ui-bg);
+      flex-direction: column;  
     }
-  }
-  .controls {
-    background: var(--bindery-ui-bg);
-    flex-direction: column;
   }
 }
 

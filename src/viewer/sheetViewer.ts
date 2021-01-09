@@ -1,4 +1,4 @@
-import { div, classes } from '../dom';
+import { div, classes, ElementWrapper } from '../dom';
 import { Page } from '../book';
 import { SheetLayout } from '../constants';
 
@@ -14,7 +14,7 @@ const onePageSpread = (...children: HTMLElement[]) => {
 };
 
 const renderSheetViewer = (
-  bookPages: Page[],
+  bookPages: ElementWrapper[],
   _doubleSided: boolean,
   layout: SheetLayout,
 ) => {
@@ -43,22 +43,25 @@ const renderSheetViewer = (
         spreadMarks.appendChild(meta);
       }
       const sheet = printSheet(
-        div('.page-bleed-clip.page-bleed-clip-left', pages[i].element),
-        div('.page-bleed-clip.page-bleed-clip-right', pages[i + 1].element),
+        div('.page-bleed-clip.page-bleed-clip-left', pages[i]),
+        div('.page-bleed-clip.page-bleed-clip-right', pages[i + 1]),
         spreadMarks,
       );
       sheet.classList.add(classes.sheetSpread);
       printLayout.appendChild(sheet);
     }
   } else {
-    pages.forEach(pg => {
+    pages.forEach(p => {
+      const pg = p as Page;
       const sheet = printSheet(pg.element, marks());
       sheet.classList.add(pg.isLeft ? classes.sheetLeft : classes.sheetRight);
       printLayout.appendChild(sheet);
     });
   }
 
-  return printLayout;
+  return {
+    element: printLayout,
+  };
 };
 
 export { renderSheetViewer };

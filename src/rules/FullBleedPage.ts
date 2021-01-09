@@ -2,10 +2,10 @@ import OutOfFlow from './OutOfFlow';
 import { validateRuntimeOptions, RuntimeTypes } from '../runtimeOptionChecker';
 import { div } from '../dom';
 import { Book } from '../book';
-import { PageMaker } from '../types';
+import { CSSSelector, PageMaker  } from '../types';
 
 export interface FullBleedPageRuleOptions {
-  selector: string;
+  selector: CSSSelector;
   continue: 'next' | 'same' | 'left' | 'right';
   rotate: 'none' | 'inward' | 'outward' | 'clockwise' | 'counterclockwise';
 }

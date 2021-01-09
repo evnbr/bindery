@@ -31,9 +31,18 @@ interface ViewerOptions {
   marks: SheetMarks;
 }
 
+interface RenderedViewer {
+  element: DocumentFragment;
+  contentSizer?: HTMLElement;
+  next?: () => void;
+  previous?: () => void;
+}
+
 class Viewer {
   book?: Book;
   pageSetup: PageSetup;
+
+  currentResult?: RenderedViewer;
 
   progressBar: HTMLElement;
   content: HTMLElement;
@@ -59,6 +68,7 @@ class Viewer {
     this.progressBar = div('.progress-bar');
     this.content = div('.zoom-content');
     this.scaler = div('.zoom-scaler', this.content);
+
     this.element = div(
       '.root',
       this.progressBar,
@@ -77,6 +87,21 @@ class Viewer {
     listenForPrint(() => {
       this.mode = ViewerMode.PRINT;
       this.render();
+    });
+
+    document.body.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowLeft':
+          const prev = this.currentResult?.previous;
+          if (prev) prev();
+          break;
+        case 'ArrowRight':
+          const next = this.currentResult?.next;
+          if (next) next();
+          break;
+        default:
+          break;
+      }  
     });
 
     window.addEventListener('resize', () => {
@@ -187,7 +212,7 @@ class Viewer {
     this.show();
     if (!this.error) {
       this.error = errorView(title, text);
-      this.element.appendChild(this.error);
+      this.element.append(this.error);
       scrollToBottom();
       if (this.book) {
         const flow = this.book.currentPage.flow;
@@ -217,6 +242,7 @@ class Viewer {
   render(newBook?: Book) {
     if (newBook) this.book = newBook;
     if (!this.book) return;
+
     this.show();
     this.updateControls();
 
@@ -229,12 +255,11 @@ class Viewer {
     this.setProgressAmount(1);
 
     window.requestAnimationFrame(() => {
-      if (!this.book) throw Error('Book missing');
-      const pages = this.book.pages.slice();
-      const render = this.renderFunctionFor(this.mode);
-      const fragment = render(pages, this.isDoubleSided, this.sheetLayout);
+      const result = this.renderViewMode();
+      this.currentResult = result;
       this.content.innerHTML = '';
-      this.content.append(fragment);
+      this.content.append(result.element);
+
       if (!this.hasRendered) this.hasRendered = true;
       else scrollToPercent(prevScroll);
 
@@ -242,11 +267,20 @@ class Viewer {
     });
   }
 
-  renderFunctionFor(mode: ViewerMode) {
-    if (mode === ViewerMode.PREVIEW) return renderGridViewer;
-    else if (mode === ViewerMode.FLIPBOOK) return renderFlipbookViewer;
-    else if (mode === ViewerMode.PRINT) return renderSheetViewer;
-    throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
+  renderViewMode(): RenderedViewer {
+    if (!this.book) throw Error('Book missing');
+    const pages = this.book.pages.slice();
+
+    switch (this.mode) {
+      case ViewerMode.PREVIEW:
+        return renderGridViewer(pages, this.isDoubleSided);
+      case ViewerMode.FLIPBOOK:
+        return renderFlipbookViewer(pages, this.isDoubleSided);
+      case ViewerMode.PRINT:
+        return renderSheetViewer(pages, this.isDoubleSided, this.sheetLayout);
+      default:
+        throw Error(`Invalid layout mode: ${this.mode} (type ${typeof this.mode})`);
+    }
   }
 
   setProgressAmount(newVal: number) {
@@ -316,14 +350,36 @@ class Viewer {
   scaleToFit() {
     if (!this.content.firstElementChild) return;
     const prevScroll = getScrollAsPercent();
-    this.scaler.style.transform = `scale(${this.scaleThatFits})`;
+    const { xScale, yScale } = this.scaleThatFits();
+
+    const scale = this.mode === ViewerMode.FLIPBOOK
+      ? Math.min(1, xScale, yScale)
+      : Math.min(1, xScale);
+
+    this.scaler.style.transform = `scale(${scale})`;
+
     scrollToPercent(prevScroll);
   }
 
-  get scaleThatFits() {
-    const viewerW = this.scaler.getBoundingClientRect().width;
-    const contentW = this.content.getBoundingClientRect().width;
-    return Math.min(1, viewerW / contentW);
+  scaleThatFits(): { xScale: number, yScale: number } {
+    const contentEl = this.currentResult?.contentSizer ?? this.content;
+
+    const availableSize = {
+      width: window.innerWidth,
+      height: window.innerHeight - 40, // toolbar
+    };
+
+    // Note use of offsetWidth rather than getBoundingClientRect
+    // so we can calculate using untransformed/unscaled dimensions
+    const contentSize = {
+      width: contentEl.offsetWidth,
+      height: contentEl.offsetHeight,
+    }
+
+    const xScale = availableSize.width / contentSize.width;
+    const yScale = availableSize.height / contentSize.height;
+
+    return { xScale, yScale };
   }
 }
 
