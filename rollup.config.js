@@ -75,6 +75,6 @@ const modules = extend(baseConfig, {
   plugins: [resolve(), sassPlugin()],
 });
 
-const outputs = process.env.BUILD === 'production' ? [umd, mini, modules] : umd;
+const outputs = process.env.BUILD === 'prod' ? [umd, mini, modules] : umd;
 
 export default outputs;
