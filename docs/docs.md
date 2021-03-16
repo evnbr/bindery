@@ -327,9 +327,8 @@ An element added to each page. By default it will add a page number
 at the top right of each page, but you can use `render` to generate running
 headers using your section titles.
 
-Keep in mind you can also use multiple
-`RunningHeaders` to create multiple elements— for example, to add both a page number
-at the bottom and a chapter title at the top.
+Note that you can't currently use multiple `RunningHeader` rules at the same
+time. However, you can [create a custom rule](https://codepen.io/brsev/pen/yLVrwdw) that works similarly.
 
 ```js
 Bindery.RunningHeader({
