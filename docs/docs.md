@@ -194,7 +194,7 @@ the previous page, and the bullet will be hidden for
 `<li>`s that started on the previous page. Everything else you should specify
 yourself—for example, you may want to remove margin, padding, or borders
 when your element splits.
-[See example](/bindery/examples/7_custom_split).
+[See example](/examples/7_custom_split).
 
 - `selector:` Which elements the rule should be applied to.
 - `toNext:` Class applied to elements that will continue onto the next page. `Optional`
@@ -275,7 +275,7 @@ Bindery.Counter({
 
 
 Here's how you could number all `<p>`s, resetting each section,
-by inserting new markup. [See example](/bindery/examples/10_counters).
+by inserting new markup. [See example](/examples/10_counters).
 
 ```js
 Bindery.Counter({

@@ -38,6 +38,6 @@ hosted on [Github Pages](https://pages.github.com). Its source code is available
 
 </div>
 
-<script type='text/javascript' src='/bindery/js/moment.min.js'></script>
-<script type='text/javascript' src='/bindery/js/platform.js'></script>
-<script type='text/javascript' src='/bindery/js/colophon.js'></script>
+<script type='text/javascript' src='/js/moment.min.js'></script>
+<script type='text/javascript' src='/js/platform.js'></script>
+<script type='text/javascript' src='/js/colophon.js'></script>

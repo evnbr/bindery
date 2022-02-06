@@ -62,7 +62,7 @@ Bindery.makeBook({
 
 You don't need to do anything special with your HTML content, as long
 as it all ends up in a single file. For example, you could use the Wikipedia
-API to [make a book from an article](/bindery/examples/6_wikipedia/) without changing the markup.
+API to [make a book from an article](/examples/6_wikipedia/) without changing the markup.
 
 You may want to use your CMS or templating language
 to generate a file by looping over you site's posts or pages.
@@ -168,10 +168,10 @@ let myCustomFootnote = Bindery.Footnote({
 
 ### Next Steps
 
-To learn more about available rules and options, check out the [documentation](/bindery/docs)
-or [view some examples](/bindery/gallery).
+To learn more about available rules and options, check out the [documentation](/docs)
+or [view some examples](/gallery).
 
 <div class="home-btns">
-  <a class="btn" href="/bindery/docs" class="btn">View Docs →</a>
-  <a class="btn" href="/bindery/gallery" class="btn">View Examples →</a>
+  <a class="btn" href="/docs" class="btn">View Docs →</a>
+  <a class="btn" href="/gallery" class="btn">View Examples →</a>
 </div>

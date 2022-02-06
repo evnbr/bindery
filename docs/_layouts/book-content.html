@@ -60,7 +60,7 @@
                   <li>
                     <a href="{{ ex.url }}">
                       <figure
-                        style="background-image: url(/bindery/assets/thumbs/{{ ex.thumb }});">
+                        style="background-image: url(/assets/thumbs/{{ ex.thumb }});">
                       </figure>
                       <div class="grid-label">
                         <h4>{{ ex.title | escape }}</h4>
@@ -77,9 +77,9 @@
                 <ul class="grid">
                 {% for ex in site.data.examples.simple %}
                   <li>
-                    <a href="/bindery/examples/{{ ex.id }}">
+                    <a href="/examples/{{ ex.id }}">
                       <figure
-                        style="background-image: url(/bindery/assets/thumbs/{{ ex.thumb }});">
+                        style="background-image: url(/assets/thumbs/{{ ex.thumb }});">
                       </figure>
                       <div class="grid-label">
                         <h4>{{ ex.title | escape }}</h4>

@@ -13,7 +13,7 @@ inBook: true
 {% for ex in site.data.examples.gallery %}
   <li>
     <a href="{{ ex.url }}" class="btn-img">
-        <figure style="background-image: url(/bindery/assets/thumbs/{{ ex.thumb }});"></figure>
+        <figure style="background-image: url(/assets/thumbs/{{ ex.thumb }});"></figure>
     </a>
     <div class="grid-label">
         <a href="{{ ex.url }}">{{ ex.title | escape }}</a>
@@ -31,10 +31,10 @@ inBook: true
 <ul class="grid responsive-grid">
 {% for ex in site.data.examples.simple %}
   <li>
-      <figure style="background-image: url(/bindery/assets/thumbs/{{ ex.thumb }});"></figure>
+      <figure style="background-image: url(/assets/thumbs/{{ ex.thumb }});"></figure>
       <div class="grid-label">
         {% if ex.id %}
-          <a href="/bindery/examples/{{ ex.id }}">{{ ex.title | escape }}</a>
+          <a href="/examples/{{ ex.id }}">{{ ex.title | escape }}</a>
         {% else %}
           <a href="{{ ex.url }}">{{ ex.title | escape }}</a>
         {% endif %}

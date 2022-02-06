@@ -80,5 +80,5 @@ simple:
     thumb: custom.png
   - title: How to make a book with HTML & CSS
     desc: These docs as a book
-    url: /bindery/book
+    url: /book
     thumb: docs.png
