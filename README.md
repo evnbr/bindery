@@ -5,11 +5,11 @@
 [![codecov](https://codecov.io/gh/evnbr/bindery/branch/master/graph/badge.svg)](https://codecov.io/gh/evnbr/bindery)
 [![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/bindery.svg)](https://www.npmjs.com/package/bindery)
 
-[Intro](https://evanbrooks.info/bindery/) ·
-[Learn](https://evanbrooks.info/bindery/learn) ·
-[Docs](https://evanbrooks.info/bindery/docs) ·
-[Examples](https://evanbrooks.info/bindery/examples) ·
-[About](https://evanbrooks.info/bindery/about)
+[Intro](https://bindery.info/) ·
+[Learn](https://bindery.info/learn) ·
+[Docs](https://bindery.info/docs) ·
+[Examples](https://bindery.info/examples) ·
+[About](https://bindery.info/about)
 
 _Bindery.js_ is a library for designing printable books with HTML and CSS.
 
@@ -53,7 +53,7 @@ makeBook({
 });
 ```
 
-For more, see [Learn](https://evanbrooks.info/bindery/learn) and the [Docs](https://evanbrooks.info/bindery/docs).
+For more, see [Learn](https://bindery.info/learn) and the [Docs](https://bindery.info/docs).
 
 ### Developing
 
@@ -73,4 +73,4 @@ When contributing, keep in mind that bindery.js is intended to provide an approa
 #### Background
 
 bindery.js was originally written in Spring 2014 for [for/with/in](http://htmloutput.risd.gd/),
-a publication from participants in "HTML Output" at RISD. For more, [see here](http://evanbrooks.info/bindery/about).
+a publication from participants in "HTML Output" at RISD. For more, [see here](https://bindery.info/about).
