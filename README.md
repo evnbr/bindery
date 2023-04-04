@@ -1,3 +1,5 @@
+> Bindery is no longer in development. You may be interested in similar open-source projects like [paged.js](https://pagedjs.org/) or [weasyprint](https://weasyprint.org/), or commercial offerings like [PrinceXML](https://www.princexml.com/). Also, keep an eye on [CSS Paged Media](https://developer.mozilla.org/en-US/docs/Web/CSS/@page)'s browser compatibility. 
+
 # Bindery.js
 
 [![npm](https://img.shields.io/npm/v/bindery.svg)](https://www.npmjs.com/package/bindery)
@@ -11,7 +13,7 @@
 [Examples](https://bindery.info/examples) ·
 [About](https://bindery.info/about)
 
-_Bindery.js_ is a library for designing printable books with HTML and CSS.
+_Bindery.js_ was a library for designing printable books with HTML and CSS.
 
 At its simplest, Bindery flows content over multiple pages. From there, the designer can create elements that depend on that flow, like running headers, footnotes, tables of contents, and indexes. Bindery also provides print options like bleed, crop marks, and booklet ordering.
 

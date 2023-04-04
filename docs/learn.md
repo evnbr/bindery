@@ -6,6 +6,10 @@ order: 0
 inBook: true
 ---
 
+> Bindery is no longer in development. You may be interested in similar open-source projects like [paged.js](https://pagedjs.org/) or [weasyprint](https://weasyprint.org/), or commercial offerings like [PrinceXML](https://www.princexml.com/). Also, keep an eye on [CSS Paged Media](https://developer.mozilla.org/en-US/docs/Web/CSS/@page)'s browser compatibility. 
+<br/>
+---
+
 ### Getting Started
 
 Bindery is intended for web designers and developers of every skill level. Just
