@@ -6,13 +6,13 @@ order: 4
 inBook: true
 ---
 
-> Bindery is no longer in development. You may be interested in similar open-source projects like [paged.js](https://pagedjs.org/) or [weasyprint](https://weasyprint.org/), or commercial offerings like [PrinceXML](https://www.princexml.com/). Also, keep an eye on [CSS Paged Media](https://developer.mozilla.org/en-US/docs/Web/CSS/@page)'s browser compatibiltiy. 
+> Bindery is no longer in development. You may be interested in similar open-source projects like [paged.js](https://pagedjs.org/) or [weasyprint](https://weasyprint.org/), or commercial offerings like [PrinceXML](https://www.princexml.com/). Also, keep an eye on [CSS Paged Media](https://developer.mozilla.org/en-US/docs/Web/CSS/@page)'s browser compatibility. 
 <br/>
 ---
 
 ### Approach
 
-Bindery is intended for anyone new to web design. The documentation doesn't assume you know javascript, and you don't need a module bundler or build step to get started. If you need help, or something seems unclear in the documentation, feel free to [open an issue](https://github.com/evnbr/bindery/issues/new/choose) on Github or ask [@bindery_js](https://twitter.com/bindery_js) on twitter.
+Bindery was intended for anyone new to web design. The documentation doesn't assume you know javascript, and you don't need a module bundler or build step to get started. If you need help, or something seems unclear in the documentation, feel free to [open an issue](https://github.com/evnbr/bindery/issues/new/choose) on Github or ask [@bindery_js](https://twitter.com/bindery_js) on twitter.
 
 Bindery relies on your browser's PDF generation. If you want to adjust a PDF setting, your browser must support it— different browsers and platforms may have different options.
 

@@ -12,7 +12,7 @@ inBook: true
 
 ### Getting Started
 
-Bindery is intended for web designers and developers of every skill level. Just
+Bindery was intended for web designers and developers of every skill level. Just
 include the script tag with your content, and you're ready to go.
 
 ```html
